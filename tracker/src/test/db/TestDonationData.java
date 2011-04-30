@@ -70,6 +70,16 @@ public class TestDonationData extends TestCase
     assertEquals(DonationAnnounceState.UNREAD, d.getAnnounceState());
     assertEquals(DonationBidState.PENDING, d.getBidState());
   }
+  
+  public void testGetDonationByDomainId()
+  {
+    final String domainId = "1234567890";
+    Donation d = this.donations.getDonationByDomainId(DonationDomain.CHIPIN, "1234567890");
+    
+    assertNotNull(d);
+    assertEquals(domainId, d.getDomainId());
+    assertEquals(3, d.getDonorId());
+  }
 
   public void testGetDonorDonations()
   {

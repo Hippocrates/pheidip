@@ -2,6 +2,7 @@ package test;
 
 import test.db.AllDBTests;
 import test.logic.AlLogicTests;
+import test.util.AllUtilTests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -15,6 +16,7 @@ public class AllTests
     
     suite.addTest(AllDBTests.suite());
     suite.addTest(AlLogicTests.suite());
+    suite.addTest(AllUtilTests.suite());
 
     //$JUnit-END$
     return suite;

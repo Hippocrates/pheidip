@@ -21,6 +21,7 @@ public class DonationData
   private Connection connection;
   
   private PreparedStatement selectDonationById;
+  private PreparedStatement selectDonationByDomainId;
   private PreparedStatement selectDonorDonations;
   private PreparedStatement selectDonorDonationTotal;
   private PreparedStatement updateDonationComment;
@@ -49,7 +50,7 @@ public class DonationData
     {
       this.selectDonationById = this.connection.prepareStatement("SELECT * FROM Donation WHERE Donation.donationId = ?;");
       this.selectDonorDonations = this.connection.prepareStatement("SELECT * FROM Donation WHERE Donation.donorId = ?;");
-    
+      this.selectDonationByDomainId = this.connection.prepareStatement("SELECT * FROM Donation WHERE Donation.domain = ? AND Donation.domainId = ?;");
       this.selectDonorDonationTotal = this.connection.prepareStatement("SELECT SUM(Donation.amount) FROM Donation WHERE Donation.donorId = ?;");
     
       this.updateDonationComment = this.connection.prepareStatement("UPDATE Donation SET comment = ? WHERE Donation.donationId = ?;");
@@ -248,5 +249,29 @@ public class DonationData
     {
       this.manager.handleSQLException(e);
     }
+  }
+
+  public Donation getDonationByDomainId(DonationDomain domain, String domainId)
+  {
+    Donation result = null;
+    
+    try
+    {
+      this.selectDonationByDomainId.setString(1, domain.toString());
+      this.selectDonationByDomainId.setString(2, domainId);
+    
+      ResultSet rows = this.selectDonationByDomainId.executeQuery();
+      
+      if (rows.next())
+      {
+        result = DonationData.extractDonation(rows);
+      }
+    }
+    catch (SQLException e)
+    {
+      this.manager.handleSQLException(e);
+    }
+    
+    return result;
   }
 }
