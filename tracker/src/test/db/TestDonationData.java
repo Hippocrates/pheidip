@@ -9,7 +9,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import pheidip.db.ConnectionManager;
+import pheidip.db.DonationDataAccess;
 import pheidip.db.DonationData;
 import pheidip.db.ScriptRunner;
 import pheidip.objects.Donation;
@@ -20,15 +20,15 @@ import pheidip.objects.DonationPaymentState;
 
 public class TestDonationData extends TestCase
 {
-  private ConnectionManager manager;
+  private DonationDataAccess dataAccess;
   private DonationData donations;
 
   public void setUp()
   {
-    this.manager = new ConnectionManager();
-    this.manager.createMemoryDatabase();
+    this.dataAccess = new DonationDataAccess();
+    this.dataAccess.createMemoryDatabase();
 
-    ScriptRunner runner = new ScriptRunner(this.manager.getConnection(), true,
+    ScriptRunner runner = new ScriptRunner(this.dataAccess.getConnection(), true,
         true);
 
     try
@@ -40,17 +40,17 @@ public class TestDonationData extends TestCase
       fail(e.getMessage());
     } catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.dataAccess.handleSQLException(e);
     }
 
-    this.donations = new DonationData(this.manager);
+    this.donations = new DonationData(this.dataAccess);
   }
 
   public void tearDown()
   {
-    if (this.manager.isConnected())
+    if (this.dataAccess.isConnected())
     {
-      this.manager.closeConnection();
+      this.dataAccess.closeConnection();
     }
   }
 

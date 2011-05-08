@@ -39,6 +39,11 @@ public class DatabaseConnectDialog extends JDialog
    */
   public DatabaseConnectDialog()
   {
+    initialize();
+  }
+
+  private void initialize()
+  {
     setTitle("Connect to Database...");
     
     setBounds(100, 100, 389, 235);
@@ -117,5 +122,4 @@ public class DatabaseConnectDialog extends JDialog
     cancelButton.setName("cancelButton");
     getContentPane().add(cancelButton);
   }
-
 }

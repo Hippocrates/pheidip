@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import pheidip.db.ConnectionManager;
+import pheidip.db.DonationDataAccess;
 import pheidip.db.DonorData;
 import pheidip.db.ScriptRunner;
 import pheidip.objects.Donor;
@@ -14,15 +14,15 @@ import junit.framework.TestCase;
 
 public class TestDonorData extends TestCase
 {
-  private ConnectionManager manager;
+  private DonationDataAccess dataAccess;
   private DonorData donors;
 
   public void setUp()
   {
-    this.manager = new ConnectionManager();
-    this.manager.createMemoryDatabase();
+    this.dataAccess = new DonationDataAccess();
+    this.dataAccess.createMemoryDatabase();
     
-    ScriptRunner runner = new ScriptRunner(this.manager.getConnection(), true, true);
+    ScriptRunner runner = new ScriptRunner(this.dataAccess.getConnection(), true, true);
     
     try
     {
@@ -34,17 +34,17 @@ public class TestDonorData extends TestCase
     } 
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.dataAccess.handleSQLException(e);
     }
     
-    this.donors = new DonorData(this.manager);
+    this.donors = this.dataAccess.getDonorData();
   }
   
   public void tearDown()
   {
-    if (this.manager.isConnected())
+    if (this.dataAccess.isConnected())
     {
-      this.manager.closeConnection();
+      this.dataAccess.closeConnection();
     }
   }
   

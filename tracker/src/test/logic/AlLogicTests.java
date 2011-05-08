@@ -10,7 +10,7 @@ public class AlLogicTests
   {
     TestSuite suite = new TestSuite(AlLogicTests.class.getName());
     //$JUnit-BEGIN$
-
+    suite.addTestSuite(TestDonationDatabaseManager.class);
     //$JUnit-END$
     return suite;
   }

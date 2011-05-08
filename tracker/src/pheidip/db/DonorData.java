@@ -16,7 +16,7 @@ import pheidip.objects.Donor;
 
 public class DonorData
 {
-  private ConnectionManager manager;
+  private DonationDataAccess manager;
   private Connection connection;
   
   private PreparedStatement selectDonorByID;
@@ -30,17 +30,24 @@ public class DonorData
   private PreparedStatement updateDonorFirstNameStatement;
   private PreparedStatement updateDonorLastNameStatement;
 
-  public DonorData(ConnectionManager manager)
+  public DonorData(DonationDataAccess manager)
   {
-    if (!manager.isConnected())
-    {
-      throw new RuntimeException("Error, manager is not connected -> later, this may not be an error.");
-    }
-    
     this.manager = manager;
-    this.connection = manager.getConnection();
     
-    this.rebuildPreparedStatements();
+    if (manager.isConnected())
+    {
+      this.setConnection(manager.getConnection());
+    }
+  }
+  
+  void setConnection(Connection connection)
+  {
+    this.connection = connection;
+    
+    if (this.connection != null)
+    {
+      this.rebuildPreparedStatements();
+    }
   }
   
   private void rebuildPreparedStatements()

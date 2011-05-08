@@ -4,11 +4,47 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class JDBCManager
 {
   private static boolean[] driversLoaded = new boolean[DBType.size()];
   private static List<Map<Integer,SQLError> > errorTables = generateErrorTables();
+  
+  public static Connection createMemoryDatabase() throws SQLException
+  {
+    JDBCManager.loadDrivers(DBType.HSQLDB);
+    String url = "jdbc:" + DBType.HSQLDB.getJDBCName() + ":mem:.";
+    return DriverManager.getConnection(url, "", "");
+  }
+  
+  public static void shutdownHSQLConnection(Connection c) throws SQLException
+  {
+    c.createStatement().execute("SHUTDOWN COMPACT");
+  }
+  
+  public static Connection connectToServer(DBType type, String server, String dbName, String userName, String password) throws SQLException
+  {
+    String location = null;
+    
+    switch(type)
+    {
+    case HSQLDB:
+      location = "hsql://" + server + "/" + dbName;
+      break;
+    case MYSQL:
+      location = "//" + server + "/" + dbName;
+      break;
+    default:
+      throw new RuntimeException("Error, unsupported database type : " + type.toString());
+    }
+    
+    JDBCManager.loadDrivers(type);
+    String url = "jdbc:" + type.getJDBCName() + ":" + location;
+    return DriverManager.getConnection(url, userName, password);
+  }
   
   public static boolean loadDrivers(DBType type)
   {
@@ -38,7 +74,7 @@ public class JDBCManager
       } 
       catch (IllegalAccessException e)
       {
-        
+    	  throw new RuntimeException(e);
       }
     }
     

@@ -10,7 +10,7 @@ public class AllDBTests
   {
     TestSuite suite = new TestSuite(AllDBTests.class.getName());
     //$JUnit-BEGIN$
-    suite.addTestSuite(TestConnectionManager.class);
+    suite.addTestSuite(TestDonationDataAccess.class);
     suite.addTestSuite(TestJDBCManager.class);
     suite.addTestSuite(TestDonationData.class);
     suite.addTestSuite(TestDonorData.class);
