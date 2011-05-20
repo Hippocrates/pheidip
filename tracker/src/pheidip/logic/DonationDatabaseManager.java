@@ -4,9 +4,11 @@ import pheidip.db.DonationDataAccess;
 
 public class DonationDatabaseManager
 {
+  private DonationDataAccess dataAccess;
+	
   public DonationDatabaseManager()
   {
-    
+    this.dataAccess = null;
   }
   
   public boolean isConnected()
@@ -16,6 +18,6 @@ public class DonationDatabaseManager
   
   DonationDataAccess getDataAccess()
   {
-    return null;
+    return this.dataAccess;
   }
 }

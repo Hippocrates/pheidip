@@ -35,10 +35,12 @@ public class TestDonationData extends TestCase
     {
       runner.runScript(new FileReader(DBTestConfiguration
           .getTestDataDirectory() + "donation_bid_test_data_1.sql"));
-    } catch (IOException e)
+    } 
+    catch (IOException e)
     {
       fail(e.getMessage());
-    } catch (SQLException e)
+    } 
+    catch (SQLException e)
     {
       this.dataAccess.handleSQLException(e);
     }
