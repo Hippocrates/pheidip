@@ -193,15 +193,40 @@ public class TestDonationData extends TestCase
     
     final Donation result = this.donations.getDonationById(template.getId());
     
-    assertEquals(template.getId(), result.getId());
-    assertEquals(template.getDonorId(), result.getDonorId());
-    assertEquals(template.getDomain(), result.getDomain());
-    assertEquals(template.getDomainId(), result.getDomainId());
-    assertEquals(template.getPaymentState(), result.getPaymentState());
-    assertEquals(template.getAnnounceState(), result.getAnnounceState());
-    assertEquals(template.getBidState(), result.getBidState());
-    assertEquals(template.getAmount(), result.getAmount());
-    assertEquals(template.getTimeReceived(), result.getTimeReceived());
-    assertEquals(template.getComment(), result.getComment());
+    this.compareDonations(template, result);
+  }
+  
+  public void testUpdateDonation()
+  {
+    final int id = 4;
+    final int donorId = 1;
+    final DonationDomain domain = DonationDomain.PAYPAL;
+    final String domainId = "ffffffffffee";
+    final DonationPaymentState paymentState = DonationPaymentState.PENDING;
+    final DonationAnnounceState announceState = DonationAnnounceState.UNREAD;
+    final DonationBidState bidState = DonationBidState.PENDING;
+    final BigDecimal amount = new BigDecimal("13.37");
+    final Date timeReceived = new Date();
+    final String comment = "asdlkjhasdkjhasdsda";
+    
+    Donation updated = new Donation(id, domain, domainId, paymentState, announceState, bidState, amount, timeReceived, donorId, comment);
+    
+    this.donations.updateDonation(updated);
+    
+    this.compareDonations(updated, this.donations.getDonationById(id));
+  }
+  
+  private void compareDonations(Donation a, Donation b)
+  {
+    assertEquals(a.getId(), b.getId());
+    assertEquals(a.getDonorId(), b.getDonorId());
+    assertEquals(a.getDomain(), b.getDomain());
+    assertEquals(a.getDomainId(), b.getDomainId());
+    assertEquals(a.getPaymentState(), b.getPaymentState());
+    assertEquals(a.getAnnounceState(), b.getAnnounceState());
+    assertEquals(a.getBidState(), b.getBidState());
+    assertEquals(a.getAmount(), b.getAmount());
+    assertEquals(a.getTimeReceived(), b.getTimeReceived());
+    assertEquals(a.getComment(), b.getComment());
   }
 }

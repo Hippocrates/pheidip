@@ -30,7 +30,8 @@ public class DonationData
   private PreparedStatement updateDonationBidState;
   private PreparedStatement deleteDonationStatement;
   private PreparedStatement insertDonationStatement;
-
+  private PreparedStatement updateDonationStatement;
+  
   public DonationData(DonationDataAccess manager)
   {
     this.manager = manager;
@@ -65,6 +66,7 @@ public class DonationData
       this.updateDonationPaymentState = this.connection.prepareStatement("UPDATE Donation SET paymentState = ? WHERE Donation.donationId = ?;");
       this.updateDonationAnnounceState = this.connection.prepareStatement("UPDATE Donation SET announceState = ? WHERE Donation.donationId = ?;");
       this.updateDonationBidState = this.connection.prepareStatement("UPDATE Donation SET bidState = ? WHERE Donation.donationId = ?;");
+      this.updateDonationStatement = this.connection.prepareStatement("UPDATE Donation SET donorId = ?, domain = ?, domainId = ?, paymentState = ?, announceState = ?, bidState = ?, amount = ?, timeReceived = ?, comment = ? WHERE donationId = ?;");
       
       this.deleteDonationStatement = this.connection.prepareStatement("DELETE FROM Donation WHERE Donation.donationId = ?;");
     
@@ -254,6 +256,29 @@ public class DonationData
       }
     }
     catch (SQLException e)
+    {
+      this.manager.handleSQLException(e);
+    }
+  }
+  
+  public void updateDonation(Donation updated)
+  {
+    try
+    {
+      this.updateDonationStatement.setInt(1, updated.getDonorId());
+      this.updateDonationStatement.setString(2, updated.getDomain().toString());
+      this.updateDonationStatement.setString(3, updated.getDomainId());
+      this.updateDonationStatement.setString(4, updated.getPaymentState().toString());
+      this.updateDonationStatement.setString(5, updated.getAnnounceState().toString());
+      this.updateDonationStatement.setString(6, updated.getBidState().toString());
+      this.updateDonationStatement.setBigDecimal(7, updated.getAmount());
+      this.updateDonationStatement.setTimestamp(8, new Timestamp(updated.getTimeReceived().getTime()));
+      this.updateDonationStatement.setString(9, updated.getComment());
+      this.updateDonationStatement.setInt(10, updated.getId());
+      
+      this.updateDonationStatement.execute();
+    }
+    catch(SQLException e)
     {
       this.manager.handleSQLException(e);
     }

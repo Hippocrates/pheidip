@@ -175,6 +175,21 @@ public class TestDonorData extends TestCase
     }
   }
   
+  public void testUpdateDonor()
+  {
+	  final int id = 1;
+	  final String email = "ANewEMaiL@asdlkj.adslih";
+	  final String alias = "ANewAlias";
+	  final String firstName = "fn";
+	  final String lastName = "ln";
+	  
+	  Donor updated = new Donor(id, email, alias, firstName, lastName);
+	  
+	  this.donors.updateDonor(updated);
+	  
+	  this.compareDonors(updated, this.donors.getDonorById(id));
+  }
+  
   public void testDeleteDonor()
   {
     // can't delete one of them due to fk constraint, try again

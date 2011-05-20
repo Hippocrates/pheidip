@@ -11,10 +11,10 @@ public class Donor
   public Donor(int id, String email, String alias, String firstName, String lastName)
   {
     this.id = id;
-    this.email = email;
+    this.email = email == null ? null : email.toLowerCase();
     this.firstName = firstName;
     this.lastName = lastName;
-    this.alias = alias;
+    this.alias = alias == null ? null : alias.toLowerCase();
   }
   
   public String getAlias()

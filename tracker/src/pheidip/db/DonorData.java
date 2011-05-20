@@ -29,7 +29,8 @@ public class DonorData
   private PreparedStatement updateDonorAliasStatement;
   private PreparedStatement updateDonorFirstNameStatement;
   private PreparedStatement updateDonorLastNameStatement;
-
+  private PreparedStatement updateDonorStatement;
+  
   public DonorData(DonationDataAccess manager)
   {
     this.manager = manager;
@@ -67,6 +68,7 @@ public class DonorData
       this.updateDonorAliasStatement = this.connection.prepareStatement("UPDATE Donor SET alias = ? WHERE donorId = ?;");
       this.updateDonorFirstNameStatement = this.connection.prepareStatement("UPDATE Donor SET firstName = ? WHERE donorId = ?;");
       this.updateDonorLastNameStatement = this.connection.prepareStatement("UPDATE Donor SET lastName = ? WHERE donorId = ?;");
+      this.updateDonorStatement = this.connection.prepareStatement("UPDATE Donor SET email = ?, alias = ?, firstName = ?, lastName = ? WHERE donorId = ?;");
     } 
     catch (SQLException e)
     {
@@ -220,6 +222,24 @@ public class DonorData
   public void setDonorLastName(int id, String newLastName)
   {
     this.runStringFieldUpdate(this.updateDonorLastNameStatement, id, newLastName);
+  }
+  
+  public void updateDonor(Donor donor)
+  {
+    try
+    {
+      this.updateDonorStatement.setString(1, donor.getEmail());
+      this.updateDonorStatement.setString(2, donor.getAlias());
+      this.updateDonorStatement.setString(3, donor.getFirstName());
+      this.updateDonorStatement.setString(4, donor.getLastName());
+      this.updateDonorStatement.setInt(5, donor.getId());
+      
+      this.updateDonorStatement.execute();
+    }
+    catch(SQLException e)
+    {
+      this.manager.handleSQLException(e);
+    }
   }
   
   // todo: add a string parameter representing the column being updated
