@@ -3,11 +3,18 @@ package pheidip.ui;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import pheidip.logic.ConnectionType;
+
 public class UIConfiguration 
 {
 	public static void setDefaultConfiguration()
 	{
 	  UIConfiguration.setSwingLookAndFeel();
+	}
+	
+	public static ConnectionType getDefaultConnectionType()
+	{
+	  return ConnectionType.MYSQL_SERVER;
 	}
 	
 	private static void setSwingLookAndFeel()

@@ -8,6 +8,7 @@ import java.awt.GridBagConstraints;
 import javax.swing.JComboBox;
 import java.awt.Insets;
 import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
 public class DatabaseServerConnectPanel extends JPanel
@@ -33,7 +34,7 @@ public class DatabaseServerConnectPanel extends JPanel
   
   private JComboBox serverURLBox;
   private JComboBox databaseNameBox;
-  private JComboBox userNameBox;
+  private JTextField userNameBox;
   private JPasswordField passwordField;
 
   /**
@@ -57,6 +58,7 @@ public class DatabaseServerConnectPanel extends JPanel
     add(lblServerUrl, gbc_lblServerUrl);
     
     serverURLBox = new JComboBox();
+    serverURLBox.setEditable(true);
     GridBagConstraints gbc_serverURLBox = new GridBagConstraints();
     gbc_serverURLBox.insets = new Insets(0, 0, 5, 0);
     gbc_serverURLBox.fill = GridBagConstraints.HORIZONTAL;
@@ -73,6 +75,7 @@ public class DatabaseServerConnectPanel extends JPanel
     add(lblDatabaseName, gbc_lblDatabaseName);
     
     databaseNameBox = new JComboBox();
+    databaseNameBox.setEditable(true);
     GridBagConstraints gbc_databaseNameBox = new GridBagConstraints();
     gbc_databaseNameBox.insets = new Insets(0, 0, 5, 0);
     gbc_databaseNameBox.fill = GridBagConstraints.HORIZONTAL;
@@ -88,7 +91,7 @@ public class DatabaseServerConnectPanel extends JPanel
     gbc_lblUserName.gridy = 2;
     add(lblUserName, gbc_lblUserName);
     
-    userNameBox = new JComboBox();
+    userNameBox = new JTextField();
     GridBagConstraints gbc_userNameBox = new GridBagConstraints();
     gbc_userNameBox.insets = new Insets(0, 0, 5, 0);
     gbc_userNameBox.fill = GridBagConstraints.HORIZONTAL;
