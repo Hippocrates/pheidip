@@ -11,6 +11,8 @@ public class AlLogicTests
     TestSuite suite = new TestSuite(AlLogicTests.class.getName());
     //$JUnit-BEGIN$
     suite.addTestSuite(TestDonationDatabaseManager.class);
+    suite.addTestSuite(TestDonorControl.class);
+    suite.addTestSuite(TestDonorSearch.class);
     //$JUnit-END$
     return suite;
   }

@@ -7,12 +7,14 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
 import pheidip.logic.ConnectionType;
+import pheidip.logic.DonationDatabaseManager;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -25,17 +27,22 @@ public class DatabaseConnectDialog extends JDialog
   private JLabel connectionTypeLabel;
   private JComboBox connectionTypeBox;
   private JPanel connectPanel;
+  private DonationDatabaseManager databaseManager;
 
   public static void main(String[] args)
   {
     UIConfiguration.setDefaultConfiguration();
-    DatabaseConnectDialog dialog = new DatabaseConnectDialog();
+    DatabaseConnectDialog dialog = new DatabaseConnectDialog(null, new DonationDatabaseManager());
     dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     dialog.setVisible(true);
   }
   
-  public DatabaseConnectDialog()
+  public DatabaseConnectDialog(JFrame parent, DonationDatabaseManager databaseManager)
   {
+    super(parent, true);
+    
+    this.databaseManager = databaseManager;
+    
     setTitle("Connect to Database...");
     setBounds(100, 100, 389, 235);
     
@@ -136,14 +143,40 @@ public class DatabaseConnectDialog extends JDialog
   {
     DatabaseServerConnectPanel panel = (DatabaseServerConnectPanel) this.connectPanel;
     
-    // ... need a database logic element to actually do anything...
+     this.databaseManager.connectToServer(
+          this.currentConnectionType.getDBType(),
+          panel.getServerURL(),
+          panel.getDBName(),
+          panel.getUserName(),
+          panel.getPassword());
+    
+    if (!this.databaseManager.isConnected())
+    {
+      JOptionPane.showMessageDialog(this, "Could not connect to database server.", "Failed to connect...", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    this.closeDialog();
   }
   
   private void createMemoryConnection()
   {
    DatabaseMemoryConnectPanel panel = (DatabaseMemoryConnectPanel) this.connectPanel;
     
-    // ...
+   this.databaseManager.createMemoryDatabase();
+     
+   String initFilename = panel.getInitializeScriptFilename();
+     
+   if (initFilename.length() > 0)
+   {
+     this.databaseManager.runSQLScript(initFilename);
+   }
+   
+   if (!this.databaseManager.isConnected())
+   {
+     JOptionPane.showMessageDialog(this, "Could not create memory connection.", "Failed to connect...", JOptionPane.ERROR_MESSAGE);
+   }
+   
+   this.closeDialog();
   }
   
   private void cancelButtonClicked()

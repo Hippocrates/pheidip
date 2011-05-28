@@ -62,7 +62,7 @@ public class DatabaseMemoryConnectPanel extends JPanel
 
   }
   
-  public String getFileNameText()
+  public String getInitializeScriptFilename()
   {
     String result = this.fileTextField.getText();
     return result == null ? "" : result;

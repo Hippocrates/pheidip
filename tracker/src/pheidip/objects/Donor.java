@@ -1,5 +1,7 @@
 package pheidip.objects;
 
+import pheidip.util.StringUtils;
+
 public class Donor
 {
   private int id;
@@ -40,5 +42,24 @@ public class Donor
   public int getId()
   {
     return id;
+  }
+  
+  public String toString()
+  {
+    if (this.alias == null)
+    {
+      if (StringUtils.isEmptyOrNull(this.email))
+      {
+        return StringUtils.emptyIfNull(this.lastName) + "," + StringUtils.emptyIfNull(this.firstName) + ":" + this.id;
+      }
+      else
+      {
+        return this.email;
+      }
+    }
+    else
+    {
+      return this.alias;
+    }
   }
 }

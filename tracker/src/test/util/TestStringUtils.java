@@ -13,4 +13,20 @@ public class TestStringUtils extends TestCase
     
     assertEquals("A Symbol String", natural);
   }
+  
+  public void testIsEmptyOrNull()
+  {
+    assertTrue(StringUtils.isEmptyOrNull(""));
+    assertTrue(StringUtils.isEmptyOrNull(null));
+    assertFalse(StringUtils.isEmptyOrNull("not empty"));
+  }
+  
+  public void testEmptyIfNull()
+  {
+    String notEmpty = "blah";
+    
+    assertEquals("", StringUtils.emptyIfNull(null));
+    assertEquals(notEmpty, StringUtils.emptyIfNull(notEmpty));
+    assertEquals("", StringUtils.emptyIfNull(""));
+  }
 }

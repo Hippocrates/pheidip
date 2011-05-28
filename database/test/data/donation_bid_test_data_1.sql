@@ -1,8 +1,8 @@
 -- Some data to use with unit tests
 
-INSERT INTO Donor VALUES(1, 'test1@test.com', null, '', '');
-INSERT INTO Donor VALUES(2, 'test2@test.com', 'analias', '', '');
-INSERT INTO Donor VALUES(3, 'test3@test.com', null, '', '');
+INSERT INTO Donor VALUES(1, 'test1@test.com', 'smk', 'Stephen', 'Kiazyk');
+INSERT INTO Donor VALUES(2, 'test2@test.com', 'analias', 'Stefan', 'Ksiazyk');
+INSERT INTO Donor VALUES(3, 'test3@test.com', 'demonrushfan6969', 'Brooks', 'Cracktackle');
 INSERT INTO Donor VALUES(4, 'test4@test.com', 'anotheralias', '', '');
 INSERT INTO Donor VALUES(5, null, null, '', '');
 INSERT INTO Donor VALUES(6, null, null, '', '');

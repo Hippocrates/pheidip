@@ -98,13 +98,14 @@ public class DonationDataAccess
     
     try
     {
-      this.setConnection(JDBCManager.createMemoryDatabase());
+      Connection newConnection = JDBCManager.createMemoryDatabase();
+      
+      ScriptRunner runner = new ScriptRunner(newConnection, true, true);
+      runner.runScript(new FileReader(DBConfiguration.getDonationSchemaFilename()));
+      
+      this.setConnection(newConnection);
       this.connectionType = DBType.HSQLDB;
       this.isMemoryConnection = true;
-
-      ScriptRunner runner = new ScriptRunner(this.connection, true, true);
-
-      runner.runScript(new FileReader(DBConfiguration.getDonationSchemaFilename()));
     }
     catch (IOException e)
     {

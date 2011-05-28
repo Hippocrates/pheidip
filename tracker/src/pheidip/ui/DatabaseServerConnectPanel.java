@@ -5,7 +5,6 @@ import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
-import javax.swing.JComboBox;
 import java.awt.Insets;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -32,10 +31,10 @@ public class DatabaseServerConnectPanel extends JPanel
     }
   }
   
-  private JComboBox serverURLBox;
-  private JComboBox databaseNameBox;
+  private JTextField serverURLBox;
+  private JTextField databaseNameBox;
   private JTextField userNameBox;
-  private JPasswordField passwordField;
+  private JPasswordField passwordBox;
 
   /**
    * Create the panel.
@@ -57,7 +56,7 @@ public class DatabaseServerConnectPanel extends JPanel
     gbc_lblServerUrl.gridy = 0;
     add(lblServerUrl, gbc_lblServerUrl);
     
-    serverURLBox = new JComboBox();
+    serverURLBox = new JTextField();
     serverURLBox.setEditable(true);
     GridBagConstraints gbc_serverURLBox = new GridBagConstraints();
     gbc_serverURLBox.insets = new Insets(0, 0, 5, 0);
@@ -74,7 +73,7 @@ public class DatabaseServerConnectPanel extends JPanel
     gbc_lblDatabaseName.gridy = 1;
     add(lblDatabaseName, gbc_lblDatabaseName);
     
-    databaseNameBox = new JComboBox();
+    databaseNameBox = new JTextField();
     databaseNameBox.setEditable(true);
     GridBagConstraints gbc_databaseNameBox = new GridBagConstraints();
     gbc_databaseNameBox.insets = new Insets(0, 0, 5, 0);
@@ -107,13 +106,38 @@ public class DatabaseServerConnectPanel extends JPanel
     gbc_lblPassword.gridy = 3;
     add(lblPassword, gbc_lblPassword);
     
-    passwordField = new JPasswordField();
+    passwordBox = new JPasswordField();
     GridBagConstraints gbc_passwordField = new GridBagConstraints();
     gbc_passwordField.fill = GridBagConstraints.HORIZONTAL;
     gbc_passwordField.gridx = 1;
     gbc_passwordField.gridy = 3;
-    add(passwordField, gbc_passwordField);
-
+    add(passwordBox, gbc_passwordField);
+  }
+  
+  public String getServerURL()
+  {
+    return emptyIfNull(this.serverURLBox.getText());
+  }
+  
+  public String getDBName()
+  {
+    return emptyIfNull(this.databaseNameBox.getText());
+  }
+  
+  public String getUserName()
+  {
+    return emptyIfNull(this.userNameBox.getText());
+  }
+  
+  // so very insecure...
+  public String getPassword()
+  {
+    return emptyIfNull(new String(this.passwordBox.getPassword()));
+  }
+  
+  public static String emptyIfNull(Object input)
+  {
+    return (input == null) ? "" : input.toString();
   }
 
 }

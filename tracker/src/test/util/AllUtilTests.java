@@ -11,6 +11,8 @@ public class AllUtilTests
     TestSuite suite = new TestSuite(AllUtilTests.class.getName());
     //$JUnit-BEGIN$
     suite.addTestSuite(TestStringUtils.class);
+    suite.addTestSuite(TestFilter.class);
+    suite.addTestSuite(TestInnerStringMatchFilter.class);
     //$JUnit-END$
     return suite;
   }

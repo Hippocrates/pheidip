@@ -34,7 +34,7 @@ public class TestDonorData extends TestCase
     } 
     catch (SQLException e)
     {
-      this.dataAccess.handleSQLException(e);
+      fail(e.getMessage());
     }
     
     this.donors = this.dataAccess.getDonorData();
@@ -55,7 +55,7 @@ public class TestDonorData extends TestCase
     assertNotNull(result);
     assertEquals(1, result.getId());
     assertEquals("test1@test.com", result.getEmail());
-    assertNull(result.getAlias());
+    assertEquals("smk", result.getAlias());
     assertNull(donors.getDonorById(0));
   }
   

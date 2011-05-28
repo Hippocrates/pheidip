@@ -116,7 +116,12 @@ public class TabHeader extends JPanel
     
     if (i != -1) 
     {
+      Component tabContent = this.parent.getComponent(i);
+      
+      if (!(tabContent instanceof TabPanel) || !((TabPanel)tabContent).confirmClose())
+      {
         this.parent.remove(i);
+      }
     }
   }
   

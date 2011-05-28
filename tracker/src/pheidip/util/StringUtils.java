@@ -29,4 +29,14 @@ public class StringUtils
     
     return new String(array);
   }
+
+  public static boolean isEmptyOrNull(String test)
+  {
+    return (test == null) ? true : test.length() == 0;
+  }
+
+  public static String emptyIfNull(String test)
+  {
+    return (test == null) ? "" : test;
+  }
 }

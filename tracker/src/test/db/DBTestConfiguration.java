@@ -4,7 +4,7 @@ public class DBTestConfiguration
 {
   public static boolean testMYSQLConnectToServer()
   {
-    return false;
+    return true;
   }
   
   public static String mysqlServerName()
