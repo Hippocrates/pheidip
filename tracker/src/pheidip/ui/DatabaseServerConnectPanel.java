@@ -36,10 +36,7 @@ public class DatabaseServerConnectPanel extends JPanel
   private JTextField userNameBox;
   private JPasswordField passwordBox;
 
-  /**
-   * Create the panel.
-   */
-  public DatabaseServerConnectPanel()
+  private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{0, 0};
@@ -112,6 +109,20 @@ public class DatabaseServerConnectPanel extends JPanel
     gbc_passwordField.gridx = 1;
     gbc_passwordField.gridy = 3;
     add(passwordBox, gbc_passwordField);
+  }
+  
+  private void initializeGUIEvents()
+  {
+    // empty (for now)
+  }
+  
+  /**
+   * Create the panel.
+   */
+  public DatabaseServerConnectPanel()
+  {
+    this.initializeGUI();
+    this.initializeGUIEvents();
   }
   
   public String getServerURL()

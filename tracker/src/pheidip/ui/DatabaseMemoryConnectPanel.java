@@ -16,11 +16,9 @@ public class DatabaseMemoryConnectPanel extends JPanel
 {
   private JTextField fileTextField;
   private JButton browseButton;
+  private JLabel initializationFileLabel;
 
-  /**
-   * Create the panel.
-   */
-  public DatabaseMemoryConnectPanel()
+  private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{0, 0, 0, 0};
@@ -29,13 +27,13 @@ public class DatabaseMemoryConnectPanel extends JPanel
     gridBagLayout.rowWeights = new double[]{0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
-    JLabel lblInitializationFile = new JLabel("Initialization File:");
+    initializationFileLabel = new JLabel("Initialization File:");
     GridBagConstraints gbc_lblInitializationFile = new GridBagConstraints();
     gbc_lblInitializationFile.insets = new Insets(0, 0, 0, 5);
     gbc_lblInitializationFile.anchor = GridBagConstraints.EAST;
     gbc_lblInitializationFile.gridx = 0;
     gbc_lblInitializationFile.gridy = 0;
-    add(lblInitializationFile, gbc_lblInitializationFile);
+    add(initializationFileLabel, gbc_lblInitializationFile);
     
     fileTextField = new JTextField();
     GridBagConstraints gbc_textField = new GridBagConstraints();
@@ -47,6 +45,15 @@ public class DatabaseMemoryConnectPanel extends JPanel
     fileTextField.setColumns(10);
     
     browseButton = new JButton("Browse...");
+    GridBagConstraints gbc_btnBrowse = new GridBagConstraints();
+    gbc_btnBrowse.anchor = GridBagConstraints.WEST;
+    gbc_btnBrowse.gridx = 2;
+    gbc_btnBrowse.gridy = 0;
+    add(browseButton, gbc_btnBrowse);
+  }
+  
+  private void initializeGUIEvents()
+  {
     browseButton.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent arg0) 
@@ -54,12 +61,15 @@ public class DatabaseMemoryConnectPanel extends JPanel
         DatabaseMemoryConnectPanel.this.browseButtonClicked();
       }
     });
-    GridBagConstraints gbc_btnBrowse = new GridBagConstraints();
-    gbc_btnBrowse.anchor = GridBagConstraints.WEST;
-    gbc_btnBrowse.gridx = 2;
-    gbc_btnBrowse.gridy = 0;
-    add(browseButton, gbc_btnBrowse);
-
+  }
+  
+  /**
+   * Create the panel.
+   */
+  public DatabaseMemoryConnectPanel()
+  {
+    this.initializeGUI();
+    this.initializeGUIEvents();
   }
   
   public String getInitializeScriptFilename()

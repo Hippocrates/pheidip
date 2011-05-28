@@ -4,6 +4,8 @@ import java.util.Date;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import pheidip.util.StringUtils;
+
 public class Donation 
 {
 	private Date timeReceived;
@@ -79,5 +81,10 @@ public class Donation
   public DonationBidState getBidState()
   {
     return bidState;
+  }
+  
+  public String getDomainString()
+  {
+    return StringUtils.symbolToNatural(this.domain.toString()) + ":" + (this.domainId == null ? "" + this.id : this.domainId);
   }
 }

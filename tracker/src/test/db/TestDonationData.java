@@ -162,6 +162,23 @@ public class TestDonationData extends TestCase
     assertEquals(DonationBidState.PROCESSED, d.getBidState());
   }
   
+  public void testSetDonationAmount()
+  {
+    final int id = 1;
+    
+    Donation d = this.donations.getDonationById(id);
+    
+    assertEquals(new BigDecimal("12.40"), d.getAmount());
+    
+    BigDecimal newAmount = new BigDecimal("5.55");
+    
+    this.donations.setDonationAmount(id, newAmount);
+    
+    d = this.donations.getDonationById(id);
+    
+    assertEquals(newAmount, d.getAmount());
+  }
+  
   public void testDeleteDonation()
   {
     final int id = 4;

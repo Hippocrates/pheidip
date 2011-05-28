@@ -1,6 +1,6 @@
 package pheidip.util;
 
-public class StringUtils
+public final class StringUtils
 {
   public static String symbolToNatural(String symbol)
   {
@@ -38,5 +38,10 @@ public class StringUtils
   public static String emptyIfNull(String test)
   {
     return (test == null) ? "" : test;
+  }
+
+  public static String nullIfEmpty(String test)
+  {
+    return (test == null) ? null : ((test.length() == 0) ? null : test);
   }
 }

@@ -71,24 +71,17 @@ public class TabHeader extends JPanel
       
       if (parent == null) 
       {
-          throw new NullPointerException("TabbedPane is null");
+        throw new NullPointerException("TabbedPane is null");
       }
       
       this.parent = parent;
       this.setOpaque(false);
       
-      //make JLabel read titles from JTabbedPane
-      JLabel label = new JLabel() 
-      {
-        public String getText() 
-        {
-          return TabHeader.this.findTabTitle();
-        }
-      };
-      this.add(label);
+      titleLabel = new JLabel("New Tab");
+      this.add(titleLabel);
       
       //add more space between the label and the button
-      label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+      titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
       
       //tab button
       JButton button = new TabButton();
@@ -98,16 +91,9 @@ public class TabHeader extends JPanel
       this.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
   }
   
-  private String findTabTitle()
+  public void setTabTitle(String title)
   {
-    int i = TabHeader.this.parent.indexOfTabComponent(TabHeader.this);
-    
-    if (i != -1) 
-    {
-      return TabHeader.this.parent.getComponentAt(i).getName();
-    }
-    
-    return null;
+    this.titleLabel.setText(title);
   }
   
   private void closeTab()
@@ -116,9 +102,9 @@ public class TabHeader extends JPanel
     
     if (i != -1) 
     {
-      Component tabContent = this.parent.getComponent(i);
+      Component tabContent = this.parent.getComponentAt(i);
       
-      if (!(tabContent instanceof TabPanel) || !((TabPanel)tabContent).confirmClose())
+      if (!(tabContent instanceof TabPanel) || ((TabPanel)tabContent).confirmClose())
       {
         this.parent.remove(i);
       }
@@ -151,11 +137,6 @@ public class TabHeader extends JPanel
     public void actionPerformed(ActionEvent e) 
     {
       TabHeader.this.closeTab();
-    }
-  
-    //we don't want to update UI for this button
-    public void updateUI() 
-    {
     }
 
     //paint the cross
@@ -203,5 +184,6 @@ public class TabHeader extends JPanel
       }
     }
   };
+  private JLabel titleLabel;
 
 }

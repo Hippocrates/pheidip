@@ -29,4 +29,12 @@ public class TestStringUtils extends TestCase
     assertEquals(notEmpty, StringUtils.emptyIfNull(notEmpty));
     assertEquals("", StringUtils.emptyIfNull(""));
   }
+  
+  public void testNullIfEmpty()
+  {
+    String notEmpty = "blah";
+    assertEquals(notEmpty, StringUtils.nullIfEmpty(notEmpty));
+    assertEquals(null, StringUtils.nullIfEmpty(""));
+    assertEquals(null, StringUtils.nullIfEmpty(null));
+  }
 }

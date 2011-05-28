@@ -1,10 +1,12 @@
 package test.logic;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.logic.DonorControl;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationDomain;
 import pheidip.objects.Donor;
 import test.db.DBTestConfiguration;
 import junit.framework.TestCase;
@@ -23,6 +25,25 @@ public class TestDonorControl extends TestCase
   public void tearDown()
   {
     this.manager.closeConnection();
+  }
+  
+  public void testCreateDonorWithDonorControl()
+  {
+    int newId = DonorControl.createNewDonor(this.manager);
+    
+    DonorControl control = new DonorControl(this.manager, newId);
+    
+    Donor result = control.getData();
+    
+    assertNotNull(result);
+    assertNull(result.getAlias());
+    assertNull(result.getEmail());
+    assertNull(result.getFirstName());
+    assertNull(result.getLastName());
+    
+    List<Donation> donations = control.getDonorDonations();
+    
+    assertEquals(0, donations.size());
   }
   
   public void testCreateDonorControl()
@@ -72,6 +93,36 @@ public class TestDonorControl extends TestCase
     assertEquals(newData.getId(), oldData.getId());
     assertEquals(newData.getId(), oldData.getId());
     assertEquals(newData.getId(), oldData.getId());
+  }
+  
+  public void testDeleteDonor()
+  {
+    final int donorId = 5;
+    
+    DonorControl control = new DonorControl(this.manager, donorId);
+    
+    control.deleteDonor();
+    
+    assertNull(control.getData());
+  }
+  
+  public void testCreateNewDonation()
+  {
+    final int donorId = 5;
+    
+    DonorControl control = new DonorControl(this.manager, donorId);
+    
+    int donationId = control.createNewLocalDonation();
+    
+    List<Donation> donations = control.getDonorDonations();
+    
+    assertEquals(1, donations.size());
+    
+    assertEquals(donationId, donations.get(0).getId());
+    assertEquals(donorId, donations.get(0).getDonorId());
+    assertEquals(DonationDomain.LOCAL, donations.get(0).getDomain());
+    assertEquals("" + donationId, donations.get(0).getDomainId());
+    assertEquals(BigDecimal.ZERO.setScale(2), donations.get(0).getAmount());
   }
   
   //TODO: make a check if a field is allowed to be updated

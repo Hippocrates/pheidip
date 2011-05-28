@@ -9,6 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -28,6 +30,9 @@ public class DatabaseConnectDialog extends JDialog
   private JComboBox connectionTypeBox;
   private JPanel connectPanel;
   private DonationDatabaseManager databaseManager;
+  private JPanel buttonPanel;
+  private JPanel connectionTypePanel;
+  private JPanel contentPanel;
 
   public static void main(String[] args)
   {
@@ -37,65 +42,52 @@ public class DatabaseConnectDialog extends JDialog
     dialog.setVisible(true);
   }
   
-  public DatabaseConnectDialog(JFrame parent, DonationDatabaseManager databaseManager)
+  private void initializeGUI()
   {
-    super(parent, true);
-    
-    this.databaseManager = databaseManager;
-    
     setTitle("Connect to Database...");
     setBounds(100, 100, 389, 235);
     
-    getContentPane().setLayout(new BorderLayout(10, 10));
+    this.contentPanel = new JPanel();
     
-    JPanel buttonsPanel = new JPanel();
-    getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
+    this.setContentPane(this.contentPanel);
+    this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+    
+    this.contentPanel.setLayout(new BorderLayout(10, 10));
+    
+    buttonPanel = new JPanel();
+    this.contentPanel.add(buttonPanel, BorderLayout.SOUTH);
     GridBagLayout gbl_panel = new GridBagLayout();
-    gbl_panel.columnWidths = new int[]{153, 73, 65, 0};
+    gbl_panel.columnWidths = new int[]{0, 73, 73, 0};
     gbl_panel.rowHeights = new int[]{23, 0};
-    gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_panel.columnWeights = new double[]{1.0, 0.0, 0.0, Double.MIN_VALUE};
     gbl_panel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
-    buttonsPanel.setLayout(gbl_panel);
+    buttonPanel.setLayout(gbl_panel);
     
     connectButton = new JButton("Connect");
-    connectButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent e) 
-      {
-        DatabaseConnectDialog.this.connectButtonClicked();
-      }
-    });
     connectButton.setHorizontalAlignment(SwingConstants.LEFT);
     GridBagConstraints gbc_connectionButton = new GridBagConstraints();
-    gbc_connectionButton.anchor = GridBagConstraints.NORTH;
+    gbc_connectionButton.anchor = GridBagConstraints.NORTHEAST;
     gbc_connectionButton.insets = new Insets(0, 0, 0, 5);
-    gbc_connectionButton.gridx = 0;
+    gbc_connectionButton.gridx = 1;
     gbc_connectionButton.gridy = 0;
-    buttonsPanel.add(connectButton, gbc_connectionButton);
+    buttonPanel.add(connectButton, gbc_connectionButton);
+    getRootPane().setDefaultButton(connectButton);
     
     cancelButton = new JButton("Cancel");
-    cancelButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent e) 
-      {
-        DatabaseConnectDialog.this.cancelButtonClicked();
-      }
-    });
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
-    gbc_cancelButton.insets = new Insets(0, 0, 0, 5);
-    gbc_cancelButton.anchor = GridBagConstraints.NORTH;
-    gbc_cancelButton.gridx = 1;
+    gbc_cancelButton.anchor = GridBagConstraints.NORTHEAST;
+    gbc_cancelButton.gridx = 2;
     gbc_cancelButton.gridy = 0;
-    buttonsPanel.add(cancelButton, gbc_cancelButton);
+    buttonPanel.add(cancelButton, gbc_cancelButton);
     
-    JPanel connectTypePanel = new JPanel();
-    getContentPane().add(connectTypePanel, BorderLayout.NORTH);
+    connectionTypePanel = new JPanel();
+    this.contentPanel.add(connectionTypePanel, BorderLayout.NORTH);
     GridBagLayout gbl_panel_1 = new GridBagLayout();
     gbl_panel_1.columnWidths = new int[]{166, 85, 28, 0};
     gbl_panel_1.rowHeights = new int[]{20, 0};
     gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
     gbl_panel_1.rowWeights = new double[]{0.0, Double.MIN_VALUE};
-    connectTypePanel.setLayout(gbl_panel_1);
+    connectionTypePanel.setLayout(gbl_panel_1);
     
     connectionTypeLabel = new JLabel("Connection Type:");
     connectionTypeLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -104,9 +96,35 @@ public class DatabaseConnectDialog extends JDialog
     gbc_connectionTypeLabel.insets = new Insets(0, 0, 0, 5);
     gbc_connectionTypeLabel.gridx = 0;
     gbc_connectionTypeLabel.gridy = 0;
-    connectTypePanel.add(connectionTypeLabel, gbc_connectionTypeLabel);
+    connectionTypePanel.add(connectionTypeLabel, gbc_connectionTypeLabel);
     
     connectionTypeBox = new JComboBox(ConnectionType.values());
+    GridBagConstraints gbc_connectionTypeBox = new GridBagConstraints();
+    gbc_connectionTypeBox.insets = new Insets(0, 0, 0, 5);
+    gbc_connectionTypeBox.anchor = GridBagConstraints.NORTHWEST;
+    gbc_connectionTypeBox.gridx = 1;
+    gbc_connectionTypeBox.gridy = 0;
+    connectionTypePanel.add(connectionTypeBox, gbc_connectionTypeBox);
+  }
+  
+  private void initializeGUIEvents()
+  {
+    connectButton.addActionListener(new ActionListener() 
+    {
+      public void actionPerformed(ActionEvent e) 
+      {
+        DatabaseConnectDialog.this.connectButtonClicked();
+      }
+    });
+    
+    cancelButton.addActionListener(new ActionListener() 
+    {
+      public void actionPerformed(ActionEvent e) 
+      {
+        DatabaseConnectDialog.this.cancelButtonClicked();
+      }
+    });
+    
     connectionTypeBox.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent e)
@@ -114,14 +132,18 @@ public class DatabaseConnectDialog extends JDialog
         DatabaseConnectDialog.this.connectionTypeChanged();
       }
     });
-    connectionTypeBox.setSelectedItem(UIConfiguration.getDefaultConnectionType());
+  }
+  
+  public DatabaseConnectDialog(JFrame parent, DonationDatabaseManager databaseManager)
+  {
+    super(parent, true);
     
-    GridBagConstraints gbc_connectionTypeBox = new GridBagConstraints();
-    gbc_connectionTypeBox.insets = new Insets(0, 0, 0, 5);
-    gbc_connectionTypeBox.anchor = GridBagConstraints.NORTHWEST;
-    gbc_connectionTypeBox.gridx = 1;
-    gbc_connectionTypeBox.gridy = 0;
-    connectTypePanel.add(connectionTypeBox, gbc_connectionTypeBox);
+    this.databaseManager = databaseManager;
+    
+    this.initializeGUI();
+    this.initializeGUIEvents();
+    
+    this.connectionTypeBox.setSelectedItem(UIConfiguration.getDefaultConnectionType());
   }
   
   private void connectButtonClicked()
@@ -209,7 +231,7 @@ public class DatabaseConnectDialog extends JDialog
       break;
     }
     
-    this.getContentPane().add(this.connectPanel, BorderLayout.CENTER);
-    this.getContentPane().validate();
+    this.contentPanel.add(this.connectPanel, BorderLayout.CENTER);
+    this.contentPanel.validate();
   }
 }

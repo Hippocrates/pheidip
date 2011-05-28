@@ -50,7 +50,16 @@ public class Donor
     {
       if (StringUtils.isEmptyOrNull(this.email))
       {
-        return StringUtils.emptyIfNull(this.lastName) + "," + StringUtils.emptyIfNull(this.firstName) + ":" + this.id;
+        String generatedId = StringUtils.emptyIfNull(this.lastName);
+        
+        if (generatedId.length() > 0)
+        {
+          generatedId += ",";
+        }
+        
+        generatedId += StringUtils.emptyIfNull(this.firstName);
+        
+        return generatedId + "#" + this.id;
       }
       else
       {

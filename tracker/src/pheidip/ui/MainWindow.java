@@ -4,21 +4,23 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-
-import java.awt.BorderLayout;
 import javax.swing.JMenuBar;
 
-import pheidip.logic.ProgramInstance;
-import pheidip.objects.Donor;
-
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+
+import pheidip.logic.DonationControl;
+import pheidip.logic.DonorControl;
+import pheidip.logic.ProgramInstance;
+import pheidip.objects.Donor;
+
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame
@@ -33,6 +35,8 @@ public class MainWindow extends JFrame
   private JMenuItem connectButton;
   private JMenu searchMenu;
   private JMenuItem searchDonorButton;
+  private JMenu createMenu;
+  private JMenuItem createNewDonorButton;
   
   private void shutdown()
   {
@@ -40,11 +44,8 @@ public class MainWindow extends JFrame
     this.dispose();
   }
   
-  public MainWindow()
+  private void initializeGUI()
   {
-    // Initialise program logic
-    this.instance = new ProgramInstance();
-    
     // Initialise window
     this.setTitle("Donation Tracking Program");
     this.setSize(new Dimension(640, 480));
@@ -65,9 +66,35 @@ public class MainWindow extends JFrame
     this.menuBar.add(this.fileMenu);
     
     this.connectButton = new JMenuItem("Connect...");
+    this.fileMenu.add(this.connectButton);
+    
+    this.exitButton = new JMenuItem("Exit");
+    this.fileMenu.add(this.exitButton);
+    
+    this.searchMenu = new JMenu("Search");
+    this.menuBar.add(this.searchMenu);
+    
+    this.searchDonorButton = new JMenuItem("Search Donor...");
+    this.searchMenu.add(this.searchDonorButton);
+   
+    this.setJMenuBar(this.menuBar);
+    
+    createMenu = new JMenu("Create");
+    menuBar.add(createMenu);
+    
+    createNewDonorButton = new JMenuItem("Create New Donor");
+    createMenu.add(createNewDonorButton);
+    
+    // Initialise message area
+    this.messageArea = new JTextField();
+    this.messageArea.setEditable(false);
+    this.getContentPane().add(this.messageArea, BorderLayout.SOUTH);
+  }
+  
+  private void initializeGUIEvents()
+  {
     this.connectButton.addActionListener(new ActionListener()
     {
-      @Override
       public void actionPerformed(ActionEvent arg0)
       {
         if (!MainWindow.this.instance.getDonationDatabase().isConnected())
@@ -80,9 +107,7 @@ public class MainWindow extends JFrame
         }
       }
     });
-    this.fileMenu.add(this.connectButton);
     
-    this.exitButton = new JMenuItem("Exit");
     this.exitButton.addActionListener(new ActionListener()
     {
       @Override
@@ -91,12 +116,7 @@ public class MainWindow extends JFrame
         MainWindow.this.confirmClose();
       }
     });
-    this.fileMenu.add(this.exitButton);
     
-    this.searchMenu = new JMenu("Search");
-    this.menuBar.add(this.searchMenu);
-    
-    this.searchDonorButton = new JMenuItem("Search Donor...");
     this.searchDonorButton.addActionListener(new ActionListener()
     {
       @Override
@@ -105,26 +125,59 @@ public class MainWindow extends JFrame
         MainWindow.this.openSearchDonorDialog();
       }
     });
-    this.searchMenu.add(this.searchDonorButton);
-   
-    this.setJMenuBar(this.menuBar);
     
-    // Initialise message area
-    this.messageArea = new JTextField();
-    this.messageArea.setEditable(false);
-    this.getContentPane().add(this.messageArea, BorderLayout.SOUTH);
+    this.createNewDonorButton.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent arg0)
+      {
+        MainWindow.this.createNewDonor();
+      }
+    });
   }
 
-  public void insertTab(JPanel panel)
+  public MainWindow()
+  {
+    this.initializeGUI();
+    this.initializeGUIEvents();
+    
+    // Initialise program logic
+    this.instance = new ProgramInstance();
+  }
+
+  protected void insertTab(Component panel)
   {
     // TODO: make this only accept a panel that can confirm its own closing
     // (TabHeader would need to change as well)
     this.tabbedPane.add(panel);
     int index = this.tabbedPane.indexOfComponent(panel);
-    
+
     if (index != -1)
     {
-      this.tabbedPane.setTabComponentAt(index, new TabHeader(this.tabbedPane));
+      TabHeader header = new TabHeader(this.tabbedPane);
+      
+      if (panel instanceof TabPanel)
+      {
+        ((TabPanel)panel).setTabHeader(header);
+      }
+      
+      this.tabbedPane.setTabComponentAt(index, header);
+      this.focusOnTab(index);
+    }
+  }
+  
+  private void focusOnTab(int index)
+  {
+    this.tabbedPane.setSelectedIndex(index);
+    this.tabbedPane.getComponentAt(index).requestFocus();
+  }
+
+  protected void removeTab(Component panel)
+  {
+    int index = this.tabbedPane.indexOfComponent(panel);
+
+    if (index != -1)
+    {
+      this.tabbedPane.removeTabAt(index);
     }
   }
   
@@ -149,10 +202,46 @@ public class MainWindow extends JFrame
     
     if (result != null)
     {
-      DonorPanel panel = new DonorPanel(this.instance.getDonationDatabase(), result.getId());
-      panel.setName(result.toString());
-      this.insertTab(panel);
+      this.openDonorTab(result.getId());
     }
+  }
+  
+  protected void openDonorTab(int donorId)
+  {
+    // prevent opening the same tab twice
+    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    {
+      Component target = this.tabbedPane.getComponentAt(i);
+      if (target instanceof DonorPanel && ((DonorPanel)target).getDonorId() == donorId)
+      {
+        this.focusOnTab(i);
+        return;
+      }
+    }
+    
+    DonorControl ctrl = new DonorControl(this.instance.getDonationDatabase(), donorId);
+    DonorPanel panel = new DonorPanel(this, ctrl);
+    this.insertTab(panel);
+    panel.refreshContent();
+  }
+  
+  protected void openDonationTab(int donationId)
+  {
+    // prevent opening the same tab twice
+    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    {
+      Component target = this.tabbedPane.getComponentAt(i);
+      if (target instanceof DonationPanel && ((DonationPanel)target).getDonationId() == donationId)
+      {
+        this.focusOnTab(i);
+        return;
+      }
+    }
+    
+    DonationControl ctrl = new DonationControl(this.instance.getDonationDatabase(), donationId);
+    DonationPanel panel = new DonationPanel(this, ctrl);
+    this.insertTab(panel);
+    panel.refreshContent();
   }
   
   private void openDisconnectDialog()
@@ -161,6 +250,7 @@ public class MainWindow extends JFrame
     
     if (result == JOptionPane.YES_OPTION)
     {
+      this.tabbedPane.removeAll();
       this.instance.getDonationDatabase().closeConnection();
       this.connectButton.setText("Connect...");
     }
@@ -174,6 +264,12 @@ public class MainWindow extends JFrame
     {
       this.shutdown();
     }
+  }
+    
+  private void createNewDonor()
+  {
+    int newId = DonorControl.createNewDonor(this.instance.getDonationDatabase());
+    this.openDonorTab(newId);
   }
   
   private class WindowEvents implements WindowListener
@@ -214,4 +310,5 @@ public class MainWindow extends JFrame
       // pass
     }
   }
+
 }

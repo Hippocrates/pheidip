@@ -31,6 +31,7 @@ public class DonationData
   private PreparedStatement deleteDonationStatement;
   private PreparedStatement insertDonationStatement;
   private PreparedStatement updateDonationStatement;
+  private PreparedStatement updateDonationAmountStatement;
   
   public DonationData(DonationDataAccess manager)
   {
@@ -67,6 +68,7 @@ public class DonationData
       this.updateDonationAnnounceState = this.connection.prepareStatement("UPDATE Donation SET announceState = ? WHERE Donation.donationId = ?;");
       this.updateDonationBidState = this.connection.prepareStatement("UPDATE Donation SET bidState = ? WHERE Donation.donationId = ?;");
       this.updateDonationStatement = this.connection.prepareStatement("UPDATE Donation SET donorId = ?, domain = ?, domainId = ?, paymentState = ?, announceState = ?, bidState = ?, amount = ?, timeReceived = ?, comment = ? WHERE donationId = ?;");
+      this.updateDonationAmountStatement = this.connection.prepareStatement("UPDATE Donation SET amount = ? WHERE Donation.donationId = ?;");
       
       this.deleteDonationStatement = this.connection.prepareStatement("DELETE FROM Donation WHERE Donation.donationId = ?;");
     
@@ -146,6 +148,11 @@ public class DonationData
       if (sum.next())
       {
         result = sum.getBigDecimal(1);
+      }
+      
+      if (result == null)
+      {
+        result = BigDecimal.ZERO;
       }
     }
     catch (SQLException e)
@@ -231,6 +238,33 @@ public class DonationData
   public void setDonationBidState(int id, DonationBidState bidState)
   {
     this.runStringFieldUpdate(this.updateDonationBidState, id, bidState.toString());
+  }
+
+  public void setDonationAmount(int donationId, BigDecimal amount)
+  {
+    try
+    {
+      Donation d = this.getDonationById(donationId);
+      
+      if (d.getDomain() != DonationDomain.LOCAL)
+      {
+        throw new RuntimeException("Error, trying to update the amount of a non-local donation.");
+      }
+      
+      this.updateDonationAmountStatement.setBigDecimal(1, amount.setScale(2));
+      this.updateDonationAmountStatement.setInt(2, donationId);
+      
+      int updated = this.updateDonationAmountStatement.executeUpdate();
+      
+      if (updated != 1)
+      {
+        throw new RuntimeException("Could not update donation amount.");
+      }
+    }
+    catch (SQLException e)
+    {
+      this.manager.handleSQLException(e);
+    }
   }
 
   public void insertDonation(Donation d)
