@@ -13,10 +13,8 @@ import pheidip.db.DonationDataAccess;
 import pheidip.db.DonationData;
 import pheidip.db.ScriptRunner;
 import pheidip.objects.Donation;
-import pheidip.objects.DonationAnnounceState;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
-import pheidip.objects.DonationPaymentState;
 
 public class TestDonationData extends TestCase
 {
@@ -68,8 +66,6 @@ public class TestDonationData extends TestCase
     // domain Id should be null for local donations (they don't have 
     // any specific Id)
     assertEquals(null, d.getDomainId());
-    assertEquals(DonationPaymentState.RECEIVED, d.getPaymentState());
-    assertEquals(DonationAnnounceState.UNREAD, d.getAnnounceState());
     assertEquals(DonationBidState.PENDING, d.getBidState());
   }
   
@@ -115,36 +111,6 @@ public class TestDonationData extends TestCase
     Donation result = this.donations.getDonationById(id);
     
     assertEquals(comment, result.getComment());
-  }
-  
-  public void testSetDonationPaymentState()
-  {
-    final int id = 1;
-    
-    Donation d = this.donations.getDonationById(id);
-    
-    assertEquals(DonationPaymentState.RECEIVED, d.getPaymentState());
-    
-    this.donations.setDonationPaymentState(id, DonationPaymentState.CANCELLED);
-    
-    d = this.donations.getDonationById(id);
-    
-    assertEquals(DonationPaymentState.CANCELLED, d.getPaymentState());
-  }
-  
-  public void testSetDonationAnnounceState()
-  {
-    final int id = 1;
-    
-    Donation d = this.donations.getDonationById(id);
-    
-    assertEquals(DonationAnnounceState.UNREAD, d.getAnnounceState());
-    
-    this.donations.setDonationAnnounceState(id, DonationAnnounceState.AMOUNT_READ);
-    
-    d = this.donations.getDonationById(id);
-    
-    assertEquals(DonationAnnounceState.AMOUNT_READ, d.getAnnounceState());
   }
   
   public void testSetDonationBidState()
@@ -200,8 +166,6 @@ public class TestDonationData extends TestCase
         id, 
         DonationDomain.LOCAL, 
         null, 
-        DonationPaymentState.RECEIVED, 
-        DonationAnnounceState.UNREAD,
         DonationBidState.PENDING, 
         new BigDecimal("3.50"),
         timeStamp, 
@@ -219,16 +183,14 @@ public class TestDonationData extends TestCase
   {
     final int id = 4;
     final int donorId = 1;
-    final DonationDomain domain = DonationDomain.PAYPAL;
+    final DonationDomain domain = DonationDomain.CHIPIN;
     final String domainId = "ffffffffffee";
-    final DonationPaymentState paymentState = DonationPaymentState.PENDING;
-    final DonationAnnounceState announceState = DonationAnnounceState.UNREAD;
     final DonationBidState bidState = DonationBidState.PENDING;
     final BigDecimal amount = new BigDecimal("13.37");
     final Date timeReceived = new Date();
     final String comment = "asdlkjhasdkjhasdsda";
     
-    Donation updated = new Donation(id, domain, domainId, paymentState, announceState, bidState, amount, timeReceived, donorId, comment);
+    Donation updated = new Donation(id, domain, domainId, bidState, amount, timeReceived, donorId, comment);
     
     this.donations.updateDonation(updated);
     
@@ -241,8 +203,6 @@ public class TestDonationData extends TestCase
     assertEquals(a.getDonorId(), b.getDonorId());
     assertEquals(a.getDomain(), b.getDomain());
     assertEquals(a.getDomainId(), b.getDomainId());
-    assertEquals(a.getPaymentState(), b.getPaymentState());
-    assertEquals(a.getAnnounceState(), b.getAnnounceState());
     assertEquals(a.getBidState(), b.getBidState());
     assertEquals(a.getAmount(), b.getAmount());
     assertEquals(a.getTimeReceived(), b.getTimeReceived());

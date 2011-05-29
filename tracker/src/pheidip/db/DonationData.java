@@ -10,10 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pheidip.objects.Donation;
-import pheidip.objects.DonationAnnounceState;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
-import pheidip.objects.DonationPaymentState;
 
 public class DonationData
 {
@@ -25,8 +23,6 @@ public class DonationData
   private PreparedStatement selectDonorDonations;
   private PreparedStatement selectDonorDonationTotal;
   private PreparedStatement updateDonationComment;
-  private PreparedStatement updateDonationPaymentState;
-  private PreparedStatement updateDonationAnnounceState;
   private PreparedStatement updateDonationBidState;
   private PreparedStatement deleteDonationStatement;
   private PreparedStatement insertDonationStatement;
@@ -64,15 +60,13 @@ public class DonationData
       this.selectDonorDonationTotal = this.connection.prepareStatement("SELECT SUM(Donation.amount) FROM Donation WHERE Donation.donorId = ?;");
     
       this.updateDonationComment = this.connection.prepareStatement("UPDATE Donation SET comment = ? WHERE Donation.donationId = ?;");
-      this.updateDonationPaymentState = this.connection.prepareStatement("UPDATE Donation SET paymentState = ? WHERE Donation.donationId = ?;");
-      this.updateDonationAnnounceState = this.connection.prepareStatement("UPDATE Donation SET announceState = ? WHERE Donation.donationId = ?;");
       this.updateDonationBidState = this.connection.prepareStatement("UPDATE Donation SET bidState = ? WHERE Donation.donationId = ?;");
-      this.updateDonationStatement = this.connection.prepareStatement("UPDATE Donation SET donorId = ?, domain = ?, domainId = ?, paymentState = ?, announceState = ?, bidState = ?, amount = ?, timeReceived = ?, comment = ? WHERE donationId = ?;");
+      this.updateDonationStatement = this.connection.prepareStatement("UPDATE Donation SET donorId = ?, domain = ?, domainId = ?, bidState = ?, amount = ?, timeReceived = ?, comment = ? WHERE donationId = ?;");
       this.updateDonationAmountStatement = this.connection.prepareStatement("UPDATE Donation SET amount = ? WHERE Donation.donationId = ?;");
       
       this.deleteDonationStatement = this.connection.prepareStatement("DELETE FROM Donation WHERE Donation.donationId = ?;");
     
-      this.insertDonationStatement = this.connection.prepareStatement("INSERT INTO Donation (donationId, donorId, domain, domainId, paymentState, announceState, bidState, amount, timeReceived, comment) VALUES (?,?,?,?,?,?,?,?,?,?);");
+      this.insertDonationStatement = this.connection.prepareStatement("INSERT INTO Donation (donationId, donorId, domain, domainId, bidState, amount, timeReceived, comment) VALUES (?,?,?,?,?,?,?,?);");
     }
     catch (SQLException e)
     {
@@ -169,8 +163,6 @@ public class DonationData
         row.getInt("donationId"),
         DonationDomain.valueOf(row.getString("domain")),
         row.getString("domainId"),
-        DonationPaymentState.valueOf(row.getString("paymentState")),
-        DonationAnnounceState.valueOf(row.getString("announceState")), 
         DonationBidState.valueOf(row.getString("bidState")), 
         row.getBigDecimal("amount"), 
         new java.util.Date( row.getTimestamp("timeReceived").getTime()),
@@ -224,17 +216,7 @@ public class DonationData
       this.manager.handleSQLException(e);
     }
   }
-
-  public void setDonationPaymentState(int id, DonationPaymentState paymentState)
-  {
-    this.runStringFieldUpdate(this.updateDonationPaymentState, id, paymentState.toString());
-  }
-
-  public void setDonationAnnounceState(int id, DonationAnnounceState announceState)
-  {
-    this.runStringFieldUpdate(this.updateDonationAnnounceState, id, announceState.toString());
-  }
-
+  
   public void setDonationBidState(int id, DonationBidState bidState)
   {
     this.runStringFieldUpdate(this.updateDonationBidState, id, bidState.toString());
@@ -275,12 +257,10 @@ public class DonationData
       this.insertDonationStatement.setInt(2, d.getDonorId());
       this.insertDonationStatement.setString(3, d.getDomain().toString());
       this.insertDonationStatement.setString(4, d.getDomainId());
-      this.insertDonationStatement.setString(5, d.getPaymentState().toString());
-      this.insertDonationStatement.setString(6, d.getAnnounceState().toString());
-      this.insertDonationStatement.setString(7, d.getBidState().toString());
-      this.insertDonationStatement.setBigDecimal(8, d.getAmount());
-      this.insertDonationStatement.setTimestamp(9, new Timestamp(d.getTimeReceived().getTime()));
-      this.insertDonationStatement.setString(10, d.getComment());
+      this.insertDonationStatement.setString(5, d.getBidState().toString());
+      this.insertDonationStatement.setBigDecimal(6, d.getAmount());
+      this.insertDonationStatement.setTimestamp(7, new Timestamp(d.getTimeReceived().getTime()));
+      this.insertDonationStatement.setString(8, d.getComment());
       
       int updated = this.insertDonationStatement.executeUpdate();
       
@@ -302,13 +282,11 @@ public class DonationData
       this.updateDonationStatement.setInt(1, updated.getDonorId());
       this.updateDonationStatement.setString(2, updated.getDomain().toString());
       this.updateDonationStatement.setString(3, updated.getDomainId());
-      this.updateDonationStatement.setString(4, updated.getPaymentState().toString());
-      this.updateDonationStatement.setString(5, updated.getAnnounceState().toString());
-      this.updateDonationStatement.setString(6, updated.getBidState().toString());
-      this.updateDonationStatement.setBigDecimal(7, updated.getAmount());
-      this.updateDonationStatement.setTimestamp(8, new Timestamp(updated.getTimeReceived().getTime()));
-      this.updateDonationStatement.setString(9, updated.getComment());
-      this.updateDonationStatement.setInt(10, updated.getId());
+      this.updateDonationStatement.setString(4, updated.getBidState().toString());
+      this.updateDonationStatement.setBigDecimal(5, updated.getAmount());
+      this.updateDonationStatement.setTimestamp(6, new Timestamp(updated.getTimeReceived().getTime()));
+      this.updateDonationStatement.setString(7, updated.getComment());
+      this.updateDonationStatement.setInt(8, updated.getId());
       
       this.updateDonationStatement.execute();
     }

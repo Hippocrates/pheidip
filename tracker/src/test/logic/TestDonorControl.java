@@ -125,5 +125,15 @@ public class TestDonorControl extends TestCase
     assertEquals(BigDecimal.ZERO.setScale(2), donations.get(0).getAmount());
   }
   
-  //TODO: make a check if a field is allowed to be updated
+  public void testCheckEmailUpdateable()
+  {
+    final int localDonor = 1;
+    final int chipinDonor = 3;
+    
+    DonorControl localDonorControl = new DonorControl(this.manager, localDonor);
+    DonorControl chipinDonorControl = new DonorControl(this.manager, chipinDonor);
+    
+    assertTrue(localDonorControl.allowEmailUpdate());
+    assertFalse(chipinDonorControl.allowEmailUpdate());
+  }
 }

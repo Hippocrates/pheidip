@@ -22,6 +22,8 @@ import javax.swing.JScrollPane;
 
 import java.awt.Component;
 import java.util.List;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 
 @SuppressWarnings("serial")
@@ -61,6 +63,7 @@ public class DonorPanel extends TabPanel
   private JButton deleteDonorButton;
 
   private MainWindow owner;
+  private JButton addDonationButton;
 
   private void initializeGUI()
   {
@@ -209,6 +212,13 @@ public class DonorPanel extends TabPanel
     gbc_btnOpen.gridy = 5;
     add(openDonationButton, gbc_btnOpen);
     
+    addDonationButton = new JButton("Add Donation");
+    GridBagConstraints gbc_addDonationButton = new GridBagConstraints();
+    gbc_addDonationButton.insets = new Insets(0, 0, 5, 5);
+    gbc_addDonationButton.gridx = 4;
+    gbc_addDonationButton.gridy = 5;
+    add(addDonationButton, gbc_addDonationButton);
+    
     
     scrollPane = new JScrollPane();
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
@@ -249,11 +259,31 @@ public class DonorPanel extends TabPanel
       }
     });
     
+    donationTable.addMouseListener(new MouseAdapter() 
+    {
+      @Override
+      public void mouseClicked(MouseEvent e) 
+      {
+        if (e.getClickCount() == 2)
+        {
+          DonorPanel.this.openDonation();
+        }
+      }
+    });
+    
     deleteDonorButton.addActionListener(new ActionListener()
     {
       public void actionPerformed(ActionEvent arg0) 
       {
         DonorPanel.this.deleteDonor();
+      }
+    });
+    
+    this.addDonationButton.addActionListener(new ActionListener() 
+    {
+      public void actionPerformed(ActionEvent arg0) 
+      {
+        DonorPanel.this.createNewDonation();
       }
     });
     
@@ -266,10 +296,11 @@ public class DonorPanel extends TabPanel
       this.saveButton,
       this.refreshButton,
       this.openDonationButton,
+      this.addDonationButton,
     });
     this.setFocusTraversalPolicy(this.tabOrder);
   }
-
+  
   public boolean isFocusCycleRoot()
   {
     return true;
@@ -307,6 +338,8 @@ public class DonorPanel extends TabPanel
     this.aliasField.setText(data.getAlias());
     this.emailField.setText(data.getEmail());
     
+    this.emailField.setEditable(this.donorControl.allowEmailUpdate());
+    
     this.totalDonatedField.setText(this.donorControl.getTotalDonated().toString());
     this.prizeField.setText("NOT IMPLEMENTED YET.");
     
@@ -327,7 +360,7 @@ public class DonorPanel extends TabPanel
       donationTableIds[i] = d.getId();
       tableData.addRow(new Object[]
       {
-        d.getTimeReceived(), 
+        d.getTimeReceived().toString(), 
         StringUtils.symbolToNatural(d.getDomain().toString()),
         d.getAmount().toString(),
         StringUtils.emptyIfNull(d.getComment())
@@ -348,6 +381,12 @@ public class DonorPanel extends TabPanel
       this.donorControl.deleteDonor();
       this.owner.removeTab(this);
     }
+  }
+  
+  private void createNewDonation()
+  {
+    int id = this.donorControl.createNewLocalDonation();
+    this.owner.openDonationTab(id);
   }
   
   private void saveEnteredContent()

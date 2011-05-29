@@ -2,9 +2,10 @@ package pheidip.ui;
 
 import pheidip.logic.DonationControl;
 import pheidip.objects.Donation;
-import pheidip.objects.DonationDomain;
 import pheidip.objects.Donor;
 
+import java.awt.Component;
+import java.awt.FocusTraversalPolicy;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
@@ -15,10 +16,9 @@ import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.JTable;
 import javax.swing.JScrollPane;
-import javax.swing.JCheckBox;
 
 @SuppressWarnings("serial")
 public class DonationPanel extends TabPanel
@@ -35,25 +35,20 @@ public class DonationPanel extends TabPanel
   private JLabel timeLabel;
   private JTextField timeField;
   private JLabel commentLabel;
-  private JLabel lblBids;
-  private JTable bidTable;
-  private JScrollPane scrollPane;
   private JTextArea commentTextArea;
   private JButton refreshButton;
   private JButton saveButton;
-  private JButton addBidButton;
-  private JButton modifyBidButton;
-  private JButton deleteBidButton;
-  private JScrollPane scrollPane_1;
-  private JCheckBox announcedCheckBox;
-
+  private JScrollPane commentScrollPane;
+  private JButton deleteButton;
+  private FocusTraversalManager tabOrder;
+  
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{85, 85, 90, 90, 104, 95, 0};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 25, 0, 0};
+    gridBagLayout.columnWidths = new int[]{85, 85, 90, 90, 104, 0, 95};
+    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 25, 0};
     gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     amountLabel = new JLabel("Amount:");
@@ -74,24 +69,25 @@ public class DonationPanel extends TabPanel
     add(amountField, gbc_amountField);
     amountField.setColumns(10);
     
-    donorLabel = new JLabel("Donor:");
-    GridBagConstraints gbc_donorLabel = new GridBagConstraints();
-    gbc_donorLabel.anchor = GridBagConstraints.EAST;
-    gbc_donorLabel.insets = new Insets(0, 0, 5, 5);
-    gbc_donorLabel.gridx = 3;
-    gbc_donorLabel.gridy = 0;
-    add(donorLabel, gbc_donorLabel);
+    commentLabel = new JLabel("Comment:");
+    GridBagConstraints gbc_commentLabel = new GridBagConstraints();
+    gbc_commentLabel.insets = new Insets(0, 0, 5, 5);
+    gbc_commentLabel.gridx = 3;
+    gbc_commentLabel.gridy = 0;
+    add(commentLabel, gbc_commentLabel);
     
-    donorField = new JTextField();
-    donorField.setEditable(false);
-    GridBagConstraints gbc_donorField = new GridBagConstraints();
-    gbc_donorField.gridwidth = 2;
-    gbc_donorField.insets = new Insets(0, 0, 5, 5);
-    gbc_donorField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_donorField.gridx = 4;
-    gbc_donorField.gridy = 0;
-    add(donorField, gbc_donorField);
-    donorField.setColumns(10);
+    commentScrollPane = new JScrollPane();
+    GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
+    gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
+    gbc_scrollPane_1.gridheight = 4;
+    gbc_scrollPane_1.gridwidth = 3;
+    gbc_scrollPane_1.insets = new Insets(0, 0, 5, 0);
+    gbc_scrollPane_1.gridx = 4;
+    gbc_scrollPane_1.gridy = 0;
+    add(commentScrollPane, gbc_scrollPane_1);
+    
+    commentTextArea = new JTextArea();
+    commentScrollPane.setViewportView(commentTextArea);
     
     domainIdLabel = new JLabel("Domain Id:");
     GridBagConstraints gbc_lblDomainId = new GridBagConstraints();
@@ -112,14 +108,6 @@ public class DonationPanel extends TabPanel
     add(domainIdField, gbc_domainIdField);
     domainIdField.setColumns(10);
     
-    openDonorButton = new JButton("Open Donor");
-    GridBagConstraints gbc_openDonorButton = new GridBagConstraints();
-    gbc_openDonorButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_openDonorButton.insets = new Insets(0, 0, 5, 5);
-    gbc_openDonorButton.gridx = 5;
-    gbc_openDonorButton.gridy = 1;
-    add(openDonorButton, gbc_openDonorButton);
-    
     timeLabel = new JLabel("Timestamp:");
     GridBagConstraints gbc_timeLabel = new GridBagConstraints();
     gbc_timeLabel.anchor = GridBagConstraints.EAST;
@@ -139,33 +127,33 @@ public class DonationPanel extends TabPanel
     add(timeField, gbc_timeField);
     timeField.setColumns(10);
     
-    commentLabel = new JLabel("Comment:");
-    GridBagConstraints gbc_commentLabel = new GridBagConstraints();
-    gbc_commentLabel.insets = new Insets(0, 0, 5, 5);
-    gbc_commentLabel.gridx = 3;
-    gbc_commentLabel.gridy = 2;
-    add(commentLabel, gbc_commentLabel);
+    donorLabel = new JLabel("Donor:");
+    GridBagConstraints gbc_donorLabel = new GridBagConstraints();
+    gbc_donorLabel.anchor = GridBagConstraints.EAST;
+    gbc_donorLabel.insets = new Insets(0, 0, 5, 5);
+    gbc_donorLabel.gridx = 0;
+    gbc_donorLabel.gridy = 3;
+    add(donorLabel, gbc_donorLabel);
     
-    scrollPane_1 = new JScrollPane();
-    GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
-    gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
-    gbc_scrollPane_1.gridheight = 4;
-    gbc_scrollPane_1.gridwidth = 3;
-    gbc_scrollPane_1.insets = new Insets(0, 0, 5, 0);
-    gbc_scrollPane_1.gridx = 4;
-    gbc_scrollPane_1.gridy = 2;
-    add(scrollPane_1, gbc_scrollPane_1);
+    donorField = new JTextField();
+    donorField.setEditable(false);
+    GridBagConstraints gbc_donorField = new GridBagConstraints();
+    gbc_donorField.gridwidth = 2;
+    gbc_donorField.insets = new Insets(0, 0, 5, 5);
+    gbc_donorField.fill = GridBagConstraints.HORIZONTAL;
+    gbc_donorField.gridx = 1;
+    gbc_donorField.gridy = 3;
+    add(donorField, gbc_donorField);
+    donorField.setColumns(10);
     
-    commentTextArea = new JTextArea();
-    scrollPane_1.setViewportView(commentTextArea);
-    
-    announcedCheckBox = new JCheckBox("Announced");
-    GridBagConstraints gbc_announcedCheckBox = new GridBagConstraints();
-    gbc_announcedCheckBox.insets = new Insets(0, 0, 5, 5);
-    gbc_announcedCheckBox.gridx = 1;
-    gbc_announcedCheckBox.gridy = 3;
-    add(announcedCheckBox, gbc_announcedCheckBox);
-    
+    openDonorButton = new JButton("Open Donor");
+    GridBagConstraints gbc_openDonorButton = new GridBagConstraints();
+    gbc_openDonorButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_openDonorButton.insets = new Insets(0, 0, 5, 5);
+    gbc_openDonorButton.gridx = 3;
+    gbc_openDonorButton.gridy = 3;
+    add(openDonorButton, gbc_openDonorButton);
+
     refreshButton = new JButton("Refresh");
     GridBagConstraints gbc_refreshButton = new GridBagConstraints();
     gbc_refreshButton.fill = GridBagConstraints.HORIZONTAL;
@@ -182,49 +170,12 @@ public class DonationPanel extends TabPanel
     gbc_saveButton.gridy = 5;
     add(saveButton, gbc_saveButton);
     
-    lblBids = new JLabel("Bids:");
-    GridBagConstraints gbc_lblBids = new GridBagConstraints();
-    gbc_lblBids.anchor = GridBagConstraints.EAST;
-    gbc_lblBids.insets = new Insets(0, 0, 5, 5);
-    gbc_lblBids.gridx = 0;
-    gbc_lblBids.gridy = 6;
-    add(lblBids, gbc_lblBids);
-    
-    addBidButton = new JButton("Add Bid");
-    GridBagConstraints gbc_addBidButton = new GridBagConstraints();
-    gbc_addBidButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_addBidButton.insets = new Insets(0, 0, 5, 5);
-    gbc_addBidButton.gridx = 1;
-    gbc_addBidButton.gridy = 6;
-    add(addBidButton, gbc_addBidButton);
-    
-    modifyBidButton = new JButton("Modify Bid");
-    GridBagConstraints gbc_modifyBidButton = new GridBagConstraints();
-    gbc_modifyBidButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_modifyBidButton.insets = new Insets(0, 0, 5, 5);
-    gbc_modifyBidButton.gridx = 2;
-    gbc_modifyBidButton.gridy = 6;
-    add(modifyBidButton, gbc_modifyBidButton);
-    
-    deleteBidButton = new JButton("Delete Bid");
-    GridBagConstraints gbc_deleteBidButton = new GridBagConstraints();
-    gbc_deleteBidButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_deleteBidButton.insets = new Insets(0, 0, 5, 5);
-    gbc_deleteBidButton.gridx = 3;
-    gbc_deleteBidButton.gridy = 6;
-    add(deleteBidButton, gbc_deleteBidButton);
-    
-    scrollPane = new JScrollPane();
-    GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-    gbc_scrollPane.fill = GridBagConstraints.BOTH;
-    gbc_scrollPane.gridwidth = 7;
-    gbc_scrollPane.gridx = 0;
-    gbc_scrollPane.gridy = 7;
-    add(scrollPane, gbc_scrollPane);
-    
-    bidTable = new JTable();
-    bidTable.setFillsViewportHeight(true);
-    scrollPane.setViewportView(bidTable);
+    deleteButton = new JButton("Delete Donation");
+    GridBagConstraints gbc_deleteButton = new GridBagConstraints();
+    gbc_deleteButton.insets = new Insets(0, 0, 5, 5);
+    gbc_deleteButton.gridx = 5;
+    gbc_deleteButton.gridy = 5;
+    add(deleteButton, gbc_deleteButton);
   }
   
   private void initializeGUIEvents()
@@ -253,7 +204,45 @@ public class DonationPanel extends TabPanel
       }
     });
     
+    this.deleteButton.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent arg0)
+      {
+        DonationPanel.this.deleteDonation();
+      }
+    });
+    
     // TODO: hook up bid buttons etc...
+    
+    this.tabOrder = new FocusTraversalManager(new Component[]
+    {
+      this.amountField,
+      this.openDonorButton,
+      this.refreshButton,
+      this.saveButton,
+    });
+    this.setFocusTraversalPolicy(this.tabOrder);
+  }
+  
+  public boolean isFocusCycleRoot()
+  {
+    return true;
+  }
+  
+  public FocusTraversalPolicy getFocusTraversalPolicy() 
+  {
+    return this.tabOrder;
+  }
+
+  protected void deleteDonation()
+  {
+    int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this donation?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+    
+    if (result == JOptionPane.OK_OPTION)
+    {
+      this.donationControl.deleteDonation();
+      this.owner.removeTab(this);
+    }
   }
 
   public DonationPanel(MainWindow owner, DonationControl control)
@@ -285,7 +274,7 @@ public class DonationPanel extends TabPanel
     this.amountField.setText(result.getAmount().toString());
     this.timeField.setText(result.getTimeReceived().toString());
     
-    if (result.getDomain() == DonationDomain.LOCAL)
+    if (this.donationControl.allowUpdateAmount())
     {
       this.amountField.setEditable(true);
     }
@@ -300,24 +289,12 @@ public class DonationPanel extends TabPanel
     
     this.commentTextArea.setText(result.getComment());
 
-    this.announcedCheckBox.setSelected(DonationControl.considerAsRead(result));
-    
     this.setHeaderText(result.getDomainString());
   }
   
   private void saveEnteredContent()
   {
-    Donation result = this.donationControl.getData();
-    
-    if (result.getDomain() == DonationDomain.LOCAL)
-    {
-      this.donationControl.updateAmount(new BigDecimal(this.amountField.getText()));
-    }
-    
-    this.donationControl.updateComment(this.commentTextArea.getText());
-    
-    this.donationControl.markAsRead(this.announcedCheckBox.isSelected());
-
+    this.donationControl.updateData(new BigDecimal(this.amountField.getText()), this.commentTextArea.getText());
     this.refreshContent();
   }
 

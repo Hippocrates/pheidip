@@ -28,27 +28,6 @@ CREATE TABLE DonationDomain
 
 INSERT INTO DonationDomain VALUES('LOCAL');
 INSERT INTO DonationDomain VALUES('CHIPIN');
-INSERT INTO DonationDomain VALUES('PAYPAL');
-
-CREATE TABLE DonationPaymentState
-(
-  donationPaymentStateId VARCHAR(16),
-  PRIMARY KEY (donationPaymentStateId)
-);
-
-INSERT INTO DonationPaymentState VALUES('PENDING');
-INSERT INTO DonationPaymentState VALUES('CANCELLED');
-INSERT INTO DonationPaymentState VALUES('RECEIVED');
-
-CREATE TABLE DonationAnnounceState
-(
-  donationAnnounceStateId VARCHAR(16),
-  PRIMARY KEY (donationAnnounceStateId)
-);
-
-INSERT INTO DonationAnnounceState VALUES ('UNREAD');
-INSERT INTO DonationAnnounceState VALUES ('AMOUNT_READ');
-INSERT INTO DonationAnnounceState VALUES ('COMMENT_READ');
 
 CREATE TABLE DonationBidState
 (
@@ -67,8 +46,6 @@ CREATE TABLE Donation
   domain VARCHAR(16),
   domainId VARCHAR(64),
   
-  paymentState VARCHAR(16),
-  announceState VARCHAR(16),
   bidState VARCHAR(16),
   
   amount DECIMAL(19,2),
@@ -78,8 +55,6 @@ CREATE TABLE Donation
   FOREIGN KEY (donorId) REFERENCES Donor(donorId),
   FOREIGN KEY (domain) REFERENCES DonationDomain (donationDomainId),
   UNIQUE (domain, domainId),
-  FOREIGN KEY (paymentState) REFERENCES DonationPaymentState (donationPaymentStateId),
-  FOREIGN KEY (announceState) REFERENCES DonationAnnounceState (donationAnnounceStateId),
   FOREIGN KEY (bidState) REFERENCES DonationBidState (donationBidStateId),
   CHECK (amount > 0 OR amount = null),
   

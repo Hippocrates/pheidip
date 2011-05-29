@@ -7,10 +7,8 @@ import java.util.List;
 import pheidip.db.DonationData;
 import pheidip.db.DonorData;
 import pheidip.objects.Donation;
-import pheidip.objects.DonationAnnounceState;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
-import pheidip.objects.DonationPaymentState;
 import pheidip.objects.Donor;
 import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
@@ -75,8 +73,6 @@ public class DonorControl
         donationId,
         DonationDomain.LOCAL,
         "" + donationId,
-        DonationPaymentState.RECEIVED,
-        DonationAnnounceState.UNREAD,
         DonationBidState.PENDING,
         BigDecimal.ZERO,
         new Date(),
@@ -86,5 +82,20 @@ public class DonorControl
     this.donations.insertDonation(toCreate);
     
     return donationId;
+  }
+
+  public boolean allowEmailUpdate()
+  {
+    List<Donation> donations = this.getDonorDonations();
+    
+    for (Donation d : donations)
+    {
+      if (d.getDomain() == DonationDomain.CHIPIN)
+      {
+        return false;
+      }
+    }
+    
+    return true;
   }
 }

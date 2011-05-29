@@ -15,11 +15,9 @@ public class Donation
 	private String comment;
 	private DonationDomain domain;
   private String domainId;
-  private DonationPaymentState paymentState;
-  private DonationAnnounceState announceState;
   private DonationBidState bidState;
 
-	public Donation(int id, DonationDomain domain, String domainId, DonationPaymentState paymentState, DonationAnnounceState announceState, DonationBidState bidState, BigDecimal amount, Date timeReceived, int donorId, String comment)
+	public Donation(int id, DonationDomain domain, String domainId, DonationBidState bidState, BigDecimal amount, Date timeReceived, int donorId, String comment)
 	{
 	  this.id = id;
 		this.donorId = donorId;
@@ -28,8 +26,6 @@ public class Donation
 		this.comment = comment;
 		this.domain = domain;
 		this.domainId = domainId;
-		this.paymentState = paymentState;
-		this.announceState = announceState;
 		this.bidState = bidState;
 	}
 	
@@ -68,16 +64,6 @@ public class Donation
     return this.domainId;
   }
 
-  public DonationPaymentState getPaymentState()
-  {
-    return paymentState;
-  }
-
-  public DonationAnnounceState getAnnounceState()
-  {
-    return announceState;
-  }
-  
   public DonationBidState getBidState()
   {
     return bidState;

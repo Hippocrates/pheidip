@@ -1,9 +1,10 @@
 package test.logic;
 
+import java.math.BigDecimal;
+
 import pheidip.logic.DonationControl;
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.objects.Donation;
-import pheidip.objects.DonationAnnounceState;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.Donor;
 import test.db.DBTestConfiguration;
@@ -50,37 +51,30 @@ public class TestDonationControl extends TestCase
     assertEquals("smk", d.getAlias());
   }
   
-  public void testUpdateDonationComment()
+  public void testUpdateDonation()
   {
     final int donationId = 1;
     
     DonationControl control = new DonationControl(this.manager, donationId);
     
     String commentText = "Some new comment text";
+    BigDecimal amount = new BigDecimal("3.50");
     
-    control.updateComment(commentText);
+    control.updateData(amount, commentText);
     
     Donation newData = control.getData();
     
     assertEquals(commentText, newData.getComment());
   }
   
-  public void testSetAnnounceState()
+  public void testDeleteDonation()
   {
-    final int donationId = 1;
+    final int donationId = 7;
     
     DonationControl control = new DonationControl(this.manager, donationId);
     
-    Donation initial = control.getData();
+    control.deleteDonation();
     
-    assertNull(initial.getComment());
-    
-    control.markAsRead(true);
-    
-    Donation firstPass = control.getData();
-    
-    assertEquals(DonationAnnounceState.AMOUNT_READ, firstPass.getAnnounceState());
-    
-    
+    assertNull(control.getData());
   }
 }
