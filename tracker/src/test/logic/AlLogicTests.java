@@ -14,6 +14,7 @@ public class AlLogicTests
     suite.addTestSuite(TestDonationDatabaseManager.class);
     suite.addTestSuite(TestDonorControl.class);
     suite.addTestSuite(TestDonorSearch.class);
+    suite.addTestSuite(TestChipinDonations.class);
     //$JUnit-END$
     return suite;
   }

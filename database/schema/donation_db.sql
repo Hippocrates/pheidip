@@ -50,7 +50,7 @@ CREATE TABLE Donation
   
   amount DECIMAL(19,2),
   timeReceived DATETIME,
-  comment VARCHAR(1024),
+  comment VARCHAR(4096),
 
   FOREIGN KEY (donorId) REFERENCES Donor(donorId),
   FOREIGN KEY (domain) REFERENCES DonationDomain (donationDomainId),
