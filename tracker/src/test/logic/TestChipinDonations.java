@@ -1,7 +1,6 @@
 package test.logic;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -13,14 +12,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import pheidip.db.DonationData;
-import pheidip.db.DonorData;
 import pheidip.logic.ChipinDonations;
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.objects.ChipinDonation;
 import pheidip.objects.Donation;
-import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
-import pheidip.objects.Donor;
+import pheidip.util.StringUtils;
 
 public class TestChipinDonations extends TestCase
 {
@@ -51,42 +48,49 @@ public class TestChipinDonations extends TestCase
     assertEquals("1262272179000", donations.get(0).getChipinTimeString());
     assertEquals(new BigDecimal("1.00"), donations.get(0).getAmount());
   }
-  /*
+  
   public void testParseFullTable()
   {
-    try
-    {
-      //TODO: replace this test w/ the random data
-      Document htmlDoc = Jsoup.parse(new File("src/test/logic/agdq-chipin.html"), null);
-      
-      List<ChipinDonation> donations = ChipinDonations.extractDonations(htmlDoc);
-      
-      final int donationCount = 3253;
-      
-      assertEquals(donationCount, donations.size());
+    Random rand = new Random(2222222);
+    final int numDonors = 600;
+    final int numDonations = 3000;
+    
+    List<ChipinDonation> sourceDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
+    assertEquals(numDonations, sourceDonations.size());
+    String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations, rand);
 
-      //TODO: write the rest of this test
-    }
-    catch (IOException e)
+    Document htmlDoc = Jsoup.parse(randomDonations);
+     
+    List<ChipinDonation> resultDonations = ChipinDonations.extractDonations(htmlDoc);
+      
+    assertEquals(numDonations, resultDonations.size());
+
+    for (int i = 0; i < numDonations; ++i)
     {
-      fail();
+      ChipinDonation source = sourceDonations.get(i);
+      ChipinDonation result = resultDonations.get(i);
+      
+      assertEquals(source.getName(), result.getName());
+      assertEquals(source.getEmail(), result.getEmail());
+      assertEquals(StringUtils.emptyIfNull(source.getComment()), StringUtils.emptyIfNull(result.getComment()));
+      assertEquals(source.getAmount(), result.getAmount());
+      assertEquals(source.getChipinTimeString(), result.getChipinTimeString());
+      assertEquals(source.getChipinId(), result.getChipinId());
     }
+
   }
-  */
+
   public void testNoDuplicateChipinIds()
   {
       Random rand = new Random(4223);
-      final int numDonors = 500;
+      final int numDonors = 300;
       final int numDonations = 1234;
       
-      String randomDonations = ChipinDonationTableGenerator.generateChipinHTMLTable(ChipinDonationTableGenerator.generateRandomDonations(numDonors, numDonations, rand), rand);
+      List<ChipinDonation> sourceDonationList = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
 
-      Document htmlDoc = Jsoup.parse(randomDonations);
-      List<ChipinDonation> donations = ChipinDonations.extractDonations(htmlDoc);
-    
       Set<String> ids = new HashSet<String>();
       
-      for (ChipinDonation d : donations)
+      for (ChipinDonation d : sourceDonationList)
       {
         if (ids.contains(d.getChipinId()))
         {
@@ -98,50 +102,27 @@ public class TestChipinDonations extends TestCase
         }
       }
   }
-  /*
+  
   public void testMergeFullTableToEmptyDatabase()
   {
     DonationDatabaseManager manager = new DonationDatabaseManager();
     
     try
     {
-      //TODO: replace this test w/ the random data
-      Document htmlDoc = Jsoup.parse(new File("src/test/logic/agdq-chipin.html"), null);
+      Random rand = new Random(731);
+      final int numDonors = 600;
+      final int numDonations = 4000;
       
-      List<ChipinDonation> chipinDonations = ChipinDonations.extractDonations(htmlDoc);
-      
+      List<ChipinDonation> chipinDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
+
       manager.createMemoryDatabase();
       
-      ChipinDonations.mergeDonations(manager, chipinDonations);
-      
-      DonationData donations = manager.getDataAccess().getDonationData();
-      DonorData donors = manager.getDataAccess().getDonorData();
-      
-      // now try to get some of the donations by ID and check that everything checks out
-      // also check that there are no duplicates of donors
-
-      for (ChipinDonation cDonation : chipinDonations)
+      for (ChipinDonation d : chipinDonations)
       {
-        Donation donation = donations.getDonationByDomainId(DonationDomain.CHIPIN, cDonation.getChipinId());
-        
-        assertNotNull(donation);
-        
-        assertEquals(cDonation.getAmount(), donation.getAmount());
-        assertEquals(cDonation.getChipinId(), donation.getDomainId());
-        assertEquals(DonationBidState.PENDING, donation.getBidState());
-        
-        Donor donor = donors.getDonorById(donation.getDonorId());
-        
-        assertEquals(cDonation.getEmail(), donor.getEmail());
-        String[] toks = cDonation.getName().trim().split("\\s+");
-        
-        if (toks.length == 2)
-        {
-          assertEquals(toks[0], donor.getFirstName());
-          assertEquals(toks[1], donor.getLastName());
-        }
+        ChipinDonations.mergeDonation(manager, d);
       }
       
+      assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(chipinDonations, manager));
     }
     catch (Exception e)
     {
@@ -153,50 +134,33 @@ public class TestChipinDonations extends TestCase
     }
   }
   
+  
+  
   public void testMergeFullTableToFullDatabase()
   {
     DonationDatabaseManager manager = new DonationDatabaseManager();
     
     try
     {
-      //TODO: replace this test w/ the random data
-      Document htmlDoc = Jsoup.parse(new File("src/test/logic/agdq-chipin.html"), null);
+      Random rand = new Random(5459898);
+      final int numDonors = 600;
+      final int numDonations = 4000;
       
-      List<ChipinDonation> chipinDonations = ChipinDonations.extractDonations(htmlDoc);
-      
+      List<ChipinDonation> chipinDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
+
       manager.createMemoryDatabase();
       
-      ChipinDonations.mergeDonations(manager, chipinDonations);
-      ChipinDonations.mergeDonations(manager, chipinDonations);
+      final int numCycles = 2;
       
-      DonationData donations = manager.getDataAccess().getDonationData();
-      DonorData donors = manager.getDataAccess().getDonorData();
-      
-      // now try to get some of the donations by ID and check that everything checks out
-      // also check that there are no duplicates of donors
-
-      for (ChipinDonation cDonation : chipinDonations)
+      for (int i = 0; i < numCycles; ++i)
       {
-        Donation donation = donations.getDonationByDomainId(DonationDomain.CHIPIN, cDonation.getChipinId());
-        
-        assertNotNull(donation);
-        
-        assertEquals(cDonation.getAmount(), donation.getAmount());
-        assertEquals(cDonation.getChipinId(), donation.getDomainId());
-        assertEquals(DonationBidState.PENDING, donation.getBidState());
-        
-        Donor donor = donors.getDonorById(donation.getDonorId());
-        
-        assertEquals(cDonation.getEmail(), donor.getEmail());
-        String[] toks = cDonation.getName().trim().split("\\s+");
-        
-        if (toks.length == 2)
+        for (ChipinDonation d : chipinDonations)
         {
-          assertEquals(toks[0], donor.getFirstName());
-          assertEquals(toks[1], donor.getLastName());
+          ChipinDonations.mergeDonation(manager, d);
         }
       }
-      
+
+      assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(chipinDonations, manager));
     }
     catch (Exception e)
     {
@@ -207,7 +171,47 @@ public class TestChipinDonations extends TestCase
       manager.closeConnection();
     }
   }
-  */
+  
+  public void testMergeAnotherTableToDatabase()
+  {
+    DonationDatabaseManager manager = new DonationDatabaseManager();
+    
+    try
+    {
+      Random rand = new Random(887554);
+      final int numDonorsA = 600;
+      final int numDonationsA = 4000;
+      final int numDonorsB = 400;
+      final int numDonationsB = 2000;
+      
+      List<ChipinDonation> sourceDonationListA = ChipinTestUtils.generateRandomDonations(numDonorsA, numDonationsA, rand);
+      List<ChipinDonation> sourceDonationListB = ChipinTestUtils.generateRandomDonations(numDonorsB, numDonationsB, rand);
+
+      manager.createMemoryDatabase();
+      
+      for (ChipinDonation d : sourceDonationListA)
+      {
+        ChipinDonations.mergeDonation(manager, d);
+      }
+      
+      for (ChipinDonation d : sourceDonationListB)
+      {
+        ChipinDonations.mergeDonation(manager, d);
+      }
+
+      assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonationListA, manager));
+      assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonationListB, manager));
+    }
+    catch (Exception e)
+    {
+      fail();
+    }
+    finally
+    {
+      manager.closeConnection();
+    }
+  }
+  
   public void testAddCommentToPreviouslyAddedDonation()
   {
     DonationDatabaseManager manager = new DonationDatabaseManager();
@@ -216,13 +220,9 @@ public class TestChipinDonations extends TestCase
     {
       ChipinDonation d = new ChipinDonation("A Guy", "somewhere@anywhere.com", null, "123456789000", new BigDecimal("15.00"));
     
-      List<ChipinDonation> chipinDonations = new ArrayList<ChipinDonation>();
-      
-      chipinDonations.add(d);
-      
       manager.createMemoryDatabase();
-     
-      ChipinDonations.mergeDonations(manager, chipinDonations);
+
+      ChipinDonations.mergeDonation(manager, d);
       
       DonationData donations = manager.getDataAccess().getDonationData();
       Donation donationBefore = donations.getDonationByDomainId(DonationDomain.CHIPIN, d.getChipinId());
@@ -232,10 +232,8 @@ public class TestChipinDonations extends TestCase
       String commentText = "Some comment text";
       
       ChipinDonation dPrime = new ChipinDonation(d.getName(), d.getEmail(), commentText, d.getChipinTimeString(), d.getAmount());
-      
-      chipinDonations.set(0, dPrime);
-      
-      ChipinDonations.mergeDonations(manager, chipinDonations);
+
+      ChipinDonations.mergeDonation(manager, dPrime);
       
       Donation donationAfter = donations.getDonationByDomainId(DonationDomain.CHIPIN, dPrime.getChipinId());
     

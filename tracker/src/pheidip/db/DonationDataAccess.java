@@ -23,7 +23,7 @@ public class DonationDataAccess
     this.donations = null;
   }
   
-  public DonorData getDonorData()
+  synchronized public DonorData getDonorData()
   {
     if (this.donors == null)
     {
@@ -33,7 +33,7 @@ public class DonationDataAccess
     return this.donors;
   }
   
-  public DonationData getDonationData()
+  synchronized public DonationData getDonationData()
   {
     if (this.donations == null)
     {
@@ -56,7 +56,7 @@ public class DonationDataAccess
     return this.connection;
   }
   
-  private void setConnection(Connection connection)
+  synchronized private void setConnection(Connection connection)
   {
     this.connection = connection;
     
@@ -71,7 +71,7 @@ public class DonationDataAccess
     }
   }
   
-  public void connectToDatabaseServer(DBType type, String server, String dbname, String user, String password)
+  synchronized public void connectToDatabaseServer(DBType type, String server, String dbname, String user, String password)
   {
     if (this.isConnected())
     {
@@ -89,7 +89,7 @@ public class DonationDataAccess
     }
   }
   
-  public void createMemoryDatabase()
+  synchronized public void createMemoryDatabase()
   {
     if (this.isConnected())
     {
@@ -117,12 +117,12 @@ public class DonationDataAccess
     }
   }
   
-  public DBType getConnectionType()
+  synchronized public DBType getConnectionType()
   {
     return this.connectionType;
   }
   
-  public boolean isConnected()
+  synchronized public boolean isConnected()
   {
     boolean result = false;
     
@@ -144,7 +144,7 @@ public class DonationDataAccess
     throw new RuntimeException(error.getMessage());
   }
 
-  public void closeConnection()
+  synchronized public void closeConnection()
   {
     if (this.isConnected())
     {

@@ -1,6 +1,6 @@
 package test.db;
 
-public class DBTestConfiguration
+public final class DBTestConfiguration
 {
   public static boolean testMYSQLConnectToServer()
   {

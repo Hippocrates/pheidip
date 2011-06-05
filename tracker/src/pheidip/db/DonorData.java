@@ -41,7 +41,8 @@ public class DonorData
     }
   }
   
-  void setConnection(Connection connection)
+  // intentionally package protected
+  synchronized void setConnection(Connection connection)
   {
     this.connection = connection;
     
@@ -76,7 +77,7 @@ public class DonorData
     }
   }
   
-  public Donor getDonorById(int donorId)
+  synchronized public Donor getDonorById(int donorId)
   {
     Donor result = null;
     
@@ -99,7 +100,7 @@ public class DonorData
     return result;
   }
   
-  public Donor getDonorByEmail(String email)
+  synchronized public Donor getDonorByEmail(String email)
   {
     Donor result = null;
     
@@ -122,7 +123,7 @@ public class DonorData
     return result;
   }
 
-  public Donor getDonorByAlias(String alias)
+  synchronized public Donor getDonorByAlias(String alias)
   {
     Donor result = null;
     
@@ -145,7 +146,7 @@ public class DonorData
     return result;
   }
   
-  public List<Donor> getAllDonors()
+  synchronized public List<Donor> getAllDonors()
   {
     List<Donor> result = null;
     
@@ -163,7 +164,7 @@ public class DonorData
     return result;
   }
 
-  public void deleteDonor(int id)
+  synchronized public void deleteDonor(int id)
   {
     try
     {
@@ -181,7 +182,7 @@ public class DonorData
     }
   }
   
-  public void createDonor(Donor newDonor)
+  synchronized public void createDonor(Donor newDonor)
   {
     try
     {
@@ -204,27 +205,27 @@ public class DonorData
     }
   }
   
-  public void setDonorEmail(int id, String newEmail)
+  synchronized public void setDonorEmail(int id, String newEmail)
   {
     this.runStringFieldUpdate(this.updateDonorEmailStatement, id, newEmail.toLowerCase());
   }
   
-  public void setDonorAlias(int id, String newAlias)
+  synchronized public void setDonorAlias(int id, String newAlias)
   {
     this.runStringFieldUpdate(this.updateDonorAliasStatement, id, newAlias.toLowerCase());
   }
   
-  public void setDonorFirstName(int id, String newFirstName)
+  synchronized public void setDonorFirstName(int id, String newFirstName)
   {
     this.runStringFieldUpdate(this.updateDonorFirstNameStatement, id, newFirstName);
   }
   
-  public void setDonorLastName(int id, String newLastName)
+  synchronized public void setDonorLastName(int id, String newLastName)
   {
     this.runStringFieldUpdate(this.updateDonorLastNameStatement, id, newLastName);
   }
   
-  public void updateDonor(Donor donor)
+  synchronized public void updateDonor(Donor donor)
   {
     try
     {

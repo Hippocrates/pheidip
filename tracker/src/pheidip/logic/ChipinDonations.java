@@ -53,71 +53,66 @@ public final class ChipinDonations
     
     return result;
   }
-
-  public static void mergeDonations(DonationDatabaseManager manager, List<ChipinDonation> chipinDonations)
+  
+  public static void mergeDonation(DonationDatabaseManager manager, ChipinDonation chipinDonation)
   {
     DonationData donations = manager.getDataAccess().getDonationData();
     DonorData donors = manager.getDataAccess().getDonorData();
 
-    int baseDonorId = IdUtils.generateId();
-    int baseDonationId = IdUtils.generateId();
+    Donation found = donations.getDonationByDomainId(DonationDomain.CHIPIN, chipinDonation.getChipinId());
     
-    for (ChipinDonation chipinDonation : chipinDonations)
+    if (found == null)
     {
-      Donation found = donations.getDonationByDomainId(DonationDomain.CHIPIN, chipinDonation.getChipinId());
+      Donor donor = donors.getDonorByEmail(chipinDonation.getEmail());
       
-      if (found == null)
+      if (donor == null)
       {
-        Donor donor = donors.getDonorByEmail(chipinDonation.getEmail());
+        String[] toks = chipinDonation.getName().trim().split("\\s+");
+        String firstName = "";
+        String lastName = "";
         
-        if (donor == null)
+        if (toks.length > 0)
         {
-          String[] toks = chipinDonation.getName().trim().split("\\s+");
-          String firstName = "";
-          String lastName = "";
-          
-          if (toks.length > 0)
-          {
-            firstName = toks[0];
-          }
-          
-          if (toks.length > 1)
-          {
-            lastName = toks[1];
-          }
-          
-          donor = new Donor(baseDonorId, chipinDonation.getEmail(), null, firstName, lastName);
-          donors.createDonor(donor);
-          ++baseDonorId;
+          firstName = toks[0];
         }
         
-        String commentString = chipinDonation.getComment();
-        
-        if (StringUtils.emptyIfNull(chipinDonation.getComment()).length() > ChipinDonation.maxCommentLength())
+        if (toks.length > 1)
         {
-          commentString = commentString.substring(0, ChipinDonation.maxCommentLength() - 1);
-          System.out.println("Warning, truncating comment with length > " + ChipinDonation.maxCommentLength());
+          lastName = toks[1];
         }
         
-        donations.insertDonation(
-          new Donation(
-              baseDonationId,
-            DonationDomain.CHIPIN, 
-            chipinDonation.getChipinId(),
-            DonationBidState.PENDING, 
-            chipinDonation.getAmount(),
-            new Date(),
-            donor.getId(),
-            commentString
-            )
-          );
-        ++baseDonationId;
+        int newDonorId = IdUtils.generateId();
+        
+        donor = new Donor(newDonorId, chipinDonation.getEmail(), null, firstName, lastName);
+        donors.createDonor(donor);
       }
-      else if (found.getComment() == null && chipinDonation.getComment() != null)
+      
+      String commentString = chipinDonation.getComment();
+      
+      if (StringUtils.emptyIfNull(chipinDonation.getComment()).length() > ChipinDonation.maxCommentLength())
       {
-        donations.setDonationComment(found.getId(), chipinDonation.getComment());
+        commentString = commentString.substring(0, ChipinDonation.maxCommentLength() - 1);
+        System.out.println("Warning, truncating comment with length > " + ChipinDonation.maxCommentLength());
       }
+      
+      int newDonationId = IdUtils.generateId();
+      
+      donations.insertDonation(
+        new Donation(
+            newDonationId,
+          DonationDomain.CHIPIN, 
+          chipinDonation.getChipinId(),
+          DonationBidState.PENDING, 
+          chipinDonation.getAmount(),
+          new Date(),
+          donor.getId(),
+          commentString
+          )
+        );
+    }
+    else if (found.getComment() == null && chipinDonation.getComment() != null)
+    {
+      donations.setDonationComment(found.getId(), chipinDonation.getComment());
     }
   }
-  
 }

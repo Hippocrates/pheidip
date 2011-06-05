@@ -40,7 +40,8 @@ public class DonationData
     }
   }
     
-  void setConnection(Connection connection)
+  // intentionally package protected
+  synchronized void setConnection(Connection connection)
   {
     this.connection = connection;
     
@@ -74,7 +75,7 @@ public class DonationData
     }
   }
   
-  public Donation getDonationById(int id)
+  synchronized public Donation getDonationById(int id)
   {
     Donation result = null;
     
@@ -97,7 +98,7 @@ public class DonationData
     return result;
   }
   
-  public List<Donation> getDonorDonations(int donorId)
+  synchronized public List<Donation> getDonorDonations(int donorId)
   {
     List<Donation> result = null;
     
@@ -129,7 +130,7 @@ public class DonationData
     return result;
   }
 
-  public BigDecimal getDonorDonationTotal(int id)
+  synchronized public BigDecimal getDonorDonationTotal(int id)
   {
     BigDecimal result = null;
     
@@ -171,12 +172,12 @@ public class DonationData
         );
   }
 
-  public void setDonationComment(int id, String comment)
+  synchronized public void setDonationComment(int id, String comment)
   {
     this.runStringFieldUpdate(this.updateDonationComment, id, comment);
   }
   
-  // todo: add a string parameter representing the column being updated
+  // todo: add a string parameter representing the name of the column being updated
   private void runStringFieldUpdate(PreparedStatement sql, int id, String value)
   {
     try
@@ -197,7 +198,7 @@ public class DonationData
     }
   }
 
-  public void deleteDonation(int id)
+  synchronized public void deleteDonation(int id)
   {
     try
     {
@@ -217,12 +218,12 @@ public class DonationData
     }
   }
   
-  public void setDonationBidState(int id, DonationBidState bidState)
+  synchronized public void setDonationBidState(int id, DonationBidState bidState)
   {
     this.runStringFieldUpdate(this.updateDonationBidState, id, bidState.toString());
   }
 
-  public void setDonationAmount(int donationId, BigDecimal amount)
+  synchronized public void setDonationAmount(int donationId, BigDecimal amount)
   {
     try
     {
@@ -249,7 +250,7 @@ public class DonationData
     }
   }
 
-  public void insertDonation(Donation d)
+  synchronized public void insertDonation(Donation d)
   {
     try
     {
@@ -275,7 +276,7 @@ public class DonationData
     }
   }
   
-  public void updateDonation(Donation updated)
+  synchronized public void updateDonation(Donation updated)
   {
     try
     {
@@ -296,7 +297,7 @@ public class DonationData
     }
   }
 
-  public Donation getDonationByDomainId(DonationDomain domain, String domainId)
+  synchronized public Donation getDonationByDomainId(DonationDomain domain, String domainId)
   {
     Donation result = null;
     

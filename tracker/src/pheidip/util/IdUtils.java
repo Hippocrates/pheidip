@@ -1,13 +1,13 @@
 package pheidip.util;
 
-import java.util.Date;
+import java.security.SecureRandom;
 
 public final class IdUtils
 {
+  private static final SecureRandom rand = new SecureRandom();
+  
   public static int generateId()
   {
-    Date d = new Date();
-    
-    return (int) d.getTime();
+    return rand.nextInt();
   }
 }

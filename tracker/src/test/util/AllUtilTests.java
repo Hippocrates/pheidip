@@ -13,6 +13,7 @@ public class AllUtilTests
     suite.addTestSuite(TestStringUtils.class);
     suite.addTestSuite(TestFilter.class);
     suite.addTestSuite(TestInnerStringMatchFilter.class);
+    suite.addTestSuite(TestIdUtils.class);
     //$JUnit-END$
     return suite;
   }
