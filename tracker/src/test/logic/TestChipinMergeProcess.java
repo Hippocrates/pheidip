@@ -119,7 +119,7 @@ public class TestChipinMergeProcess extends TestCase
     
     try
     {
-      thread.join(1000);
+      thread.join(10000);
     } 
     catch (InterruptedException e)
     {

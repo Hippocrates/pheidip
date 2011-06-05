@@ -1,6 +1,5 @@
 package pheidip.db;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,11 +13,8 @@ import pheidip.objects.Donor;
 // for example, we can generally identify what the issue is, based 
 // on which method we're in, and the sql code
 
-public class DonorData
+public class DonorData extends DataInterface
 {
-  private DonationDataAccess manager;
-  private Connection connection;
-  
   private PreparedStatement selectDonorByID;
   private PreparedStatement selectDonorByEmail;
   private PreparedStatement selectDonorByAlias;
@@ -33,47 +29,31 @@ public class DonorData
   
   public DonorData(DonationDataAccess manager)
   {
-    this.manager = manager;
-    
-    if (manager.isConnected())
-    {
-      this.setConnection(manager.getConnection());
-    }
+    super(manager);
   }
-  
-  // intentionally package protected
-  synchronized void setConnection(Connection connection)
-  {
-    this.connection = connection;
-    
-    if (this.connection != null)
-    {
-      this.rebuildPreparedStatements();
-    }
-  }
-  
-  private void rebuildPreparedStatements()
+
+  void rebuildPreparedStatements()
   {
     try
     {
-      this.selectDonorByID = this.connection.prepareStatement("SELECT * FROM Donor WHERE Donor.donorId = ?;");
-      this.selectDonorByEmail = this.connection.prepareStatement("SELECT * FROM Donor WHERE Donor.email = ?;");
-      this.selectDonorByAlias = this.connection.prepareStatement("SELECT * FROM Donor WHERE Donor.alias = ?;");
-      this.selectAllDonors = this.connection.prepareStatement("SELECT * FROM Donor;");
+      this.selectDonorByID = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.donorId = ?;");
+      this.selectDonorByEmail = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.email = ?;");
+      this.selectDonorByAlias = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.alias = ?;");
+      this.selectAllDonors = this.getConnection().prepareStatement("SELECT * FROM Donor;");
     
-      this.deleteDonorStatement = this.connection.prepareStatement("DELETE FROM Donor WHERE Donor.donorId = ?;");
+      this.deleteDonorStatement = this.getConnection().prepareStatement("DELETE FROM Donor WHERE Donor.donorId = ?;");
       
-      this.createDonorStatement = this.connection.prepareStatement("INSERT INTO Donor (donorId, email, alias, firstName, lastName) VALUES(?,?,?,?,?);");
+      this.createDonorStatement = this.getConnection().prepareStatement("INSERT INTO Donor (donorId, email, alias, firstName, lastName) VALUES(?,?,?,?,?);");
 
-      this.updateDonorEmailStatement = this.connection.prepareStatement("UPDATE Donor SET email = ? WHERE donorId = ?;");
-      this.updateDonorAliasStatement = this.connection.prepareStatement("UPDATE Donor SET alias = ? WHERE donorId = ?;");
-      this.updateDonorFirstNameStatement = this.connection.prepareStatement("UPDATE Donor SET firstName = ? WHERE donorId = ?;");
-      this.updateDonorLastNameStatement = this.connection.prepareStatement("UPDATE Donor SET lastName = ? WHERE donorId = ?;");
-      this.updateDonorStatement = this.connection.prepareStatement("UPDATE Donor SET email = ?, alias = ?, firstName = ?, lastName = ? WHERE donorId = ?;");
+      this.updateDonorEmailStatement = this.getConnection().prepareStatement("UPDATE Donor SET email = ? WHERE donorId = ?;");
+      this.updateDonorAliasStatement = this.getConnection().prepareStatement("UPDATE Donor SET alias = ? WHERE donorId = ?;");
+      this.updateDonorFirstNameStatement = this.getConnection().prepareStatement("UPDATE Donor SET firstName = ? WHERE donorId = ?;");
+      this.updateDonorLastNameStatement = this.getConnection().prepareStatement("UPDATE Donor SET lastName = ? WHERE donorId = ?;");
+      this.updateDonorStatement = this.getConnection().prepareStatement("UPDATE Donor SET email = ?, alias = ?, firstName = ?, lastName = ? WHERE donorId = ?;");
     } 
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
   
@@ -94,7 +74,7 @@ public class DonorData
     } 
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
     
     return result;
@@ -117,7 +97,7 @@ public class DonorData
     } 
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
     
     return result;
@@ -140,7 +120,7 @@ public class DonorData
     } 
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
     
     return result;
@@ -158,7 +138,7 @@ public class DonorData
     } 
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
     
     return result;
@@ -178,7 +158,7 @@ public class DonorData
     } 
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
   
@@ -201,7 +181,7 @@ public class DonorData
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
   
@@ -239,7 +219,7 @@ public class DonorData
     }
     catch(SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
   
@@ -260,7 +240,7 @@ public class DonorData
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
   

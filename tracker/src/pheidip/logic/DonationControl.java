@@ -7,7 +7,6 @@ import pheidip.db.DonorData;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.Donor;
-import pheidip.util.StringUtils;
 
 public class DonationControl
 {
@@ -41,20 +40,18 @@ public class DonationControl
   
   public void updateData(BigDecimal amount, String comment)
   {
-    this.donations.setDonationComment(this.donationId, StringUtils.nullIfEmpty(comment));
-  
-    Donation d = this.getData();
-    
-    if (!this.allowUpdateAmount() && !d.getAmount().equals(amount))
+    if (this.allowUpdateData())
     {
-      throw new RuntimeException("Update of amount not allowed on " + StringUtils.symbolToNatural(d.getDomain().toString()) + " donations.");
+      this.donations.setDonationAmount(this.donationId, amount);
+      this.donations.setDonationComment(this.donationId, comment);
     }
-    
-    this.donations.setDonationAmount(this.donationId, amount);
-    this.donations.setDonationComment(this.donationId, comment);
+    else
+    {
+      throw new RuntimeException("Raw updates not allowed on non-local donations.");
+    }
   }
   
-  public boolean allowUpdateAmount()
+  public boolean allowUpdateData()
   {
     Donation data = this.getData();
     

@@ -43,7 +43,7 @@ public class TestDonationData extends TestCase
       this.dataAccess.handleSQLException(e);
     }
 
-    this.donations = new DonationData(this.dataAccess);
+    this.donations = this.dataAccess.getDonationData();
   }
 
   public void tearDown()

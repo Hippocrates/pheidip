@@ -8,9 +8,15 @@ import pheidip.objects.ChipinDonation;
 
 public class ChipinMergeProcess implements Runnable
 {
+  public interface MergeStateCallback
+  {
+    void stateChanged(ChipinMergeState newState);
+  }
+  
   private DonationDatabaseManager donationDatabase;
   private ChipinDocumentSource documentSource;
   private ChipinMergeState currentState;
+  private MergeStateCallback listener;
 
   public ChipinMergeProcess(DonationDatabaseManager donationDatabase, ChipinDocumentSource documentSource)
   {
@@ -18,9 +24,16 @@ public class ChipinMergeProcess implements Runnable
     this.documentSource = documentSource;
     
     this.currentState = ChipinMergeState.IDLE;
+    
+    this.listener = null;
   }
   
-  public synchronized ChipinMergeState getState()
+  public synchronized void setListener(MergeStateCallback listener)
+  {
+    this.listener = listener;
+  }
+  
+  public ChipinMergeState getState()
   {
     return this.currentState;
   }
@@ -28,30 +41,33 @@ public class ChipinMergeProcess implements Runnable
   private synchronized void setState(ChipinMergeState newState)
   {
     this.currentState = newState;
+    
+    if (this.listener != null)
+    {
+      this.listener.stateChanged(this.currentState);
+    }
   }
   
   public void run()
   {
     try
     {
-      this.setState(ChipinMergeState.RETRIEVING);
-      
       Thread.sleep(0);
+      this.setState(ChipinMergeState.RETRIEVING);
       
       Document html = this.documentSource.provideDocument();
       
-      this.setState(ChipinMergeState.EXTRACTING);
-      
       Thread.sleep(0);
-      
+      this.setState(ChipinMergeState.EXTRACTING);
+
       List<ChipinDonation> donations = ChipinDonations.extractDonations(html);
       
+      Thread.sleep(0);
       this.setState(ChipinMergeState.MERGING);
       
       for (ChipinDonation d : donations)
       {
         Thread.sleep(0);
-        
         ChipinDonations.mergeDonation(this.donationDatabase, d);
       }
       

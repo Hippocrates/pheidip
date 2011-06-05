@@ -13,6 +13,7 @@ public class DonationDataAccess
   
   private DonorData donors;
   private DonationData donations;
+  private BidData bids;
   
   public DonationDataAccess()
   {
@@ -41,6 +42,16 @@ public class DonationDataAccess
     }
     
     return this.donations;
+  }
+
+  synchronized public BidData getBids()
+  {
+    if (this.bids == null)
+    {
+      this.bids = new BidData(this);
+    }
+    
+    return this.bids;
   }
   
   protected void finalize()

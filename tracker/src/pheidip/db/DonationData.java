@@ -1,7 +1,6 @@
 package pheidip.db;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,11 +12,8 @@ import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
 
-public class DonationData
+public class DonationData extends DataInterface
 {
-  private DonationDataAccess manager;
-  private Connection connection;
-  
   private PreparedStatement selectDonationById;
   private PreparedStatement selectDonationByDomainId;
   private PreparedStatement selectDonorDonations;
@@ -31,47 +27,30 @@ public class DonationData
   
   public DonationData(DonationDataAccess manager)
   {
-    this.manager = manager;
-    this.connection = null;
-    
-    if (this.manager.isConnected())
-    {
-      this.setConnection(this.manager.getConnection());
-    }
-  }
-    
-  // intentionally package protected
-  synchronized void setConnection(Connection connection)
-  {
-    this.connection = connection;
-    
-    if (this.connection != null)
-    {
-      this.rebuildPreparedStatements();
-    }
+    super(manager);
   }
 
-  private void rebuildPreparedStatements()
+  protected void rebuildPreparedStatements()
   {
     try
     {
-      this.selectDonationById = this.connection.prepareStatement("SELECT * FROM Donation WHERE Donation.donationId = ?;");
-      this.selectDonorDonations = this.connection.prepareStatement("SELECT * FROM Donation WHERE Donation.donorId = ?;");
-      this.selectDonationByDomainId = this.connection.prepareStatement("SELECT * FROM Donation WHERE Donation.domain = ? AND Donation.domainId = ?;");
-      this.selectDonorDonationTotal = this.connection.prepareStatement("SELECT SUM(Donation.amount) FROM Donation WHERE Donation.donorId = ?;");
+      this.selectDonationById = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE Donation.donationId = ?;");
+      this.selectDonorDonations = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE Donation.donorId = ?;");
+      this.selectDonationByDomainId = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE Donation.domain = ? AND Donation.domainId = ?;");
+      this.selectDonorDonationTotal = this.getConnection().prepareStatement("SELECT SUM(Donation.amount) FROM Donation WHERE Donation.donorId = ?;");
     
-      this.updateDonationComment = this.connection.prepareStatement("UPDATE Donation SET comment = ? WHERE Donation.donationId = ?;");
-      this.updateDonationBidState = this.connection.prepareStatement("UPDATE Donation SET bidState = ? WHERE Donation.donationId = ?;");
-      this.updateDonationStatement = this.connection.prepareStatement("UPDATE Donation SET donorId = ?, domain = ?, domainId = ?, bidState = ?, amount = ?, timeReceived = ?, comment = ? WHERE donationId = ?;");
-      this.updateDonationAmountStatement = this.connection.prepareStatement("UPDATE Donation SET amount = ? WHERE Donation.donationId = ?;");
+      this.updateDonationComment = this.getConnection().prepareStatement("UPDATE Donation SET comment = ? WHERE Donation.donationId = ?;");
+      this.updateDonationBidState = this.getConnection().prepareStatement("UPDATE Donation SET bidState = ? WHERE Donation.donationId = ?;");
+      this.updateDonationStatement = this.getConnection().prepareStatement("UPDATE Donation SET donorId = ?, domain = ?, domainId = ?, bidState = ?, amount = ?, timeReceived = ?, comment = ? WHERE donationId = ?;");
+      this.updateDonationAmountStatement = this.getConnection().prepareStatement("UPDATE Donation SET amount = ? WHERE Donation.donationId = ?;");
       
-      this.deleteDonationStatement = this.connection.prepareStatement("DELETE FROM Donation WHERE Donation.donationId = ?;");
+      this.deleteDonationStatement = this.getConnection().prepareStatement("DELETE FROM Donation WHERE Donation.donationId = ?;");
     
-      this.insertDonationStatement = this.connection.prepareStatement("INSERT INTO Donation (donationId, donorId, domain, domainId, bidState, amount, timeReceived, comment) VALUES (?,?,?,?,?,?,?,?);");
+      this.insertDonationStatement = this.getConnection().prepareStatement("INSERT INTO Donation (donationId, donorId, domain, domainId, bidState, amount, timeReceived, comment) VALUES (?,?,?,?,?,?,?,?);");
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
   
@@ -92,7 +71,7 @@ public class DonationData
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
     
     return result;
@@ -112,7 +91,7 @@ public class DonationData
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
     
     return result;
@@ -152,7 +131,7 @@ public class DonationData
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
     
     return result;
@@ -194,7 +173,7 @@ public class DonationData
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
 
@@ -214,7 +193,7 @@ public class DonationData
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
   
@@ -246,7 +225,7 @@ public class DonationData
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
 
@@ -272,7 +251,7 @@ public class DonationData
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
   
@@ -293,7 +272,7 @@ public class DonationData
     }
     catch(SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
   }
 
@@ -315,7 +294,7 @@ public class DonationData
     }
     catch (SQLException e)
     {
-      this.manager.handleSQLException(e);
+      this.getManager().handleSQLException(e);
     }
     
     return result;

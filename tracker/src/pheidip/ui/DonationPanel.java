@@ -19,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 @SuppressWarnings("serial")
 public class DonationPanel extends TabPanel
@@ -46,9 +47,9 @@ public class DonationPanel extends TabPanel
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{85, 85, 90, 90, 104, 0, 95};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 25, 0};
+    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 113, 25, 0};
     gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     amountLabel = new JLabel("Amount:");
@@ -77,9 +78,10 @@ public class DonationPanel extends TabPanel
     add(commentLabel, gbc_commentLabel);
     
     commentScrollPane = new JScrollPane();
+    commentScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
     gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
-    gbc_scrollPane_1.gridheight = 4;
+    gbc_scrollPane_1.gridheight = 7;
     gbc_scrollPane_1.gridwidth = 3;
     gbc_scrollPane_1.insets = new Insets(0, 0, 5, 0);
     gbc_scrollPane_1.gridx = 4;
@@ -87,6 +89,8 @@ public class DonationPanel extends TabPanel
     add(commentScrollPane, gbc_scrollPane_1);
     
     commentTextArea = new JTextArea();
+    commentTextArea.setLineWrap(true);
+    commentTextArea.setWrapStyleWord(true);
     commentScrollPane.setViewportView(commentTextArea);
     
     domainIdLabel = new JLabel("Domain Id:");
@@ -172,9 +176,9 @@ public class DonationPanel extends TabPanel
     
     deleteButton = new JButton("Delete Donation");
     GridBagConstraints gbc_deleteButton = new GridBagConstraints();
-    gbc_deleteButton.insets = new Insets(0, 0, 5, 5);
+    gbc_deleteButton.insets = new Insets(0, 0, 0, 5);
     gbc_deleteButton.gridx = 5;
-    gbc_deleteButton.gridy = 5;
+    gbc_deleteButton.gridy = 7;
     add(deleteButton, gbc_deleteButton);
   }
   
@@ -274,13 +278,17 @@ public class DonationPanel extends TabPanel
     this.amountField.setText(result.getAmount().toString());
     this.timeField.setText(result.getTimeReceived().toString());
     
-    if (this.donationControl.allowUpdateAmount())
+    if (this.donationControl.allowUpdateData())
     {
       this.amountField.setEditable(true);
+      this.commentTextArea.setEditable(true);
+      this.saveButton.setEnabled(true);
     }
     else
     {
       this.amountField.setEditable(false);
+      this.commentTextArea.setEditable(false);
+      this.saveButton.setEnabled(false);
     }
     
     this.domainIdField.setText(result.getDomainString());
@@ -294,7 +302,11 @@ public class DonationPanel extends TabPanel
   
   private void saveEnteredContent()
   {
-    this.donationControl.updateData(new BigDecimal(this.amountField.getText()), this.commentTextArea.getText());
+    if (this.donationControl.allowUpdateData())
+    {
+      this.donationControl.updateData(new BigDecimal(this.amountField.getText()), this.commentTextArea.getText());
+    }
+    
     this.refreshContent();
   }
 

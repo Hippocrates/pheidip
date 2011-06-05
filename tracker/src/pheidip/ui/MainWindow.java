@@ -1,5 +1,6 @@
 package pheidip.ui;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -16,10 +17,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+import pheidip.logic.ChipinDocumentSource;
+import pheidip.logic.ChipinFileDocumentSource;
+import pheidip.logic.ChipinMergeProcess;
+import pheidip.logic.ChipinTextDocumentSource;
+import pheidip.logic.ChipinWebsiteDocumentSource;
 import pheidip.logic.DonationControl;
 import pheidip.logic.DonorControl;
 import pheidip.logic.ProgramInstance;
 import pheidip.objects.Donor;
+import javax.swing.JSeparator;
 
 
 @SuppressWarnings("serial")
@@ -37,6 +44,12 @@ public class MainWindow extends JFrame
   private JMenuItem searchDonorButton;
   private JMenu createMenu;
   private JMenuItem createNewDonorButton;
+  private JMenu chipinMenu;
+  private JMenuItem chipinTextMergeButton;
+  private JMenuItem chipinFileMergeButton;
+  private JSeparator chipinMenuSeperator;
+  private JMenuItem chipinLoginButton;
+  private JMenuItem chipinWebsiteMergeButton;
   
   private void shutdown()
   {
@@ -72,6 +85,7 @@ public class MainWindow extends JFrame
     this.fileMenu.add(this.exitButton);
     
     this.searchMenu = new JMenu("Search");
+    this.searchMenu.setEnabled(false);
     this.menuBar.add(this.searchMenu);
     
     this.searchDonorButton = new JMenuItem("Search Donor...");
@@ -80,10 +94,31 @@ public class MainWindow extends JFrame
     this.setJMenuBar(this.menuBar);
     
     createMenu = new JMenu("Create");
+    this.createMenu.setEnabled(false);
     menuBar.add(createMenu);
     
     createNewDonorButton = new JMenuItem("Create New Donor");
     createMenu.add(createNewDonorButton);
+    
+    chipinMenu = new JMenu("Chipin");
+    this.chipinMenu.setEnabled(false);
+    menuBar.add(chipinMenu);
+    
+    chipinLoginButton = new JMenuItem("Log In...");
+    chipinMenu.add(chipinLoginButton);
+    
+    chipinMenuSeperator = new JSeparator();
+    chipinMenu.add(chipinMenuSeperator);
+    
+    chipinTextMergeButton = new JMenuItem("Merge from text...");
+    chipinMenu.add(chipinTextMergeButton);
+    
+    chipinFileMergeButton = new JMenuItem("Merge from file...");
+    chipinMenu.add(chipinFileMergeButton);
+    
+    chipinWebsiteMergeButton = new JMenuItem("Merge from chipin website");
+    chipinWebsiteMergeButton.setEnabled(false);
+    chipinMenu.add(chipinWebsiteMergeButton);
     
     // Initialise message area
     this.messageArea = new JTextField();
@@ -133,21 +168,61 @@ public class MainWindow extends JFrame
         MainWindow.this.createNewDonor();
       }
     });
+    
+    chipinLoginButton.addActionListener(new ActionListener() 
+    {
+      public void actionPerformed(ActionEvent arg0) 
+      {
+        if (!MainWindow.this.instance.getChipinLogin().isLoggedIn())
+        {
+          MainWindow.this.openChipinLoginDialog();
+        }
+        else
+        {
+          MainWindow.this.openChipinLogoutDialog();
+        }
+      }
+    });
+    
+    chipinTextMergeButton.addActionListener(new ActionListener() 
+    {
+      public void actionPerformed(ActionEvent arg0) 
+      {
+        MainWindow.this.openChipinTextMergeDialog();
+      }
+    });
+    
+    chipinFileMergeButton.addActionListener(new ActionListener() 
+    {
+      public void actionPerformed(ActionEvent arg0) 
+      {
+        MainWindow.this.openChipinFileMergeDialog();
+      }
+    });
+    
+    chipinWebsiteMergeButton.addActionListener(new ActionListener() 
+    {
+      public void actionPerformed(ActionEvent arg0) 
+      {
+        if (MainWindow.this.instance.getChipinLogin().isLoggedIn())
+        {
+          MainWindow.this.runChipinWebsiteMerge();
+        }
+      }
+    });
   }
 
   public MainWindow()
   {
-    this.initializeGUI();
-    this.initializeGUIEvents();
-    
     // Initialise program logic
     this.instance = new ProgramInstance();
+    
+    this.initializeGUI();
+    this.initializeGUIEvents();
   }
 
-  protected void insertTab(Component panel)
+  private void insertTab(Component panel)
   {
-    // TODO: make this only accept a panel that can confirm its own closing
-    // (TabHeader would need to change as well)
     this.tabbedPane.add(panel);
     int index = this.tabbedPane.indexOfComponent(panel);
 
@@ -181,6 +256,88 @@ public class MainWindow extends JFrame
     }
   }
   
+  protected void runChipinWebsiteMerge()
+  {
+    if (this.instance.getChipinLogin().isLoggedIn())
+    {
+      ChipinDocumentSource source = new ChipinWebsiteDocumentSource(this.instance.getChipinLogin());
+      this.openChipinMergeTab(source);
+    }
+    else
+    {
+      throw new RuntimeException("Error, not logged in.");
+    }
+  }
+ 
+  private void openChipinTextMergeDialog()
+  {
+    ChipinTextMergeDialog dialog = new ChipinTextMergeDialog(this);
+    dialog.setVisible(true);
+    
+    if (dialog.getResultText() != null)
+    {
+      ChipinDocumentSource source = new ChipinTextDocumentSource(dialog.getResultText());
+      this.openChipinMergeTab(source);
+    }
+  }
+
+  protected void openChipinFileMergeDialog()
+  {
+    JFileChooser fileChooser = new JFileChooser();
+    int result = fileChooser.showOpenDialog(this);
+    
+    if (result == JFileChooser.APPROVE_OPTION)
+    {
+      ChipinDocumentSource source = new ChipinFileDocumentSource(fileChooser.getSelectedFile());
+      this.openChipinMergeTab(source);
+    }
+  }
+ 
+  private void openChipinLogoutDialog()
+  {
+    if (this.instance.getChipinLogin().isLoggedIn())
+    {
+      int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to log out of www.chipin.com?", "Confirm logout...", JOptionPane.YES_NO_OPTION);
+      
+      if (result == JOptionPane.YES_OPTION)
+      {
+        this.instance.getChipinLogin().logOut();
+        this.chipinLoginButton.setText("Log In...");
+        this.chipinWebsiteMergeButton.setEnabled(false);
+      }
+    }
+    else
+    {
+      throw new RuntimeException("Error, not logged in.");
+    }
+  }
+
+  private void openChipinLoginDialog()
+  {
+    if (!this.instance.getChipinLogin().isLoggedIn())
+    {
+      ChipinLoginDialog dialog = new ChipinLoginDialog(this, this.instance.getChipinLogin());
+      dialog.setVisible(true);
+      
+      if (this.instance.getChipinLogin().isLoggedIn())
+      {
+        this.chipinLoginButton.setText("Log Out...");
+        this.chipinWebsiteMergeButton.setEnabled(true);
+      }
+    }
+    else
+    {
+      throw new RuntimeException("Error, already logged in.");
+    }
+  }
+  
+  private void openChipinMergeTab(ChipinDocumentSource documentSource)
+  {
+    ChipinMergeTab tab = new ChipinMergeTab(new ChipinMergeProcess(this.instance.getDonationDatabase(), documentSource));
+    this.insertTab(tab);
+    tab.setHeaderText("Chipin Merge");
+  }
+  
   private void openConnectDialog()
   {
     DatabaseConnectDialog dialog = new DatabaseConnectDialog(this, this.instance.getDonationDatabase());
@@ -188,7 +345,15 @@ public class MainWindow extends JFrame
     
     if (this.instance.getDonationDatabase().isConnected())
     {
+      //TODO: Change this (and all the other UI state management)
+      // to a single method called 'updateUIState' that will perform
+      // all of these checks at once, and can be called whenever there
+      // is a potential UI change in state
+      // n.b. this isn't the only window that needs this done
       this.connectButton.setText("Disconnect...");
+      this.createMenu.setEnabled(true);
+      this.searchMenu.setEnabled(true);
+      this.chipinMenu.setEnabled(true);
     }
   }
   
@@ -253,6 +418,9 @@ public class MainWindow extends JFrame
       this.tabbedPane.removeAll();
       this.instance.getDonationDatabase().closeConnection();
       this.connectButton.setText("Connect...");
+      this.createMenu.setEnabled(false);
+      this.searchMenu.setEnabled(false);
+      this.chipinMenu.setEnabled(false);
     }
   }
   

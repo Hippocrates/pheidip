@@ -13,6 +13,7 @@ INSERT INTO SpeedRun VALUES(2, 'run 2');
 INSERT INTO Choice VALUES(1, 1, 'naming something');
 INSERT INTO Choice VALUES(2, 1, 'naming something else');
 INSERT INTO Choice VALUES(3, 1, 'a path of some sort');
+INSERT INTO Choice VALUES(4, 2, 'not part of game 1');
 
 INSERT INTO ChoiceOption VALUES(1, 1, 'name 1');
 INSERT INTO ChoiceOption VALUES(2, 1, 'name 2');
