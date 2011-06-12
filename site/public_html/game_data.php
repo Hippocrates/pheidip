@@ -27,11 +27,17 @@ if ($game == null)
 else
 {
   $choices = $data->getSpeedRunChoices($game['speedRunId']);
+  $challenges = $data->getSpeedRunChallenges($game['speedRunId']);
   
+  if (count($choices) == 0 && count($options) == 0)
+  {
+  	echo "<h3>There are no choices are challenges submitted for this run.</h3>";
+  }
+
   foreach ($choices as $choice)
   {
     $choiceName = $choice['name'];
-    echo "<h3>Runner Choice: $choiceName:</h3>";
+    echo "<h3>Choice '$choiceName':</h3>";
     
     $options = $data->getChoiceOptions($choice['choiceId']);
     
@@ -50,16 +56,15 @@ else
   }
   
   echo "";
-  
-  $challenges = $data->getSpeedRunChallenges($game['speedRunId']);
-  
+
   foreach ($challenges as $challenge)
   {
     $challengeName = $challenge['name'];
     $challengeTotal = number_format($data->getChallengeSum($challenge['challengeId']), 2, '.', '');
     $challengeGoal = number_format($challenge['goalAmount'], 2, '.', '');
     
-    echo "<h3>Runner Challenge:</h3>\n <h4>$challengeName : $$challengeTotal of $$challengeGoal</h4>";
+    echo "<h3>Challenge '$challengeName':</h3>";
+    echo "<h4>Collected $$challengeTotal of $$challengeGoal so far.</h4>";
   }
   echo "";
 }
