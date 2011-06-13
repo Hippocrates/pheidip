@@ -140,3 +140,24 @@ CREATE TABLE ChallengeBid
   
   PRIMARY KEY (challengeBidId)
 );
+
+CREATE TABLE Prize
+(
+  prizeId INTEGER,
+  name VARCHAR(63),
+  
+  UNIQUE(name),
+  CHECK(name = lower(name)),
+  
+  PRIMARY KEY(prizeId)
+);
+
+CREATE TABLE PrizeWinner
+(
+  prizeId INTEGER,
+  donorId INTEGER,
+  
+  FOREIGN KEY (donorId) REFERENCES Donor (donorId),
+  
+  PRIMARY KEY(prizeId)
+);

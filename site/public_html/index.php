@@ -16,6 +16,10 @@ $data = new DataAccess($donationDB);
 <?php
 $runs = $data->getAllSpeedRuns();
 
+echo "This page desperately needs attention by a real web designer...";
+
+echo "<h3>List of all runs:</h3>";
+
 foreach($runs as $run)
 {
   $runId = $run['speedRunId'];
