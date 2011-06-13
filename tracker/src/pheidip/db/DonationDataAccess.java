@@ -14,6 +14,7 @@ public class DonationDataAccess
   private DonorData donors;
   private DonationData donations;
   private BidData bids;
+  private SpeedRunData speedRuns;
   
   public DonationDataAccess()
   {
@@ -52,6 +53,16 @@ public class DonationDataAccess
     }
     
     return this.bids;
+  }
+  
+  synchronized public SpeedRunData getSpeedRuns()
+  {
+    if (this.speedRuns == null)
+    {
+      this.speedRuns = new SpeedRunData(this);
+    }
+    
+    return this.speedRuns;
   }
   
   protected void finalize()

@@ -1,57 +1,23 @@
 package test.db;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.TestCase;
 
-import pheidip.db.DonationDataAccess;
 import pheidip.db.DonationData;
-import pheidip.db.ScriptRunner;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
 
-public class TestDonationData extends TestCase
+public class TestDonationData extends DonationDatabaseTest
 {
-  private DonationDataAccess dataAccess;
-  private DonationData donations;
-
+  DonationData donations;
+  
   public void setUp()
   {
-    this.dataAccess = new DonationDataAccess();
-    this.dataAccess.createMemoryDatabase();
-
-    ScriptRunner runner = new ScriptRunner(this.dataAccess.getConnection(), true,
-        true);
-
-    try
-    {
-      runner.runScript(new FileReader(DBTestConfiguration
-          .getTestDataDirectory() + "donation_bid_test_data_1.sql"));
-    } 
-    catch (IOException e)
-    {
-      fail(e.getMessage());
-    } 
-    catch (SQLException e)
-    {
-      this.dataAccess.handleSQLException(e);
-    }
-
-    this.donations = this.dataAccess.getDonationData();
-  }
-
-  public void tearDown()
-  {
-    if (this.dataAccess.isConnected())
-    {
-      this.dataAccess.closeConnection();
-    }
+    super.setUp();
+    this.donations = this.getDataAccess().getDonationData();
   }
 
   public void testGetDonationById()

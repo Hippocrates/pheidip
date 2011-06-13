@@ -21,10 +21,6 @@ public class DonorData extends DataInterface
   private PreparedStatement selectAllDonors;
   private PreparedStatement deleteDonorStatement;
   private PreparedStatement createDonorStatement;
-  private PreparedStatement updateDonorEmailStatement;
-  private PreparedStatement updateDonorAliasStatement;
-  private PreparedStatement updateDonorFirstNameStatement;
-  private PreparedStatement updateDonorLastNameStatement;
   private PreparedStatement updateDonorStatement;
   
   public DonorData(DonationDataAccess manager)
@@ -44,11 +40,6 @@ public class DonorData extends DataInterface
       this.deleteDonorStatement = this.getConnection().prepareStatement("DELETE FROM Donor WHERE Donor.donorId = ?;");
       
       this.createDonorStatement = this.getConnection().prepareStatement("INSERT INTO Donor (donorId, email, alias, firstName, lastName) VALUES(?,?,?,?,?);");
-
-      this.updateDonorEmailStatement = this.getConnection().prepareStatement("UPDATE Donor SET email = ? WHERE donorId = ?;");
-      this.updateDonorAliasStatement = this.getConnection().prepareStatement("UPDATE Donor SET alias = ? WHERE donorId = ?;");
-      this.updateDonorFirstNameStatement = this.getConnection().prepareStatement("UPDATE Donor SET firstName = ? WHERE donorId = ?;");
-      this.updateDonorLastNameStatement = this.getConnection().prepareStatement("UPDATE Donor SET lastName = ? WHERE donorId = ?;");
       this.updateDonorStatement = this.getConnection().prepareStatement("UPDATE Donor SET email = ?, alias = ?, firstName = ?, lastName = ? WHERE donorId = ?;");
     } 
     catch (SQLException e)
@@ -185,26 +176,6 @@ public class DonorData extends DataInterface
     }
   }
   
-  synchronized public void setDonorEmail(int id, String newEmail)
-  {
-    this.runStringFieldUpdate(this.updateDonorEmailStatement, id, newEmail.toLowerCase());
-  }
-  
-  synchronized public void setDonorAlias(int id, String newAlias)
-  {
-    this.runStringFieldUpdate(this.updateDonorAliasStatement, id, newAlias.toLowerCase());
-  }
-  
-  synchronized public void setDonorFirstName(int id, String newFirstName)
-  {
-    this.runStringFieldUpdate(this.updateDonorFirstNameStatement, id, newFirstName);
-  }
-  
-  synchronized public void setDonorLastName(int id, String newLastName)
-  {
-    this.runStringFieldUpdate(this.updateDonorLastNameStatement, id, newLastName);
-  }
-  
   synchronized public void updateDonor(Donor donor)
   {
     try
@@ -218,27 +189,6 @@ public class DonorData extends DataInterface
       this.updateDonorStatement.execute();
     }
     catch(SQLException e)
-    {
-      this.getManager().handleSQLException(e);
-    }
-  }
-  
-  // todo: add a string parameter representing the column being updated
-  private void runStringFieldUpdate(PreparedStatement sql, int id, String value)
-  {
-    try
-    {
-      sql.setInt(2, id);
-      sql.setString(1, value);
-      
-      int created = sql.executeUpdate();
-      
-      if (created != 1)
-      {
-        throw new RuntimeException("Error, update of donor failed.");
-      }
-    }
-    catch (SQLException e)
     {
       this.getManager().handleSQLException(e);
     }

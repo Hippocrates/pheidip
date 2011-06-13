@@ -9,6 +9,7 @@ INSERT INTO Donor VALUES(6, null, null, '', '');
 
 INSERT INTO SpeedRun VALUES(1, 'run 1');
 INSERT INTO SpeedRun VALUES(2, 'run 2');
+INSERT INTO SpeedRun VALUES(3, 'yet another run');
 
 INSERT INTO Choice VALUES(1, 1, 'naming something');
 INSERT INTO Choice VALUES(2, 1, 'naming something else');
@@ -22,6 +23,7 @@ INSERT INTO ChoiceOption VALUES(3, 2, 'name 1');
 INSERT INTO Challenge VALUES(1, 2, 'challenge 1', 20.00);
 INSERT INTO Challenge VALUES(2, 1, 'challenge 2', 50.00);
 INSERT INTO Challenge VALUES(3, 2, 'challenge 2', 100.00);
+INSERT INTO Challenge VALUES(4, 2, 'challenge whatever', 150.00);
 
 INSERT INTO Donation VALUES(1, 1, 'LOCAL', null, 'PENDING', 12.40, '2004-10-18 23:32:34', null);
 INSERT INTO Donation VALUES(2, 2, 'LOCAL', null, 'PENDING', 25.00, '2006-10-18 00:32:34', null);

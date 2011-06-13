@@ -1,51 +1,19 @@
 package test.db;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import pheidip.db.DonationDataAccess;
 import pheidip.db.DonorData;
-import pheidip.db.ScriptRunner;
 import pheidip.objects.Donor;
-import junit.framework.TestCase;
 
-public class TestDonorData extends TestCase
+public class TestDonorData extends DonationDatabaseTest
 {
-  private DonationDataAccess dataAccess;
   private DonorData donors;
 
   public void setUp()
   {
-    this.dataAccess = new DonationDataAccess();
-    this.dataAccess.createMemoryDatabase();
-    
-    ScriptRunner runner = new ScriptRunner(this.dataAccess.getConnection(), true, true);
-    
-    try
-    {
-      runner.runScript(new FileReader(DBTestConfiguration.getTestDataDirectory() + "donation_bid_test_data_1.sql"));
-    }
-    catch (IOException e)
-    {
-      fail(e.getMessage());
-    } 
-    catch (SQLException e)
-    {
-      fail(e.getMessage());
-    }
-    
-    this.donors = this.dataAccess.getDonorData();
-  }
-  
-  public void tearDown()
-  {
-    if (this.dataAccess.isConnected())
-    {
-      this.dataAccess.closeConnection();
-    }
+    super.setUp();
+    this.donors = this.getDataAccess().getDonorData();
   }
   
   public void testGetDonorById()
@@ -120,59 +88,6 @@ public class TestDonorData extends TestCase
     assertEquals(a.getAlias(), b.getAlias());
     assertEquals(a.getFirstName(), b.getFirstName());
     assertEquals(a.getLastName(), b.getLastName());
-  }
-  
-  public void testUpdateDonorEmail()
-  {
-    final String newEmail = "DifFerent@eMAil.com";
-    this.donors.setDonorEmail(1, newEmail);
-    
-    Donor result = this.donors.getDonorById(1);
-    
-    assertEquals(newEmail.toLowerCase(), result.getEmail());
-    
-    try
-    {
-      this.donors.setDonorEmail(2, newEmail);
-      
-      fail("Error, update allowed duplicate.");
-    }
-    catch (Exception e)
-    {
-      // pass
-    }
-  }
-  
-  public void testUpdateDonorAlias()
-  {
-    final String newAlias = "sMk";
-    this.donors.setDonorAlias(1, newAlias);
-    
-    Donor result = this.donors.getDonorById(1);
-    
-    assertEquals(newAlias.toLowerCase(), result.getAlias());
-    
-    try
-    {
-      this.donors.setDonorAlias(2, newAlias);
-      
-      fail("Error, update allowed duplicate.");
-    }
-    catch (Exception e)
-    {
-      // pass
-    }
-    
-    try
-    {
-      this.donors.setDonorAlias(7, "something different");
-      
-      fail("Error, update non-existant allowed.");
-    }
-    catch (Exception e)
-    {
-      // pass
-    }
   }
   
   public void testUpdateDonor()

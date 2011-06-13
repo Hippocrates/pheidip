@@ -79,7 +79,7 @@ CREATE TABLE Choice
   name VARCHAR(63),
 
   FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
-  UNIQUE (name),
+  UNIQUE (speedRunId, name),
   CHECK (name = lower(name)),
   
   PRIMARY KEY (choiceId)
