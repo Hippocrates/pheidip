@@ -7,10 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import pheidip.logic.DonationDatabaseManager;
 import pheidip.logic.DonorSearch;
 import pheidip.objects.Donor;
-import test.db.DBTestConfiguration;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
@@ -43,29 +41,6 @@ public class DonorSearchDialog extends JDialog
   private JButton searchButton;
   private JButton okButton;
   private JButton cancelButton;
-
-  /**
-   * Launch the application.
-   */
-  public static void main(String[] args)
-  {
-    try
-    {
-      DonationDatabaseManager manager = new DonationDatabaseManager();
-      manager.createMemoryDatabase();
-      manager.runSQLScript(DBTestConfiguration.getTestDataDirectory() + "donation_bid_test_data_1.sql");
-      
-      DonorSearchDialog dialog = new DonorSearchDialog(null, manager);
-      dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-      dialog.setVisible(true);
-      
-      System.out.println(dialog.getResult());
-    } 
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
-  }
   
   private void initializeGUI()
   {
@@ -78,9 +53,9 @@ public class DonorSearchDialog extends JDialog
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     
     GridBagLayout gbl_panel = new GridBagLayout();
-    gbl_panel.columnWidths = new int[]{0, 190, 90, 76, 0};
+    gbl_panel.columnWidths = new int[]{0, 66, 112, 90, 76, 0};
     gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-    gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gbl_panel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_panel);
 
@@ -94,6 +69,7 @@ public class DonorSearchDialog extends JDialog
 
     firstNameField = new JTextField();
     GridBagConstraints gbc_textField = new GridBagConstraints();
+    gbc_textField.gridwidth = 2;
     gbc_textField.insets = new Insets(0, 0, 5, 5);
     gbc_textField.fill = GridBagConstraints.HORIZONTAL;
     gbc_textField.gridx = 1;
@@ -107,7 +83,7 @@ public class DonorSearchDialog extends JDialog
     gbc_scrollPane.gridheight = 6;
     gbc_scrollPane.gridwidth = 2;
     gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
-    gbc_scrollPane.gridx = 2;
+    gbc_scrollPane.gridx = 3;
     gbc_scrollPane.gridy = 0;
     contentPanel.add(donorScrollPane, gbc_scrollPane);
     {
@@ -125,6 +101,7 @@ public class DonorSearchDialog extends JDialog
 
     lastNameField = new JTextField();
     GridBagConstraints gbc_textField_1 = new GridBagConstraints();
+    gbc_textField_1.gridwidth = 2;
     gbc_textField_1.insets = new Insets(0, 0, 5, 5);
     gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
     gbc_textField_1.gridx = 1;
@@ -142,6 +119,7 @@ public class DonorSearchDialog extends JDialog
 
     aliasField = new JTextField();
     GridBagConstraints gbc_textField_2 = new GridBagConstraints();
+    gbc_textField_2.gridwidth = 2;
     gbc_textField_2.insets = new Insets(0, 0, 5, 5);
     gbc_textField_2.fill = GridBagConstraints.HORIZONTAL;
     gbc_textField_2.gridx = 1;
@@ -159,26 +137,27 @@ public class DonorSearchDialog extends JDialog
 
     emailField = new JTextField();
     GridBagConstraints gbc_textField_3 = new GridBagConstraints();
+    gbc_textField_3.gridwidth = 2;
     gbc_textField_3.insets = new Insets(0, 0, 5, 5);
     gbc_textField_3.fill = GridBagConstraints.HORIZONTAL;
     gbc_textField_3.gridx = 1;
     gbc_textField_3.gridy = 3;
     contentPanel.add(emailField, gbc_textField_3);
     emailField.setColumns(10);
-
-    searchButton = new JButton("Search");
-    GridBagConstraints gbc_btnSearch = new GridBagConstraints();
-    gbc_btnSearch.fill = GridBagConstraints.HORIZONTAL;
-    gbc_btnSearch.insets = new Insets(0, 0, 5, 5);
-    gbc_btnSearch.gridx = 1;
-    gbc_btnSearch.gridy = 5;
-    contentPanel.add(searchButton, gbc_btnSearch);
+    
+        searchButton = new JButton("Search");
+        GridBagConstraints gbc_btnSearch = new GridBagConstraints();
+        gbc_btnSearch.fill = GridBagConstraints.HORIZONTAL;
+        gbc_btnSearch.insets = new Insets(0, 0, 5, 5);
+        gbc_btnSearch.gridx = 2;
+        gbc_btnSearch.gridy = 5;
+        contentPanel.add(searchButton, gbc_btnSearch);
 
     okButton = new JButton("OK");
     GridBagConstraints gbc_okButton = new GridBagConstraints();
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
-    gbc_okButton.gridx = 2;
+    gbc_okButton.gridx = 3;
     gbc_okButton.gridy = 6;
     contentPanel.add(okButton, gbc_okButton);
     getRootPane().setDefaultButton(okButton);
@@ -186,7 +165,7 @@ public class DonorSearchDialog extends JDialog
     cancelButton = new JButton("Cancel");
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_cancelButton.gridx = 3;
+    gbc_cancelButton.gridx = 4;
     gbc_cancelButton.gridy = 6;
     contentPanel.add(cancelButton, gbc_cancelButton);
   }
@@ -222,14 +201,14 @@ public class DonorSearchDialog extends JDialog
    * Create the dialog.
    * @param manager 
    */
-  public DonorSearchDialog(JFrame parent, DonationDatabaseManager manager)
+  public DonorSearchDialog(JFrame parent, DonorSearch searcher)
   {
     super(parent, true);
     
     this.initializeGUI();
     this.initializeGUIEvents();
     
-    this.searcher = new DonorSearch(manager);
+    this.searcher = searcher;
     this.resultDonor = null;
   }
   

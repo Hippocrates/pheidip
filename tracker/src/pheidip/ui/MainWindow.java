@@ -24,8 +24,13 @@ import pheidip.logic.ChipinTextDocumentSource;
 import pheidip.logic.ChipinWebsiteDocumentSource;
 import pheidip.logic.DonationControl;
 import pheidip.logic.DonorControl;
+import pheidip.logic.DonorSearch;
 import pheidip.logic.ProgramInstance;
+import pheidip.logic.SpeedRunControl;
+import pheidip.logic.SpeedRunSearch;
 import pheidip.objects.Donor;
+import pheidip.objects.SpeedRun;
+
 import javax.swing.JSeparator;
 
 
@@ -50,6 +55,8 @@ public class MainWindow extends JFrame
   private JSeparator chipinMenuSeperator;
   private JMenuItem chipinLoginButton;
   private JMenuItem chipinWebsiteMergeButton;
+  private JMenuItem searchRunButton;
+  private JMenuItem createNewRunButton;
   
   private void shutdown()
   {
@@ -90,6 +97,9 @@ public class MainWindow extends JFrame
     
     this.searchDonorButton = new JMenuItem("Search Donor...");
     this.searchMenu.add(this.searchDonorButton);
+    
+    searchRunButton = new JMenuItem("Search Run...");
+    searchMenu.add(searchRunButton);
    
     this.setJMenuBar(this.menuBar);
     
@@ -99,6 +109,9 @@ public class MainWindow extends JFrame
     
     createNewDonorButton = new JMenuItem("Create New Donor");
     createMenu.add(createNewDonorButton);
+    
+    createNewRunButton = new JMenuItem("Create New Run");
+    createMenu.add(createNewRunButton);
     
     chipinMenu = new JMenu("Chipin");
     this.chipinMenu.setEnabled(false);
@@ -158,6 +171,22 @@ public class MainWindow extends JFrame
       public void actionPerformed(ActionEvent arg0)
       {
         MainWindow.this.openSearchDonorDialog();
+      }
+    });
+    
+    searchRunButton.addActionListener(new ActionListener() 
+    {
+      public void actionPerformed(ActionEvent arg0) 
+      {
+        MainWindow.this.openSearchSpeedRunDialog();
+      }
+    });
+    
+    createNewRunButton.addActionListener(new ActionListener() 
+    {
+      public void actionPerformed(ActionEvent arg0) 
+      {
+        MainWindow.this.createNewSpeedRun();
       }
     });
     
@@ -359,7 +388,7 @@ public class MainWindow extends JFrame
   
   private void openSearchDonorDialog()
   {
-    DonorSearchDialog dialog = new DonorSearchDialog(null, this.instance.getDonationDatabase());
+    DonorSearchDialog dialog = new DonorSearchDialog(null, new DonorSearch(this.instance.getDonationDatabase()));
     
     dialog.setVisible(true);
     
@@ -371,6 +400,39 @@ public class MainWindow extends JFrame
     }
   }
   
+  private void openSearchSpeedRunDialog()
+  {
+    SpeedRunSearchDialog dialog = new SpeedRunSearchDialog(null, new SpeedRunSearch(this.instance.getDonationDatabase()));
+    
+    dialog.setVisible(true);
+    
+    SpeedRun result = dialog.getResult();
+    
+    if (result != null)
+    {
+      this.openSpeedRunTab(result.getId());
+    }
+  }
+  
+  protected void openSpeedRunTab(int speedRunId)
+  {
+    // prevent opening the same tab twice
+    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    {
+      Component target = this.tabbedPane.getComponentAt(i);
+      if (target instanceof SpeedRunPanel && ((SpeedRunPanel)target).getSpeedRunId() == speedRunId)
+      {
+        this.focusOnTab(i);
+        return;
+      }
+    }
+    
+    SpeedRunControl ctrl = new SpeedRunControl(this.instance.getDonationDatabase(), speedRunId);
+    SpeedRunPanel panel = new SpeedRunPanel(this, ctrl);
+    this.insertTab(panel);
+    panel.refreshContent();
+  }
+
   protected void openDonorTab(int donorId)
   {
     // prevent opening the same tab twice
@@ -432,6 +494,12 @@ public class MainWindow extends JFrame
     {
       this.shutdown();
     }
+  }
+
+  protected void createNewSpeedRun()
+  {
+    int newId = SpeedRunControl.createNewSpeedRun(this.instance.getDonationDatabase());
+    this.openSpeedRunTab(newId);
   }
     
   private void createNewDonor()

@@ -2,7 +2,7 @@ package pheidip.objects;
 
 import java.math.BigDecimal;
 
-public class Challenge
+public class Challenge implements Bid
 {
   private int id;
   private int speedRunId;
@@ -35,5 +35,11 @@ public class Challenge
   public BigDecimal getGoalAmount()
   {
     return this.goalAmount;
+  }
+
+  @Override
+  public BidType getType()
+  {
+    return BidType.CHALLENGE;
   }
 }

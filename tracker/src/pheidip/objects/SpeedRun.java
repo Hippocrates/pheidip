@@ -20,4 +20,9 @@ public class SpeedRun
   {
     return name;
   }
+  
+  public String toString()
+  {
+    return this.getName();
+  }
 }

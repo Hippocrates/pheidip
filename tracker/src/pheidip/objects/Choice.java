@@ -1,6 +1,6 @@
 package pheidip.objects;
 
-public class Choice
+public class Choice implements Bid
 {
 	private String name;
   private int id;
@@ -26,5 +26,11 @@ public class Choice
   public int getId()
   {
     return id;
+  }
+
+  @Override
+  public BidType getType()
+  {
+    return BidType.CHOICE;
   }
 }

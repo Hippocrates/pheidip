@@ -1,5 +1,7 @@
 package test.db;
 
+import java.util.List;
+
 import pheidip.db.SpeedRunData;
 import pheidip.objects.SpeedRun;
 
@@ -63,5 +65,12 @@ public class TestSpeedRunData extends DonationDatabaseTest
     SpeedRun sprime = this.speedRuns.getSpeedRunById(runId);
     
     assertEquals(newName, sprime.getName());
+  }
+  
+  public void testGetAllSpeedRuns()
+  {
+    List<SpeedRun> all = this.speedRuns.getAllSpeedRuns();
+    
+    assertEquals(3, all.size());
   }
 }
