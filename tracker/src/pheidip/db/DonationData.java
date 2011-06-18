@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import pheidip.objects.ChallengeBid;
+import pheidip.objects.ChoiceBid;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
@@ -24,6 +26,14 @@ public class DonationData extends DataInterface
   private PreparedStatement insertDonationStatement;
   private PreparedStatement updateDonationStatement;
   private PreparedStatement updateDonationAmountStatement;
+  private PreparedStatement selectDonationChallengeBidsStatement;
+  private PreparedStatement selectDonationChoiceBidsStatement;
+  private PreparedStatement insertDonationChallengeBidStatement;
+  private PreparedStatement insertDonationChoiceBidStatement;
+  private PreparedStatement updateDonationChallengeBidStatement;
+  private PreparedStatement updateDonationChoiceBidStatement;
+  private PreparedStatement deleteDonationChallengeBidStatement;
+  private PreparedStatement deleteDonationChoiceBidStatement;
   
   public DonationData(DonationDataAccess manager)
   {
@@ -34,6 +44,17 @@ public class DonationData extends DataInterface
   {
     try
     {
+      this.updateDonationChallengeBidStatement = this.getConnection().prepareStatement("UPDATE ChallengeBid SET amount = ? WHERE ChallengeBid.challengeBidId = ?;");
+      this.updateDonationChoiceBidStatement = this.getConnection().prepareStatement("UPDATE ChoiceBid SET amount = ? WHERE ChoiceBid.choiceBidId = ?;");
+      this.deleteDonationChallengeBidStatement = this.getConnection().prepareStatement("DELETE FROM ChallengeBid WHERE ChallengeBid.challengeBidId = ?;");
+      this.deleteDonationChoiceBidStatement = this.getConnection().prepareStatement("DELETE FROM ChoiceBid WHERE ChoiceBid.choiceBidId = ?;");
+      
+      this.insertDonationChallengeBidStatement = this.getConnection().prepareStatement("INSERT INTO ChallengeBid (challengeBidId, amount, challengeId, donationId) VALUES (?,?,?,?);");
+      this.insertDonationChoiceBidStatement = this.getConnection().prepareStatement("INSERT INTO ChoiceBid (choiceBidId, amount, optionId, donationId) VALUES (?,?,?,?);");
+      
+      this.selectDonationChallengeBidsStatement = this.getConnection().prepareStatement("SELECT * FROM ChallengeBid WHERE ChallengeBid.donationId = ?;");
+      this.selectDonationChoiceBidsStatement = this.getConnection().prepareStatement("SELECT * FROM ChoiceBid WHERE ChoiceBid.donationId = ?;");
+      
       this.selectDonationById = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE Donation.donationId = ?;");
       this.selectDonorDonations = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE Donation.donorId = ?;");
       this.selectDonationByDomainId = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE Donation.domain = ? AND Donation.domainId = ?;");
@@ -149,6 +170,48 @@ public class DonationData extends DataInterface
         row.getInt("donorId"),
         row.getString("comment")
         );
+  }
+  
+  private static ChallengeBid extractChallengeBid(ResultSet row) throws SQLException
+  {
+    return new ChallengeBid(
+        row.getInt("challengeBidId"),
+        row.getBigDecimal("amount"),
+        row.getInt("challengeId"),
+        row.getInt("donationId"));
+  }
+  
+  private static List<ChallengeBid> extractChallengeBidList(ResultSet row) throws SQLException
+  {
+    List<ChallengeBid> list = new ArrayList<ChallengeBid>();
+    
+    while (row.next())
+    {
+      list.add(extractChallengeBid(row));
+    }
+    
+    return list;
+  }
+  
+  private static ChoiceBid extractChoiceBid(ResultSet row) throws SQLException
+  {
+    return new ChoiceBid(
+        row.getInt("choiceBidId"),
+        row.getBigDecimal("amount"),
+        row.getInt("optionId"),
+        row.getInt("donationId"));
+  }
+  
+  private static List<ChoiceBid> extractChoiceBidList(ResultSet row) throws SQLException
+  {
+    List<ChoiceBid> list = new ArrayList<ChoiceBid>();
+    
+    while (row.next())
+    {
+      list.add(extractChoiceBid(row));
+    }
+    
+    return list;
   }
 
   synchronized public void setDonationComment(int id, String comment)
@@ -298,5 +361,167 @@ public class DonationData extends DataInterface
     }
     
     return result;
+  }
+  
+  synchronized public List<ChallengeBid> getChallengeBidsByDonationId(int donationId)
+  {
+    List<ChallengeBid> result = null;
+    
+    try
+    {
+      this.selectDonationChallengeBidsStatement.setInt(1, donationId);
+      
+      ResultSet results = this.selectDonationChallengeBidsStatement.executeQuery();
+      
+      result = extractChallengeBidList(results);
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    return result;
+  }
+  
+  public synchronized List<ChoiceBid> getChoiceBidsByDonationId(int donationId)
+  {
+    List<ChoiceBid> result = null;
+    
+    try
+    {
+      this.selectDonationChoiceBidsStatement.setInt(1, donationId);
+      
+      ResultSet results = this.selectDonationChoiceBidsStatement.executeQuery();
+      
+      result = extractChoiceBidList(results);
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    return result;
+  }
+
+  public synchronized void attachChallengeBid(ChallengeBid created)
+  {
+    try
+    {
+      this.insertDonationChallengeBidStatement.setInt(1,created.getId());
+      this.insertDonationChallengeBidStatement.setBigDecimal(2,created.getAmount());
+      this.insertDonationChallengeBidStatement.setInt(3,created.getChallengeId());
+      this.insertDonationChallengeBidStatement.setInt(4,created.getDonationId());
+      
+      int updated = this.insertDonationChallengeBidStatement.executeUpdate();
+      
+      if (updated != 1)
+      {
+        throw new RuntimeException("Could not insert donation challenge bid.");
+      }
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+  }
+  
+  public synchronized void attachChoiceBid(ChoiceBid created)
+  {
+    try
+    {
+      this.insertDonationChoiceBidStatement.setInt(1,created.getId());
+      this.insertDonationChoiceBidStatement.setBigDecimal(2,created.getAmount());
+      this.insertDonationChoiceBidStatement.setInt(3,created.getOptionId());
+      this.insertDonationChoiceBidStatement.setInt(4,created.getDonationId());
+      
+      int updated = this.insertDonationChoiceBidStatement.executeUpdate();
+      
+      if (updated != 1)
+      {
+        throw new RuntimeException("Could not insert donation choice bid.");
+      }
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+  }
+  
+  public synchronized void updateChallengeBidAmount(int challengeBidId, BigDecimal newAmount)
+  {
+    try
+    {
+      this.updateDonationChallengeBidStatement.setInt(2, challengeBidId);
+      this.updateDonationChallengeBidStatement.setBigDecimal(1, newAmount);
+      
+      int updated = this.updateDonationChallengeBidStatement.executeUpdate();
+      
+      if (updated != 1)
+      {
+        throw new RuntimeException("Could not update donation challenge bid amount.");
+      }
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+  }
+  
+  public synchronized void updateChoiceBidAmount(int choiceBidId, BigDecimal newAmount)
+  {
+    try
+    {
+      this.updateDonationChoiceBidStatement.setInt(2, choiceBidId);
+      this.updateDonationChoiceBidStatement.setBigDecimal(1, newAmount);
+      
+      int updated = this.updateDonationChoiceBidStatement.executeUpdate();
+      
+      if (updated != 1)
+      {
+        throw new RuntimeException("Could not update donation choice bid amount.");
+      }
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+  }
+  
+  public synchronized void removeChallengeBid(int challengeBidId)
+  {
+    try
+    {
+      this.deleteDonationChallengeBidStatement.setInt(1, challengeBidId);
+      
+      int updated = this.deleteDonationChallengeBidStatement.executeUpdate();
+      
+      if (updated != 1)
+      {
+        throw new RuntimeException("Could not delete donation challenge bid.");
+      }
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+  }
+  
+  public synchronized void removeChoiceBid(int choiceBidId)
+  {
+    try
+    {
+      this.deleteDonationChoiceBidStatement.setInt(1, choiceBidId);
+      
+      int updated = this.deleteDonationChoiceBidStatement.executeUpdate();
+      
+      if (updated != 1)
+      {
+        throw new RuntimeException("Could not delete donation choice bid.");
+      }
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
   }
 }

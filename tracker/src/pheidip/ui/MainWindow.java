@@ -36,6 +36,8 @@ import pheidip.objects.SpeedRun;
 import pheidip.util.Reporter;
 
 import javax.swing.JSeparator;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 @SuppressWarnings("serial")
@@ -144,7 +146,7 @@ public class MainWindow extends JFrame implements Reporter
     this.getContentPane().add(this.messageArea, BorderLayout.SOUTH);
   }
   
-  private class ActionHandler extends MouseAdapter implements ActionListener
+  private class ActionHandler extends MouseAdapter implements ActionListener, ChangeListener
   {
     @Override
     public void actionPerformed(ActionEvent ev)
@@ -214,6 +216,15 @@ public class MainWindow extends JFrame implements Reporter
         MainWindow.this.report(e);
       }
     }
+
+    @Override
+    public void stateChanged(ChangeEvent ev)
+    {
+      if (ev.getSource() == tabbedPane)
+      {
+        refreshCurrentTab();
+      }
+    }
   }
   
   private void initializeGUIEvents()
@@ -230,6 +241,7 @@ public class MainWindow extends JFrame implements Reporter
     this.chipinTextMergeButton.addActionListener(this.actionHandler);
     this.chipinFileMergeButton.addActionListener(this.actionHandler);
     this.chipinWebsiteMergeButton.addActionListener(this.actionHandler);
+    this.tabbedPane.addChangeListener(this.actionHandler);
   }
 
   public MainWindow()
@@ -257,6 +269,16 @@ public class MainWindow extends JFrame implements Reporter
       
       this.tabbedPane.setTabComponentAt(index, header);
       this.focusOnTab(index);
+    }
+  }
+  
+  private void refreshCurrentTab()
+  {
+    Component current = this.tabbedPane.getSelectedComponent();
+    
+    if (current != null && current instanceof TabPanel)
+    {
+      ((TabPanel)current).refreshContent();
     }
   }
   
@@ -536,7 +558,7 @@ public class MainWindow extends JFrame implements Reporter
     int newId = DonorControl.createNewDonor(this.instance.getDonationDatabase());
     this.openDonorTab(newId);
   }
-  
+
   private class WindowEvents implements WindowListener
   {
     public void windowActivated(WindowEvent arg0)

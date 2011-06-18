@@ -17,6 +17,7 @@ import java.awt.Insets;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 
@@ -237,17 +238,54 @@ public class ChoicePanel extends TabPanel
   
   private void addNewOption()
   {
+    String name = JOptionPane.showInputDialog(this, "Please enter an option name.", "New Option", JOptionPane.OK_CANCEL_OPTION);
     
+    if (name != null)
+    {
+      this.choiceControl.createNewOption(name);
+      this.refreshContent();
+    }
+  }
+  
+  private Integer getSelectedOptionId()
+  {
+    int rowId = this.optionTable.getSelectedRow();
+    Integer result = null;
+    
+    if (rowId != -1)
+    {
+      result = this.optionTableIds[rowId];
+    }
+    
+    return result;
   }
   
   private void renameCurrentOption()
   {
+    Integer selectedId = getSelectedOptionId();
     
+    if (selectedId != null)
+    {
+      String name = JOptionPane.showInputDialog(this, "Please enter a new name for this option.", "Rename Option", JOptionPane.OK_CANCEL_OPTION);
+      
+      if (name != null)
+      {
+        this.choiceControl.renameOption(selectedId, name);
+        this.refreshContent();
+      }
+    }
   }
   
   private void deleteCurrentOption()
   {
+    Integer selectedId = getSelectedOptionId();
     
+    if (selectedId != null)
+    {
+      JOptionPane.showInputDialog(this, "Are you sure you want to delete this option?", "Delete Option?", JOptionPane.YES_NO_OPTION);
+      this.choiceControl.deleteOption(selectedId);
+      this.refreshContent();
+    }
   }
   
   private void deleteChoice()

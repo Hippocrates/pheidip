@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.JTable;
 
 @SuppressWarnings("serial")
 public class DonationPanel extends TabPanel
@@ -44,14 +45,19 @@ public class DonationPanel extends TabPanel
   private JButton deleteButton;
   private FocusTraversalManager tabOrder;
   private ActionHandler actionHandler;
+  private JScrollPane bidScrollPane;
+  private JButton attachBidButton;
+  private JButton changeAmountButton;
+  private JButton removeBidButton;
+  private JTable bidTable;
   
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{85, 85, 90, 90, 104, 0, 95};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 113, 25, 0};
+    gridBagLayout.columnWidths = new int[]{66, 113, 105, 90, 104, 0, 95};
+    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 113, 0, 25, 0};
     gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     amountLabel = new JLabel("Amount:");
@@ -176,12 +182,45 @@ public class DonationPanel extends TabPanel
     gbc_saveButton.gridy = 5;
     add(saveButton, gbc_saveButton);
     
+    attachBidButton = new JButton("Attach Bid");
+    GridBagConstraints gbc_attachBidButton = new GridBagConstraints();
+    gbc_attachBidButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_attachBidButton.insets = new Insets(0, 0, 5, 5);
+    gbc_attachBidButton.gridx = 1;
+    gbc_attachBidButton.gridy = 7;
+    add(attachBidButton, gbc_attachBidButton);
+    
+    changeAmountButton = new JButton("Change Amount");
+    GridBagConstraints gbc_changeAmountButton = new GridBagConstraints();
+    gbc_changeAmountButton.insets = new Insets(0, 0, 5, 5);
+    gbc_changeAmountButton.gridx = 2;
+    gbc_changeAmountButton.gridy = 7;
+    add(changeAmountButton, gbc_changeAmountButton);
+    
+    removeBidButton = new JButton("Remove Bid");
+    GridBagConstraints gbc_removeBidButton = new GridBagConstraints();
+    gbc_removeBidButton.insets = new Insets(0, 0, 5, 5);
+    gbc_removeBidButton.gridx = 3;
+    gbc_removeBidButton.gridy = 7;
+    add(removeBidButton, gbc_removeBidButton);
+    
     deleteButton = new JButton("Delete Donation");
     GridBagConstraints gbc_deleteButton = new GridBagConstraints();
-    gbc_deleteButton.insets = new Insets(0, 0, 0, 5);
+    gbc_deleteButton.insets = new Insets(0, 0, 5, 5);
     gbc_deleteButton.gridx = 5;
     gbc_deleteButton.gridy = 7;
     add(deleteButton, gbc_deleteButton);
+    
+    bidScrollPane = new JScrollPane();
+    GridBagConstraints gbc_bidScrollPane = new GridBagConstraints();
+    gbc_bidScrollPane.gridwidth = 7;
+    gbc_bidScrollPane.fill = GridBagConstraints.BOTH;
+    gbc_bidScrollPane.gridx = 0;
+    gbc_bidScrollPane.gridy = 8;
+    add(bidScrollPane, gbc_bidScrollPane);
+    
+    bidTable = new JTable();
+    bidScrollPane.setViewportView(bidTable);
   }
   
   private class ActionHandler extends MouseAdapter implements ActionListener
@@ -207,6 +246,18 @@ public class DonationPanel extends TabPanel
         {
           DonationPanel.this.deleteDonation();
         }
+        else if (event.getSource() == attachBidButton)
+        {
+          DonationPanel.this.attachNewBid();
+        }
+        else if (event.getSource() == changeAmountButton)
+        {
+          DonationPanel.this.changeCurrentBidAmount();
+        }
+        else if (event.getSource() == removeBidButton)
+        {
+          DonationPanel.this.removeCurrentBid();
+        }
       }
       catch(Exception e)
       {
@@ -223,8 +274,9 @@ public class DonationPanel extends TabPanel
     this.refreshButton.addActionListener(this.actionHandler);
     this.saveButton.addActionListener(this.actionHandler);
     this.deleteButton.addActionListener(this.actionHandler);
-    
-    // TODO: hook up bid buttons etc...
+    this.attachBidButton.addActionListener(this.actionHandler);
+    this.changeAmountButton.addActionListener(this.actionHandler);
+    this.removeBidButton.addActionListener(this.actionHandler);
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
@@ -235,7 +287,7 @@ public class DonationPanel extends TabPanel
     });
     this.setFocusTraversalPolicy(this.tabOrder);
   }
-  
+
   public boolean isFocusCycleRoot()
   {
     return true;
@@ -322,5 +374,23 @@ public class DonationPanel extends TabPanel
   {
     Donor donor = this.donationControl.getDonationDonor();
     this.owner.openDonorTab(donor.getId());
+  }
+  
+  public void removeCurrentBid()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void changeCurrentBidAmount()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void attachNewBid()
+  {
+    // TODO Auto-generated method stub
+    
   }
 }
