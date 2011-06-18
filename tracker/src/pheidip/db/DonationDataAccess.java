@@ -163,7 +163,7 @@ public class DonationDataAccess
   public void handleSQLException(SQLException error)
   {
     System.out.println("Error Code = " + error.getErrorCode() + " : " + error.getMessage());
-    throw new RuntimeException(error.getMessage());
+    throw DonationDataErrorParser.convert(error);
   }
 
   synchronized public void closeConnection()

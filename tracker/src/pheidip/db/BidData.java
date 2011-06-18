@@ -1,5 +1,6 @@
 package pheidip.db;
 
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,6 +25,7 @@ public class BidData extends DataInterface
   private PreparedStatement insertChoiceOptionStatement;
   private PreparedStatement updateChoiceOptionStatement;
   private PreparedStatement deleteChoiceOptionStatement;
+  private PreparedStatement selectChoiceOptionTotalStatement;
   
   private PreparedStatement selectChallengeByIdStatement;
   private PreparedStatement selectChallengesBySpeedRunId;
@@ -59,6 +61,7 @@ public class BidData extends DataInterface
     
       this.deleteChoiceOptionStatement = this.getConnection().prepareStatement("DELETE FROM ChoiceOption WHERE ChoiceOption.optionId = ?;");
       
+      this.selectChoiceOptionTotalStatement = this.getConnection().prepareStatement("SELECT SUM(amount) FROM ChoiceBid WHERE ChoiceBid.optionId = ?");
       
       this.selectChallengeByIdStatement = this.getConnection().prepareStatement("SELECT * FROM Challenge WHERE Challenge.challengeId = ?;");
       this.selectChallengesBySpeedRunId = this.getConnection().prepareStatement("SELECT * FROM Challenge WHERE Challenge.speedRunId = ?;");
@@ -408,6 +411,34 @@ public class BidData extends DataInterface
     }
     
     return results;
+  }
+  
+  public synchronized BigDecimal getChoiceOptionTotal(int optionId)
+  {
+    BigDecimal result = null;
+    
+    try
+    {
+      this.selectChoiceOptionTotalStatement.setInt(1, optionId);
+      
+      ResultSet results = this.selectChoiceOptionTotalStatement.executeQuery();
+      
+      if (results.next())
+      {
+        result = results.getBigDecimal(1);
+      }
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    if (result == null)
+    {
+      result = BigDecimal.ZERO.setScale(2);
+    }
+    
+    return result;
   }
 
   public synchronized void deleteChallenge(int challengeId)

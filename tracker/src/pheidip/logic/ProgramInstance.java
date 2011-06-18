@@ -1,5 +1,7 @@
 package pheidip.logic;
 
+import pheidip.util.Reporter;
+
 public class ProgramInstance
 {
   private DonationDatabaseManager donationDatabase;
@@ -8,6 +10,12 @@ public class ProgramInstance
   public ProgramInstance()
   {
     this.donationDatabase = new DonationDatabaseManager();
+    this.chipinLogin = new ChipinLoginManager();
+  }
+  
+  public ProgramInstance(Reporter reporter)
+  {
+    this.donationDatabase = new DonationDatabaseManager(reporter);
     this.chipinLogin = new ChipinLoginManager();
   }
   

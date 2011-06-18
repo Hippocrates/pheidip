@@ -9,6 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import pheidip.db.DonationData;
+import pheidip.db.DonationDataConstraintException;
 import pheidip.db.DonorData;
 import pheidip.objects.ChipinDonation;
 import pheidip.objects.Donation;
@@ -81,34 +82,63 @@ public final class ChipinDonations
           lastName = toks[1];
         }
         
-        int newDonorId = IdUtils.generateId();
-        
-        donor = new Donor(newDonorId, chipinDonation.getEmail(), null, firstName, lastName);
-        donors.createDonor(donor);
+        int retryCount = 0;
+
+        while (retryCount < 5)
+        {
+          try
+          {
+            int newDonorId = IdUtils.generateId();
+            
+            donor = new Donor(newDonorId, chipinDonation.getEmail(), null, firstName, lastName);
+            donors.createDonor(donor);
+            retryCount = 5;
+          }
+          catch(DonationDataConstraintException e)
+          {
+            donor = null;
+            ++retryCount;
+          }
+        }
       }
       
-      String commentString = chipinDonation.getComment();
-      
-      if (StringUtils.emptyIfNull(chipinDonation.getComment()).length() > ChipinDonation.maxCommentLength())
+      if (donor != null)
       {
-        commentString = commentString.substring(0, ChipinDonation.maxCommentLength() - 1);
-        System.out.println("Warning, truncating comment with length > " + ChipinDonation.maxCommentLength());
+        String commentString = chipinDonation.getComment();
+        
+        if (StringUtils.emptyIfNull(chipinDonation.getComment()).length() > ChipinDonation.maxCommentLength())
+        {
+          commentString = commentString.substring(0, ChipinDonation.maxCommentLength() - 1);
+          System.out.println("Warning, truncating comment with length > " + ChipinDonation.maxCommentLength());
+        }
+        
+        int retryCount = 0;
+
+        while (retryCount < 5)
+        {
+          try
+          {
+            int newDonationId = IdUtils.generateId();
+            
+            donations.insertDonation(
+              new Donation(
+                newDonationId,
+                DonationDomain.CHIPIN, 
+                chipinDonation.getChipinId(),
+                DonationBidState.PENDING, 
+                chipinDonation.getAmount(),
+                new Date(),
+                donor.getId(),
+                commentString
+                )
+              );
+          }
+          catch(DonationDataConstraintException e)
+          {
+            ++retryCount;
+          }
+        }
       }
-      
-      int newDonationId = IdUtils.generateId();
-      
-      donations.insertDonation(
-        new Donation(
-            newDonationId,
-          DonationDomain.CHIPIN, 
-          chipinDonation.getChipinId(),
-          DonationBidState.PENDING, 
-          chipinDonation.getAmount(),
-          new Date(),
-          donor.getId(),
-          commentString
-          )
-        );
     }
     else if (found.getComment() == null && chipinDonation.getComment() != null)
     {

@@ -18,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JScrollPane;
 
 import java.awt.Component;
@@ -64,6 +65,7 @@ public class DonorPanel extends TabPanel
 
   private MainWindow owner;
   private JButton addDonationButton;
+  private ActionHandler actionHandler;
 
   private void initializeGUI()
   {
@@ -233,59 +235,70 @@ public class DonorPanel extends TabPanel
     donationTable.setFillsViewportHeight(true);
   }
   
-  private void initializeGUIEvents()
+  private class ActionHandler extends MouseAdapter implements ActionListener 
   {
-    saveButton.addActionListener(new ActionListener() 
+    @Override
+    public void actionPerformed(ActionEvent event)
     {
-      public void actionPerformed(ActionEvent arg0) 
+      try
       {
-        DonorPanel.this.saveEnteredContent();
-      }
-    });
-    
-    refreshButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        DonorPanel.this.refreshContent();
-      }
-    });
-    
-    openDonationButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        DonorPanel.this.openDonation();
-      }
-    });
-    
-    donationTable.addMouseListener(new MouseAdapter() 
-    {
-      @Override
-      public void mouseClicked(MouseEvent e) 
-      {
-        if (e.getClickCount() == 2)
+        if (event.getSource() == saveButton)
+        {
+          DonorPanel.this.saveEnteredContent();
+        }
+        else if (event.getSource() == refreshButton)
+        {
+          DonorPanel.this.refreshContent();
+        }
+        else if (event.getSource() == openDonationButton)
         {
           DonorPanel.this.openDonation();
         }
+        else if (event.getSource() == deleteDonorButton)
+        {
+          DonorPanel.this.deleteDonor();
+        }
+        else if (event.getSource() == addDonationButton)
+        {
+          DonorPanel.this.createNewDonation();
+        }
       }
-    });
-    
-    deleteDonorButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent arg0) 
+      catch (Exception e)
       {
-        DonorPanel.this.deleteDonor();
+        owner.report(e);
       }
-    });
-    
-    this.addDonationButton.addActionListener(new ActionListener() 
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent event)
     {
-      public void actionPerformed(ActionEvent arg0) 
+      try
       {
-        DonorPanel.this.createNewDonation();
+        if (event.getSource() == donationTable)
+        {
+          if (event.getClickCount() == 2)
+          {
+            DonorPanel.this.openDonation();
+          }
+        }
       }
-    });
+      catch(Exception e)
+      {
+        owner.report(e);
+      }
+    }
+  }
+  
+  private void initializeGUIEvents()
+  {
+    this.actionHandler = new ActionHandler();
+    
+    saveButton.addActionListener(this.actionHandler);
+    refreshButton.addActionListener(this.actionHandler);
+    openDonationButton.addActionListener(this.actionHandler);
+    donationTable.addMouseListener(this.actionHandler);
+    deleteDonorButton.addActionListener(this.actionHandler);
+    addDonationButton.addActionListener(this.actionHandler);
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {

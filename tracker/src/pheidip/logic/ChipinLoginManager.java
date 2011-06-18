@@ -8,6 +8,8 @@ import org.jsoup.Connection.Response;
 import org.jsoup.helper.HttpConnection;
 import org.jsoup.nodes.Document;
 
+import pheidip.util.Reporter;
+
 public class ChipinLoginManager
 {
   private static final String LOGIN_NAME_INPUT_ID = "loginEmail";
@@ -25,11 +27,18 @@ public class ChipinLoginManager
   private String password;
   private String chipinId;
   private String sessionId;
+  private Reporter reporter;
   
   
   public ChipinLoginManager()
   {
     this.sessionId = null;
+  }
+  
+  public ChipinLoginManager(Reporter reporter)
+  {
+    this.sessionId = null;
+    this.reporter = reporter;
   }
   
   public boolean isLoggedIn()
@@ -62,7 +71,7 @@ public class ChipinLoginManager
     {
       this.cleanFields();
       
-      throw new RuntimeException(e);
+      this.reportMessage(e.getMessage());
     }
   }
  
@@ -102,7 +111,7 @@ public class ChipinLoginManager
       } 
       catch (Exception e)
       {
-        throw new RuntimeException(e);
+        this.reportMessage(e.getMessage());
       }
     }
   }
@@ -133,12 +142,21 @@ public class ChipinLoginManager
       else
       {
         this.logOut();
-        return null;
       }
     } 
     catch (Exception e)
     {
-      throw new RuntimeException(e);
+      this.reportMessage(e.getMessage());
+    }
+    
+    return null;
+  }
+  
+  private void reportMessage(String toReport)
+  {
+    if (this.reporter != null)
+    {
+      this.reporter.report(toReport);
     }
   }
 }

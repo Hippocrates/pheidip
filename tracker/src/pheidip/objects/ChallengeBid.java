@@ -2,7 +2,7 @@ package pheidip.objects;
 
 import java.math.BigDecimal;
 
-public class ChallengeBid
+public class ChallengeBid implements DonationBid
 {
   private int id;
   private BigDecimal amount;
@@ -35,5 +35,11 @@ public class ChallengeBid
   public int getDonationId()
   {
     return donationId;
+  }
+
+  @Override
+  public BidType getType()
+  {
+    return BidType.CHALLENGE;
   }
 }

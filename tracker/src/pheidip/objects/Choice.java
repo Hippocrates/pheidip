@@ -33,4 +33,9 @@ public class Choice implements Bid
   {
     return BidType.CHOICE;
   }
+  
+  public String toString()
+  {
+    return "Choice : " + this.getName();
+  }
 }

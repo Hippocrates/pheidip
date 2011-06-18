@@ -38,7 +38,7 @@ public class DonationData extends DataInterface
       this.selectDonorDonations = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE Donation.donorId = ?;");
       this.selectDonationByDomainId = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE Donation.domain = ? AND Donation.domainId = ?;");
       this.selectDonorDonationTotal = this.getConnection().prepareStatement("SELECT SUM(Donation.amount) FROM Donation WHERE Donation.donorId = ?;");
-    
+
       this.updateDonationComment = this.getConnection().prepareStatement("UPDATE Donation SET comment = ? WHERE Donation.donationId = ?;");
       this.updateDonationBidState = this.getConnection().prepareStatement("UPDATE Donation SET bidState = ? WHERE Donation.donationId = ?;");
       this.updateDonationStatement = this.getConnection().prepareStatement("UPDATE Donation SET donorId = ?, domain = ?, domainId = ?, bidState = ?, amount = ?, timeReceived = ?, comment = ? WHERE donationId = ?;");

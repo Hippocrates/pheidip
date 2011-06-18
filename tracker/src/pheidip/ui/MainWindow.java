@@ -14,14 +14,17 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+import pheidip.logic.ChallengeControl;
 import pheidip.logic.ChipinDocumentSource;
 import pheidip.logic.ChipinFileDocumentSource;
 import pheidip.logic.ChipinMergeProcess;
 import pheidip.logic.ChipinTextDocumentSource;
 import pheidip.logic.ChipinWebsiteDocumentSource;
+import pheidip.logic.ChoiceControl;
 import pheidip.logic.DonationControl;
 import pheidip.logic.DonorControl;
 import pheidip.logic.DonorSearch;
@@ -30,12 +33,13 @@ import pheidip.logic.SpeedRunControl;
 import pheidip.logic.SpeedRunSearch;
 import pheidip.objects.Donor;
 import pheidip.objects.SpeedRun;
+import pheidip.util.Reporter;
 
 import javax.swing.JSeparator;
 
 
 @SuppressWarnings("serial")
-public class MainWindow extends JFrame
+public class MainWindow extends JFrame implements Reporter
 {
   private JMenuBar menuBar;
   private JTabbedPane tabbedPane;
@@ -57,6 +61,7 @@ public class MainWindow extends JFrame
   private JMenuItem chipinWebsiteMergeButton;
   private JMenuItem searchRunButton;
   private JMenuItem createNewRunButton;
+  private ActionHandler actionHandler;
   
   private void shutdown()
   {
@@ -139,112 +144,98 @@ public class MainWindow extends JFrame
     this.getContentPane().add(this.messageArea, BorderLayout.SOUTH);
   }
   
+  private class ActionHandler extends MouseAdapter implements ActionListener
+  {
+    @Override
+    public void actionPerformed(ActionEvent ev)
+    {
+      try
+      {
+        if (ev.getSource() == connectButton)
+        {
+          if (!MainWindow.this.instance.getDonationDatabase().isConnected())
+          {
+            MainWindow.this.openConnectDialog();
+          }
+          else
+          {
+            MainWindow.this.openDisconnectDialog();
+          }
+        }
+        else if (ev.getSource() == exitButton)
+        {
+          MainWindow.this.confirmClose();
+        }
+        else if (ev.getSource() == searchDonorButton)
+        {
+            MainWindow.this.openSearchDonorDialog();
+        }
+        else if (ev.getSource() == searchRunButton)
+        {
+          MainWindow.this.openSearchSpeedRunDialog();
+        }
+        else if (ev.getSource() == createNewRunButton)
+        {
+          MainWindow.this.createNewSpeedRun();
+        }
+        else if (ev.getSource() == createNewDonorButton)
+        {
+          MainWindow.this.createNewDonor();
+        }
+        else if (ev.getSource() == chipinLoginButton)
+        {
+          if (!MainWindow.this.instance.getChipinLogin().isLoggedIn())
+          {
+            MainWindow.this.openChipinLoginDialog();
+          }
+          else
+          {
+            MainWindow.this.openChipinLogoutDialog();
+          }
+        }
+        else if (ev.getSource() == chipinTextMergeButton)
+        {
+          MainWindow.this.openChipinTextMergeDialog();
+        }
+        else if (ev.getSource() == chipinFileMergeButton)
+        {
+          MainWindow.this.openChipinFileMergeDialog();
+        }
+        else if (ev.getSource() == chipinWebsiteMergeButton)
+        {
+          if (MainWindow.this.instance.getChipinLogin().isLoggedIn())
+          {
+            MainWindow.this.runChipinWebsiteMerge();
+          }
+        }
+      }
+      catch(Exception e)
+      {
+        MainWindow.this.report(e);
+      }
+    }
+  }
+  
   private void initializeGUIEvents()
   {
-    this.connectButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent arg0)
-      {
-        if (!MainWindow.this.instance.getDonationDatabase().isConnected())
-        {
-          MainWindow.this.openConnectDialog();
-        }
-        else
-        {
-          MainWindow.this.openDisconnectDialog();
-        }
-      }
-    });
+    this.actionHandler = new ActionHandler();
     
-    this.exitButton.addActionListener(new ActionListener()
-    {
-      @Override
-      public void actionPerformed(ActionEvent arg0)
-      {
-        MainWindow.this.confirmClose();
-      }
-    });
-    
-    this.searchDonorButton.addActionListener(new ActionListener()
-    {
-      @Override
-      public void actionPerformed(ActionEvent arg0)
-      {
-        MainWindow.this.openSearchDonorDialog();
-      }
-    });
-    
-    searchRunButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        MainWindow.this.openSearchSpeedRunDialog();
-      }
-    });
-    
-    createNewRunButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        MainWindow.this.createNewSpeedRun();
-      }
-    });
-    
-    this.createNewDonorButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent arg0)
-      {
-        MainWindow.this.createNewDonor();
-      }
-    });
-    
-    chipinLoginButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        if (!MainWindow.this.instance.getChipinLogin().isLoggedIn())
-        {
-          MainWindow.this.openChipinLoginDialog();
-        }
-        else
-        {
-          MainWindow.this.openChipinLogoutDialog();
-        }
-      }
-    });
-    
-    chipinTextMergeButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        MainWindow.this.openChipinTextMergeDialog();
-      }
-    });
-    
-    chipinFileMergeButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        MainWindow.this.openChipinFileMergeDialog();
-      }
-    });
-    
-    chipinWebsiteMergeButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        if (MainWindow.this.instance.getChipinLogin().isLoggedIn())
-        {
-          MainWindow.this.runChipinWebsiteMerge();
-        }
-      }
-    });
+    this.connectButton.addActionListener(this.actionHandler);
+    this.exitButton.addActionListener(this.actionHandler);
+    this.searchDonorButton.addActionListener(this.actionHandler);
+    this.searchRunButton.addActionListener(this.actionHandler);
+    this.createNewRunButton.addActionListener(this.actionHandler);
+    this.createNewDonorButton.addActionListener(this.actionHandler);
+    this.chipinLoginButton.addActionListener(this.actionHandler);
+    this.chipinTextMergeButton.addActionListener(this.actionHandler);
+    this.chipinFileMergeButton.addActionListener(this.actionHandler);
+    this.chipinWebsiteMergeButton.addActionListener(this.actionHandler);
   }
 
   public MainWindow()
   {
     // Initialise program logic
-    this.instance = new ProgramInstance();
+    this.instance = new ProgramInstance(this);
     
     this.initializeGUI();
     this.initializeGUIEvents();
@@ -452,6 +443,44 @@ public class MainWindow extends JFrame
     panel.refreshContent();
   }
   
+  protected void openChoiceTab(int choiceId)
+  {
+    // prevent opening the same tab twice
+    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    {
+      Component target = this.tabbedPane.getComponentAt(i);
+      if (target instanceof DonationPanel && ((ChoicePanel)target).getChoiceId() == choiceId)
+      {
+        this.focusOnTab(i);
+        return;
+      }
+    }
+    
+    ChoiceControl ctrl = new ChoiceControl(this.instance.getDonationDatabase(), choiceId);
+    ChoicePanel panel = new ChoicePanel(this, ctrl);
+    this.insertTab(panel);
+    panel.refreshContent();
+  }
+
+  protected void openChallengeTab(int challengeId)
+  {
+    // prevent opening the same tab twice
+    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    {
+      Component target = this.tabbedPane.getComponentAt(i);
+      if (target instanceof DonationPanel && ((ChallengePanel)target).getChallengeId() == challengeId)
+      {
+        this.focusOnTab(i);
+        return;
+      }
+    }
+    
+    ChallengeControl ctrl = new ChallengeControl(this.instance.getDonationDatabase(), challengeId);
+    ChallengePanel panel = new ChallengePanel(this, ctrl);
+    this.insertTab(panel);
+    panel.refreshContent();
+  }
+  
   protected void openDonationTab(int donationId)
   {
     // prevent opening the same tab twice
@@ -547,4 +576,16 @@ public class MainWindow extends JFrame
     }
   }
 
+  @Override
+  public void report(String report)
+  {
+    JOptionPane.showMessageDialog(this, report, "Error", JOptionPane.ERROR_MESSAGE);
+    this.messageArea.setText(report);
+  }
+
+  @Override
+  public void report(Exception report)
+  {
+    this.report(report.getMessage());
+  }
 }

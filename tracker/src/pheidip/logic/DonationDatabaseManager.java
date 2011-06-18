@@ -6,15 +6,24 @@ import java.sql.SQLException;
 
 import pheidip.db.DBType;
 import pheidip.db.DonationDataAccess;
+import pheidip.db.DonationDataErrorParser;
 import pheidip.db.ScriptRunner;
+import pheidip.util.Reporter;
 
 public class DonationDatabaseManager
 {
   private DonationDataAccess dataAccess;
+  private Reporter reporter;
 	
   public DonationDatabaseManager()
   {
     this.dataAccess = new DonationDataAccess();
+  }
+  
+  public DonationDatabaseManager(Reporter reporter)
+  {
+    this.dataAccess = new DonationDataAccess();
+    this.reporter = reporter;
   }
   
   protected void finalize()
@@ -34,16 +43,28 @@ public class DonationDatabaseManager
 
   public void createMemoryDatabase()
   {
-    this.autoCloseConnection();
-    
-    this.dataAccess.createMemoryDatabase();
+    try
+    {
+      this.autoCloseConnection();
+      this.dataAccess.createMemoryDatabase();
+    }
+    catch (Exception e)
+    {
+      this.reportMessage(e.getMessage());
+    }
   }
 
   public void connectToServer(DBType type, String serverURL, String dbName, String userName, String password)
   {
-    this.autoCloseConnection();
-    
-    this.dataAccess.connectToDatabaseServer(type, serverURL, dbName, userName, password);
+    try
+    {
+      this.autoCloseConnection();
+      this.dataAccess.connectToDatabaseServer(type, serverURL, dbName, userName, password);
+    }
+    catch (Exception e)
+    {
+      this.reportMessage(e.getMessage());
+    }
   }
   
   public void runSQLScript(String filename)
@@ -57,15 +78,11 @@ public class DonationDatabaseManager
     } 
     catch (IOException e)
     {
-      // TODO Auto-generated catch block
-      // this is where the Reporter would be invoked
-      e.printStackTrace();
+      this.reportMessage(e.getMessage());
     } 
     catch (SQLException e)
     {
-      // TODO Auto-generated catch block
-      // this is where the Reporter would be invoked
-      e.printStackTrace();
+      this.reportMessage(DonationDataErrorParser.parseError(e.getMessage()).getErrorMessage());
     }
   }
   
@@ -80,5 +97,13 @@ public class DonationDatabaseManager
   public void closeConnection()
   {
     this.autoCloseConnection();
+  }
+  
+  public void reportMessage(String message)
+  {
+    if (this.reporter != null)
+    {
+      this.reporter.report(message);
+    }
   }
 }

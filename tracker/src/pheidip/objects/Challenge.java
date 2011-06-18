@@ -42,4 +42,9 @@ public class Challenge implements Bid
   {
     return BidType.CHALLENGE;
   }
+  
+  public String toString()
+  {
+    return "Challenge: " + this.getName();
+  }
 }

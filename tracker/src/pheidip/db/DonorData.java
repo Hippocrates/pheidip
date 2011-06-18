@@ -22,6 +22,7 @@ public class DonorData extends DataInterface
   private PreparedStatement deleteDonorStatement;
   private PreparedStatement createDonorStatement;
   private PreparedStatement updateDonorStatement;
+  private PreparedStatement deleteAllDonorsStatement;
   
   public DonorData(DonationDataAccess manager)
   {
@@ -38,6 +39,7 @@ public class DonorData extends DataInterface
       this.selectAllDonors = this.getConnection().prepareStatement("SELECT * FROM Donor;");
     
       this.deleteDonorStatement = this.getConnection().prepareStatement("DELETE FROM Donor WHERE Donor.donorId = ?;");
+      this.deleteAllDonorsStatement = this.getConnection().prepareStatement("DELETE FROM Donor;");
       
       this.createDonorStatement = this.getConnection().prepareStatement("INSERT INTO Donor (donorId, email, alias, firstName, lastName) VALUES(?,?,?,?,?);");
       this.updateDonorStatement = this.getConnection().prepareStatement("UPDATE Donor SET email = ?, alias = ?, firstName = ?, lastName = ? WHERE donorId = ?;");
@@ -214,5 +216,22 @@ public class DonorData extends DataInterface
         row.getString("alias"),
         row.getString("firstName"),
         row.getString("lastName") );
+  }
+
+  public void deleteAllDonors()
+  {
+    try
+    {
+      int updated = this.deleteAllDonorsStatement.executeUpdate();
+      
+      if (updated < 0)
+      {
+        throw new RuntimeException("Error, could not delete all donors.");
+      }
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
   }
 }

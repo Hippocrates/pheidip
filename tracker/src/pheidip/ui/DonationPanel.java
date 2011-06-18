@@ -13,6 +13,7 @@ import javax.swing.JTextField;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.math.BigDecimal;
 
 import javax.swing.JButton;
@@ -42,6 +43,7 @@ public class DonationPanel extends TabPanel
   private JScrollPane commentScrollPane;
   private JButton deleteButton;
   private FocusTraversalManager tabOrder;
+  private ActionHandler actionHandler;
   
   private void initializeGUI()
   {
@@ -182,39 +184,45 @@ public class DonationPanel extends TabPanel
     add(deleteButton, gbc_deleteButton);
   }
   
+  private class ActionHandler extends MouseAdapter implements ActionListener
+  {
+    @Override
+    public void actionPerformed(ActionEvent event)
+    {
+      try
+      {
+        if (event.getSource() == openDonorButton)
+        {
+          DonationPanel.this.openDonor();
+        }
+        else if (event.getSource() == refreshButton)
+        {
+          DonationPanel.this.refreshContent();
+        }
+        else if (event.getSource() == saveButton)
+        {
+          DonationPanel.this.saveEnteredContent();
+        }
+        else if (event.getSource() == deleteButton)
+        {
+          DonationPanel.this.deleteDonation();
+        }
+      }
+      catch(Exception e)
+      {
+        owner.report(e);
+      }
+    }
+  }
+  
   private void initializeGUIEvents()
   {
-    this.openDonorButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent arg0)
-      {
-        DonationPanel.this.openDonor();
-      }
-    });
+    this.actionHandler = new ActionHandler();
     
-    this.refreshButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent arg0)
-      {
-        DonationPanel.this.refreshContent();
-      }
-    });
-    
-    this.saveButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent arg0)
-      {
-        DonationPanel.this.saveEnteredContent();
-      }
-    });
-    
-    this.deleteButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent arg0)
-      {
-        DonationPanel.this.deleteDonation();
-      }
-    });
+    this.openDonorButton.addActionListener(this.actionHandler);
+    this.refreshButton.addActionListener(this.actionHandler);
+    this.saveButton.addActionListener(this.actionHandler);
+    this.deleteButton.addActionListener(this.actionHandler);
     
     // TODO: hook up bid buttons etc...
     

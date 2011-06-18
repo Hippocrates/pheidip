@@ -2,9 +2,11 @@ package pheidip.ui;
 
 import pheidip.logic.SpeedRunControl;
 import pheidip.objects.Bid;
+import pheidip.objects.BidType;
 import pheidip.objects.SpeedRun;
 import pheidip.util.StringUtils;
 
+import java.awt.Component;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
@@ -36,6 +38,8 @@ public class SpeedRunPanel extends TabPanel
   private JButton newChoiceButton;
   private JButton newChallengeButton;
   private JScrollPane bidsScrollPane;
+  private ActionHandler actionHandler;
+  private FocusTraversalManager tabOrder;
 
   private void initializeGUI()
   {
@@ -124,67 +128,77 @@ public class SpeedRunPanel extends TabPanel
     bidsScrollPane.setViewportView(bidTable);
   }
   
-  private void initializeGUIEvents()
+  private class ActionHandler extends MouseAdapter implements ActionListener
   {
-    refreshButton.addActionListener(new ActionListener() 
+    public void actionPerformed(ActionEvent ev)
     {
-      public void actionPerformed(ActionEvent e) 
+      try
       {
-        SpeedRunPanel.this.refreshContent();
+        if (ev.getSource() == refreshButton)
+        {
+          SpeedRunPanel.this.refreshContent();
+        }
+        else if (ev.getSource() == saveButton)
+        {
+          SpeedRunPanel.this.saveContent();
+        }
+        else if (ev.getSource() == openBidButton)
+        {
+          SpeedRunPanel.this.openSelectedBid();
+        }
+        else if (ev.getSource() == newChoiceButton)
+        {
+          SpeedRunPanel.this.createNewChoice();
+        }
+        else if (ev.getSource() == newChallengeButton)
+        {
+          SpeedRunPanel.this.createNewChallenge();
+        }
+        else if (ev.getSource() == deleteButton)
+        {
+          SpeedRunPanel.this.deleteSpeedRun();
+        }
       }
-    });
-    
-    saveButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent e) 
+      catch(Exception e)
       {
-        SpeedRunPanel.this.saveContent();
+        owner.report(e);
       }
-    });
+    }
     
-    openBidButton.addActionListener(new ActionListener() 
+    public void mouseClicked(MouseEvent ev) 
     {
-      public void actionPerformed(ActionEvent e) 
+      if (ev.getSource() == bidTable)
       {
-        SpeedRunPanel.this.openSelectedBid();
-      }
-    });
-    
-    newChoiceButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent e) 
-      {
-
-      }
-    });
-    
-    newChallengeButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent e) 
-      {
-
-      }
-    });
-    
-    deleteButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent e) 
-      {
-        SpeedRunPanel.this.deleteSpeedRun();
-      }
-    });
-    
-    bidTable.addMouseListener(new MouseAdapter() 
-    {
-      @Override
-      public void mouseClicked(MouseEvent e) 
-      {
-        if (e.getClickCount() == 2)
+        if (ev.getClickCount() == 2)
         {
           SpeedRunPanel.this.openSelectedBid();
         }
       }
+    }
+  }
+  
+  private void initializeGUIEvents()
+  {
+    this.actionHandler = new ActionHandler();
+    
+    refreshButton.addActionListener(this.actionHandler);
+    saveButton.addActionListener(this.actionHandler);
+    openBidButton.addActionListener(this.actionHandler);
+    newChoiceButton.addActionListener(this.actionHandler);
+    newChallengeButton.addActionListener(this.actionHandler);
+    deleteButton.addActionListener(this.actionHandler);
+    bidTable.addMouseListener(this.actionHandler);
+    
+    this.tabOrder = new FocusTraversalManager(new Component[]
+    {
+      this.nameField,
+      this.saveButton,
+      this.refreshButton,
+      this.openBidButton,
+      this.newChoiceButton,
+      this.newChallengeButton,
     });
+    this.setFocusTraversalPolicy(this.tabOrder);
   }
 
   public SpeedRunPanel(MainWindow owner, SpeedRunControl control)
@@ -238,7 +252,6 @@ public class SpeedRunPanel extends TabPanel
     this.refreshContent();
   }
 
-  
   private void deleteSpeedRun()
   {
     int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this speed run?", "Confirm delete", JOptionPane.YES_NO_OPTION);
@@ -252,11 +265,46 @@ public class SpeedRunPanel extends TabPanel
   
   private void openSelectedBid()
   {
-    // TODO Auto-generated method stub
+    int selectedIndex = this.bidTable.getSelectedRow();
+    
+    if (selectedIndex != -1)
+    {
+      Bid current = this.cachedRelatedBids.get(selectedIndex);
+      if (current.getType() == BidType.CHOICE)
+      {
+        this.owner.openChoiceTab(current.getId());
+      }
+      else if (current.getType() == BidType.CHALLENGE)
+      {
+        this.owner.openChallengeTab(current.getId());
+      }
+    }
   }
 
   public int getSpeedRunId()
   {
     return this.speedRunControl.getSpeedRunId();
+  }
+  
+  public void createNewChallenge()
+  {
+    String result = JOptionPane.showInputDialog(this, "Please enter a challenge name...");
+    
+    if (result != null)
+    {
+      int created = this.speedRunControl.createNewChallenge();
+      this.owner.openChallengeTab(created);
+    }
+  }
+
+  public void createNewChoice()
+  {
+    String result = JOptionPane.showInputDialog(this, "Please enter a choice name...");
+    
+    if (result != null)
+    {
+      int created = this.speedRunControl.createNewChoice();
+      this.owner.openChoiceTab(created);
+    }
   }
 }

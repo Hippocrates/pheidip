@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import pheidip.db.DonationData;
+import pheidip.db.DonationDataConstraintException;
 import pheidip.db.DonorData;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
@@ -57,12 +58,26 @@ public class DonorControl
 
   public void updateData(String email, String alias, String firstName, String lastName)
   {
-    this.donors.updateDonor(new Donor(this.donorId, StringUtils.nullIfEmpty(email), StringUtils.nullIfEmpty(alias), firstName, lastName));
+    try
+    {
+      this.donors.updateDonor(new Donor(this.donorId, StringUtils.nullIfEmpty(email), StringUtils.nullIfEmpty(alias), firstName, lastName));
+    }
+    catch(DonationDataConstraintException e)
+    {
+      this.donationDatabase.reportMessage(e.getMessage());
+    }
   }
   
   public void deleteDonor()
   {
-    this.donors.deleteDonor(this.donorId);
+    try
+    {
+      this.donors.deleteDonor(this.donorId);
+    }
+    catch(DonationDataConstraintException e)
+    {
+      this.donationDatabase.reportMessage(e.getMessage());
+    }
   }
 
   public int createNewLocalDonation()

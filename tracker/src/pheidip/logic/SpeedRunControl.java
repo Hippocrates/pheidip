@@ -1,11 +1,14 @@
 package pheidip.logic;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import pheidip.db.BidData;
 import pheidip.db.SpeedRunData;
 import pheidip.objects.Bid;
+import pheidip.objects.Challenge;
+import pheidip.objects.Choice;
 import pheidip.objects.SpeedRun;
 import pheidip.util.IdUtils;
 
@@ -48,6 +51,24 @@ public class SpeedRunControl
   {
     int id = IdUtils.generateId();
     manager.getDataAccess().getSpeedRuns().insertSpeedRun(new SpeedRun(id, null));
+    return id;
+  }
+  
+  public int createNewChallenge()
+  {
+    int id = IdUtils.generateId();
+    
+    this.bids.insertChallenge(new Challenge(id, null, BigDecimal.ZERO, this.speedRunId));
+    
+    return id;
+  }
+  
+  public int createNewChoice()
+  {
+    int id = IdUtils.generateId();
+    
+    this.bids.insertChoice(new Choice(id, null, this.speedRunId));
+    
     return id;
   }
 

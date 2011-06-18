@@ -115,6 +115,8 @@ public class JDBCManager
   {
     Map<Integer,SQLError> errorMap = new TreeMap<Integer,SQLError>();
     
+    errorMap.put(1062, SQLError.UNIQUE_VIOLATION);
+    errorMap.put(-8, SQLError.FOREIGN_KEY_VIOLATION);
     
     return errorMap;
   }

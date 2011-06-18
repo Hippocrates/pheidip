@@ -12,12 +12,12 @@ CREATE TABLE Donor
   firstName VARCHAR(31),
   lastName VARCHAR(31),
 
-  UNIQUE (email),
-  CHECK (email = lower(email)),
-  UNIQUE (alias),
-  CHECK (alias = lower(alias)),
+  CONSTRAINT DonorEmailUnique UNIQUE (email),
+  CONSTRAINT DonorEmailLowerCase CHECK (email = lower(email)),
+  CONSTRAINT DonorAliasUnique UNIQUE (alias),
+  CONSTRAINT DonorAliasLowerCase CHECK (alias = lower(alias)),
   
-  PRIMARY KEY (donorId)
+  CONSTRAINT DonorPK PRIMARY KEY (donorId)
 );
 
 CREATE TABLE DonationDomain
@@ -52,13 +52,13 @@ CREATE TABLE Donation
   timeReceived DATETIME,
   comment VARCHAR(4096),
 
-  FOREIGN KEY (donorId) REFERENCES Donor(donorId),
-  FOREIGN KEY (domain) REFERENCES DonationDomain (donationDomainId),
-  UNIQUE (domain, domainId),
-  FOREIGN KEY (bidState) REFERENCES DonationBidState (donationBidStateId),
-  CHECK (amount > 0 OR amount = null),
+  CONSTRAINT DonationFKDonor FOREIGN KEY (donorId) REFERENCES Donor(donorId),
+  CONSTRAINT DonationFKDomain FOREIGN KEY (domain) REFERENCES DonationDomain (donationDomainId),
+  CONSTRAINT DonationDomainIdUnique UNIQUE (domain, domainId),
+  CONSTRAINT DonationFKBidState FOREIGN KEY (bidState) REFERENCES DonationBidState (donationBidStateId),
+  CONSTRAINT DonationAmountValid CHECK (amount > 0 OR amount = null),
   
-  PRIMARY KEY (donationId)
+  CONSTRAINT DonationPK PRIMARY KEY (donationId)
 );
 
 CREATE TABLE SpeedRun
@@ -66,10 +66,10 @@ CREATE TABLE SpeedRun
   speedRunId INTEGER,
   name VARCHAR(63),
 
-  UNIQUE (name),
-  CHECK (name = lower(name)),
+  CONSTRAINT SpeedRunNameUnique UNIQUE (name),
+  CONSTRAINT SpeedRunNameLowerCase CHECK (name = lower(name)),
   
-  PRIMARY KEY (speedRunId)
+  CONSTRAINT SpeedRunPK PRIMARY KEY (speedRunId)
 );
 
 CREATE TABLE Choice
@@ -78,11 +78,11 @@ CREATE TABLE Choice
   speedRunId INTEGER,
   name VARCHAR(63),
 
-  FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
-  UNIQUE (speedRunId, name),
-  CHECK (name = lower(name)),
+  CONSTRAINT ChoiceFKSpeedRun FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
+  CONSTRAINT ChoiceNameUnique UNIQUE (speedRunId, name),
+  CONSTRAINT ChoiceNameLowerCase CHECK (name = lower(name)),
   
-  PRIMARY KEY (choiceId)
+  CONSTRAINT ChoicePK PRIMARY KEY (choiceId)
 );
 
 CREATE TABLE ChoiceOption
@@ -91,11 +91,11 @@ CREATE TABLE ChoiceOption
   choiceId INTEGER,
   name VARCHAR(63),
   
-  FOREIGN KEY (choiceId) REFERENCES Choice(choiceId),
-  UNIQUE(choiceId, name),
-  CHECK (name = lower(name)),
+  CONSTRAINT OptionFKChoice FOREIGN KEY (choiceId) REFERENCES Choice(choiceId),
+  CONSTRAINT OptionNameUnique UNIQUE(choiceId, name),
+  CONSTRAINT OptionNameLowerCase CHECK (name = lower(name)),
   
-  PRIMARY KEY (optionId)
+  CONSTRAINT OptionPK PRIMARY KEY (optionId)
 );
 
 CREATE TABLE Challenge
@@ -105,12 +105,12 @@ CREATE TABLE Challenge
   name VARCHAR(63),
   goalAmount DECIMAL(19,2),
   
-  FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
-  UNIQUE (speedRunId, name),
-  CHECK (name = lower(name)),
-  CHECK(goalAmount > 0),
+  CONSTRAINT ChallengeFKSpeedRun FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
+  CONSTRAINT ChallengeNameUnique UNIQUE (speedRunId, name),
+  CONSTRAINT ChallengeNameLowerCase CHECK (name = lower(name)),
+  CONSTRAINT ChallengeAmountValid CHECK(goalAmount > 0),
   
-  PRIMARY KEY (challengeId)
+  CONSTRAINT ChallengePK PRIMARY KEY (challengeId)
 );
 
 CREATE TABLE ChoiceBid
@@ -120,11 +120,11 @@ CREATE TABLE ChoiceBid
   donationId INTEGER,
   amount DECIMAL(19,2),
 
-  FOREIGN KEY (donationId) REFERENCES Donation(donationId),
-  FOREIGN KEY (optionId) REFERENCES ChoiceOption(optionId),
-  CHECK (amount > 0),
+  CONSTRAINT ChoiceBidFKDonation FOREIGN KEY (donationId) REFERENCES Donation(donationId),
+  CONSTRAINT ChoiceBidFKOption FOREIGN KEY (optionId) REFERENCES ChoiceOption(optionId),
+  CONSTRAINT ChoiceBidAmountValid CHECK (amount > 0),
 
-  PRIMARY KEY (choiceBidId)
+  CONSTRAINT ChoiceBidPK PRIMARY KEY (choiceBidId)
 );
 
 CREATE TABLE ChallengeBid
@@ -134,11 +134,11 @@ CREATE TABLE ChallengeBid
   donationId INTEGER,
   amount DECIMAL(19,2),
 
-  FOREIGN KEY (donationId) REFERENCES Donation(donationId),
-  FOREIGN KEY (challengeId) REFERENCES Challenge(challengeId),
-  CHECK (amount > 0),
+  CONSTRAINT ChallengeBidFKDonation FOREIGN KEY (donationId) REFERENCES Donation(donationId),
+  CONSTRAINT ChallengeBidFKChallenge FOREIGN KEY (challengeId) REFERENCES Challenge(challengeId),
+  CONSTRAINT ChallengeBidAmountValid CHECK (amount > 0),
   
-  PRIMARY KEY (challengeBidId)
+  CONSTRAINT ChallengeBidPK PRIMARY KEY (challengeBidId)
 );
 
 CREATE TABLE Prize
@@ -146,10 +146,10 @@ CREATE TABLE Prize
   prizeId INTEGER,
   name VARCHAR(63),
   
-  UNIQUE(name),
-  CHECK(name = lower(name)),
+  CONSTRAINT PrizeNameUnique UNIQUE(name),
+  CONSTRAINT PrizeNameLowerCase CHECK(name = lower(name)),
   
-  PRIMARY KEY(prizeId)
+  CONSTRAINT PrizePK PRIMARY KEY(prizeId)
 );
 
 CREATE TABLE PrizeWinner
@@ -157,7 +157,7 @@ CREATE TABLE PrizeWinner
   prizeId INTEGER,
   donorId INTEGER,
   
-  FOREIGN KEY (donorId) REFERENCES Donor (donorId),
+  CONSTRAINT PrizeWinnerFKDonor FOREIGN KEY (donorId) REFERENCES Donor (donorId),
   
-  PRIMARY KEY(prizeId)
+  CONSTRAINT PrizeWinnerPK PRIMARY KEY(prizeId)
 );
