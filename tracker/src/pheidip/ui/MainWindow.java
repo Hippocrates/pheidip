@@ -18,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+import pheidip.logic.BidSearch;
 import pheidip.logic.ChallengeControl;
 import pheidip.logic.ChipinDocumentSource;
 import pheidip.logic.ChipinFileDocumentSource;
@@ -326,6 +327,7 @@ public class MainWindow extends JFrame implements Reporter
   protected void openChipinFileMergeDialog()
   {
     JFileChooser fileChooser = new JFileChooser();
+    fileChooser.addChoosableFileFilter(new ListFileFilter(new String[]{"html","htm","xml"}));
     int result = fileChooser.showOpenDialog(this);
     
     if (result == JFileChooser.APPROVE_OPTION)
@@ -471,7 +473,7 @@ public class MainWindow extends JFrame implements Reporter
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof DonationPanel && ((ChoicePanel)target).getChoiceId() == choiceId)
+      if (target instanceof ChoicePanel && ((ChoicePanel)target).getChoiceId() == choiceId)
       {
         this.focusOnTab(i);
         return;
@@ -490,7 +492,7 @@ public class MainWindow extends JFrame implements Reporter
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof DonationPanel && ((ChallengePanel)target).getChallengeId() == challengeId)
+      if (target instanceof ChallengePanel && ((ChallengePanel)target).getChallengeId() == challengeId)
       {
         this.focusOnTab(i);
         return;
@@ -551,6 +553,11 @@ public class MainWindow extends JFrame implements Reporter
   {
     int newId = SpeedRunControl.createNewSpeedRun(this.instance.getDonationDatabase());
     this.openSpeedRunTab(newId);
+  }
+  
+  protected BidSearchDialog openBidSearch()
+  {
+    return new BidSearchDialog(this, new SpeedRunSearch(this.instance.getDonationDatabase()), new BidSearch(this.instance.getDonationDatabase()));
   }
     
   private void createNewDonor()

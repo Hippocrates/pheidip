@@ -1,6 +1,5 @@
 package pheidip.ui;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
@@ -12,25 +11,6 @@ import javax.swing.JTextField;
 @SuppressWarnings("serial")
 public class DatabaseServerConnectPanel extends JPanel
 {
-  /**
-   * Launch the application.
-   */
-  public static void main(String[] args)
-  {
-    try
-    {
-      JFrame window = new JFrame();
-      window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      window.getContentPane().add(new DatabaseServerConnectPanel());
-      window.setSize(300,200);
-      window.setVisible(true);
-    } 
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
-  }
-  
   private JTextField serverURLBox;
   private JTextField databaseNameBox;
   private JTextField userNameBox;

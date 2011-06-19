@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import pheidip.util.StringUtils;
 
 public class JDBCManager
 {
@@ -17,6 +20,14 @@ public class JDBCManager
   {
     JDBCManager.loadDrivers(DBType.HSQLDB);
     String url = "jdbc:" + DBType.HSQLDB.getJDBCName() + ":mem:.";
+    return DriverManager.getConnection(url, "", "");
+  }
+  
+  public static Connection createFileDatabase(File fileLocation) throws SQLException
+  {
+    String fileBase = StringUtils.getFileBase(fileLocation.getAbsolutePath());
+    JDBCManager.loadDrivers(DBType.HSQLDB);
+    String url = "jdbc:" + DBType.HSQLDB.getJDBCName() + ":file:" + fileBase;
     return DriverManager.getConnection(url, "", "");
   }
   

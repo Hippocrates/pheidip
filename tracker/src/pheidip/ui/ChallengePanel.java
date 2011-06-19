@@ -3,6 +3,8 @@ package pheidip.ui;
 import pheidip.logic.ChallengeControl;
 import pheidip.objects.Challenge;
 
+import java.awt.Component;
+import java.awt.FocusTraversalPolicy;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
@@ -30,6 +32,7 @@ public class ChallengePanel extends TabPanel
   private JLabel nameLabel;
   private JLabel goalAmountLabel;
   private ActionHandler actionHandler;
+  private FocusTraversalManager tabOrder;
   
   private void initializeGUI()
   {
@@ -154,6 +157,24 @@ public class ChallengePanel extends TabPanel
     this.saveButton.addActionListener(this.actionHandler);
     this.refreshButton.addActionListener(this.actionHandler);
     this.deleteChallengeButton.addActionListener(this.actionHandler);
+    
+    this.tabOrder = new FocusTraversalManager(new Component[]
+    {
+      this.amountField,
+      this.saveButton,
+      this.refreshButton,
+    });
+    this.setFocusTraversalPolicy(this.tabOrder);
+  }
+  
+  public boolean isFocusCycleRoot()
+  {
+    return true;
+  }
+  
+  public FocusTraversalPolicy getFocusTraversalPolicy() 
+  {
+    return this.tabOrder;
   }
 
   public ChallengePanel(MainWindow owner, ChallengeControl challengeControl)
@@ -178,9 +199,7 @@ public class ChallengePanel extends TabPanel
     
     this.nameField.setText(data.getName());
     this.amountField.setText(data.getGoalAmount().toString());
-    
-    // todo: set total collected field
-    this.totalAmountField.setText("NOT IMPLEMENTED YET");
+    this.totalAmountField.setText(this.challengeControl.getTotalCollected().toString());
     
     this.setHeaderText(data.toString());
   }

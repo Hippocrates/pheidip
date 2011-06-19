@@ -1,6 +1,7 @@
 package pheidip.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -35,23 +36,9 @@ public class ChipinLoginDialog extends JDialog
   private JPasswordField loginPasswordField;
   private JTextField chipinIdField;
   private ChipinLoginManager loginManager;
+  private FocusTraversalManager tabOrder;
+  private ActionHandler actionHandler;
 
-  /**
-   * Launch the application.
-   */
-  public static void main(String[] args)
-  {
-    try
-    {
-      ChipinLoginDialog dialog = new ChipinLoginDialog(null, new ChipinLoginManager());
-      dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-      dialog.setVisible(true);
-    } catch (Exception e)
-    {
-      e.printStackTrace();
-    }
-  }
-  
   private void initializeGUI()
   {
     setBounds(100, 100, 450, 187);
@@ -141,23 +128,45 @@ public class ChipinLoginDialog extends JDialog
     }
   }
   
+  private class ActionHandler implements ActionListener
+  {
+    public void actionPerformed(ActionEvent ev)
+    {
+      try
+      {
+        if (ev.getSource() == loginButton)
+        {
+          ChipinLoginDialog.this.loginClicked();
+        }
+        else if (ev.getSource() == cancelButton)
+        {
+          ChipinLoginDialog.this.closeDialog();
+        }
+      }
+      catch (Exception e)
+      {
+        JOptionPane.showMessageDialog(ChipinLoginDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+    
+  }
+  
   private void initializeGUIEvents()
   {
-    loginButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        ChipinLoginDialog.this.loginClicked();
-      }
-    });
+    this.actionHandler = new ActionHandler();
     
-    cancelButton.addActionListener(new ActionListener() 
+    loginButton.addActionListener(this.actionHandler);
+    cancelButton.addActionListener(this.actionHandler);
+    
+    this.tabOrder = new FocusTraversalManager(new Component[]
     {
-      public void actionPerformed(ActionEvent e) 
-      {
-        ChipinLoginDialog.this.closeDialog();
-      }
+      this.loginNameField,
+      this.loginPasswordField,
+      this.chipinIdField,
+      this.loginButton,
+      this.cancelButton,
     });
+    this.setFocusTraversalPolicy(this.tabOrder);
   }
 
   /**

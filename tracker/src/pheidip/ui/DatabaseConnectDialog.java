@@ -17,8 +17,10 @@ import java.awt.Insets;
 
 import pheidip.logic.ConnectionType;
 import pheidip.logic.DonationDatabaseManager;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 @SuppressWarnings("serial")
 public class DatabaseConnectDialog extends JDialog
@@ -33,6 +35,7 @@ public class DatabaseConnectDialog extends JDialog
   private JPanel buttonPanel;
   private JPanel connectionTypePanel;
   private JPanel contentPanel;
+  private ActionHandler actionHandler;
 
   public static void main(String[] args)
   {
@@ -107,31 +110,39 @@ public class DatabaseConnectDialog extends JDialog
     connectionTypePanel.add(connectionTypeBox, gbc_connectionTypeBox);
   }
   
+  private class ActionHandler implements ActionListener
+  {
+    public void actionPerformed(ActionEvent ev)
+    {
+      try
+      {
+        if (ev.getSource() == connectButton)
+        {
+          DatabaseConnectDialog.this.connectButtonClicked();
+        }
+        else if (ev.getSource() == cancelButton)
+        {
+          DatabaseConnectDialog.this.cancelButtonClicked();
+        }
+        else if (ev.getSource() == connectionTypeBox)
+        {
+          DatabaseConnectDialog.this.connectionTypeChanged();
+        }
+      }
+      catch (Exception e)
+      {
+        JOptionPane.showMessageDialog(DatabaseConnectDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
+  
   private void initializeGUIEvents()
   {
-    connectButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent e) 
-      {
-        DatabaseConnectDialog.this.connectButtonClicked();
-      }
-    });
+    this.actionHandler = new ActionHandler();
     
-    cancelButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent e) 
-      {
-        DatabaseConnectDialog.this.cancelButtonClicked();
-      }
-    });
-    
-    connectionTypeBox.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
-        DatabaseConnectDialog.this.connectionTypeChanged();
-      }
-    });
+    connectButton.addActionListener(this.actionHandler);
+    cancelButton.addActionListener(this.actionHandler);
+    connectionTypeBox.addActionListener(this.actionHandler);
   }
   
   public DatabaseConnectDialog(JFrame parent, DonationDatabaseManager databaseManager)
@@ -156,11 +167,30 @@ public class DatabaseConnectDialog extends JDialog
     case HSQLDB_MEMORY:
       this.createMemoryConnection();
       break;
+    case HSQLDB_FILE:
+      this.createFileConnection();
+      break;
     }
     
     this.closeDialog();
   }
   
+  private void createFileConnection()
+  {
+    DatabaseFileConnectPanel panel = (DatabaseFileConnectPanel) this.connectPanel;
+
+    String initFilename = panel.getDBFileName();
+    
+    this.databaseManager.openFileDatabase(new File(initFilename));
+
+    if (!this.databaseManager.isConnected())
+    {
+      JOptionPane.showMessageDialog(this, "Could not create memory connection.", "Failed to connect...", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    this.closeDialog();
+  }
+
   private void connectToSever()
   {
     DatabaseServerConnectPanel panel = (DatabaseServerConnectPanel) this.connectPanel;
@@ -228,6 +258,9 @@ public class DatabaseConnectDialog extends JDialog
       break;
     case HSQLDB_MEMORY:
       this.connectPanel = new DatabaseMemoryConnectPanel();
+      break;
+    case HSQLDB_FILE:
+      this.connectPanel = new DatabaseFileConnectPanel();
       break;
     }
     

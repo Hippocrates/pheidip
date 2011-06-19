@@ -7,6 +7,7 @@ import java.util.List;
 import pheidip.db.BidData;
 import pheidip.db.SpeedRunData;
 import pheidip.objects.Bid;
+import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.SpeedRun;
@@ -54,27 +55,40 @@ public class SpeedRunControl
     return id;
   }
   
-  public int createNewChallenge()
+  public int createNewChallenge(String result)
   {
     int id = IdUtils.generateId();
     
-    this.bids.insertChallenge(new Challenge(id, null, BigDecimal.ZERO, this.speedRunId));
+    this.bids.insertChallenge(new Challenge(id, result, BigDecimal.ZERO.setScale(2), this.speedRunId));
     
     return id;
   }
   
-  public int createNewChoice()
+  public int createNewChoice(String defaultName)
   {
     int id = IdUtils.generateId();
     
-    this.bids.insertChoice(new Choice(id, null, this.speedRunId));
+    this.bids.insertChoice(new Choice(id, defaultName, this.speedRunId));
     
     return id;
   }
 
   public void deleteSpeedRun()
   {
-    //TODO: clear all related bids
+    List<Bid> allBids = this.getAllBids();
+    
+    for (Bid b : allBids)
+    {
+      if (b.getType() == BidType.CHALLENGE)
+      {
+        this.bids.deleteChallenge(b.getId());
+      }
+      else
+      {
+        ChoiceControl control = new ChoiceControl(this.donationDatabase, b.getId());
+        control.deleteChoice();
+      }
+    }
     
     this.speedRuns.deleteSpeedRun(this.speedRunId);
   }

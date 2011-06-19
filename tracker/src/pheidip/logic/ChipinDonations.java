@@ -132,6 +132,7 @@ public final class ChipinDonations
                 commentString
                 )
               );
+            retryCount = 5;
           }
           catch(DonationDataConstraintException e)
           {

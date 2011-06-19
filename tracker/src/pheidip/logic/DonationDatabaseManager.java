@@ -1,5 +1,6 @@
 package pheidip.logic;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -47,6 +48,19 @@ public class DonationDatabaseManager
     {
       this.autoCloseConnection();
       this.dataAccess.createMemoryDatabase();
+    }
+    catch (Exception e)
+    {
+      this.reportMessage(e.getMessage());
+    }
+  }
+  
+  public void openFileDatabase(File location)
+  {
+    try
+    {
+      this.autoCloseConnection();
+      this.dataAccess.openFileDatabase(location);
     }
     catch (Exception e)
     {

@@ -1,5 +1,6 @@
 package pheidip.db;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -111,6 +112,34 @@ public class DonationDataAccess
     }
   }
   
+  synchronized public void openFileDatabase(File location)
+  {      
+    boolean dbAlreadyExists = location.exists();
+    
+    try
+    {
+      Connection connection = JDBCManager.createFileDatabase(location);
+      
+      if (!dbAlreadyExists)
+      {
+        ScriptRunner runner = new ScriptRunner(connection, true, true);
+        runner.runScript(new FileReader(DBConfiguration.getDonationSchemaFilename()));
+      }
+      
+      this.setConnection(connection);
+      this.connectionType = DBType.HSQLDB;
+      this.isMemoryConnection = true;
+    }
+    catch (SQLException e)
+    {
+      this.handleSQLException(e);
+    } 
+    catch (IOException e)
+    {
+      throw new RuntimeException(e);
+    }
+  }
+  
   synchronized public void createMemoryDatabase()
   {
     if (this.isConnected())
@@ -163,7 +192,16 @@ public class DonationDataAccess
   public void handleSQLException(SQLException error)
   {
     System.out.println("Error Code = " + error.getErrorCode() + " : " + error.getMessage());
-    throw DonationDataErrorParser.convert(error);
+    DonationDataConstraint violatedConstraint = DonationDataErrorParser.parseError(error.getMessage());
+    
+    if (violatedConstraint != null)
+    {
+      throw new DonationDataConstraintException(violatedConstraint);
+    }
+    else
+    {
+      throw new RuntimeException(error.getMessage());
+    }
   }
 
   synchronized public void closeConnection()

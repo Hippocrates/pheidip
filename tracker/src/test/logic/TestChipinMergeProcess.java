@@ -39,7 +39,7 @@ public class TestChipinMergeProcess extends TestCase
     Random rand = new Random();
     
     List<ChipinDonation> sourceDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
-    String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations, rand);
+    String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations);
 
     testRunMergeOn(new ChipinMergeProcess(this.manager, new ChipinTextDocumentSource(randomDonations)));
   
@@ -53,7 +53,7 @@ public class TestChipinMergeProcess extends TestCase
     Random rand = new Random();
 
     List<ChipinDonation> sourceDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
-    String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations, rand);
+    String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations);
 
     ByteArrayInputStream stream = new ByteArrayInputStream(randomDonations.getBytes());
     
@@ -97,7 +97,7 @@ public class TestChipinMergeProcess extends TestCase
     Random rand = new Random();
 
     List<ChipinDonation> sourceDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
-    String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations, rand);
+    String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations);
 
     ChipinMergeProcess process = new ChipinMergeProcess(this.manager, new ChipinTextDocumentSource(randomDonations));
       

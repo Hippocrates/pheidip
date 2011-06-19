@@ -34,7 +34,7 @@ public class DonationData extends DataInterface
   private PreparedStatement updateDonationChoiceBidStatement;
   private PreparedStatement deleteDonationChallengeBidStatement;
   private PreparedStatement deleteDonationChoiceBidStatement;
-  
+
   public DonationData(DonationDataAccess manager)
   {
     super(manager);

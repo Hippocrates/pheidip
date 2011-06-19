@@ -8,7 +8,7 @@ public class SpeedRun
   public SpeedRun(int id, String name)
   {
     this.id = id;
-    this.name = name;
+    this.name = name == null ? null : name.toLowerCase();
   }
 
   public int getId()

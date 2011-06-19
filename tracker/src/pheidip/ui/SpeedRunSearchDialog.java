@@ -7,6 +7,8 @@ import javax.swing.JOptionPane;
 
 import pheidip.logic.SpeedRunSearch;
 import pheidip.objects.SpeedRun;
+
+import java.awt.Component;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
@@ -18,6 +20,11 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.JList;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
 public class SpeedRunSearchDialog extends JDialog
@@ -27,9 +34,11 @@ public class SpeedRunSearchDialog extends JDialog
   private JTextField nameField;
   private JLabel nameLabel;
   private JList speedRunList;
-  private JButton searchButton;
   private JButton okButton;
   private JButton cancelButton;
+  private ActionHandler actionHandler;
+  private JScrollPane scrollPane;
+  private FocusTraversalManager tabOrder;
 
   private void initializeGUI()
   {
@@ -37,9 +46,9 @@ public class SpeedRunSearchDialog extends JDialog
     setBounds(100, 100, 450, 300);
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{0, 235, 103, 102, 99, 0};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0};
+    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0};
     gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
     getContentPane().setLayout(gridBagLayout);
     
     nameLabel = new JLabel("Name:");
@@ -60,65 +69,99 @@ public class SpeedRunSearchDialog extends JDialog
     getContentPane().add(nameField, gbc_nameField);
     nameField.setColumns(10);
     
-    speedRunList = new JList();
-    GridBagConstraints gbc_speedRunList = new GridBagConstraints();
-    gbc_speedRunList.gridheight = 3;
-    gbc_speedRunList.gridwidth = 2;
-    gbc_speedRunList.insets = new Insets(0, 0, 5, 5);
-    gbc_speedRunList.fill = GridBagConstraints.BOTH;
-    gbc_speedRunList.gridx = 3;
-    gbc_speedRunList.gridy = 0;
-    getContentPane().add(speedRunList, gbc_speedRunList);
+    scrollPane = new JScrollPane();
+    GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+    gbc_scrollPane.gridwidth = 2;
+    gbc_scrollPane.gridheight = 2;
+    gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
+    gbc_scrollPane.fill = GridBagConstraints.BOTH;
+    gbc_scrollPane.gridx = 3;
+    gbc_scrollPane.gridy = 0;
+    getContentPane().add(scrollPane, gbc_scrollPane);
     
-    searchButton = new JButton("Search");
-    GridBagConstraints gbc_searchButton = new GridBagConstraints();
-    gbc_searchButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_searchButton.insets = new Insets(0, 0, 5, 5);
-    gbc_searchButton.gridx = 2;
-    gbc_searchButton.gridy = 2;
-    getContentPane().add(searchButton, gbc_searchButton);
+    speedRunList = new JList();
+    scrollPane.setViewportView(speedRunList);
     
     okButton = new JButton("OK");
     GridBagConstraints gbc_okButton = new GridBagConstraints();
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
     gbc_okButton.gridx = 3;
-    gbc_okButton.gridy = 3;
+    gbc_okButton.gridy = 2;
     getContentPane().add(okButton, gbc_okButton);
     
     cancelButton = new JButton("Cancel");
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_cancelButton.gridx = 4;
-    gbc_cancelButton.gridy = 3;
+    gbc_cancelButton.gridy = 2;
     getContentPane().add(cancelButton, gbc_cancelButton);
+  }
+  
+  private class ActionHandler implements ActionListener, DocumentListener, ListSelectionListener
+  {
+    public void actionPerformed(ActionEvent ev)
+    {
+      if (ev.getSource() == okButton)
+      {
+        SpeedRunSearchDialog.this.returnSelectedRun();
+      }
+      else if (ev.getSource() == cancelButton)
+      {
+        SpeedRunSearchDialog.this.cancelSelection();
+      }
+    }
+    
+    private void documentChanged(DocumentEvent ev)
+    {
+      if (ev.getDocument() == nameField.getDocument())
+      {
+        SpeedRunSearchDialog.this.runFilters();
+      }
+    }
+
+    public void changedUpdate(DocumentEvent ev)
+    {
+      this.documentChanged(ev);
+    }
+
+    public void insertUpdate(DocumentEvent ev)
+    {
+      this.documentChanged(ev);
+    }
+
+    public void removeUpdate(DocumentEvent ev)
+    {
+      this.documentChanged(ev);
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent ev)
+    {
+      if (ev.getSource() == speedRunList)
+      {
+        okButton.setEnabled(!speedRunList.isSelectionEmpty());
+      }
+    }
   }
   
   private void initializeGUIEvents()
   {
-    searchButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent e) 
-      {
-        SpeedRunSearchDialog.this.runFilters();
-      }
-    });
+    this.actionHandler = new ActionHandler();
     
-    okButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent e) 
-      {
-        SpeedRunSearchDialog.this.returnSelectedDonor();
-      }
-    });
+    this.nameField.getDocument().addDocumentListener(this.actionHandler);
+    okButton.addActionListener(this.actionHandler);
+    cancelButton.addActionListener(this.actionHandler);
+    this.speedRunList.addListSelectionListener(this.actionHandler);
     
-    cancelButton.addActionListener(new ActionListener() 
+    this.tabOrder = new FocusTraversalManager(new Component[]
     {
-      public void actionPerformed(ActionEvent e) 
-      {
-        SpeedRunSearchDialog.this.cancelSelection();
-      }
+      this.nameField,
+      this.speedRunList,
+      this.okButton,
+      this.cancelButton,
     });
+    this.setFocusTraversalPolicy(this.tabOrder);
   }
 
   /**
@@ -128,11 +171,13 @@ public class SpeedRunSearchDialog extends JDialog
   {
     super(parent, true);
     
-    this.initializeGUI();
-    this.initializeGUIEvents();
-    
     this.searcher = searcher;
     this.resultRun = null;
+    
+    this.initializeGUI();
+    this.initializeGUIEvents();
+
+    this.runFilters();
   }
   
   public SpeedRun getResult()
@@ -140,7 +185,7 @@ public class SpeedRunSearchDialog extends JDialog
     return this.resultRun;
   }
   
-  private void returnSelectedDonor()
+  private void returnSelectedRun()
   {
     SpeedRun result = (SpeedRun) this.speedRunList.getSelectedValue();
     if (result == null)
@@ -177,5 +222,6 @@ public class SpeedRunSearchDialog extends JDialog
     }
     
     this.speedRunList.setModel(listData);
+    this.speedRunList.setEnabled(this.speedRunList.getModel().getSize() > 0);
   }
 }

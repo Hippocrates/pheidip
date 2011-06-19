@@ -44,7 +44,7 @@ CREATE TABLE Donation
   donationId INTEGER,
   donorId INTEGER,
   domain VARCHAR(16),
-  domainId VARCHAR(64),
+  domainId VARCHAR(300),
   
   bidState VARCHAR(16),
   
@@ -108,7 +108,7 @@ CREATE TABLE Challenge
   CONSTRAINT ChallengeFKSpeedRun FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
   CONSTRAINT ChallengeNameUnique UNIQUE (speedRunId, name),
   CONSTRAINT ChallengeNameLowerCase CHECK (name = lower(name)),
-  CONSTRAINT ChallengeAmountValid CHECK(goalAmount > 0),
+  CONSTRAINT ChallengeAmountValid CHECK(goalAmount >= 0),
   
   CONSTRAINT ChallengePK PRIMARY KEY (challengeId)
 );

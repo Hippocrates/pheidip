@@ -6,7 +6,8 @@ import pheidip.util.StringUtils;
 public enum ConnectionType
 {
   MYSQL_SERVER(DBType.MYSQL),
-  HSQLDB_MEMORY(DBType.HSQLDB);
+  HSQLDB_MEMORY(DBType.HSQLDB),
+  HSQLDB_FILE(DBType.HSQLDB);
   
   private DBType dbType;
   

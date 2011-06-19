@@ -7,6 +7,7 @@ import pheidip.objects.SpeedRun;
 import pheidip.util.StringUtils;
 
 import java.awt.Component;
+import java.awt.FocusTraversalPolicy;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
@@ -209,6 +210,16 @@ public class SpeedRunPanel extends TabPanel
     this.initializeGUI();
     this.initializeGUIEvents();
   }
+  
+  public boolean isFocusCycleRoot()
+  {
+    return true;
+  }
+  
+  public FocusTraversalPolicy getFocusTraversalPolicy() 
+  {
+    return this.tabOrder;
+  }
 
   @Override
   public boolean confirmClose()
@@ -237,7 +248,7 @@ public class SpeedRunPanel extends TabPanel
           new Object[]
           {
               StringUtils.symbolToNatural(b.getType().toString()),
-              b.getName(),
+              StringUtils.emptyIfNull(b.getName()),
           });
     }
     
@@ -292,7 +303,7 @@ public class SpeedRunPanel extends TabPanel
     
     if (result != null)
     {
-      int created = this.speedRunControl.createNewChallenge();
+      int created = this.speedRunControl.createNewChallenge(result);
       this.owner.openChallengeTab(created);
     }
   }
@@ -303,7 +314,7 @@ public class SpeedRunPanel extends TabPanel
     
     if (result != null)
     {
-      int created = this.speedRunControl.createNewChoice();
+      int created = this.speedRunControl.createNewChoice(result);
       this.owner.openChoiceTab(created);
     }
   }

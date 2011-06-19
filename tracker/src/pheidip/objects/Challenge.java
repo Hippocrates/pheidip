@@ -12,7 +12,7 @@ public class Challenge implements Bid
   public Challenge(int id, String name, BigDecimal goalAmount, int speedRunId)
   {
     this.id = id;
-    this.name = name;
+    this.name = name == null ? null : name.toLowerCase();
     this.speedRunId = speedRunId;
     this.goalAmount = goalAmount;
   }

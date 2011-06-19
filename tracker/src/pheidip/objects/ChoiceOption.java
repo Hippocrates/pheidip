@@ -10,7 +10,7 @@ public class ChoiceOption
 	{
 	  this.id = id;
 		this.choiceId = choiceId;
-		this.name = name;
+		this.name = name == null ? null : name.toLowerCase();
 	}
 	
 	public int getChoiceId()
@@ -26,5 +26,10 @@ public class ChoiceOption
   public int getId()
   {
     return id;
+  }
+  
+  public String toString()
+  {
+    return this.name;
   }
 }

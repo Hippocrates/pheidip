@@ -70,9 +70,9 @@ public class DonorPanel extends TabPanel
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{67, 111, 102, 99, 56, 94, 46, 0};
+    gridBagLayout.columnWidths = new int[]{67, 83, 102, 99, 56, 94, 46, 0};
     gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 54, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
@@ -210,14 +210,14 @@ public class DonorPanel extends TabPanel
     GridBagConstraints gbc_btnOpen = new GridBagConstraints();
     gbc_btnOpen.insets = new Insets(0, 0, 5, 5);
     gbc_btnOpen.fill = GridBagConstraints.HORIZONTAL;
-    gbc_btnOpen.gridx = 3;
+    gbc_btnOpen.gridx = 2;
     gbc_btnOpen.gridy = 5;
     add(openDonationButton, gbc_btnOpen);
     
     addDonationButton = new JButton("Add Donation");
     GridBagConstraints gbc_addDonationButton = new GridBagConstraints();
     gbc_addDonationButton.insets = new Insets(0, 0, 5, 5);
-    gbc_addDonationButton.gridx = 4;
+    gbc_addDonationButton.gridx = 3;
     gbc_addDonationButton.gridy = 5;
     add(addDonationButton, gbc_addDonationButton);
     
@@ -351,7 +351,7 @@ public class DonorPanel extends TabPanel
     this.aliasField.setText(data.getAlias());
     this.emailField.setText(data.getEmail());
     
-    this.emailField.setEditable(this.donorControl.allowEmailUpdate());
+    this.emailField.setEnabled(this.donorControl.allowEmailUpdate());
     
     this.totalDonatedField.setText(this.donorControl.getTotalDonated().toString());
     this.prizeField.setText("NOT IMPLEMENTED YET.");

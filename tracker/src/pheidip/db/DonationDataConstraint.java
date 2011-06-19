@@ -26,7 +26,7 @@ public enum DonationDataConstraint
   ChallengeFKSpeedRun("This SpeedRun still has a Challenge linked to it."),
   ChallengeNameUnique("A Challenge with that name already exists."),
   ChallengeNameLowerCase("Challenge names must be lowercase."),
-  ChallengeAmountValid("Challenge amount must be non-null and greater than zero."),
+  ChallengeAmountValid("Challenge amount must be non-null and non-negative."),
   ChallengePK("An Challenge with that ID already exists."),
   ChoiceBidFKDonation("A Bid is still linked to this Donation."),
   ChoiceBidFKOption("A Bid is still linked to this Option."),

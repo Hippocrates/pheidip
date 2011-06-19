@@ -81,6 +81,7 @@ public class DatabaseMemoryConnectPanel extends JPanel
   private void browseButtonClicked()
   {
     JFileChooser fileChooser = new JFileChooser();
+    fileChooser.addChoosableFileFilter(new ListFileFilter(new String[]{"sql"}));
     int result = fileChooser.showOpenDialog(this);
     
     if (result == JFileChooser.APPROVE_OPTION)

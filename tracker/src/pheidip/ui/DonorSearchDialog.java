@@ -9,18 +9,27 @@ import javax.swing.JPanel;
 
 import pheidip.logic.DonorSearch;
 import pheidip.objects.Donor;
+
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JTextField;
 import javax.swing.JList;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.JScrollPane;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
 
 @SuppressWarnings("serial")
 public class DonorSearchDialog extends JDialog
@@ -38,9 +47,10 @@ public class DonorSearchDialog extends JDialog
   private JLabel lastNameLabel;
   private JLabel aliasLabel;
   private JLabel emailLabel;
-  private JButton searchButton;
   private JButton okButton;
   private JButton cancelButton;
+  private ActionHandler actionHandler;
+  private FocusTraversalManager tabOrder;
   
   private void initializeGUI()
   {
@@ -54,9 +64,9 @@ public class DonorSearchDialog extends JDialog
     
     GridBagLayout gbl_panel = new GridBagLayout();
     gbl_panel.columnWidths = new int[]{0, 66, 112, 90, 76, 0};
-    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
     gbl_panel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_panel);
 
     firstNameLabel = new JLabel("First Name:");
@@ -78,9 +88,10 @@ public class DonorSearchDialog extends JDialog
     firstNameField.setColumns(10);
 
     donorScrollPane = new JScrollPane();
+    donorScrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
-    gbc_scrollPane.gridheight = 6;
+    gbc_scrollPane.gridheight = 5;
     gbc_scrollPane.gridwidth = 2;
     gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
     gbc_scrollPane.gridx = 3;
@@ -144,21 +155,13 @@ public class DonorSearchDialog extends JDialog
     gbc_textField_3.gridy = 3;
     contentPanel.add(emailField, gbc_textField_3);
     emailField.setColumns(10);
-    
-        searchButton = new JButton("Search");
-        GridBagConstraints gbc_btnSearch = new GridBagConstraints();
-        gbc_btnSearch.fill = GridBagConstraints.HORIZONTAL;
-        gbc_btnSearch.insets = new Insets(0, 0, 5, 5);
-        gbc_btnSearch.gridx = 2;
-        gbc_btnSearch.gridy = 5;
-        contentPanel.add(searchButton, gbc_btnSearch);
 
     okButton = new JButton("OK");
     GridBagConstraints gbc_okButton = new GridBagConstraints();
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
     gbc_okButton.gridx = 3;
-    gbc_okButton.gridy = 6;
+    gbc_okButton.gridy = 5;
     contentPanel.add(okButton, gbc_okButton);
     getRootPane().setDefaultButton(okButton);
 
@@ -166,35 +169,77 @@ public class DonorSearchDialog extends JDialog
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_cancelButton.gridx = 4;
-    gbc_cancelButton.gridy = 6;
+    gbc_cancelButton.gridy = 5;
     contentPanel.add(cancelButton, gbc_cancelButton);
+  }
+  
+  private class ActionHandler implements ActionListener, DocumentListener, ListSelectionListener
+  {
+    public void actionPerformed(ActionEvent ev)
+    {
+      if (ev.getSource() == okButton)
+      {
+        returnSelectedDonor();
+      }
+      else if (ev.getSource() == cancelButton)
+      {
+        closeDialog();
+      }
+    }
+
+    private void documentChanged(DocumentEvent ev)
+    {
+      DonorSearchDialog.this.runFilters();
+    }
+
+    public void changedUpdate(DocumentEvent ev)
+    {
+      this.documentChanged(ev);
+    }
+
+    public void insertUpdate(DocumentEvent ev)
+    {
+      this.documentChanged(ev);
+    }
+
+    public void removeUpdate(DocumentEvent ev)
+    {
+      this.documentChanged(ev);
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent ev)
+    {
+      if (ev.getSource() == donorList)
+      {
+        okButton.setEnabled(!donorList.isSelectionEmpty());
+      }
+    }
   }
   
   private void initializeGUIEvents()
   {
-    searchButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        DonorSearchDialog.this.runFilters();
-      }
-    });
+    this.actionHandler = new ActionHandler();
     
-    okButton.addActionListener(new ActionListener() 
-    {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        DonorSearchDialog.this.returnSelectedDonor();
-      }
-    });
+    this.firstNameField.getDocument().addDocumentListener(this.actionHandler);
+    this.lastNameField.getDocument().addDocumentListener(this.actionHandler);
+    this.aliasField.getDocument().addDocumentListener(this.actionHandler);
+    this.emailField.getDocument().addDocumentListener(this.actionHandler);
+    okButton.addActionListener(this.actionHandler);
+    cancelButton.addActionListener(this.actionHandler);
     
-    cancelButton.addActionListener(new ActionListener() 
+    this.tabOrder = new FocusTraversalManager(new Component[]
     {
-      public void actionPerformed(ActionEvent arg0) 
-      {
-        DonorSearchDialog.this.cancelSelection();
-      }
+      this.firstNameField,
+      this.lastNameField,
+      this.aliasField,
+      this.emailField,
+      this.donorList,
+      this.okButton,
+      this.cancelButton,
     });
+
+    this.setFocusTraversalPolicy(this.tabOrder);
   }
 
   /**
@@ -205,11 +250,13 @@ public class DonorSearchDialog extends JDialog
   {
     super(parent, true);
     
+    this.searcher = searcher;
+    this.resultDonor = null;
+    
     this.initializeGUI();
     this.initializeGUIEvents();
     
-    this.searcher = searcher;
-    this.resultDonor = null;
+    this.runFilters();
   }
   
   public Donor getResult()
@@ -230,12 +277,7 @@ public class DonorSearchDialog extends JDialog
       this.closeDialog();
     }
   }
-  
-  private void cancelSelection()
-  {
-    this.closeDialog();
-  }
-  
+
   private void closeDialog()
   {
     this.setVisible(false);
@@ -258,5 +300,6 @@ public class DonorSearchDialog extends JDialog
     }
     
     this.donorList.setModel(listData);
+    this.donorList.setSelectedIndex(0);
   }
 }

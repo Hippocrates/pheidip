@@ -5,7 +5,6 @@
 	<classpathentry kind="lib" path="lib/hsqldb.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector.jar"/>
-	<classpathentry kind="lib" path="lib/sqltool.jar"/>
 	<classpathentry kind="lib" path="lib/jsoup-1.5.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

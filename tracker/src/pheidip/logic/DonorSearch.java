@@ -41,9 +41,8 @@ public class DonorSearch
     {
       throw new RuntimeException(e);
     }
-    
   }
-  
+
   public List<Donor> searchDonors(String firstName, String lastName, String email, String alias)
   {
     List<Donor> filtered = this.cachedDonors;

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import pheidip.objects.Bid;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
@@ -32,6 +33,11 @@ public class BidData extends DataInterface
   private PreparedStatement insertChallengeStatement;
   private PreparedStatement updateChallengeStatement;
   private PreparedStatement deleteChallengeStatement;
+  private PreparedStatement selectChallengeTotalStatement;
+  
+  private PreparedStatement selectAllChallengesStatement;
+  private PreparedStatement selectAllChoicesStatement;
+  private PreparedStatement selectAllChoiceOptionsStatement;
   
   public BidData(DonationDataAccess manager)
   {
@@ -43,6 +49,10 @@ public class BidData extends DataInterface
   {
     try
     {
+      this.selectAllChallengesStatement = this.getConnection().prepareStatement("SELECT * FROM Challenge;");
+      this.selectAllChoicesStatement = this.getConnection().prepareStatement("SELECT * FROM Choice;");
+      this.selectAllChoiceOptionsStatement = this.getConnection().prepareStatement("SELECT * FROM ChoiceOption;");
+      
       this.selectChoiceByIdStatement = this.getConnection().prepareStatement("SELECT * FROM Choice WHERE Choice.choiceId = ?;");
       this.selectChoicesBySpeedRunId = this.getConnection().prepareStatement("SELECT * FROM Choice WHERE Choice.speedRunId = ?;");
       
@@ -65,6 +75,7 @@ public class BidData extends DataInterface
       
       this.selectChallengeByIdStatement = this.getConnection().prepareStatement("SELECT * FROM Challenge WHERE Challenge.challengeId = ?;");
       this.selectChallengesBySpeedRunId = this.getConnection().prepareStatement("SELECT * FROM Challenge WHERE Challenge.speedRunId = ?;");
+      this.selectChallengeTotalStatement = this.getConnection().prepareStatement("SELECT SUM(amount) FROM ChallengeBid WHERE ChallengeBid.challengeId = ?;");
       
       this.updateChallengeStatement = this.getConnection().prepareStatement("UPDATE Challenge SET speedRunId = ?, name = ?, goalAmount = ? WHERE Challenge.challengeId = ?;");
       
@@ -76,6 +87,33 @@ public class BidData extends DataInterface
     {
       this.getManager().handleSQLException(e);
     }
+  }
+  
+  public synchronized List<Bid> getAllBids()
+  {
+    List<Bid> list = new ArrayList<Bid>();
+    
+    try
+    {
+      ResultSet challenges = this.selectAllChallengesStatement.executeQuery();
+      ResultSet choices = this.selectAllChoicesStatement.executeQuery();
+      
+      while (challenges.next())
+      {
+        list.add(extractChallenge(challenges));
+      }
+      
+      while (choices.next())
+      {
+        list.add(extractChoice(choices));
+      }
+    }
+    catch (SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    return list;
   }
 
   public synchronized Choice getChoiceById(int choiceId)
@@ -372,8 +410,8 @@ public class BidData extends DataInterface
     {
       this.updateChallengeStatement.setInt(4, challenge.getId());
       this.updateChallengeStatement.setInt(1, challenge.getSpeedRunId());
-      this.updateChallengeStatement.setString(1, challenge.getName());
-      this.updateChallengeStatement.setBigDecimal(1, challenge.getGoalAmount());
+      this.updateChallengeStatement.setString(2, challenge.getName());
+      this.updateChallengeStatement.setBigDecimal(3, challenge.getGoalAmount());
       
       int updated = this.updateChallengeStatement.executeUpdate();
       
@@ -438,6 +476,38 @@ public class BidData extends DataInterface
       result = BigDecimal.ZERO.setScale(2);
     }
     
+    result = result.setScale(2);
+    
+    return result;
+  }
+  
+  public synchronized BigDecimal getChallengeTotal(int challengeId)
+  {
+    BigDecimal result = null;
+    
+    try
+    {
+      this.selectChallengeTotalStatement.setInt(1, challengeId);
+      
+      ResultSet results = this.selectChallengeTotalStatement.executeQuery();
+      
+      if (results.next())
+      {
+        result = results.getBigDecimal(1);
+      }
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    if (result == null)
+    {
+      result = BigDecimal.ZERO.setScale(2);
+    }
+    
+    result = result.setScale(2);
+    
     return result;
   }
 
@@ -458,5 +528,26 @@ public class BidData extends DataInterface
     {
       this.getManager().handleSQLException(e);
     }
+  }
+
+  public List<ChoiceOption> getAllChoiceOptions()
+  {
+    List<ChoiceOption> list = new ArrayList<ChoiceOption>();
+    
+    try
+    {
+      ResultSet results = this.selectAllChoiceOptionsStatement.executeQuery();
+      
+      while (results.next())
+      {
+        list.add(extractChoiceOption(results));
+      }
+    }
+    catch (SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    return list;
   }
 }

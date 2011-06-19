@@ -57,7 +57,7 @@ public class TestChipinDonations extends TestCase
     
     List<ChipinDonation> sourceDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
     assertEquals(numDonations, sourceDonations.size());
-    String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations, rand);
+    String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations);
 
     Document htmlDoc = Jsoup.parse(randomDonations);
      

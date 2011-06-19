@@ -9,6 +9,7 @@ import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 
 import java.awt.Component;
+import java.awt.FocusTraversalPolicy;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
@@ -181,9 +182,19 @@ public class ChoicePanel extends TabPanel
         this.refreshButton,
         this.addOptionButton,
         this.renameOptionButton,
-        this.deleteOptionButton
+        this.deleteOptionButton,
     });
     this.setFocusTraversalPolicy(this.tabOrder);
+  }
+  
+  public boolean isFocusCycleRoot()
+  {
+    return true;
+  }
+  
+  public FocusTraversalPolicy getFocusTraversalPolicy() 
+  {
+    return this.tabOrder;
   }
   
   public ChoicePanel(MainWindow owner, ChoiceControl choiceControl)

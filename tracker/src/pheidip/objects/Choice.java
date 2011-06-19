@@ -9,7 +9,7 @@ public class Choice implements Bid
 	public Choice(int id, String name, int speedRunId)
 	{
 	  this.id = id;
-		this.name = name;
+		this.name = name == null ? null : name.toLowerCase();
 		this.speedRunId = speedRunId;
 	}
 	

@@ -1,7 +1,5 @@
 package pheidip.db;
 
-import java.sql.SQLException;
-
 public final class DonationDataErrorParser
 {
   public static DonationDataConstraint parseError(String errorString)
@@ -19,10 +17,5 @@ public final class DonationDataErrorParser
     }
     
     return null;
-  }
-  
-  public static DonationDataConstraintException convert(SQLException e)
-  {
-    return new DonationDataConstraintException(DonationDataErrorParser.parseError(e.getMessage()));
   }
 }

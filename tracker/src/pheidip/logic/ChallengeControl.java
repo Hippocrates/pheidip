@@ -46,4 +46,9 @@ public class ChallengeControl
   {
     return this.challengeId;
   }
+
+  public BigDecimal getTotalCollected()
+  {
+    return this.bids.getChallengeTotal(this.challengeId);
+  }
 }

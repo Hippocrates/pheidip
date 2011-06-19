@@ -72,6 +72,13 @@ public class ChoiceControl
   
   public void deleteChoice()
   {
+    List<ChoiceOption> allOptions = this.getOptions();
+    
+    for (ChoiceOption option : allOptions)
+    {
+      this.bids.deleteChoiceOption(option.getId());
+    }
+    
     this.bids.deleteChoice(this.choiceId);
   }
 

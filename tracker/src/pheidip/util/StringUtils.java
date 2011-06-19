@@ -49,7 +49,7 @@ public final class StringUtils
   
   public static String randomStringOverAlphabet(int loRange, int hiRange, String alphabet, Random rand)
   {
-    if (loRange <= 0 || hiRange <= 0 || loRange > hiRange)
+    if (loRange < 0 || hiRange <= 0 || loRange > hiRange)
     {
       return "";
     }
@@ -89,4 +89,31 @@ public final class StringUtils
     return randomStringOverAlphabet(loNumDigits, hiNumDigits, digits, rand) + "." + randomStringOverAlphabet(2,2,digits, rand);
   }
   
+  public static String getFileBase(String filename)
+  {
+    int dotlocation = filename.lastIndexOf('.');
+    
+    if (dotlocation == -1)
+    {
+      return filename;
+    }
+    else
+    {
+      return filename.substring(0, dotlocation);
+    }
+  }
+  
+  public static String getFileExtension(String filename)
+  {
+    int dotlocation = filename.lastIndexOf('.');
+    
+    if (dotlocation == -1)
+    {
+      return "";
+    }
+    else
+    {
+      return filename.substring(dotlocation + 1);
+    }
+  }
 }

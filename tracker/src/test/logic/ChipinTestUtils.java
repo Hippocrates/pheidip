@@ -2,6 +2,7 @@ package test.logic;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -32,14 +33,12 @@ public class ChipinTestUtils
     
     for (int i = 0; i < numDonors; ++i)
     {
-      donorNames[i] = "";
-      if (rand.nextInt(2) == 0)
-      {
-        donorNames[i] = StringUtils.randomName(4, 25, rand) + " " + StringUtils.randomName(4, 25, rand);
-      }
+      donorNames[i] = StringUtils.randomName(4, 25, rand) + " " + StringUtils.randomName(4, 25, rand);
       
       donorEmails[i] = StringUtils.randomEmail(4, 25, 4, 25, possibleTopLevelDomains[rand.nextInt(possibleTopLevelDomains.length)], rand);
     }
+    
+    Date currenttime = new Date();
     
     for (int i = 0; i < numDonations; ++i)
     {
@@ -50,13 +49,13 @@ public class ChipinTestUtils
       
       String comment = StringUtils.randomStringOverAlphabet(0, 3000, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()@:.,! ;'\"-?_", rand);
     
-      result.add(new ChipinDonation(donorNames[donor], donorEmails[donor], comment, ""+i, new BigDecimal(amount)));
+      result.add(new ChipinDonation(donorNames[donor], donorEmails[donor], comment, ""+(currenttime.getTime()+rand.nextInt(1000000000)), new BigDecimal(amount)));
     }
     
     return result;
   }
   
-  public static String generateChipinHTMLTable(List<ChipinDonation> donations, Random rand)
+  public static String generateChipinHTMLTable(List<ChipinDonation> donations)
   {
     StringBuilder builder = new StringBuilder();
     

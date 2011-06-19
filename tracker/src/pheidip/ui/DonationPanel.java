@@ -1,7 +1,9 @@
 package pheidip.ui;
 
 import pheidip.logic.DonationControl;
+import pheidip.objects.BidType;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationBid;
 import pheidip.objects.Donor;
 
 import java.awt.Component;
@@ -15,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -50,6 +53,7 @@ public class DonationPanel extends TabPanel
   private JButton changeAmountButton;
   private JButton removeBidButton;
   private JTable bidTable;
+  private List<DonationBid> cachedDonationBids;
   
   private void initializeGUI()
   {
@@ -281,9 +285,13 @@ public class DonationPanel extends TabPanel
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.amountField,
+      this.commentTextArea,
       this.openDonorButton,
       this.refreshButton,
       this.saveButton,
+      this.attachBidButton,
+      this.changeAmountButton,
+      this.removeBidButton,
     });
     this.setFocusTraversalPolicy(this.tabOrder);
   }
@@ -340,14 +348,14 @@ public class DonationPanel extends TabPanel
     
     if (this.donationControl.allowUpdateData())
     {
-      this.amountField.setEditable(true);
-      this.commentTextArea.setEditable(true);
+      this.amountField.setEnabled(true);
+      this.commentTextArea.setEnabled(true);
       this.saveButton.setEnabled(true);
     }
     else
     {
-      this.amountField.setEditable(false);
-      this.commentTextArea.setEditable(false);
+      this.amountField.setEnabled(false);
+      this.commentTextArea.setEnabled(false);
       this.saveButton.setEnabled(false);
     }
     
@@ -356,6 +364,23 @@ public class DonationPanel extends TabPanel
     this.donorField.setText(donor.toString());
     
     this.commentTextArea.setText(result.getComment());
+    
+    CustomTableModel tableData = new CustomTableModel(
+        new String[]{"Bid", "Amount"}, 0);
+    
+    this.cachedDonationBids = this.donationControl.getAttachedBids();
+    
+    for (DonationBid b : this.cachedDonationBids)
+    {
+      tableData.addRow(
+          new Object[]
+          {
+              this.donationControl.getDonationBidDisplayName(b),
+              b.getAmount()
+          });
+    }
+    
+    this.bidTable.setModel(tableData);
 
     this.setHeaderText(result.getDomainString());
   }
@@ -376,21 +401,88 @@ public class DonationPanel extends TabPanel
     this.owner.openDonorTab(donor.getId());
   }
   
+  private DonationBid getSelectedDonationBid()
+  {
+    int selectedRow = this.bidTable.getSelectedRow();
+    if (selectedRow != -1)
+    {
+      return this.cachedDonationBids.get(selectedRow);
+    }
+    else
+    {
+      return null;
+    }
+  }
+  
   public void removeCurrentBid()
   {
-    // TODO Auto-generated method stub
+    DonationBid selected = this.getSelectedDonationBid();
     
+    if (selected != null)
+    {
+      int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this bid?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+      
+      if (result == JOptionPane.YES_OPTION)
+      {
+        if (selected.getType() == BidType.CHOICE)
+        {
+          this.donationControl.removeChoiceBid(selected.getId());
+        }
+        else
+        {
+          this.donationControl.removeChallengeBid(selected.getId());
+        }
+        
+        this.refreshContent();
+      }
+    }
   }
-
+  
   public void changeCurrentBidAmount()
   {
-    // TODO Auto-generated method stub
+    DonationBid selected = this.getSelectedDonationBid();
     
+    if (selected != null)
+    {
+      String amount = JOptionPane.showInputDialog(this, "Please enter a new amount to bid.", "Enter amount", JOptionPane.OK_CANCEL_OPTION);
+      
+      if (amount != null)
+      {
+        if (selected.getType() == BidType.CHOICE)
+        {
+          this.donationControl.updateChoiceBidAmount(selected.getId(), new BigDecimal(amount));
+        }
+        else
+        {
+          this.donationControl.updateChallengeBidAmount(selected.getId(), new BigDecimal(amount));
+        }
+        this.refreshContent();
+      }
+    }
   }
 
   public void attachNewBid()
   {
-    // TODO Auto-generated method stub
+    BidSearchDialog dialog = this.owner.openBidSearch();
     
+    dialog.setVisible(true);
+    
+    if (dialog.getSelectedBid() != null)
+    {
+      String amount = JOptionPane.showInputDialog(this, "Please enter an amount to bid.", "Enter amount", JOptionPane.OK_CANCEL_OPTION);
+      
+      if (amount != null)
+      {
+        if (dialog.getSelectedOption() != null)
+        {
+          this.donationControl.attachNewChoiceBid(dialog.getSelectedOption().getId(), new BigDecimal(amount));
+        }
+        else
+        {
+          this.donationControl.attachNewChallengeBid(dialog.getSelectedBid().getId(), new BigDecimal(amount));
+        }
+        this.refreshContent();
+      }
+    }
   }
 }
