@@ -13,15 +13,18 @@ import pheidip.objects.ChoiceBid;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
+import pheidip.objects.DonationReadState;
 
 public class DonationData extends DataInterface
 {
+  private PreparedStatement selectAllDonations;
   private PreparedStatement selectDonationById;
   private PreparedStatement selectDonationByDomainId;
   private PreparedStatement selectDonorDonations;
   private PreparedStatement selectDonorDonationTotal;
   private PreparedStatement updateDonationComment;
   private PreparedStatement updateDonationBidState;
+  private PreparedStatement updateDonationReadState;
   private PreparedStatement deleteDonationStatement;
   private PreparedStatement insertDonationStatement;
   private PreparedStatement updateDonationStatement;
@@ -34,6 +37,8 @@ public class DonationData extends DataInterface
   private PreparedStatement updateDonationChoiceBidStatement;
   private PreparedStatement deleteDonationChallengeBidStatement;
   private PreparedStatement deleteDonationChoiceBidStatement;
+  private PreparedStatement selectDonationsWithBidPendingStatement;
+  private PreparedStatement selectDonationsWithReadPendingStatement;
 
   public DonationData(DonationDataAccess manager)
   {
@@ -44,6 +49,11 @@ public class DonationData extends DataInterface
   {
     try
     {
+      this.selectAllDonations = this.getConnection().prepareStatement("SELECT * FROM Donation");
+      this.updateDonationReadState = this.getConnection().prepareStatement("UPDATE Donation SET readState = ? WHERE Donation.donationId = ?;");
+      this.selectDonationsWithReadPendingStatement = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE (Donation.readState = 'PENDING' OR Donation.readState = 'FLAGGED') OR (Donation.readState = 'AMOUNT_READ' AND Donation.comment != NULL)");
+      this.selectDonationsWithBidPendingStatement = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE (Donation.bidState = 'PENDING' OR Donation.bidState = 'FLAGGED') AND Donation.comment != NULL");
+      
       this.updateDonationChallengeBidStatement = this.getConnection().prepareStatement("UPDATE ChallengeBid SET amount = ? WHERE ChallengeBid.challengeBidId = ?;");
       this.updateDonationChoiceBidStatement = this.getConnection().prepareStatement("UPDATE ChoiceBid SET amount = ? WHERE ChoiceBid.choiceBidId = ?;");
       this.deleteDonationChallengeBidStatement = this.getConnection().prepareStatement("DELETE FROM ChallengeBid WHERE ChallengeBid.challengeBidId = ?;");
@@ -62,12 +72,12 @@ public class DonationData extends DataInterface
 
       this.updateDonationComment = this.getConnection().prepareStatement("UPDATE Donation SET comment = ? WHERE Donation.donationId = ?;");
       this.updateDonationBidState = this.getConnection().prepareStatement("UPDATE Donation SET bidState = ? WHERE Donation.donationId = ?;");
-      this.updateDonationStatement = this.getConnection().prepareStatement("UPDATE Donation SET donorId = ?, domain = ?, domainId = ?, bidState = ?, amount = ?, timeReceived = ?, comment = ? WHERE donationId = ?;");
+      this.updateDonationStatement = this.getConnection().prepareStatement("UPDATE Donation SET donorId = ?, domain = ?, domainId = ?, bidState = ?, readState = ?, amount = ?, timeReceived = ?, comment = ? WHERE donationId = ?;");
       this.updateDonationAmountStatement = this.getConnection().prepareStatement("UPDATE Donation SET amount = ? WHERE Donation.donationId = ?;");
       
       this.deleteDonationStatement = this.getConnection().prepareStatement("DELETE FROM Donation WHERE Donation.donationId = ?;");
     
-      this.insertDonationStatement = this.getConnection().prepareStatement("INSERT INTO Donation (donationId, donorId, domain, domainId, bidState, amount, timeReceived, comment) VALUES (?,?,?,?,?,?,?,?);");
+      this.insertDonationStatement = this.getConnection().prepareStatement("INSERT INTO Donation (donationId, donorId, domain, domainId, bidState, readState, amount, timeReceived, comment) VALUES (?,?,?,?,?,?,?,?,?);");
     }
     catch (SQLException e)
     {
@@ -165,6 +175,7 @@ public class DonationData extends DataInterface
         DonationDomain.valueOf(row.getString("domain")),
         row.getString("domainId"),
         DonationBidState.valueOf(row.getString("bidState")), 
+        DonationReadState.valueOf(row.getString("readState")),
         row.getBigDecimal("amount"), 
         new java.util.Date( row.getTimestamp("timeReceived").getTime()),
         row.getInt("donorId"),
@@ -301,9 +312,10 @@ public class DonationData extends DataInterface
       this.insertDonationStatement.setString(3, d.getDomain().toString());
       this.insertDonationStatement.setString(4, d.getDomainId());
       this.insertDonationStatement.setString(5, d.getBidState().toString());
-      this.insertDonationStatement.setBigDecimal(6, d.getAmount());
-      this.insertDonationStatement.setTimestamp(7, new Timestamp(d.getTimeReceived().getTime()));
-      this.insertDonationStatement.setString(8, d.getComment());
+      this.insertDonationStatement.setString(6, d.getReadState().toString());
+      this.insertDonationStatement.setBigDecimal(7, d.getAmount());
+      this.insertDonationStatement.setTimestamp(8, new Timestamp(d.getTimeReceived().getTime()));
+      this.insertDonationStatement.setString(9, d.getComment());
       
       int updated = this.insertDonationStatement.executeUpdate();
       
@@ -326,10 +338,11 @@ public class DonationData extends DataInterface
       this.updateDonationStatement.setString(2, updated.getDomain().toString());
       this.updateDonationStatement.setString(3, updated.getDomainId());
       this.updateDonationStatement.setString(4, updated.getBidState().toString());
-      this.updateDonationStatement.setBigDecimal(5, updated.getAmount());
-      this.updateDonationStatement.setTimestamp(6, new Timestamp(updated.getTimeReceived().getTime()));
-      this.updateDonationStatement.setString(7, updated.getComment());
-      this.updateDonationStatement.setInt(8, updated.getId());
+      this.updateDonationStatement.setString(5, updated.getReadState().toString());
+      this.updateDonationStatement.setBigDecimal(6, updated.getAmount());
+      this.updateDonationStatement.setTimestamp(7, new Timestamp(updated.getTimeReceived().getTime()));
+      this.updateDonationStatement.setString(8, updated.getComment());
+      this.updateDonationStatement.setInt(9, updated.getId());
       
       this.updateDonationStatement.execute();
     }
@@ -523,5 +536,79 @@ public class DonationData extends DataInterface
     {
       this.getManager().handleSQLException(e);
     }
+  }
+  
+  public synchronized List<Donation> getDonationsWithPendingBids()
+  {
+    List<Donation> list = null;
+    
+    try
+    {
+      ResultSet results = this.selectDonationsWithBidPendingStatement.executeQuery();
+      
+      list = extractDonationList(results);
+    }
+    catch (SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    return list;
+  }
+  
+  public synchronized List<Donation> getDonationsToBeRead()
+  {
+    List<Donation> list = null;
+    
+    try
+    {
+      ResultSet results = this.selectDonationsWithReadPendingStatement.executeQuery();
+      
+      list = extractDonationList(results);
+    }
+    catch (SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    return list;
+  }
+
+  public synchronized void setDonationReadState(int donationId, DonationReadState readState)
+  {
+    try
+    {
+      this.updateDonationReadState.setInt(2, donationId);
+      this.updateDonationReadState.setString(1, readState.toString());
+      
+      int updated = this.updateDonationReadState.executeUpdate();
+      
+      if (updated != 1)
+      {
+        throw new RuntimeException("Error, could not update donation read state.");
+      }
+    } 
+    catch (SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+  }
+
+  public synchronized List<Donation> getAllDonations()
+  {
+    List<Donation> list = null;
+    
+    try
+    {
+      ResultSet results = selectAllDonations.executeQuery();
+      
+      list = extractDonationList(results);
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    return list;
   }
 }

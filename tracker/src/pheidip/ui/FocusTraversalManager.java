@@ -6,6 +6,8 @@ import java.awt.FocusTraversalPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.text.JTextComponent;
+
 public class FocusTraversalManager extends FocusTraversalPolicy
 {
   List<Component> components;
@@ -34,16 +36,22 @@ public class FocusTraversalManager extends FocusTraversalPolicy
     
     return i % this.components.size();
   }
-  
+
   @Override
   public Component getComponentAfter(Container container, Component component)
   {
+    if (container instanceof DonationBidsPanel)
+    {
+      int y = 75;
+      System.out.println("" + y);
+    }
+    
     for (int currentIndex = this.clampToSize(this.components.indexOf(component) + 1); currentIndex != this.components.indexOf(component); currentIndex = this.clampToSize(currentIndex + 1))
     {
       Component current = this.components.get(currentIndex);
-      if (current.isEnabled())
+      if (isComponentSelectable(current))
       {
-        return current;
+        return getUnderlyingComponent(current);
       }
     }
     
@@ -56,9 +64,9 @@ public class FocusTraversalManager extends FocusTraversalPolicy
     for (int currentIndex = this.clampToSize(this.components.indexOf(component) - 1); currentIndex != this.components.indexOf(component); currentIndex = this.clampToSize(currentIndex - 1))
     {
       Component current = this.components.get(currentIndex);
-      if (current.isEnabled())
+      if (isComponentSelectable(current))
       {
-        return current;
+        return getUnderlyingComponent(current);
       }
     }
     
@@ -75,20 +83,57 @@ public class FocusTraversalManager extends FocusTraversalPolicy
   public Component getFirstComponent(Container arg0)
   {
     Component first = this.components.get(0);
-    if (first.isEnabled())
+    if (isComponentSelectable(first))
     {
-      return first;
+      return getUnderlyingComponent(first);
     }
     else
     {
       return this.getComponentAfter(arg0, first);
     }
   }
+  
+  private Component getUnderlyingComponent(Component c)
+  {
+    if (c instanceof Container)
+    {
+      Container container = (Container) c;
+
+      FocusTraversalPolicy ftp = container.getFocusTraversalPolicy();
+      
+      if (ftp != null)
+      {
+        return ftp.getFirstComponent(container);
+      }
+    }
+      
+    return c;
+  }
 
   @Override
   public Component getLastComponent(Container arg0)
   {
     return this.getComponentBefore(arg0, this.getFirstComponent(arg0));
+  }
+  
+  private static boolean isComponentSelectable(Component c)
+  {
+    if (c == null)
+    {
+      return false;
+    }
+    else if (c instanceof JTextComponent && !((JTextComponent)c).isEditable())
+    {
+      return false;
+    }
+    else if (c.isEnabled())
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 
 }

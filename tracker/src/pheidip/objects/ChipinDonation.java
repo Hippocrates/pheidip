@@ -1,6 +1,7 @@
 package pheidip.objects;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import pheidip.util.StringUtils;
 
@@ -11,14 +12,16 @@ public class ChipinDonation
   private String comment;
   private String chipinTimeStamp;
   private BigDecimal amount;
+  private Date timeStamp;
 
-  public ChipinDonation(String name, String email, String comment, String chipinId, BigDecimal amount)
+  public ChipinDonation(String name, String email, String comment, String chipinTimeStamp, BigDecimal amount)
   {
     this.name = name;
     this.email = email;
     this.comment = StringUtils.nullIfEmpty(comment);
-    this.chipinTimeStamp = chipinId;
+    this.chipinTimeStamp = chipinTimeStamp;
     this.amount = amount;
+    this.timeStamp = new Date(Long.parseLong(chipinTimeStamp));
   }
   
   public String getName()
@@ -49,6 +52,11 @@ public class ChipinDonation
   public String getChipinId()
   {
     return this.chipinTimeStamp + this.email;
+  }
+  
+  public Date getTimeStamp()
+  {
+    return this.timeStamp;
   }
   
   public static int maxCommentLength()

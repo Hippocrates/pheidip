@@ -16,7 +16,9 @@ import pheidip.objects.ChoiceBid;
 import pheidip.objects.ChoiceOption;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBid;
+import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
+import pheidip.objects.DonationReadState;
 import pheidip.objects.Donor;
 import pheidip.objects.SpeedRun;
 import pheidip.util.IdUtils;
@@ -55,7 +57,7 @@ public class DonationControl
     return this.donors.getDonorById(this.getData().getDonorId());
   }
   
-  public void updateData(BigDecimal amount, String comment)
+  public void updateData(BigDecimal amount, String comment, boolean markAsRead)
   {
     if (this.allowUpdateData())
     {
@@ -72,12 +74,22 @@ public class DonationControl
       this.donations.setDonationAmount(this.donationId, amount);
       this.donations.setDonationComment(this.donationId, comment);
     }
+    
+    if (markAsRead)
+    {
+      this.markDonationAsRead();
+    }
     else
     {
-      throw new RuntimeException("Raw updates not allowed on non-local donations.");
+      this.clearDonationRead();
     }
   }
-  
+
+  public void clearDonationRead()
+  {
+    this.donations.setDonationReadState(this.donationId, DonationReadState.PENDING);
+  }
+
   public boolean allowUpdateData()
   {
     Donation data = this.getData();
@@ -102,6 +114,7 @@ public class DonationControl
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
       this.donations.attachChallengeBid(created);
+      this.donations.setDonationBidState(this.donationId, DonationBidState.PROCESSED);
     }
     else
     {
@@ -121,6 +134,7 @@ public class DonationControl
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
       this.donations.attachChoiceBid(created);
+      this.markAsBidsHandled();
     }
     else
     {
@@ -241,6 +255,11 @@ public class DonationControl
     return sumBids(this.getAttachedBids());
   }
   
+  public BigDecimal getTotalAvailiable()
+  {
+    return this.getData().getAmount().subtract(sumBids(this.getAttachedBids()));
+  }
+  
   private static BigDecimal sumBids(List<DonationBid> attachedBids)
   {
     BigDecimal sum = BigDecimal.ZERO;
@@ -251,5 +270,29 @@ public class DonationControl
     }
     
     return sum;
+  }
+
+  public void markDonationAsRead()
+  {
+    Donation d = this.getData();
+    
+    if (d.getComment() != null)
+    {
+      this.donations.setDonationReadState(this.donationId, DonationReadState.COMMENT_READ);
+    }
+    else
+    {
+      this.donations.setDonationReadState(this.donationId, DonationReadState.AMOUNT_READ);
+    }
+  }
+  
+  public void markAsBidsHandled()
+  {
+    Donation d = this.getData();
+    
+    if (d.getComment() != null)
+    {
+      this.donations.setDonationBidState(d.getId(), DonationBidState.PROCESSED);
+    }
   }
 }

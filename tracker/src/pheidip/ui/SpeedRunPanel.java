@@ -1,10 +1,13 @@
 package pheidip.ui;
 
+import pheidip.logic.ChallengeControl;
+import pheidip.logic.ChoiceControl;
 import pheidip.logic.SpeedRunControl;
 import pheidip.objects.Bid;
 import pheidip.objects.BidType;
+import pheidip.objects.ChoiceOption;
 import pheidip.objects.SpeedRun;
-import pheidip.util.StringUtils;
+import pheidip.util.Pair;
 
 import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
@@ -21,10 +24,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class SpeedRunPanel extends TabPanel
+public class SpeedRunPanel extends EntityPanel
 {
   private MainWindow owner;
   private SpeedRunControl speedRunControl;
@@ -157,7 +161,7 @@ public class SpeedRunPanel extends TabPanel
         }
         else if (ev.getSource() == deleteButton)
         {
-          SpeedRunPanel.this.deleteSpeedRun();
+          SpeedRunPanel.this.deleteContent();
         }
       }
       catch(Exception e)
@@ -232,23 +236,54 @@ public class SpeedRunPanel extends TabPanel
   {
     SpeedRun data = this.speedRunControl.getData();
     
+    if (data == null)
+    {
+      JOptionPane.showMessageDialog(this, "Error, this run no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
+      this.owner.removeTab(this);
+      return;
+    }
+    
     this.nameField.setText(data.getName());
     
     cachedRelatedBids = this.speedRunControl.getAllBids();
     
     CustomTableModel tableData = new CustomTableModel(new String[]
     {
-        "Type",
-        "Name",
+        "Bid",
+        "Status",
     },0);
     
     for (Bid b : cachedRelatedBids)
     {
+      String statusString = "";
+      
+      if (b.getType() == BidType.CHALLENGE)
+      {
+        ChallengeControl c = this.speedRunControl.getChallengeControl(b.getId());
+        statusString = c.getTotalCollected().toString();
+      }
+      else
+      {
+        ChoiceControl c = this.speedRunControl.getChoiceControl(b.getId());
+        List<Pair<ChoiceOption,BigDecimal>> options = c.getOptionsWithTotals(true);
+        String[] strings = new String[options.size()];
+        
+        for (int i = 0; i < strings.length; ++i)
+        {
+          statusString += options.get(i).getFirst() + " : $" + options.get(i).getSecond().toString();
+          
+          if (i != strings.length - 1)
+          {
+            statusString += ", ";
+          }
+        }
+      }
+      
       tableData.addRow(
           new Object[]
           {
-              StringUtils.symbolToNatural(b.getType().toString()),
-              StringUtils.emptyIfNull(b.getName()),
+              b,
+              statusString,
           });
     }
     
@@ -257,13 +292,13 @@ public class SpeedRunPanel extends TabPanel
     this.setHeaderText("Run: " + data.getName());
   }
   
-  private void saveContent()
+  public void saveContent()
   {
     this.speedRunControl.updateData(this.nameField.getText());
     this.refreshContent();
   }
 
-  private void deleteSpeedRun()
+  public void deleteContent()
   {
     int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this speed run?", "Confirm delete", JOptionPane.YES_NO_OPTION);
     
@@ -276,11 +311,11 @@ public class SpeedRunPanel extends TabPanel
   
   private void openSelectedBid()
   {
-    int selectedIndex = this.bidTable.getSelectedRow();
+    int selectedRow = this.bidTable.getSelectedRow();
     
-    if (selectedIndex != -1)
+    if (selectedRow != -1)
     {
-      Bid current = this.cachedRelatedBids.get(selectedIndex);
+      Bid current = (Bid)this.bidTable.getValueAt(selectedRow, 0);
       if (current.getType() == BidType.CHOICE)
       {
         this.owner.openChoiceTab(current.getId());

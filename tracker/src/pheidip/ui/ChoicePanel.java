@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import pheidip.logic.ChoiceControl;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
+import pheidip.util.Pair;
 
 import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
@@ -15,6 +16,7 @@ import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
 import java.awt.Insets;
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -23,7 +25,7 @@ import javax.swing.JTable;
 import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
-public class ChoicePanel extends TabPanel
+public class ChoicePanel extends EntityPanel
 {
   private MainWindow owner;
   private ChoiceControl choiceControl;
@@ -39,7 +41,6 @@ public class ChoicePanel extends TabPanel
   private JButton deleteChoiceButton;
   private JLabel nameLabel;
   private FocusTraversalManager tabOrder;
-  private int[] optionTableIds;
 
   private void initializeGUI()
   {
@@ -142,7 +143,7 @@ public class ChoicePanel extends TabPanel
         }
         else if (ev.getSource() == deleteChoiceButton)
         {
-          deleteChoice();
+          deleteContent();
         }
         else if (ev.getSource() == renameOptionButton)
         {
@@ -199,7 +200,6 @@ public class ChoicePanel extends TabPanel
   
   public ChoicePanel(MainWindow owner, ChoiceControl choiceControl)
   {
-
     this.owner = owner;
     this.choiceControl = choiceControl;
 
@@ -213,9 +213,16 @@ public class ChoicePanel extends TabPanel
   {
     Choice choice = this.choiceControl.getData();
     
+    if (choice == null)
+    {
+      JOptionPane.showMessageDialog(this, "Error, this challenge no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
+      this.owner.removeTab(this);
+      return;
+    }
+    
     this.nameField.setText(choice.getName());
     
-    List<ChoiceOption> donations = this.choiceControl.getOptions();
+    List<Pair<ChoiceOption,BigDecimal>> options = this.choiceControl.getOptionsWithTotals(true);
     
     CustomTableModel tableData = new CustomTableModel(new String[]
     {
@@ -223,16 +230,12 @@ public class ChoicePanel extends TabPanel
         "Total Collected",
     },0);
 
-    this.optionTableIds = new int[donations.size()];
-    
-    for(int i = 0; i < donations.size(); ++i)
+    for(Pair<ChoiceOption,BigDecimal> option : options)
     {
-      ChoiceOption d = donations.get(i);
-      this.optionTableIds[i] = d.getId();
       tableData.addRow(new Object[]
       {
-        d.getName(),
-        this.choiceControl.getOptionTotal(d.getId()),
+        option.getFirst(),
+        option.getSecond(),
       });
     }
     
@@ -241,7 +244,7 @@ public class ChoicePanel extends TabPanel
     this.setHeaderText(choice.toString());
   }
   
-  private void saveContent()
+  public void saveContent()
   {
     this.choiceControl.updateData(this.nameField.getText());
     this.refreshContent();
@@ -265,7 +268,7 @@ public class ChoicePanel extends TabPanel
     
     if (rowId != -1)
     {
-      result = this.optionTableIds[rowId];
+      result = ((ChoiceOption)this.optionTable.getValueAt(rowId, 0)).getId();
     }
     
     return result;
@@ -293,16 +296,26 @@ public class ChoicePanel extends TabPanel
     
     if (selectedId != null)
     {
-      JOptionPane.showInputDialog(this, "Are you sure you want to delete this option?", "Delete Option?", JOptionPane.YES_NO_OPTION);
-      this.choiceControl.deleteOption(selectedId);
-      this.refreshContent();
+      int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this option?", "Delete Option?", JOptionPane.YES_NO_OPTION);
+      
+      if (result == JOptionPane.YES_OPTION)
+      {
+        this.choiceControl.deleteOption(selectedId);
+        this.refreshContent();
+      }
     }
   }
-  
-  private void deleteChoice()
+
+  @Override
+  public void deleteContent()
   {
-    this.choiceControl.deleteChoice();
-    this.owner.removeTab(this);
+    int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this choice?", "Delete Choice?", JOptionPane.YES_NO_OPTION);
+    
+    if (result == JOptionPane.YES_OPTION)
+    {
+      this.choiceControl.deleteChoice();
+      this.owner.removeTab(this);
+    }
   }
   
   @Override

@@ -7,6 +7,8 @@ import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
 import java.awt.Insets;
@@ -18,7 +20,7 @@ import java.math.BigDecimal;
 import javax.swing.JButton;
 
 @SuppressWarnings("serial")
-public class ChallengePanel extends TabPanel
+public class ChallengePanel extends EntityPanel
 {
   private MainWindow owner;
   private ChallengeControl challengeControl;
@@ -139,7 +141,7 @@ public class ChallengePanel extends TabPanel
         }
         else if (ev.getSource() == deleteChallengeButton)
         {
-          ChallengePanel.this.deleteChallenge();
+          ChallengePanel.this.deleteContent();
         }
       }
       catch(Exception e)
@@ -197,6 +199,13 @@ public class ChallengePanel extends TabPanel
   {
     Challenge data = this.challengeControl.getData();
     
+    if (data == null)
+    {
+      JOptionPane.showMessageDialog(this, "Error, this challenge no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
+      this.owner.removeTab(this);
+      return;
+    }
+    
     this.nameField.setText(data.getName());
     this.amountField.setText(data.getGoalAmount().toString());
     this.totalAmountField.setText(this.challengeControl.getTotalCollected().toString());
@@ -209,13 +218,18 @@ public class ChallengePanel extends TabPanel
     return this.challengeControl.getChallengeId();
   }
 
-  private void deleteChallenge()
+  public void deleteContent()
   {
-    this.challengeControl.deleteChallenge();
-    this.owner.removeTab(this);
+    int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this challenge?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+    
+    if (result == JOptionPane.YES_OPTION)
+    {
+      this.challengeControl.deleteChallenge();
+      this.owner.removeTab(this);
+    }
   }
 
-  private void saveContent()
+  public void saveContent()
   {
     this.challengeControl.updateData(this.nameField.getText(), new BigDecimal(this.amountField.getText()));
   }

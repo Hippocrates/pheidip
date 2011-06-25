@@ -25,12 +25,12 @@ INSERT INTO Challenge VALUES(2, 1, 'challenge 2', 50.00);
 INSERT INTO Challenge VALUES(3, 2, 'challenge 2', 100.00);
 INSERT INTO Challenge VALUES(4, 2, 'challenge whatever', 150.00);
 
-INSERT INTO Donation VALUES(1, 1, 'LOCAL', null, 'PENDING', 12.40, '2004-10-18 23:32:34', null);
-INSERT INTO Donation VALUES(2, 2, 'LOCAL', null, 'PENDING', 25.00, '2006-10-18 00:32:34', null);
-INSERT INTO Donation VALUES(3, 4, 'LOCAL', null, 'PENDING', 25.00, '2006-10-18 00:32:34', null);
-INSERT INTO Donation VALUES(4, 4, 'LOCAL', null, 'PENDING',  5.00, '2006-10-18 12:44:55', null);
-INSERT INTO Donation VALUES(5, 6, 'LOCAL', null, 'PENDING', 25.00, '2006-10-18 00:32:34', null);
-INSERT INTO Donation VALUES(7, 3, 'CHIPIN', '1234567890', 'PENDING', 15.00, '2006-11-13 10:00:00', 'Some comment text.');
+INSERT INTO Donation VALUES(1, 1, 'LOCAL', null, 'PENDING', 'PENDING', 12.40, '2004-10-18 23:32:34', null);
+INSERT INTO Donation VALUES(2, 2, 'LOCAL', null, 'PENDING', 'PENDING', 25.00, '2006-10-18 00:32:34', null);
+INSERT INTO Donation VALUES(3, 4, 'LOCAL', null, 'PENDING', 'PENDING', 25.00, '2006-10-18 00:32:34', null);
+INSERT INTO Donation VALUES(4, 4, 'LOCAL', null, 'PENDING', 'PENDING',  5.00, '2006-10-18 12:44:55', null);
+INSERT INTO Donation VALUES(5, 6, 'LOCAL', null, 'PENDING', 'PENDING', 25.00, '2006-10-18 00:32:34', null);
+INSERT INTO Donation VALUES(7, 3, 'CHIPIN', '1234567890', 'PENDING', 'PENDING', 15.00, '2006-11-13 10:00:00', 'Some comment text.');
 
 INSERT INTO ChoiceBid VALUES(1, 1, 1, 10.00);
 INSERT INTO ChoiceBid VALUES(2, 1, 1, 5.00);

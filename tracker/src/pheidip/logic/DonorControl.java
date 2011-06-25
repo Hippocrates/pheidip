@@ -10,6 +10,7 @@ import pheidip.db.DonorData;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
+import pheidip.objects.DonationReadState;
 import pheidip.objects.Donor;
 import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
@@ -70,14 +71,7 @@ public class DonorControl
   
   public void deleteDonor()
   {
-    try
-    {
-      this.donors.deleteDonor(this.donorId);
-    }
-    catch(DonationDataConstraintException e)
-    {
-      this.donationDatabase.reportMessage(e.getMessage());
-    }
+    this.donors.deleteDonor(this.donorId);
   }
 
   public int createNewLocalDonation()
@@ -89,6 +83,7 @@ public class DonorControl
         DonationDomain.LOCAL,
         "" + donationId,
         DonationBidState.PENDING,
+        DonationReadState.PENDING,
         BigDecimal.ZERO,
         new Date(),
         this.donorId,

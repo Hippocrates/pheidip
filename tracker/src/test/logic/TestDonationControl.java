@@ -60,7 +60,7 @@ public class TestDonationControl extends TestCase
     String commentText = "Some new comment text";
     BigDecimal amount = new BigDecimal("3.50");
     
-    control.updateData(amount, commentText);
+    control.updateData(amount, commentText, false);
     
     Donation newData = control.getData();
     

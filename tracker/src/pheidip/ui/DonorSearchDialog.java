@@ -242,14 +242,20 @@ public class DonorSearchDialog extends JDialog
     this.setFocusTraversalPolicy(this.tabOrder);
   }
 
-  /**
-   * Create the dialog.
-   * @param manager 
-   */
+  public DonorSearchDialog(JDialog parent, DonorSearch searcher)
+  {
+    super(parent, true);
+    this.init(searcher);
+  }
+  
   public DonorSearchDialog(JFrame parent, DonorSearch searcher)
   {
     super(parent, true);
-    
+    this.init(searcher);
+  }
+  
+  private void init(DonorSearch searcher)
+  {
     this.searcher = searcher;
     this.resultDonor = null;
     

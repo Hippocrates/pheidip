@@ -23,6 +23,7 @@ public class DonorData extends DataInterface
   private PreparedStatement createDonorStatement;
   private PreparedStatement updateDonorStatement;
   private PreparedStatement deleteAllDonorsStatement;
+  private PreparedStatement allowDeleteDonorStatement;
   
   public DonorData(DonationDataAccess manager)
   {
@@ -33,6 +34,7 @@ public class DonorData extends DataInterface
   {
     try
     {
+      this.allowDeleteDonorStatement = this.getConnection().prepareStatement("SELECT COUNT(*) FROM Donation WHERE Donation.donorId = ?;");
       this.selectDonorByID = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.donorId = ?;");
       this.selectDonorByEmail = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.email = ?;");
       this.selectDonorByAlias = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.alias = ?;");
@@ -141,6 +143,19 @@ public class DonorData extends DataInterface
   {
     try
     {
+      this.allowDeleteDonorStatement.setInt(1, id);
+      
+      ResultSet results = this.allowDeleteDonorStatement.executeQuery();
+      
+      if (results.next())
+      {
+        int count = results.getInt(1);
+        if (count > 0)
+        {
+          throw new SQLException("Error, violated constraint : '" + DonationDataConstraint.DonationFKDonor.toString() + "'", "", JDBCManager.getCodeForError(this.getManager().getConnectionType(), SQLError.FOREIGN_KEY_VIOLATION));
+        }
+      }
+      
       this.deleteDonorStatement.setInt(1, id);
       int deleted = this.deleteDonorStatement.executeUpdate();
       

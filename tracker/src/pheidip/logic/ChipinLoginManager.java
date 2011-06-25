@@ -15,7 +15,7 @@ public class ChipinLoginManager
   private static final String LOGIN_NAME_INPUT_ID = "loginEmail";
   private static final String LOGIN_PASSWORD_INPUT_ID = "loginPassword";
 
-  private static final String SITE_BASE_URL = "http://www.chipin.com";
+  private static final String SITE_BASE_URL = "http://www.chipin.com:80";
   private static final String LOGIN_POST_PAGE = "/loginsubmit";
   private static final String LOGOUT_PAGE = "/logout";
   private static final String CHIPIN_PAGE_BASE = "/contributors/private/id/";

@@ -116,6 +116,8 @@ public class ChipinMergeTab extends TabPanel
     this.initializeGUI();
     this.initializeGUIEvents();
     
+    this.setHeaderText("Merge Process");
+    
     this.onUpdateMergeState(ChipinMergeState.IDLE);
     
     this.loadingThread = new Thread(mergeProcess);
@@ -156,12 +158,6 @@ public class ChipinMergeTab extends TabPanel
     {
       throw new RuntimeException("Error, this button shouldn't be pressable in this state");
     }
-  }
-  
-  @Override
-  public void refreshContent()
-  {
-    // nothing yet.
   }
 
   private void onUpdateMergeState(ChipinMergeState newState)

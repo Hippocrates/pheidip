@@ -93,6 +93,16 @@ public class SpeedRunControl
     this.speedRuns.deleteSpeedRun(this.speedRunId);
   }
   
+  public ChoiceControl getChoiceControl(int choiceId)
+  {
+    return new ChoiceControl(this.donationDatabase, choiceId);
+  }
+  
+  public ChallengeControl getChallengeControl(int challengeId)
+  {
+    return new ChallengeControl(this.donationDatabase, challengeId);
+  }
+  
   public int getSpeedRunId()
   {
     return this.speedRunId;

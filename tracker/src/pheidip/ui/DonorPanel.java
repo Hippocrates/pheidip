@@ -28,7 +28,7 @@ import java.awt.event.MouseEvent;
 
 
 @SuppressWarnings("serial")
-public class DonorPanel extends TabPanel
+public class DonorPanel extends EntityPanel
 {
   private DonorControl donorControl;
   int[] donationTableIds;
@@ -244,7 +244,7 @@ public class DonorPanel extends TabPanel
       {
         if (event.getSource() == saveButton)
         {
-          DonorPanel.this.saveEnteredContent();
+          DonorPanel.this.saveContent();
         }
         else if (event.getSource() == refreshButton)
         {
@@ -256,7 +256,7 @@ public class DonorPanel extends TabPanel
         }
         else if (event.getSource() == deleteDonorButton)
         {
-          DonorPanel.this.deleteDonor();
+          DonorPanel.this.deleteContent();
         }
         else if (event.getSource() == addDonationButton)
         {
@@ -346,12 +346,19 @@ public class DonorPanel extends TabPanel
   {
     Donor data = this.donorControl.getData();
     
+    if (data == null)
+    {
+      JOptionPane.showMessageDialog(this, "Error, This donor no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
+      this.owner.removeTab(this);
+      return;
+    }
+    
     this.firstNameField.setText(data.getFirstName());
     this.lastNameField.setText(data.getLastName());
     this.aliasField.setText(data.getAlias());
     this.emailField.setText(data.getEmail());
     
-    this.emailField.setEnabled(this.donorControl.allowEmailUpdate());
+    this.emailField.setEditable(this.donorControl.allowEmailUpdate());
     
     this.totalDonatedField.setText(this.donorControl.getTotalDonated().toString());
     this.prizeField.setText("NOT IMPLEMENTED YET.");
@@ -385,7 +392,7 @@ public class DonorPanel extends TabPanel
     this.setHeaderText(data.toString());
   }
 
-  private void deleteDonor()
+  public void deleteContent()
   {
     int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this donor?", "Confirm delete", JOptionPane.YES_NO_OPTION);
     
@@ -402,7 +409,7 @@ public class DonorPanel extends TabPanel
     this.owner.openDonationTab(id);
   }
   
-  private void saveEnteredContent()
+  public void saveContent()
   {
     this.donorControl.updateData(
         this.emailField.getText(),

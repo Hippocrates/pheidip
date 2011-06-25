@@ -16,8 +16,9 @@ public class Donation
 	private DonationDomain domain;
   private String domainId;
   private DonationBidState bidState;
+  private DonationReadState readState;
 
-	public Donation(int id, DonationDomain domain, String domainId, DonationBidState bidState, BigDecimal amount, Date timeReceived, int donorId, String comment)
+	public Donation(int id, DonationDomain domain, String domainId, DonationBidState bidState, DonationReadState readState, BigDecimal amount, Date timeReceived, int donorId, String comment)
 	{
 	  this.id = id;
 		this.donorId = donorId;
@@ -27,6 +28,7 @@ public class Donation
 		this.domain = domain;
 		this.domainId = domainId;
 		this.bidState = bidState;
+		this.readState = readState;
 	}
 	
 	public Date getTimeReceived()
@@ -69,8 +71,29 @@ public class Donation
     return bidState;
   }
   
+  public DonationReadState getReadState()
+  {
+    return this.readState;
+  }
+  
   public String getDomainString()
   {
     return StringUtils.symbolToNatural(this.domain.toString()) + ":" + (this.domainId == null ? "" + this.id : this.domainId);
+  }
+  
+  public boolean isMarkedAsRead()
+  {
+    return this.getReadState() == DonationReadState.COMMENT_READ ||
+      (this.comment == null && this.getReadState() == DonationReadState.AMOUNT_READ);
+  }
+  
+  public boolean isBidStateHandled()
+  {
+    return this.bidState == DonationBidState.PROCESSED || this.comment == null;
+  }
+  
+  public String toString()
+  {
+    return this.domain.toString() + " : $" + this.amount.toString() + " : " + this.timeReceived.toString();
   }
 }

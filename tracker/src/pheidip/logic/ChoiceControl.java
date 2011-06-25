@@ -1,6 +1,9 @@
 package pheidip.logic;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import pheidip.db.BidData;
@@ -8,6 +11,7 @@ import pheidip.db.DonationDataConstraintException;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 import pheidip.util.IdUtils;
+import pheidip.util.Pair;
 
 public class ChoiceControl
 {
@@ -98,5 +102,31 @@ public class ChoiceControl
   public int getChoiceId()
   {
     return this.choiceId;
+  }
+
+  public List<Pair<ChoiceOption, BigDecimal>> getOptionsWithTotals(boolean returnSorted)
+  {
+    List<ChoiceOption> options = this.getOptions();
+    
+    List<Pair<ChoiceOption,BigDecimal>> result = new ArrayList<Pair<ChoiceOption,BigDecimal>>();
+    
+    for (ChoiceOption o : options)
+    {
+      result.add(new Pair<ChoiceOption, BigDecimal>(o, this.getOptionTotal(o.getId())));
+    }
+    
+    if (returnSorted)
+    {
+      Collections.sort(result, new Comparator<Pair<ChoiceOption, BigDecimal>>()
+      {
+        public int compare(Pair<ChoiceOption, BigDecimal> o1,
+            Pair<ChoiceOption, BigDecimal> o2)
+        {
+          return o1.getSecond().compareTo(o2.getSecond());
+        }
+      });
+    }
+    
+    return result;
   }
 }

@@ -2,7 +2,6 @@ package pheidip.logic;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.jsoup.nodes.Document;
@@ -15,6 +14,7 @@ import pheidip.objects.ChipinDonation;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
+import pheidip.objects.DonationReadState;
 import pheidip.objects.Donor;
 import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
@@ -126,8 +126,9 @@ public final class ChipinDonations
                 DonationDomain.CHIPIN, 
                 chipinDonation.getChipinId(),
                 DonationBidState.PENDING, 
+                DonationReadState.PENDING,
                 chipinDonation.getAmount(),
-                new Date(),
+                chipinDonation.getTimeStamp(),
                 donor.getId(),
                 commentString
                 )

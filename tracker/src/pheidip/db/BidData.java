@@ -34,10 +34,12 @@ public class BidData extends DataInterface
   private PreparedStatement updateChallengeStatement;
   private PreparedStatement deleteChallengeStatement;
   private PreparedStatement selectChallengeTotalStatement;
+  private PreparedStatement allowChallengeDeleteStatement;
   
   private PreparedStatement selectAllChallengesStatement;
   private PreparedStatement selectAllChoicesStatement;
   private PreparedStatement selectAllChoiceOptionsStatement;
+  private PreparedStatement allowChoiceOptionDeleteStatement;
   
   public BidData(DonationDataAccess manager)
   {
@@ -49,6 +51,9 @@ public class BidData extends DataInterface
   {
     try
     {
+      this.allowChallengeDeleteStatement = this.getConnection().prepareStatement("SELECT COUNT(*) FROM ChallengeBid WHERE ChallengeBid.challengeId = ?;");
+      this.allowChoiceOptionDeleteStatement = this.getConnection().prepareStatement("SELECT COUNT(*) FROM ChoiceBid WHERE ChoiceBid.optionId = ?;");
+      
       this.selectAllChallengesStatement = this.getConnection().prepareStatement("SELECT * FROM Challenge;");
       this.selectAllChoicesStatement = this.getConnection().prepareStatement("SELECT * FROM Choice;");
       this.selectAllChoiceOptionsStatement = this.getConnection().prepareStatement("SELECT * FROM ChoiceOption;");
@@ -335,6 +340,20 @@ public class BidData extends DataInterface
   {
     try
     {
+      this.allowChoiceOptionDeleteStatement.setInt(1, optionId);
+      
+      ResultSet results = this.allowChoiceOptionDeleteStatement.executeQuery();
+      
+      if (results.next())
+      {
+        int links = results.getInt(1);
+        
+        if (links > 0)
+        {
+          throw new SQLException("Error, violated constraint : '" + DonationDataConstraint.ChoiceBidFKOption.toString() + "'", "", JDBCManager.getCodeForError(this.getManager().getConnectionType(), SQLError.FOREIGN_KEY_VIOLATION));
+        }
+      }
+      
       this.deleteChoiceOptionStatement.setInt(1, optionId);
       
       int updated = this.deleteChoiceOptionStatement.executeUpdate();
@@ -515,6 +534,20 @@ public class BidData extends DataInterface
   {
     try
     {
+      this.allowChallengeDeleteStatement.setInt(1, challengeId);
+      
+      ResultSet results = this.allowChallengeDeleteStatement.executeQuery();
+      
+      if (results.next())
+      {
+        int links = results.getInt(1);
+        
+        if (links > 0)
+        {
+          throw new SQLException("Error, violated constraint : '" + DonationDataConstraint.ChallengeBidFKChallenge.toString() + "'", "", JDBCManager.getCodeForError(this.getManager().getConnectionType(), SQLError.FOREIGN_KEY_VIOLATION));
+        }
+      }
+      
       this.deleteChallengeStatement.setInt(1, challengeId);
       
       int updated = this.deleteChallengeStatement.executeUpdate();

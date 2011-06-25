@@ -26,12 +26,16 @@ import pheidip.logic.ChipinMergeProcess;
 import pheidip.logic.ChipinTextDocumentSource;
 import pheidip.logic.ChipinWebsiteDocumentSource;
 import pheidip.logic.ChoiceControl;
+import pheidip.logic.DonationBidTask;
 import pheidip.logic.DonationControl;
+import pheidip.logic.DonationReadTask;
+import pheidip.logic.DonationSearch;
 import pheidip.logic.DonorControl;
 import pheidip.logic.DonorSearch;
 import pheidip.logic.ProgramInstance;
 import pheidip.logic.SpeedRunControl;
 import pheidip.logic.SpeedRunSearch;
+import pheidip.objects.Donation;
 import pheidip.objects.Donor;
 import pheidip.objects.SpeedRun;
 import pheidip.util.Reporter;
@@ -51,7 +55,7 @@ public class MainWindow extends JFrame implements Reporter
   private ProgramInstance instance;
   private JMenu fileMenu;
   private JMenuItem exitButton;
-  private JMenuItem connectButton;
+  private JMenuItem connectToDatabaseButton;
   private JMenu searchMenu;
   private JMenuItem searchDonorButton;
   private JMenu createMenu;
@@ -59,12 +63,16 @@ public class MainWindow extends JFrame implements Reporter
   private JMenu chipinMenu;
   private JMenuItem chipinTextMergeButton;
   private JMenuItem chipinFileMergeButton;
-  private JSeparator chipinMenuSeperator;
   private JMenuItem chipinLoginButton;
   private JMenuItem chipinWebsiteMergeButton;
   private JMenuItem searchRunButton;
   private JMenuItem createNewRunButton;
   private ActionHandler actionHandler;
+  private JSeparator separator;
+  private JMenuItem searchDonationButton;
+  private JMenu tasksMenu;
+  private JMenuItem processBidsButton;
+  private JMenuItem readDonationsButton;
   
   private void shutdown()
   {
@@ -93,8 +101,14 @@ public class MainWindow extends JFrame implements Reporter
     this.fileMenu = new JMenu("File");
     this.menuBar.add(this.fileMenu);
     
-    this.connectButton = new JMenuItem("Connect...");
-    this.fileMenu.add(this.connectButton);
+    this.connectToDatabaseButton = new JMenuItem("Connect To Database...");
+    this.fileMenu.add(this.connectToDatabaseButton);
+    
+    chipinLoginButton = new JMenuItem("Log In To Chipin...");
+    fileMenu.add(chipinLoginButton);
+    
+    separator = new JSeparator();
+    fileMenu.add(separator);
     
     this.exitButton = new JMenuItem("Exit");
     this.fileMenu.add(this.exitButton);
@@ -105,6 +119,9 @@ public class MainWindow extends JFrame implements Reporter
     
     this.searchDonorButton = new JMenuItem("Search Donor...");
     this.searchMenu.add(this.searchDonorButton);
+    
+    searchDonationButton = new JMenuItem("Search Donation...");
+    searchMenu.add(searchDonationButton);
     
     searchRunButton = new JMenuItem("Search Run...");
     searchMenu.add(searchRunButton);
@@ -121,15 +138,18 @@ public class MainWindow extends JFrame implements Reporter
     createNewRunButton = new JMenuItem("Create New Run");
     createMenu.add(createNewRunButton);
     
+    tasksMenu = new JMenu("Tasks");
+    menuBar.add(tasksMenu);
+    
+    readDonationsButton = new JMenuItem("Read Donations...");
+    tasksMenu.add(readDonationsButton);
+    
+    processBidsButton = new JMenuItem("Process Bids...");
+    tasksMenu.add(processBidsButton);
+    
     chipinMenu = new JMenu("Chipin");
     this.chipinMenu.setEnabled(false);
     menuBar.add(chipinMenu);
-    
-    chipinLoginButton = new JMenuItem("Log In...");
-    chipinMenu.add(chipinLoginButton);
-    
-    chipinMenuSeperator = new JSeparator();
-    chipinMenu.add(chipinMenuSeperator);
     
     chipinTextMergeButton = new JMenuItem("Merge from text...");
     chipinMenu.add(chipinTextMergeButton);
@@ -154,7 +174,7 @@ public class MainWindow extends JFrame implements Reporter
     {
       try
       {
-        if (ev.getSource() == connectButton)
+        if (ev.getSource() == connectToDatabaseButton)
         {
           if (!MainWindow.this.instance.getDonationDatabase().isConnected())
           {
@@ -172,6 +192,10 @@ public class MainWindow extends JFrame implements Reporter
         else if (ev.getSource() == searchDonorButton)
         {
             MainWindow.this.openSearchDonorDialog();
+        }
+        else if (ev.getSource() == searchDonationButton)
+        {
+          MainWindow.this.openSearchDonationDialog();
         }
         else if (ev.getSource() == searchRunButton)
         {
@@ -195,6 +219,14 @@ public class MainWindow extends JFrame implements Reporter
           {
             MainWindow.this.openChipinLogoutDialog();
           }
+        }
+        else if (ev.getSource() == processBidsButton)
+        {
+          MainWindow.this.openProcessBidsTab();
+        }
+        else if (ev.getSource() == readDonationsButton)
+        {
+          MainWindow.this.openReadDonationsTab();
         }
         else if (ev.getSource() == chipinTextMergeButton)
         {
@@ -232,9 +264,10 @@ public class MainWindow extends JFrame implements Reporter
   {
     this.actionHandler = new ActionHandler();
     
-    this.connectButton.addActionListener(this.actionHandler);
+    this.connectToDatabaseButton.addActionListener(this.actionHandler);
     this.exitButton.addActionListener(this.actionHandler);
     this.searchDonorButton.addActionListener(this.actionHandler);
+    this.searchDonationButton.addActionListener(this.actionHandler);
     this.searchRunButton.addActionListener(this.actionHandler);
     this.createNewRunButton.addActionListener(this.actionHandler);
     this.createNewDonorButton.addActionListener(this.actionHandler);
@@ -242,7 +275,9 @@ public class MainWindow extends JFrame implements Reporter
     this.chipinTextMergeButton.addActionListener(this.actionHandler);
     this.chipinFileMergeButton.addActionListener(this.actionHandler);
     this.chipinWebsiteMergeButton.addActionListener(this.actionHandler);
+    this.processBidsButton.addActionListener(this.actionHandler);
     this.tabbedPane.addChangeListener(this.actionHandler);
+    this.readDonationsButton.addActionListener(this.actionHandler);
   }
 
   public MainWindow()
@@ -252,6 +287,8 @@ public class MainWindow extends JFrame implements Reporter
     
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.updateUIState();
   }
 
   private void insertTab(Component panel)
@@ -263,7 +300,7 @@ public class MainWindow extends JFrame implements Reporter
     {
       TabHeader header = new TabHeader(this.tabbedPane);
       
-      if (panel instanceof TabPanel)
+      if (panel instanceof EntityPanel)
       {
         ((TabPanel)panel).setTabHeader(header);
       }
@@ -277,9 +314,9 @@ public class MainWindow extends JFrame implements Reporter
   {
     Component current = this.tabbedPane.getSelectedComponent();
     
-    if (current != null && current instanceof TabPanel)
+    if (current != null && current instanceof EntityPanel)
     {
-      ((TabPanel)current).refreshContent();
+      ((EntityPanel)current).refreshContent();
     }
   }
   
@@ -346,8 +383,7 @@ public class MainWindow extends JFrame implements Reporter
       if (result == JOptionPane.YES_OPTION)
       {
         this.instance.getChipinLogin().logOut();
-        this.chipinLoginButton.setText("Log In...");
-        this.chipinWebsiteMergeButton.setEnabled(false);
+        this.updateUIState();
       }
     }
     else
@@ -365,8 +401,7 @@ public class MainWindow extends JFrame implements Reporter
       
       if (this.instance.getChipinLogin().isLoggedIn())
       {
-        this.chipinLoginButton.setText("Log Out...");
-        this.chipinWebsiteMergeButton.setEnabled(true);
+        this.updateUIState();
       }
     }
     else
@@ -387,23 +422,58 @@ public class MainWindow extends JFrame implements Reporter
     DatabaseConnectDialog dialog = new DatabaseConnectDialog(this, this.instance.getDonationDatabase());
     dialog.setVisible(true);
     
+    this.updateUIState();
+  }
+  
+  private void updateUIState()
+  {
     if (this.instance.getDonationDatabase().isConnected())
     {
-      //TODO: Change this (and all the other UI state management)
-      // to a single method called 'updateUIState' that will perform
-      // all of these checks at once, and can be called whenever there
-      // is a potential UI change in state
-      // n.b. this isn't the only window that needs this done
-      this.connectButton.setText("Disconnect...");
+      this.connectToDatabaseButton.setText("Disconnect From Database...");
       this.createMenu.setEnabled(true);
       this.searchMenu.setEnabled(true);
       this.chipinMenu.setEnabled(true);
+      this.tasksMenu.setEnabled(true);
+    }
+    else
+    {
+      this.connectToDatabaseButton.setText("Connect To Database...");
+      this.createMenu.setEnabled(false);
+      this.searchMenu.setEnabled(false);
+      this.chipinMenu.setEnabled(false);
+      this.tasksMenu.setEnabled(false);
+      this.tabbedPane.removeAll();
+    }
+    
+    if (this.instance.getChipinLogin().isLoggedIn())
+    {
+      this.chipinLoginButton.setText("Log Out Of Chipin...");
+      this.chipinWebsiteMergeButton.setEnabled(true);
+    }
+    else
+    {
+      this.chipinLoginButton.setText("Log In To Chipin...");
+      this.chipinWebsiteMergeButton.setEnabled(false);
+    }
+  }
+
+  private void openSearchDonationDialog()
+  {
+    DonationSearchDialog dialog = new DonationSearchDialog(this, new DonationSearch(this.instance.getDonationDatabase()));
+    
+    dialog.setVisible(true);
+    
+    Donation result = dialog.getResult();
+    
+    if (result != null)
+    {
+      this.openDonationTab(result.getId());
     }
   }
   
   private void openSearchDonorDialog()
   {
-    DonorSearchDialog dialog = new DonorSearchDialog(null, new DonorSearch(this.instance.getDonationDatabase()));
+    DonorSearchDialog dialog = new DonorSearchDialog(this, new DonorSearch(this.instance.getDonationDatabase()));
     
     dialog.setVisible(true);
     
@@ -428,7 +498,45 @@ public class MainWindow extends JFrame implements Reporter
       this.openSpeedRunTab(result.getId());
     }
   }
-  
+
+  private void openReadDonationsTab()
+  {
+    // prevent opening the same tab twice
+    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    {
+      Component target = this.tabbedPane.getComponentAt(i);
+      if (target instanceof DonationTaskPanel && ((DonationTaskPanel)target).getName().equals(DonationReadTask.TASK_NAME))
+      {
+        this.focusOnTab(i);
+        return;
+      }
+    }
+    
+    DonationReadTask task = new DonationReadTask(this.instance.getDonationDatabase());
+    DonationTaskPanel panel = new DonationTaskPanel(this, task);
+    
+    this.insertTab(panel);
+  }
+
+  private void openProcessBidsTab()
+  {
+ // prevent opening the same tab twice
+    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    {
+      Component target = this.tabbedPane.getComponentAt(i);
+      if (target instanceof DonationTaskPanel && ((DonationTaskPanel)target).getName().equals(DonationBidTask.TASK_NAME))
+      {
+        this.focusOnTab(i);
+        return;
+      }
+    }
+    
+    DonationBidTask task = new DonationBidTask(this.instance.getDonationDatabase());
+    DonationTaskPanel panel = new DonationTaskPanel(this, task);
+    
+    this.insertTab(panel);
+  }
+
   protected void openSpeedRunTab(int speedRunId)
   {
     // prevent opening the same tab twice
@@ -445,7 +553,6 @@ public class MainWindow extends JFrame implements Reporter
     SpeedRunControl ctrl = new SpeedRunControl(this.instance.getDonationDatabase(), speedRunId);
     SpeedRunPanel panel = new SpeedRunPanel(this, ctrl);
     this.insertTab(panel);
-    panel.refreshContent();
   }
 
   protected void openDonorTab(int donorId)
@@ -464,7 +571,6 @@ public class MainWindow extends JFrame implements Reporter
     DonorControl ctrl = new DonorControl(this.instance.getDonationDatabase(), donorId);
     DonorPanel panel = new DonorPanel(this, ctrl);
     this.insertTab(panel);
-    panel.refreshContent();
   }
   
   protected void openChoiceTab(int choiceId)
@@ -483,7 +589,6 @@ public class MainWindow extends JFrame implements Reporter
     ChoiceControl ctrl = new ChoiceControl(this.instance.getDonationDatabase(), choiceId);
     ChoicePanel panel = new ChoicePanel(this, ctrl);
     this.insertTab(panel);
-    panel.refreshContent();
   }
 
   protected void openChallengeTab(int challengeId)
@@ -502,7 +607,6 @@ public class MainWindow extends JFrame implements Reporter
     ChallengeControl ctrl = new ChallengeControl(this.instance.getDonationDatabase(), challengeId);
     ChallengePanel panel = new ChallengePanel(this, ctrl);
     this.insertTab(panel);
-    panel.refreshContent();
   }
   
   protected void openDonationTab(int donationId)
@@ -521,21 +625,17 @@ public class MainWindow extends JFrame implements Reporter
     DonationControl ctrl = new DonationControl(this.instance.getDonationDatabase(), donationId);
     DonationPanel panel = new DonationPanel(this, ctrl);
     this.insertTab(panel);
-    panel.refreshContent();
   }
   
   private void openDisconnectDialog()
   {
     int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to disconnect?", "Confirm Disconnect...", JOptionPane.YES_NO_OPTION);
     
+    
     if (result == JOptionPane.YES_OPTION)
     {
-      this.tabbedPane.removeAll();
       this.instance.getDonationDatabase().closeConnection();
-      this.connectButton.setText("Connect...");
-      this.createMenu.setEnabled(false);
-      this.searchMenu.setEnabled(false);
-      this.chipinMenu.setEnabled(false);
+      this.updateUIState();
     }
   }
   

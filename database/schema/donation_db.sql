@@ -7,7 +7,7 @@
 CREATE TABLE Donor
 (
   donorId INTEGER,
-  email VARCHAR(255),
+  email VARCHAR(128),
   alias VARCHAR(31),
   firstName VARCHAR(31),
   lastName VARCHAR(31),
@@ -39,14 +39,26 @@ INSERT INTO DonationBidState VALUES ('PENDING');
 INSERT INTO DonationBidState VALUES ('PROCESSED');
 INSERT INTO DonationBidState VALUES ('FLAGGED');
 
+CREATE TABLE DonationReadState
+(
+  donationReadStateId VARCHAR(16),
+  PRIMARY KEY (donationReadStateId)
+);
+
+INSERT INTO DonationReadState VALUES ('PENDING');
+INSERT INTO DonationReadState VALUES ('AMOUNT_READ');
+INSERT INTO DonationReadState VALUES ('COMMENT_READ');
+INSERT INTO DonationReadState VALUES ('FLAGGED');
+
 CREATE TABLE Donation
 (
   donationId INTEGER,
   donorId INTEGER,
   domain VARCHAR(16),
-  domainId VARCHAR(300),
+  domainId VARCHAR(160),
   
   bidState VARCHAR(16),
+  readState VARCHAR(16),
   
   amount DECIMAL(19,2),
   timeReceived DATETIME,
@@ -56,6 +68,7 @@ CREATE TABLE Donation
   CONSTRAINT DonationFKDomain FOREIGN KEY (domain) REFERENCES DonationDomain (donationDomainId),
   CONSTRAINT DonationDomainIdUnique UNIQUE (domain, domainId),
   CONSTRAINT DonationFKBidState FOREIGN KEY (bidState) REFERENCES DonationBidState (donationBidStateId),
+  CONSTRAINT DonationFKReadState FOREIGN KEY (readState) REFERENCES DonationReadState (donationReadStateId),
   CONSTRAINT DonationAmountValid CHECK (amount > 0 OR amount = null),
   
   CONSTRAINT DonationPK PRIMARY KEY (donationId)

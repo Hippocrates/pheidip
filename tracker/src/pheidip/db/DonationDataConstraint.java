@@ -11,6 +11,7 @@ public enum DonationDataConstraint
   DonationFKDomain("Invalid Donation domain."),
   DonationDomainIdUnique("A Donation with that ID already exists."),
   DonationFKBidState("Invalid Donation bid state."),
+  DonationFKReadState("Invalid Donation read state."),
   DonationAmountValid("Donation amount must be non-null and greater than zero."),
   SpeedRunNameUnique("A SpeedRun with that name already exists."),
   SpeedRunNameLowerCase("SpeedRun names must be lowercase."),

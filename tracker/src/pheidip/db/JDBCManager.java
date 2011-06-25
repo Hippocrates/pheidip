@@ -149,4 +149,19 @@ public class JDBCManager
     
     return result;
   }
+
+  public static int getCodeForError(DBType type, SQLError error)
+  {
+    Map<Integer,SQLError> table = errorTables.get(type.ordinal());
+    
+    for (Map.Entry<Integer, SQLError> entry : table.entrySet())
+    {
+      if (entry.getValue() == error)
+      {
+        return entry.getKey();
+      }
+    }
+    
+    return 0;
+  }
 }
