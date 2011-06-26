@@ -12,7 +12,6 @@ import java.awt.FlowLayout;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.SwingConstants;
 
 @SuppressWarnings("serial")
 public class FormattedInputDialog extends JDialog
@@ -32,7 +31,6 @@ public class FormattedInputDialog extends JDialog
     getContentPane().add(messageLabel, BorderLayout.NORTH);
     
     textField = new JFormattedTextField(formatter);
-    textField.setHorizontalAlignment(SwingConstants.TRAILING);
     getContentPane().add(textField, BorderLayout.CENTER);
     
     JPanel panel = new JPanel();

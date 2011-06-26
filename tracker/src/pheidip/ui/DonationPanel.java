@@ -15,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -54,7 +56,7 @@ public class DonationPanel extends EntityPanel
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{66, 113, 105, 90, 104, 0};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 113, 0, 0};
+    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 49, 0, 0};
     gridBagLayout.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
@@ -249,16 +251,20 @@ public class DonationPanel extends EntityPanel
     this.refreshButton.addActionListener(this.actionHandler);
     this.saveButton.addActionListener(this.actionHandler);
     this.deleteButton.addActionListener(this.actionHandler);
-
-    this.tabOrder = new FocusTraversalManager(new Component[]
+    
+    List<Component> tabArray = new ArrayList<Component>();
+    tabArray.add(this.amountField);
+    tabArray.add(this.openDonorButton);
+    tabArray.add(this.refreshButton);
+    tabArray.add(this.saveButton);
+    tabArray.add(this.commentTextArea);
+    
+    for (Component c : this.donationBidsPanel.getTabOrder())
     {
-      this.amountField,
-      this.openDonorButton,
-      this.refreshButton,
-      this.saveButton,
-      this.commentTextArea,
-      this.donationBidsPanel
-    });
+      tabArray.add(c);
+    }
+
+    this.tabOrder = new FocusTraversalManager(tabArray.toArray(new Component[tabArray.size()]));
     this.setFocusTraversalPolicy(this.tabOrder);
     this.setFocusTraversalPolicyProvider(true);
     this.setFocusCycleRoot(true);

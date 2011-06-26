@@ -176,6 +176,8 @@ public class ChoicePanel extends EntityPanel
     this.renameOptionButton.addActionListener(this.actionHandler);
     this.deleteChoiceButton.addActionListener(this.actionHandler);
     
+    this.optionTable.addKeyListener(new TabTraversalKeyListener(this.optionTable));
+    
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
         this.nameField,
@@ -184,6 +186,7 @@ public class ChoicePanel extends EntityPanel
         this.addOptionButton,
         this.renameOptionButton,
         this.deleteOptionButton,
+        this.optionTable,
     });
     this.setFocusTraversalPolicy(this.tabOrder);
   }

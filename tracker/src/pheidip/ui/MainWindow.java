@@ -35,6 +35,8 @@ import pheidip.logic.DonorSearch;
 import pheidip.logic.ProgramInstance;
 import pheidip.logic.SpeedRunControl;
 import pheidip.logic.SpeedRunSearch;
+import pheidip.objects.Bid;
+import pheidip.objects.BidType;
 import pheidip.objects.Donation;
 import pheidip.objects.Donor;
 import pheidip.objects.SpeedRun;
@@ -73,6 +75,7 @@ public class MainWindow extends JFrame implements Reporter
   private JMenu tasksMenu;
   private JMenuItem processBidsButton;
   private JMenuItem readDonationsButton;
+  private JMenuItem searchBidButton;
   
   private void shutdown()
   {
@@ -125,6 +128,9 @@ public class MainWindow extends JFrame implements Reporter
     
     searchRunButton = new JMenuItem("Search Run...");
     searchMenu.add(searchRunButton);
+    
+    searchBidButton = new JMenuItem("SearchBid...");
+    searchMenu.add(searchBidButton);
    
     this.setJMenuBar(this.menuBar);
     
@@ -139,6 +145,7 @@ public class MainWindow extends JFrame implements Reporter
     createMenu.add(createNewRunButton);
     
     tasksMenu = new JMenu("Tasks");
+    tasksMenu.setEnabled(false);
     menuBar.add(tasksMenu);
     
     readDonationsButton = new JMenuItem("Read Donations...");
@@ -243,6 +250,10 @@ public class MainWindow extends JFrame implements Reporter
             MainWindow.this.runChipinWebsiteMerge();
           }
         }
+        else if (ev.getSource() == searchBidButton)
+        {
+          MainWindow.this.openSearchBidDialog();
+        }
       }
       catch(Exception e)
       {
@@ -255,6 +266,7 @@ public class MainWindow extends JFrame implements Reporter
     {
       if (ev.getSource() == tabbedPane)
       {
+        messageArea.setText("");
         refreshCurrentTab();
       }
     }
@@ -454,6 +466,24 @@ public class MainWindow extends JFrame implements Reporter
     {
       this.chipinLoginButton.setText("Log In To Chipin...");
       this.chipinWebsiteMergeButton.setEnabled(false);
+    }
+  }
+
+  private void openSearchBidDialog()
+  {
+    BidSearchDialog dialog = new BidSearchDialog(this, new SpeedRunSearch(this.instance.getDonationDatabase()), new BidSearch(this.instance.getDonationDatabase()), false);
+  
+    dialog.setVisible(true);
+    
+    Bid result = dialog.getSelectedBid();
+    
+    if (result.getType() == BidType.CHALLENGE)
+    {
+      this.openChallengeTab(result.getId());
+    }
+    else
+    {
+      this.openChoiceTab(result.getId());
     }
   }
 

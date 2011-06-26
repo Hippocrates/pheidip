@@ -300,6 +300,8 @@ public class DonorPanel extends EntityPanel
     deleteDonorButton.addActionListener(this.actionHandler);
     addDonationButton.addActionListener(this.actionHandler);
     
+    this.donationTable.addKeyListener(new TabTraversalKeyListener(this.donationTable));
+    
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.firstNameField,
@@ -310,6 +312,7 @@ public class DonorPanel extends EntityPanel
       this.refreshButton,
       this.openDonationButton,
       this.addDonationButton,
+      this.donationTable,
     });
     this.setFocusTraversalPolicy(this.tabOrder);
   }

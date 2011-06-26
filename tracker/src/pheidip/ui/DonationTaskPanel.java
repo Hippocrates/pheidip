@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -193,13 +194,17 @@ public class DonationTaskPanel extends EntityPanel
     this.refreshButton.addActionListener(this.actionHandler);
     this.donationList.addListSelectionListener(this.actionHandler);
     
-    this.tabOrder = new FocusTraversalManager(new Component[]
+    List<Component> tabArray = new ArrayList<Component>();
+    tabArray.add(this.refreshButton);
+    tabArray.add(this.nextButton);
+    tabArray.add(this.donationList);
+
+    for (Component c : this.donationBidsPanel.getTabOrder())
     {
-      this.refreshButton,
-      this.nextButton,
-      this.donationList,
-      this.donationBidsPanel,
-    });
+      tabArray.add(c);
+    }
+
+    this.tabOrder = new FocusTraversalManager(tabArray.toArray(new Component[tabArray.size()]));
     this.setFocusTraversalPolicy(this.tabOrder);
     this.setFocusTraversalPolicyProvider(true);
     this.setFocusCycleRoot(true);

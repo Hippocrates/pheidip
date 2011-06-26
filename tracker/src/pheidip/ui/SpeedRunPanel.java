@@ -194,6 +194,8 @@ public class SpeedRunPanel extends EntityPanel
     deleteButton.addActionListener(this.actionHandler);
     bidTable.addMouseListener(this.actionHandler);
     
+    this.bidTable.addKeyListener(new TabTraversalKeyListener(this.bidTable));
+    
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.nameField,
@@ -202,6 +204,7 @@ public class SpeedRunPanel extends EntityPanel
       this.openBidButton,
       this.newChoiceButton,
       this.newChallengeButton,
+      this.bidTable,
     });
     this.setFocusTraversalPolicy(this.tabOrder);
   }

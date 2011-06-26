@@ -36,41 +36,47 @@ public class FocusTraversalManager extends FocusTraversalPolicy
     
     return i % this.components.size();
   }
-
+  
   @Override
   public Component getComponentAfter(Container container, Component component)
   {
-    if (container instanceof DonationBidsPanel)
-    {
-      int y = 75;
-      System.out.println("" + y);
-    }
+    int currentIndex = this.components.indexOf(component);
     
-    for (int currentIndex = this.clampToSize(this.components.indexOf(component) + 1); currentIndex != this.components.indexOf(component); currentIndex = this.clampToSize(currentIndex + 1))
+    if (currentIndex != -1)
     {
-      Component current = this.components.get(currentIndex);
-      if (isComponentSelectable(current))
+      for (int i = 1; i < this.components.size(); ++i)
       {
-        return getUnderlyingComponent(current);
+        Component current = this.components.get(this.clampToSize(currentIndex + i));
+        if (isComponentSelectable(current))
+        {
+          return current;
+        }
       }
+      return component;
     }
     
-    return component;
+    return null;
   }
 
   @Override
   public Component getComponentBefore(Container container, Component component)
   {
-    for (int currentIndex = this.clampToSize(this.components.indexOf(component) - 1); currentIndex != this.components.indexOf(component); currentIndex = this.clampToSize(currentIndex - 1))
+    int currentIndex = this.components.indexOf(component);
+    
+    if (currentIndex != -1)
     {
-      Component current = this.components.get(currentIndex);
-      if (isComponentSelectable(current))
+      for (int i = 1; i < this.components.size(); ++i)
       {
-        return getUnderlyingComponent(current);
+        Component current = this.components.get(this.clampToSize(currentIndex - i));
+        if (isComponentSelectable(current))
+        {
+          return current;
+        }
       }
+      return component;
     }
     
-    return component;
+    return null;
   }
 
   @Override
@@ -80,40 +86,23 @@ public class FocusTraversalManager extends FocusTraversalPolicy
   }
 
   @Override
-  public Component getFirstComponent(Container arg0)
+  public Component getFirstComponent(Container container)
   {
     Component first = this.components.get(0);
     if (isComponentSelectable(first))
     {
-      return getUnderlyingComponent(first);
+      return first;
     }
     else
     {
-      return this.getComponentAfter(arg0, first);
+      return this.getComponentAfter(container, first);
     }
   }
   
-  private Component getUnderlyingComponent(Component c)
-  {
-    if (c instanceof Container)
-    {
-      Container container = (Container) c;
-
-      FocusTraversalPolicy ftp = container.getFocusTraversalPolicy();
-      
-      if (ftp != null)
-      {
-        return ftp.getFirstComponent(container);
-      }
-    }
-      
-    return c;
-  }
-
   @Override
-  public Component getLastComponent(Container arg0)
+  public Component getLastComponent(Container container)
   {
-    return this.getComponentBefore(arg0, this.getFirstComponent(arg0));
+    return this.getComponentBefore(container, this.getFirstComponent(container));
   }
   
   private static boolean isComponentSelectable(Component c)
