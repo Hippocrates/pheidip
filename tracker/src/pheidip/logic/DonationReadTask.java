@@ -34,6 +34,11 @@ public class DonationReadTask implements DonationTask
     params.onlyIfUnread = true;
     return searcher.searchDonations(params);
   }
+  
+  public boolean isTaskCleared(Donation d)
+  {
+    return d.isMarkedAsRead();
+  }
 
   @Override
   public String taskName()

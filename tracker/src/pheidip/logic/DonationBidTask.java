@@ -25,6 +25,11 @@ public class DonationBidTask implements DonationTask
   {
     this.getControl(donationId).markAsBidsHandled();
   }
+  
+  public boolean isTaskCleared(Donation d)
+  {
+    return d.isBidStateHandled();
+  }
 
   @Override
   public List<Donation> refreshTaskList()

@@ -535,7 +535,7 @@ public class MainWindow extends JFrame implements Reporter
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof DonationTaskPanel && ((DonationTaskPanel)target).getName().equals(DonationReadTask.TASK_NAME))
+      if (target instanceof DonationTaskPanel && ((DonationTaskPanel)target).getTaskName().equals(DonationReadTask.TASK_NAME))
       {
         this.focusOnTab(i);
         return;
@@ -554,7 +554,7 @@ public class MainWindow extends JFrame implements Reporter
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof DonationTaskPanel && ((DonationTaskPanel)target).getName().equals(DonationBidTask.TASK_NAME))
+      if (target instanceof DonationTaskPanel && ((DonationTaskPanel)target).getTaskName().equals(DonationBidTask.TASK_NAME))
       {
         this.focusOnTab(i);
         return;

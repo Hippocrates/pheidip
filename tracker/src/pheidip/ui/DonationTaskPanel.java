@@ -58,7 +58,7 @@ public class DonationTaskPanel extends EntityPanel
     gbc_refreshButton.gridy = 0;
     add(refreshButton, gbc_refreshButton);
     
-    nextButton = new JButton("Next");
+    nextButton = new JButton("Mark As Done");
     GridBagConstraints gbc_nextButton = new GridBagConstraints();
     gbc_nextButton.insets = new Insets(0, 0, 5, 5);
     gbc_nextButton.fill = GridBagConstraints.HORIZONTAL;
@@ -213,7 +213,24 @@ public class DonationTaskPanel extends EntityPanel
 
   private void nextDonation()
   {
-    this.donationList.setSelectedIndex(this.donationList.getSelectedIndex() + 1);
+    Donation d = this.getSelectedDonation();
+    
+    int selectedIndex = this.donationList.getSelectedIndex();
+    
+    if (d != null)
+    {
+      this.task.clearTask(d.getId());
+    }
+    
+    if (selectedIndex + 1 == this.donationList.getModel().getSize())
+    {
+      this.donationList.clearSelection();
+    }
+    else
+    {
+      this.donationList.setSelectedIndex(selectedIndex + 1);
+      this.donationList.ensureIndexIsVisible(selectedIndex + 1);
+    }
   }
   
   private Donation getSelectedDonation()
@@ -228,13 +245,13 @@ public class DonationTaskPanel extends EntityPanel
     if (d != null)
     {
       this.control = this.task.getControl(d.getId());
-      this.task.clearTask(this.control.getDonationId());
-      refreshDonationView();
     }
     else
     {
       this.control = null;
     }
+    
+    refreshDonationView();
   }
   
   public DonationTaskPanel(MainWindow owner, DonationTask task)
@@ -255,30 +272,37 @@ public class DonationTaskPanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    Donation current = this.getSelectedDonation();
+    Donation oldInstance = this.getSelectedDonation();
     
     DefaultListModel listData = new DefaultListModel();
     List<Donation> pendingDonations = this.task.refreshTaskList();
     
+    Donation currentInstance = null;
+    
     for (Donation d : pendingDonations)
     {
       listData.addElement(d);
+      if (oldInstance != null && d.getId() == oldInstance.getId())
+      {
+        currentInstance = d;
+      }
     }
     
     this.donationList.setModel(listData);
     
-    if (current != null)
+    if (currentInstance != null)
     {
-      this.donationList.setSelectedValue(current, true);
+      this.donationList.setSelectedValue(currentInstance, true);
     }
     else
     {
       this.donationList.setSelectedIndex(0);
+      this.donationList.ensureIndexIsVisible(0);
     }
     
     this.setHeaderText(this.task.taskName());
     
-    this.refreshDonationView();
+    this.openDonation();
   }
 
   private void refreshDonationView()
@@ -290,12 +314,15 @@ public class DonationTaskPanel extends EntityPanel
       this.amountField.setText(data.getAmount().toString());
       this.donorTextField.setText(this.control.getDonationDonor().toString());
       this.commentTextArea.setText(data.getComment());
+      
+      this.nextButton.setEnabled(!this.task.isTaskCleared(data));
     }
     else
     {
       this.amountField.setText("");
       this.donorTextField.setText("");
       this.commentTextArea.setText("");
+      this.nextButton.setEnabled(false);
     }
     
     this.donationBidsPanel.setControl(this.control);
