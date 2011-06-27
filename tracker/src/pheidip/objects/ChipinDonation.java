@@ -13,6 +13,7 @@ public class ChipinDonation
   private String chipinTimeStamp;
   private BigDecimal amount;
   private Date timeStamp;
+  private String chipinId;
 
   public ChipinDonation(String name, String email, String comment, String chipinTimeStamp, BigDecimal amount)
   {
@@ -22,6 +23,8 @@ public class ChipinDonation
     this.chipinTimeStamp = chipinTimeStamp;
     this.amount = amount;
     this.timeStamp = new Date(Long.parseLong(chipinTimeStamp));
+    
+    this.chipinId = this.chipinTimeStamp + this.email;
   }
   
   public String getName()
@@ -51,7 +54,7 @@ public class ChipinDonation
   
   public String getChipinId()
   {
-    return this.chipinTimeStamp + this.email;
+    return this.chipinId;
   }
   
   public Date getTimeStamp()

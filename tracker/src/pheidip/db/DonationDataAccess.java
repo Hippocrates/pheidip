@@ -24,6 +24,8 @@ public class DonationDataAccess
     
     this.donors = null;
     this.donations = null;
+    this.speedRuns = null;
+    this.bids = null;
   }
   
   synchronized public DonorData getDonorData()
@@ -91,6 +93,16 @@ public class DonationDataAccess
     if (this.donations != null)
     {
       this.donations.setConnection(this.connection);
+    }
+    
+    if (this.speedRuns != null)
+    {
+      this.speedRuns.setConnection(this.connection);
+    }
+    
+    if (this.bids != null)
+    {
+      this.bids.setConnection(this.connection);
     }
   }
   

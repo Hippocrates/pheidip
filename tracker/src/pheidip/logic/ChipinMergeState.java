@@ -5,6 +5,7 @@ public enum ChipinMergeState
   IDLE(true),
   RETRIEVING(true),
   EXTRACTING(true),
+  COMPARING(true),
   MERGING(true),
   COMPLETED(false),
   CANCELLED(false), 

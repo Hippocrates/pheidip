@@ -1,5 +1,7 @@
 package pheidip.objects;
 
+import pheidip.util.StringUtils;
+
 public class ChoiceOption 
 {
 	private int choiceId;
@@ -30,6 +32,6 @@ public class ChoiceOption
   
   public String toString()
   {
-    return this.name;
+    return StringUtils.isEmptyOrNull(this.name) ? "#" + this.id : this.name;
   }
 }

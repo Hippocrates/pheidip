@@ -1,8 +1,10 @@
 package test.logic;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -117,10 +119,7 @@ public class TestChipinDonations extends TestCase
 
       manager.createMemoryDatabase();
       
-      for (ChipinDonation d : chipinDonations)
-      {
-        ChipinDonations.mergeDonation(manager, d);
-      }
+      ChipinDonations.mergeDonations(manager, chipinDonations);
       
       assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(chipinDonations, manager));
     }
@@ -154,10 +153,7 @@ public class TestChipinDonations extends TestCase
       
       for (int i = 0; i < numCycles; ++i)
       {
-        for (ChipinDonation d : chipinDonations)
-        {
-          ChipinDonations.mergeDonation(manager, d);
-        }
+        ChipinDonations.mergeDonations(manager, chipinDonations);
       }
 
       assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(chipinDonations, manager));
@@ -189,16 +185,10 @@ public class TestChipinDonations extends TestCase
 
       manager.createMemoryDatabase();
       
-      for (ChipinDonation d : sourceDonationListA)
-      {
-        ChipinDonations.mergeDonation(manager, d);
-      }
+      ChipinDonations.mergeDonations(manager, sourceDonationListA);
+ 
+      ChipinDonations.mergeDonations(manager, sourceDonationListB);
       
-      for (ChipinDonation d : sourceDonationListB)
-      {
-        ChipinDonations.mergeDonation(manager, d);
-      }
-
       assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonationListA, manager));
       assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonationListB, manager));
     }
@@ -218,11 +208,13 @@ public class TestChipinDonations extends TestCase
     
     try
     {
+      Map<String,Donation> mappedDonations = new HashMap<String,Donation>();
+      
       ChipinDonation d = new ChipinDonation("A Guy", "somewhere@anywhere.com", null, "123456789000", new BigDecimal("15.00"));
     
       manager.createMemoryDatabase();
 
-      ChipinDonations.mergeDonation(manager, d);
+      ChipinDonations.mergeDonation(manager, d, mappedDonations);
       
       DonationData donations = manager.getDataAccess().getDonationData();
       Donation donationBefore = donations.getDonationByDomainId(DonationDomain.CHIPIN, d.getChipinId());
@@ -233,7 +225,9 @@ public class TestChipinDonations extends TestCase
       
       ChipinDonation dPrime = new ChipinDonation(d.getName(), d.getEmail(), commentText, d.getChipinTimeString(), d.getAmount());
 
-      ChipinDonations.mergeDonation(manager, dPrime);
+      mappedDonations.put(donationBefore.getDomainId(), donationBefore);
+      
+      ChipinDonations.mergeDonation(manager, dPrime, mappedDonations);
       
       Donation donationAfter = donations.getDonationByDomainId(DonationDomain.CHIPIN, dPrime.getChipinId());
     

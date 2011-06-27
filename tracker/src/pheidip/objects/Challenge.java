@@ -2,6 +2,8 @@ package pheidip.objects;
 
 import java.math.BigDecimal;
 
+import pheidip.util.StringUtils;
+
 public class Challenge implements Bid
 {
   private int id;
@@ -45,6 +47,6 @@ public class Challenge implements Bid
   
   public String toString()
   {
-    return "Challenge: " + this.getName();
+    return "Challenge: " + (StringUtils.isEmptyOrNull(this.name) ? ("#" + this.id) : this.name);
   }
 }

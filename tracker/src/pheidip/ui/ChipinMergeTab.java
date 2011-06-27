@@ -21,25 +21,17 @@ import java.awt.event.ActionEvent;
 @SuppressWarnings("serial")
 public class ChipinMergeTab extends TabPanel
 {
+  private final static int MAXIMUM_PROGRESS = 1000;
   private static final Map<ChipinMergeState, String> updateProgressStrings = 
     Collections.unmodifiableMap(new EnumMap<ChipinMergeState, String>(ChipinMergeState.class) {{ 
         put(ChipinMergeState.IDLE, "No Operation.");
         put(ChipinMergeState.RETRIEVING, "Retreiving donations from chipin...");
         put(ChipinMergeState.EXTRACTING, "Reading donations...");
+        put(ChipinMergeState.COMPARING, "Reading current donation set...");
         put(ChipinMergeState.MERGING, "Merging donations into database...");
         put(ChipinMergeState.COMPLETED, "Merge operation complete.");
         put(ChipinMergeState.CANCELLED, "Merge operation cancelled.");
         put(ChipinMergeState.FAILED, "The merge operation failed.");
-    }});
-  private static final Map<ChipinMergeState, Integer> updateProgressAmounts = 
-    Collections.unmodifiableMap(new EnumMap<ChipinMergeState, Integer>(ChipinMergeState.class) {{ 
-        put(ChipinMergeState.IDLE, 0);
-        put(ChipinMergeState.RETRIEVING, 10);
-        put(ChipinMergeState.EXTRACTING, 40);
-        put(ChipinMergeState.MERGING, 60);
-        put(ChipinMergeState.COMPLETED, 100);
-        put(ChipinMergeState.CANCELLED, 0);
-        put(ChipinMergeState.FAILED, 0);
     }});
   
   private JButton cancelButton;
@@ -69,7 +61,7 @@ public class ChipinMergeTab extends TabPanel
     add(loadingLabel, gbc_loadingLabel);
     
     loadingProgressBar = new JProgressBar();
-    loadingProgressBar.setMaximum(100);
+    loadingProgressBar.setMaximum(MAXIMUM_PROGRESS);
     GridBagConstraints gbc_loadingProgressBar = new GridBagConstraints();
     gbc_loadingProgressBar.fill = GridBagConstraints.HORIZONTAL;
     gbc_loadingProgressBar.gridwidth = 2;
@@ -99,9 +91,9 @@ public class ChipinMergeTab extends TabPanel
     
     this.mergeProcess.setListener(new MergeStateCallback()
     {
-      public void stateChanged(ChipinMergeState newState)
+      public void stateChanged(ChipinMergeState newState, double percentage)
       {
-        ChipinMergeTab.this.onUpdateMergeState(newState);
+        ChipinMergeTab.this.onUpdateMergeState(newState, percentage);
       }
     });
   }
@@ -118,7 +110,7 @@ public class ChipinMergeTab extends TabPanel
     
     this.setHeaderText("Merge Process");
     
-    this.onUpdateMergeState(ChipinMergeState.IDLE);
+    this.onUpdateMergeState(ChipinMergeState.IDLE, 0.0);
     
     this.loadingThread = new Thread(mergeProcess);
     
@@ -160,11 +152,11 @@ public class ChipinMergeTab extends TabPanel
     }
   }
 
-  private void onUpdateMergeState(ChipinMergeState newState)
+  private void onUpdateMergeState(ChipinMergeState newState, double percentage)
   {
     this.currentState = newState;
     this.loadingLabel.setText(updateProgressStrings.get(newState));
-    this.loadingProgressBar.setValue(updateProgressAmounts.get(newState));
+    this.loadingProgressBar.setValue((int)(percentage * MAXIMUM_PROGRESS));
     
     if (!this.currentState.isRunningState())
     {

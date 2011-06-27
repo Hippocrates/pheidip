@@ -1,5 +1,7 @@
 package pheidip.objects;
 
+import pheidip.util.StringUtils;
+
 public class Choice implements Bid
 {
 	private String name;
@@ -36,6 +38,6 @@ public class Choice implements Bid
   
   public String toString()
   {
-    return "Choice : " + this.getName();
+    return "Choice : " + (StringUtils.isEmptyOrNull(this.name) ? ("#" + this.id) : this.name);
   }
 }
