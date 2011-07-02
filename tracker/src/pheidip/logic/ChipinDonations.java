@@ -47,11 +47,11 @@ public final class ChipinDonations
       List<Element> donationElements = element.getElementsByTag("td");
 
       result.add(new ChipinDonation(
-          donationElements.get(NAME_INDEX).ownText(),
-          donationElements.get(EMAIL_INDEX).ownText(),
-          donationElements.get(COMMENT_INDEX).ownText(),
-          donationElements.get(CHIPIN_ID_INDEX).ownText(),
-          new BigDecimal(donationElements.get(AMOUNT_INDEX).ownText())
+          donationElements.get(NAME_INDEX).ownText().trim(),
+          donationElements.get(EMAIL_INDEX).ownText().trim(),
+          donationElements.get(COMMENT_INDEX).ownText().trim(),
+          donationElements.get(CHIPIN_ID_INDEX).ownText().trim(),
+          new BigDecimal(donationElements.get(AMOUNT_INDEX).ownText().trim())
           )
       );
     }
@@ -59,72 +59,104 @@ public final class ChipinDonations
     return result;
   }
   
-  public static void mergeDonations(DonationDatabaseManager manager, List<ChipinDonation> chipinDonations)
+  public static Map<String,Donation> generateDonationSet(DonationData donations)
   {
-    DonationSearch searcher = new DonationSearch(manager);
-    DonationSearchParams params = new DonationSearchParams();
-    params.domain = DonationDomain.CHIPIN;
-    List<Donation> all = searcher.searchDonations(params);
+    Map<String,Donation> table = new HashMap<String,Donation>();
     
-    Map<String,Donation> mappedDonations = new HashMap<String,Donation>();
+    List<Donation> all = donations.getAllDonations();
     
     for (Donation d : all)
     {
-      mappedDonations.put(d.getDomainId(), d);
+      if (d.getDomain() == DonationDomain.CHIPIN)
+      {
+        table.put(d.getDomainId(), d);
+      }
     }
     
-    for (ChipinDonation d : chipinDonations)
-    {
-      mergeDonation(manager, d, mappedDonations);
-    }
+    return table;
   }
   
-  public static void mergeDonation(DonationDatabaseManager manager, ChipinDonation chipinDonation, Map<String,Donation> mappedDonations)
+  public static Map<String,Donor> generateDonorSet(DonorData donors)
+  {
+    Map<String,Donor> table = new HashMap<String,Donor>();
+    
+    List<Donor> all = donors.getAllDonors();
+    
+    for (Donor d : all)
+    {
+      table.put(d.getEmail(), d);
+    }
+    
+    return table;
+  }
+  
+  public static void mergeDonations(DonationDatabaseManager manager, List<ChipinDonation> chipinDonations)
   {
     DonationData donations = manager.getDataAccess().getDonationData();
     DonorData donors = manager.getDataAccess().getDonorData();
     
-    Donation found = mappedDonations.get(chipinDonation.getChipinId());
+    Map<String,Donation> donationTable = generateDonationSet(donations);
+    Map<String,Donor> donorTable = generateDonorSet(donors);
+    
+    for (ChipinDonation d : chipinDonations)
+    {
+      mergeDonation(manager, d, donorTable, donationTable);
+    }
+  }
+  
+  public static void mergeDonation(DonationDatabaseManager manager, ChipinDonation chipinDonation, Map<String, Donor> donorTable, Map<String, Donation> donationTable)
+  {
+    DonationData donations = manager.getDataAccess().getDonationData();
+    DonorData donors = manager.getDataAccess().getDonorData();
+
+    Donation found = donationTable.get(chipinDonation.getChipinId());
     
     if (found == null)
     {
-      String[] toks = chipinDonation.getName().trim().split("\\s+");
-      String firstName = "";
-      String lastName = "";
-        
-      if (toks.length > 0)
-      {
-        firstName = toks[0];
-      }
-        
-      if (toks.length > 1)
-      {
-        lastName = toks[1];
-      }
-        
-      int retryCount = 0;
-      Donor donor = null;
+      Donor donor = donorTable.get(chipinDonation.getEmail());
       
-      while (retryCount < NUM_ID_RETRIES)
+      if (donor == null)
       {
-        try
+      
+        String[] toks = chipinDonation.getName().trim().split("\\s+");
+        String firstName = "";
+        String lastName = "";
+          
+        if (toks.length > 0)
         {
-          int newDonorId = IdUtils.generateId();
-            
-          donor = new Donor(newDonorId, chipinDonation.getEmail(), null, firstName, lastName);
-          donors.createDonor(donor);
-          retryCount = NUM_ID_RETRIES;
+          firstName = toks[0];
         }
-        catch(DonationDataConstraintException e)
+          
+        if (toks.length > 1)
         {
-          if (e.getConstraintViolation() == DonationDataConstraint.DonorPK)
+          lastName = toks[1];
+        }
+          
+        int retryCount = 0;
+
+        while (retryCount < NUM_ID_RETRIES)
+        {
+          try
           {
-            donor = null;
-            ++retryCount;
-          }
-          else
-          {
+            int newDonorId = IdUtils.generateId();
+              
+            donor = new Donor(newDonorId, chipinDonation.getEmail(), null, firstName, lastName);
+            donors.createDonor(donor);
+            donorTable.put(chipinDonation.getEmail(), donor);
             retryCount = NUM_ID_RETRIES;
+          }
+          catch(DonationDataConstraintException e)
+          {
+            if (e.getConstraintViolation() == DonationDataConstraint.DonorPK)
+            {
+              donor = null;
+              ++retryCount;
+            }
+            else
+            {
+              retryCount = NUM_ID_RETRIES;
+              donor = null;
+            }
           }
         }
       }
@@ -139,7 +171,7 @@ public final class ChipinDonations
           System.out.println("Warning, truncating comment with length > " + ChipinDonation.maxCommentLength());
         }
         
-        retryCount = 0;
+        int retryCount = 0;
 
         while (retryCount < NUM_ID_RETRIES)
         {
@@ -170,7 +202,7 @@ public final class ChipinDonations
             }
             else
             {
-              
+              retryCount = NUM_ID_RETRIES;
             }
           }
         }

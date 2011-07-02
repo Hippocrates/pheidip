@@ -1,6 +1,5 @@
 package pheidip.logic;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,7 +7,7 @@ import org.jsoup.nodes.Document;
 
 import pheidip.objects.ChipinDonation;
 import pheidip.objects.Donation;
-import pheidip.objects.DonationDomain;
+import pheidip.objects.Donor;
 
 public class ChipinMergeProcess implements Runnable
 {
@@ -69,21 +68,10 @@ public class ChipinMergeProcess implements Runnable
       Thread.sleep(0);
       this.setState(ChipinMergeState.COMPARING, 0.3);
       
-      DonationSearch searcher = new DonationSearch(this.donationDatabase);
-      
-      List<Donation> all = searcher.searchDonations(new DonationSearchParams());
-      
-      Map<String,Donation> mappedDonations = new HashMap<String,Donation>();
-      
-      for (Donation d : all)
-      {
-        if (d.getDomain() == DonationDomain.CHIPIN)
-        {
-          mappedDonations.put(d.getDomainId(), d);
-        }
-      }
-      
       int current = 0;
+      
+      Map<String,Donation> donationTable = ChipinDonations.generateDonationSet(this.donationDatabase.getDataAccess().getDonationData());
+      Map<String,Donor> donorTable = ChipinDonations.generateDonorSet(this.donationDatabase.getDataAccess().getDonorData());
       
       this.setState(ChipinMergeState.MERGING, 0.4);
       
@@ -92,7 +80,7 @@ public class ChipinMergeProcess implements Runnable
         Thread.sleep(0);
         this.setState(ChipinMergeState.MERGING, 0.4 + (((double)current / (double)donations.size()) * 0.6));
         
-        ChipinDonations.mergeDonation(this.donationDatabase, d, mappedDonations);
+        ChipinDonations.mergeDonation(this.donationDatabase, d, donorTable, donationTable);
         ++current;
       }
       

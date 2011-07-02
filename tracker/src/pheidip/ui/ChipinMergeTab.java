@@ -115,6 +115,8 @@ public class ChipinMergeTab extends TabPanel
     this.loadingThread = new Thread(mergeProcess);
     
     this.loadingThread.start();
+    
+    this.setHeaderText("Merge Operation");
   }
 
   @Override

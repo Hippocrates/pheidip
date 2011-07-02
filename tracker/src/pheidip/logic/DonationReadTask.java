@@ -2,16 +2,19 @@ package pheidip.logic;
 
 import java.util.List;
 
+import pheidip.db.DonationData;
 import pheidip.objects.Donation;
 
 public class DonationReadTask implements DonationTask
 {
   public static String TASK_NAME = "Read Task";
   private DonationDatabaseManager manager;
+  private DonationData donations;
   
   public DonationReadTask(DonationDatabaseManager manager)
   {
     this.manager = manager;
+    this.donations = this.manager.getDataAccess().getDonationData();
   }
   
   @Override
@@ -29,10 +32,7 @@ public class DonationReadTask implements DonationTask
   @Override
   public List<Donation> refreshTaskList()
   {
-    DonationSearch searcher = new DonationSearch(this.manager);
-    DonationSearchParams params = new DonationSearchParams();
-    params.onlyIfUnread = true;
-    return searcher.searchDonations(params);
+    return this.donations.getDonationsToBeRead();
   }
   
   public boolean isTaskCleared(Donation d)

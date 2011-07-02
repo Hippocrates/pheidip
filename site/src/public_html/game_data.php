@@ -1,7 +1,7 @@
 <html>
 <head>
 <?php 
-require_once("ddmanag_config.php");
+require_once("config/ddmanag_init.php");
 require_once("db/DataAccess.php");
 
 $data = new DataAccess($donationDB);
@@ -22,28 +22,30 @@ $pageTitle = $game == null ? "Error" : $game['name'];
 <?php
 if ($game == null)
 {
-  echo "No game id supplied. <br />";
+  echo "<h3>Uknown or no game id supplied. <br /></h3>";
 }
 else
 {
+  echo "<h3>Information for " . $game['name'] . "</h3>";
+	
   $choices = $data->getSpeedRunChoices($game['speedRunId']);
   $challenges = $data->getSpeedRunChallenges($game['speedRunId']);
   
   if (count($choices) == 0 && count($options) == 0)
   {
-  	echo "<h3>There are no choices are challenges submitted for this run.</h3>";
+  	echo "<h4>There are no choices are challenges submitted for this run.</h4>";
   }
 
   foreach ($choices as $choice)
   {
     $choiceName = $choice['name'];
-    echo "<h3>Choice '$choiceName':</h3>";
+    echo "<h4>Choice '$choiceName':</h4>";
     
     $options = $data->getChoiceOptions($choice['choiceId']);
     
     if (count($options) == 0)
     {
-      echo "<h4>No options have been submitted for this choice yet.</h4>";
+      echo "<h5>No options have been submitted for this choice yet.</h5>";
     }
     
     foreach ($options as $option)
@@ -51,7 +53,7 @@ else
       $optionName = $option['name'];
       $optionTotal = number_format($data->getOptionSum($option['optionId']), 2, '.', '');
       
-      echo "<h4>$optionName : $$optionTotal </h4>";
+      echo "<h5>$optionName : $$optionTotal </h5>";
     }
   }
   
@@ -64,7 +66,7 @@ else
     $challengeGoal = number_format($challenge['goalAmount'], 2, '.', '');
     
     echo "<h3>Challenge '$challengeName':</h3>";
-    echo "<h4>Collected $$challengeTotal of $$challengeGoal so far.</h4>";
+    echo "<h4>Collected $$challengeTotal" . ($challengeGoal > 0 ? " of $$challengeGoal" : "") . " so far.</h4>";
   }
   echo "";
 }

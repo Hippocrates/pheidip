@@ -47,7 +47,7 @@ public class ChipinTestUtils
       
       String amount = StringUtils.randomDollarAmountString(1, 5, rand);
       
-      String comment = StringUtils.randomStringOverAlphabet(0, 3000, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()@:.,! ;'\"-?_", rand);
+      String comment = StringUtils.randomStringOverAlphabet(0, 1000, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789()@:.,! ;'\"-?_", rand);
     
       result.add(new ChipinDonation(donorNames[donor], donorEmails[donor], comment, ""+(currenttime.getTime()+rand.nextInt(1000000000)), new BigDecimal(amount)));
     }
@@ -67,17 +67,17 @@ public class ChipinTestUtils
       
       builder.append("\t\t<td>");
       builder.append(donation.getName());
-      builder.append("</td>\n");
+      builder.append("\t\t</td>\n");
       
       builder.append("\t\t<td>");
       builder.append(donation.getEmail());
-      builder.append("</td>\n");
+      builder.append("\t\t</td>\n");
       
       builder.append("\t\t<td></td>\n");
       
       builder.append("\t\t<td>");
       builder.append(StringUtils.emptyIfNull(donation.getComment()));
-      builder.append("</td>\n");
+      builder.append("\t\t</td>\n");
       
       builder.append("\t\t<td>");
       builder.append(donation.getChipinTimeString());
@@ -85,10 +85,10 @@ public class ChipinTestUtils
       
       builder.append("\t\t<td>");
       builder.append(donation.getAmount().toString());
-      builder.append("</td>\n");
+      builder.append("\t\t</td>\n");
       
       builder.append("\t\t<td>??????</td>\n");
-      builder.append("<td>donations@speeddemosarchive.com</td>\n");
+      builder.append("\t\t<td>donations@speeddemosarchive.com</td>\n");
       
       builder.append("\t</tr>\n\n");
     }

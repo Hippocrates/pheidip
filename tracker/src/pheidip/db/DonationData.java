@@ -51,8 +51,8 @@ public class DonationData extends DataInterface
     {
       this.selectAllDonations = this.getConnection().prepareStatement("SELECT * FROM Donation");
       this.updateDonationReadState = this.getConnection().prepareStatement("UPDATE Donation SET readState = ? WHERE Donation.donationId = ?;");
-      this.selectDonationsWithReadPendingStatement = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE (Donation.readState = 'PENDING' OR Donation.readState = 'FLAGGED') OR (Donation.readState = 'AMOUNT_READ' AND Donation.comment != NULL)");
-      this.selectDonationsWithBidPendingStatement = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE (Donation.bidState = 'PENDING' OR Donation.bidState = 'FLAGGED') AND Donation.comment != NULL");
+      this.selectDonationsWithReadPendingStatement = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE (Donation.readState = 'PENDING' OR Donation.readState = 'FLAGGED') OR (Donation.readState = 'AMOUNT_READ' AND Donation.comment IS NOT NULL);");
+      this.selectDonationsWithBidPendingStatement = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE (Donation.bidState = 'PENDING' OR Donation.bidState = 'FLAGGED') AND Donation.comment IS NOT NULL;");
       
       this.updateDonationChallengeBidStatement = this.getConnection().prepareStatement("UPDATE ChallengeBid SET amount = ? WHERE ChallengeBid.challengeBidId = ?;");
       this.updateDonationChoiceBidStatement = this.getConnection().prepareStatement("UPDATE ChoiceBid SET amount = ? WHERE ChoiceBid.choiceBidId = ?;");
