@@ -24,8 +24,17 @@ public class DonorControl
   
   public static int createNewDonor(DonationDatabaseManager donationDatabase)
   {
+    return createNewDonor(donationDatabase, null, null, null, null);
+  }
+  
+  public static int createNewDonor(DonationDatabaseManager donationDatabase, String eMail, String alias, String firstName, String lastName)
+  {
     int id = IdUtils.generateId();
-    donationDatabase.getDataAccess().getDonorData().createDonor(new Donor(id, null, null, null, null));
+    donationDatabase.getDataAccess().getDonorData().createDonor(new Donor(id, 
+        StringUtils.nullIfEmpty(eMail), 
+        StringUtils.nullIfEmpty(alias), 
+        StringUtils.nullIfEmpty(firstName), 
+        StringUtils.nullIfEmpty(lastName)));
     return id;
   }
   

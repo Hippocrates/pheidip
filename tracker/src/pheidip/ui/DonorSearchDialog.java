@@ -51,6 +51,7 @@ public class DonorSearchDialog extends JDialog
   private JButton cancelButton;
   private ActionHandler actionHandler;
   private FocusTraversalManager tabOrder;
+  private JButton createNewButton;
   
   private void initializeGUI()
   {
@@ -64,9 +65,9 @@ public class DonorSearchDialog extends JDialog
     
     GridBagLayout gbl_panel = new GridBagLayout();
     gbl_panel.columnWidths = new int[]{0, 66, 112, 90, 76, 0};
-    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
+    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
     gbl_panel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_panel);
 
     firstNameLabel = new JLabel("First Name:");
@@ -91,7 +92,7 @@ public class DonorSearchDialog extends JDialog
     donorScrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
-    gbc_scrollPane.gridheight = 5;
+    gbc_scrollPane.gridheight = 6;
     gbc_scrollPane.gridwidth = 2;
     gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
     gbc_scrollPane.gridx = 3;
@@ -155,13 +156,21 @@ public class DonorSearchDialog extends JDialog
     gbc_textField_3.gridy = 3;
     contentPanel.add(emailField, gbc_textField_3);
     emailField.setColumns(10);
+    
+    createNewButton = new JButton("Create New");
+    GridBagConstraints gbc_createNewButton = new GridBagConstraints();
+    gbc_createNewButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_createNewButton.insets = new Insets(0, 0, 5, 5);
+    gbc_createNewButton.gridx = 1;
+    gbc_createNewButton.gridy = 4;
+    contentPanel.add(createNewButton, gbc_createNewButton);
 
     okButton = new JButton("OK");
     GridBagConstraints gbc_okButton = new GridBagConstraints();
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
     gbc_okButton.gridx = 3;
-    gbc_okButton.gridy = 5;
+    gbc_okButton.gridy = 6;
     contentPanel.add(okButton, gbc_okButton);
     getRootPane().setDefaultButton(okButton);
 
@@ -169,7 +178,7 @@ public class DonorSearchDialog extends JDialog
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_cancelButton.gridx = 4;
-    gbc_cancelButton.gridy = 5;
+    gbc_cancelButton.gridy = 6;
     contentPanel.add(cancelButton, gbc_cancelButton);
   }
   
@@ -177,13 +186,24 @@ public class DonorSearchDialog extends JDialog
   {
     public void actionPerformed(ActionEvent ev)
     {
-      if (ev.getSource() == okButton)
+      try
       {
-        returnSelectedDonor();
+        if (ev.getSource() == okButton)
+        {
+          returnSelectedDonor();
+        }
+        else if (ev.getSource() == cancelButton)
+        {
+          closeDialog();
+        }
+        else if (ev.getSource() == createNewButton)
+        {
+          createFromFields();
+        }
       }
-      else if (ev.getSource() == cancelButton)
+      catch (Exception e)
       {
-        closeDialog();
+        JOptionPane.showMessageDialog(DonorSearchDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       }
     }
 
@@ -225,6 +245,7 @@ public class DonorSearchDialog extends JDialog
     this.lastNameField.getDocument().addDocumentListener(this.actionHandler);
     this.aliasField.getDocument().addDocumentListener(this.actionHandler);
     this.emailField.getDocument().addDocumentListener(this.actionHandler);
+    this.createNewButton.addActionListener(this.actionHandler);
     okButton.addActionListener(this.actionHandler);
     cancelButton.addActionListener(this.actionHandler);
     
@@ -235,6 +256,7 @@ public class DonorSearchDialog extends JDialog
       this.aliasField,
       this.emailField,
       this.donorList,
+      this.createNewButton,
       this.okButton,
       this.cancelButton,
     });
@@ -248,6 +270,9 @@ public class DonorSearchDialog extends JDialog
     this.init(searcher);
   }
   
+  /**
+   * @wbp.parser.constructor
+   */
   public DonorSearchDialog(JFrame parent, DonorSearch searcher)
   {
     super(parent, true);
@@ -268,6 +293,18 @@ public class DonorSearchDialog extends JDialog
   public Donor getResult()
   {
     return this.resultDonor;
+  }
+  
+  private void createFromFields()
+  {
+    Donor result = this.searcher.createIfAble(        
+        this.firstNameField.getText(),
+        this.lastNameField.getText(),
+        this.emailField.getText(),
+        this.aliasField.getText());
+    
+    this.resultDonor = result;
+    this.closeDialog();
   }
   
   private void returnSelectedDonor()

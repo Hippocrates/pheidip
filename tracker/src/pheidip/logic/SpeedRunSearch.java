@@ -34,6 +34,12 @@ public class SpeedRunSearch
     }
   }
   
+  public SpeedRun createIfAble(String speedRunName)
+  {
+    int id = SpeedRunControl.createNewSpeedRun(this.manager, speedRunName);
+    return this.speedRuns.getSpeedRunById(id);
+  }
+  
   public List<SpeedRun> searchSpeedRuns(String name)
   {
     List<SpeedRun> filtered = this.cachedRuns;

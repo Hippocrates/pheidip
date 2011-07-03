@@ -12,6 +12,7 @@ import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.SpeedRun;
 import pheidip.util.IdUtils;
+import pheidip.util.StringUtils;
 
 public class SpeedRunControl
 {
@@ -47,12 +48,17 @@ public class SpeedRunControl
     
     return bids;
   }
+  
+  public static int createNewSpeedRun(DonationDatabaseManager manager, String name)
+  {
+    int id = IdUtils.generateId();
+    manager.getDataAccess().getSpeedRuns().insertSpeedRun(new SpeedRun(id, StringUtils.nullIfEmpty(name)));
+    return id;
+  }
 
   public static int createNewSpeedRun(DonationDatabaseManager manager)
   {
-    int id = IdUtils.generateId();
-    manager.getDataAccess().getSpeedRuns().insertSpeedRun(new SpeedRun(id, null));
-    return id;
+    return createNewSpeedRun(manager, null);
   }
   
   public int createNewChallenge(String result)

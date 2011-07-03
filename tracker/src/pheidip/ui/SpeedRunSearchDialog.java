@@ -39,6 +39,7 @@ public class SpeedRunSearchDialog extends JDialog
   private ActionHandler actionHandler;
   private JScrollPane scrollPane;
   private FocusTraversalManager tabOrder;
+  private JButton createNewButton;
 
   private void initializeGUI()
   {
@@ -46,9 +47,9 @@ public class SpeedRunSearchDialog extends JDialog
     setBounds(100, 100, 450, 300);
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{0, 235, 103, 102, 99, 0};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0};
+    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0};
     gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     getContentPane().setLayout(gridBagLayout);
     
     nameLabel = new JLabel("Name:");
@@ -72,7 +73,7 @@ public class SpeedRunSearchDialog extends JDialog
     scrollPane = new JScrollPane();
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
     gbc_scrollPane.gridwidth = 2;
-    gbc_scrollPane.gridheight = 2;
+    gbc_scrollPane.gridheight = 3;
     gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
     gbc_scrollPane.gridx = 3;
@@ -82,19 +83,27 @@ public class SpeedRunSearchDialog extends JDialog
     speedRunList = new JList();
     scrollPane.setViewportView(speedRunList);
     
+    createNewButton = new JButton("Create New");
+    GridBagConstraints gbc_createNewButton = new GridBagConstraints();
+    gbc_createNewButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_createNewButton.insets = new Insets(0, 0, 5, 5);
+    gbc_createNewButton.gridx = 1;
+    gbc_createNewButton.gridy = 1;
+    getContentPane().add(createNewButton, gbc_createNewButton);
+    
     okButton = new JButton("OK");
     GridBagConstraints gbc_okButton = new GridBagConstraints();
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
     gbc_okButton.gridx = 3;
-    gbc_okButton.gridy = 2;
+    gbc_okButton.gridy = 3;
     getContentPane().add(okButton, gbc_okButton);
     
     cancelButton = new JButton("Cancel");
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_cancelButton.gridx = 4;
-    gbc_cancelButton.gridy = 2;
+    gbc_cancelButton.gridy = 3;
     getContentPane().add(cancelButton, gbc_cancelButton);
   }
   
@@ -102,13 +111,24 @@ public class SpeedRunSearchDialog extends JDialog
   {
     public void actionPerformed(ActionEvent ev)
     {
-      if (ev.getSource() == okButton)
+      try
       {
-        SpeedRunSearchDialog.this.returnSelectedRun();
+        if (ev.getSource() == okButton)
+        {
+          SpeedRunSearchDialog.this.returnSelectedRun();
+        }
+        else if (ev.getSource() == cancelButton)
+        {
+          SpeedRunSearchDialog.this.cancelSelection();
+        }
+        else if (ev.getSource() == createNewButton)
+        {
+          createFromFields();
+        }
       }
-      else if (ev.getSource() == cancelButton)
+      catch (Exception e)
       {
-        SpeedRunSearchDialog.this.cancelSelection();
+        JOptionPane.showMessageDialog(SpeedRunSearchDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       }
     }
     
@@ -153,11 +173,13 @@ public class SpeedRunSearchDialog extends JDialog
     okButton.addActionListener(this.actionHandler);
     cancelButton.addActionListener(this.actionHandler);
     this.speedRunList.addListSelectionListener(this.actionHandler);
+    this.createNewButton.addActionListener(this.actionHandler);
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.nameField,
       this.speedRunList,
+      this.createNewButton,
       this.okButton,
       this.cancelButton,
     });
@@ -183,6 +205,14 @@ public class SpeedRunSearchDialog extends JDialog
   public SpeedRun getResult()
   {
     return this.resultRun;
+  }
+  
+  private void createFromFields()
+  {
+    SpeedRun s = this.searcher.createIfAble(this.nameField.getText());
+    
+    this.resultRun = s;
+    this.closeDialog();
   }
   
   private void returnSelectedRun()

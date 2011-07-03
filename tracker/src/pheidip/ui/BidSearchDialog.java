@@ -130,7 +130,7 @@ public class BidSearchDialog extends JDialog
     bidNameList = new JList();
     bidNameScrollPane.setViewportView(bidNameList);
     
-    if (this.showOptions)
+    //if (this.showOptions)
     {
       optionNameLabel = new JLabel("Option Name:");
       GridBagConstraints gbc_optionNameLabel = new GridBagConstraints();
@@ -299,6 +299,9 @@ public class BidSearchDialog extends JDialog
     this.setFocusTraversalPolicy(this.tabOrder);
   }
   
+  /**
+   * @wbp.parser.constructor
+   */
   public BidSearchDialog(JFrame parent, SpeedRunSearch speedRunSearcher, BidSearch searcher)
   {
     this(parent, speedRunSearcher, searcher, true);

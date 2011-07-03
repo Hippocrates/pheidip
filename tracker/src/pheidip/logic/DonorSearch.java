@@ -43,6 +43,12 @@ public class DonorSearch
     }
   }
   
+  public Donor createIfAble(String firstName, String lastName, String email, String alias)
+  {
+    int createdDonor = DonorControl.createNewDonor(this.donationDatabase, email, alias, firstName, lastName);
+    return this.donors.getDonorById(createdDonor);
+  }
+  
   public List<Donor> searchDonors(String firstName, String lastName, String email, String alias)
   {
     List<Donor> filtered = this.cachedDonors;
