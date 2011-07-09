@@ -29,12 +29,12 @@ public class ChallengeControl
     this.bids.deleteChallenge(this.challengeId);
   }
 
-  public void updateData(String name, BigDecimal amount)
+  public void updateData(String name, BigDecimal amount, String description)
   {
     try
     {
       Challenge c = this.getData();
-      this.bids.updateChallenge(new Challenge(this.challengeId, name, amount, c.getSpeedRunId()));
+      this.bids.updateChallenge(new Challenge(this.challengeId, name, amount, description, c.getSpeedRunId()));
     }
     catch (DonationDataConstraintException e)
     {

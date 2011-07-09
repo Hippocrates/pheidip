@@ -61,9 +61,9 @@ public class BidData extends DataInterface
       this.selectChoiceByIdStatement = this.getConnection().prepareStatement("SELECT * FROM Choice WHERE Choice.choiceId = ?;");
       this.selectChoicesBySpeedRunId = this.getConnection().prepareStatement("SELECT * FROM Choice WHERE Choice.speedRunId = ?;");
       
-      this.updateChoiceStatement = this.getConnection().prepareStatement("UPDATE Choice SET speedRunId = ?, name = ? WHERE Choice.choiceId = ?;");
+      this.updateChoiceStatement = this.getConnection().prepareStatement("UPDATE Choice SET speedRunId = ?, name = ?, description = ? WHERE Choice.choiceId = ?;");
 
-      this.insertChoiceStatement = this.getConnection().prepareStatement("INSERT INTO Choice (choiceId, speedRunId, name) VALUES (?,?,?);");
+      this.insertChoiceStatement = this.getConnection().prepareStatement("INSERT INTO Choice (choiceId, speedRunId, name, description) VALUES (?,?,?,?);");
     
       this.deleteChoiceStatement = this.getConnection().prepareStatement("DELETE FROM Choice WHERE Choice.choiceId = ?;");
       
@@ -82,9 +82,9 @@ public class BidData extends DataInterface
       this.selectChallengesBySpeedRunId = this.getConnection().prepareStatement("SELECT * FROM Challenge WHERE Challenge.speedRunId = ?;");
       this.selectChallengeTotalStatement = this.getConnection().prepareStatement("SELECT SUM(amount) FROM ChallengeBid WHERE ChallengeBid.challengeId = ?;");
       
-      this.updateChallengeStatement = this.getConnection().prepareStatement("UPDATE Challenge SET speedRunId = ?, name = ?, goalAmount = ? WHERE Challenge.challengeId = ?;");
+      this.updateChallengeStatement = this.getConnection().prepareStatement("UPDATE Challenge SET speedRunId = ?, name = ?, goalAmount = ?, description = ? WHERE Challenge.challengeId = ?;");
       
-      this.insertChallengeStatement = this.getConnection().prepareStatement("INSERT INTO Challenge (challengeId, speedRunId, name, goalAmount) VALUES (?,?,?,?);");
+      this.insertChallengeStatement = this.getConnection().prepareStatement("INSERT INTO Challenge (challengeId, speedRunId, name, goalAmount, description) VALUES (?,?,?,?,?);");
     
       this.deleteChallengeStatement = this.getConnection().prepareStatement("DELETE FROM Challenge WHERE Challenge.challengeId = ?;");
     }
@@ -151,6 +151,7 @@ public class BidData extends DataInterface
       this.insertChoiceStatement.setInt(1, choice.getId());
       this.insertChoiceStatement.setInt(2, choice.getSpeedRunId());
       this.insertChoiceStatement.setString(3, choice.getName());
+      this.insertChoiceStatement.setString(4, choice.getDescription());
       
       int updated = this.insertChoiceStatement.executeUpdate();
       
@@ -170,6 +171,7 @@ public class BidData extends DataInterface
     return new Choice(
         result.getInt("choiceId"),
         result.getString("name"),
+        result.getString("description"),
         result.getInt("speedRunId"));
   }
   
@@ -177,9 +179,10 @@ public class BidData extends DataInterface
   {
     try
     {
-      this.updateChoiceStatement.setInt(3, choice.getId());
+      this.updateChoiceStatement.setInt(4, choice.getId());
       this.updateChoiceStatement.setString(2, choice.getName());
       this.updateChoiceStatement.setInt(1, choice.getSpeedRunId());
+      this.updateChoiceStatement.setString(3, choice.getDescription());
       
       int updated = this.updateChoiceStatement.executeUpdate();
       
@@ -400,6 +403,7 @@ public class BidData extends DataInterface
       this.insertChallengeStatement.setInt(2, challenge.getSpeedRunId());
       this.insertChallengeStatement.setString(3, challenge.getName());
       this.insertChallengeStatement.setBigDecimal(4, challenge.getGoalAmount());
+      this.insertChallengeStatement.setString(5, challenge.getDescription());
       
       int updated = this.insertChallengeStatement.executeUpdate();
       
@@ -409,8 +413,7 @@ public class BidData extends DataInterface
       }
     }
     catch (SQLException e)
-    {
-      this.getManager().handleSQLException(e);
+    {      this.getManager().handleSQLException(e);
     }
   }
   
@@ -420,6 +423,7 @@ public class BidData extends DataInterface
         result.getInt("challengeId"),
         result.getString("name"),
         result.getBigDecimal("goalAmount"),
+        result.getString("description"),
         result.getInt("speedRunId"));
   }
 
@@ -427,10 +431,11 @@ public class BidData extends DataInterface
   {
     try
     {
-      this.updateChallengeStatement.setInt(4, challenge.getId());
+      this.updateChallengeStatement.setInt(5, challenge.getId());
       this.updateChallengeStatement.setInt(1, challenge.getSpeedRunId());
       this.updateChallengeStatement.setString(2, challenge.getName());
       this.updateChallengeStatement.setBigDecimal(3, challenge.getGoalAmount());
+      this.updateChallengeStatement.setString(4, challenge.getDescription());
       
       int updated = this.updateChallengeStatement.executeUpdate();
       

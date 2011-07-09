@@ -36,13 +36,14 @@ public class TestBidData extends DonationDatabaseTest
     
     assertNull(this.bids.getChoiceById(newId));
     
-    this.bids.insertChoice(new Choice(newId, name, speedRunId));
+    this.bids.insertChoice(new Choice(newId, name, null, speedRunId));
   
     Choice choice = this.bids.getChoiceById(newId);
     
     assertEquals(newId, choice.getId());
     assertEquals(speedRunId, choice.getSpeedRunId());
     assertEquals(name, choice.getName());
+    assertEquals(null, choice.getDescription());
   }
   
   public void testUpdateChoice()
@@ -56,13 +57,14 @@ public class TestBidData extends DonationDatabaseTest
     assertFalse(newName.equals(oldChoice.getName()));
     assertFalse(anotherRun == oldChoice.getSpeedRunId());
     
-    this.bids.updateChoice(new Choice(choiceId, newName, anotherRun));
+    this.bids.updateChoice(new Choice(choiceId, newName, null, anotherRun));
     
     Choice choice = this.bids.getChoiceById(choiceId);
     
     assertEquals(choiceId, choice.getId());
     assertEquals(anotherRun, choice.getSpeedRunId());
     assertEquals(newName, choice.getName());
+    assertEquals(null, choice.getDescription());
   }
   
   public void testSearchChoicesBySpeedRun()
@@ -172,14 +174,15 @@ public class TestBidData extends DonationDatabaseTest
     
     assertNull(this.bids.getChallengeById(newId));
     
-    this.bids.insertChallenge(new Challenge(newId, name, amount, speedRunId));
+    this.bids.insertChallenge(new Challenge(newId, name, amount, null, speedRunId));
   
-    Challenge choice = this.bids.getChallengeById(newId);
+    Challenge challenge = this.bids.getChallengeById(newId);
     
-    assertEquals(newId, choice.getId());
-    assertEquals(speedRunId, choice.getSpeedRunId());
-    assertEquals(amount, choice.getGoalAmount());
-    assertEquals(name, choice.getName());
+    assertEquals(newId, challenge.getId());
+    assertEquals(speedRunId, challenge.getSpeedRunId());
+    assertEquals(amount, challenge.getGoalAmount());
+    assertEquals(name, challenge.getName());
+    assertEquals(null, challenge.getDescription());
   }
   
   public void updateChallenge()
@@ -194,7 +197,7 @@ public class TestBidData extends DonationDatabaseTest
     assertFalse(newAmount.equals(oldChallenge.getGoalAmount()));
     assertFalse(anotherRun == oldChallenge.getSpeedRunId());
     
-    this.bids.updateChallenge(new Challenge(challengeId, newName, newAmount, anotherRun));
+    this.bids.updateChallenge(new Challenge(challengeId, newName, newAmount, null, anotherRun));
     
     Challenge challenge = this.bids.getChallengeById(challengeId);
     
@@ -202,6 +205,7 @@ public class TestBidData extends DonationDatabaseTest
     assertEquals(anotherRun, challenge.getSpeedRunId());
     assertEquals(newAmount, challenge.getGoalAmount());
     assertEquals(newName, challenge.getName());
+    assertEquals(null, challenge.getDescription());
   }
   
   public void testSearchChallengesBySpeedRun()

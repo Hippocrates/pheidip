@@ -10,7 +10,11 @@ $game = null;
 
 if (array_key_exists('game_id', $_GET))
 {
-  $game = $data->getSpeedRun($_GET['game_id']);
+  $id = $_GET['game_id'];
+  if (checkNumberParam($id))
+  {
+  	$game = $data->getSpeedRun();
+  }
 }
 
 $pageTitle = $game == null ? "Error" : $game['name'];
@@ -22,7 +26,7 @@ $pageTitle = $game == null ? "Error" : $game['name'];
 <?php
 if ($game == null)
 {
-  echo "<h3>Uknown or no game id supplied. <br /></h3>";
+  echo "<h3>Invalid game id supplied. <br /></h3>";
 }
 else
 {

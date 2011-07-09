@@ -27,9 +27,9 @@ public class SpeedRunData extends DataInterface
     try
     {
       this.selectSpeedRunByIdStatement = this.getConnection().prepareStatement("SELECT * FROM SpeedRun WHERE SpeedRun.speedRunId = ?;");
-      this.insertSpeedRunStatement = this.getConnection().prepareStatement("INSERT INTO SpeedRun (speedRunId, name) VALUES (?,?);");
+      this.insertSpeedRunStatement = this.getConnection().prepareStatement("INSERT INTO SpeedRun (speedRunId, name, description) VALUES (?,?,?);");
       this.deleteSpeedRunStatement = this.getConnection().prepareStatement("DELETE FROM SpeedRun WHERE SpeedRun.speedRunId = ?;");
-      this.updateSpeedRunStatement = this.getConnection().prepareStatement("UPDATE SpeedRun SET name = ? WHERE SpeedRun.speedRunId = ?;");
+      this.updateSpeedRunStatement = this.getConnection().prepareStatement("UPDATE SpeedRun SET name = ?, description = ? WHERE SpeedRun.speedRunId = ?;");
       this.selectAllSpeedRunsStatement = this.getConnection().prepareStatement("SELECT * FROM SpeedRun;");
     }
     catch(SQLException e)
@@ -77,7 +77,8 @@ public class SpeedRunData extends DataInterface
   {
     return new SpeedRun(
         results.getInt("speedRunId"),
-        results.getString("name"));
+        results.getString("name"),
+        results.getString("description"));
   }
 
   public synchronized void insertSpeedRun(SpeedRun speedRun)
@@ -86,6 +87,7 @@ public class SpeedRunData extends DataInterface
     {
       this.insertSpeedRunStatement.setInt(1, speedRun.getId());
       this.insertSpeedRunStatement.setString(2, speedRun.getName());
+      this.insertSpeedRunStatement.setString(3, speedRun.getDescription());
       
       int updated = this.insertSpeedRunStatement.executeUpdate();
       
@@ -123,8 +125,9 @@ public class SpeedRunData extends DataInterface
   {
     try
     {
-      this.updateSpeedRunStatement.setInt(2, run.getId());
+      this.updateSpeedRunStatement.setInt(3, run.getId());
       this.updateSpeedRunStatement.setString(1, run.getName());
+      this.updateSpeedRunStatement.setString(2, run.getDescription());
       
       int updated = this.updateSpeedRunStatement.executeUpdate();
       

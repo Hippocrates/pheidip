@@ -23,6 +23,8 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 
 @SuppressWarnings("serial")
 public class ChoicePanel extends EntityPanel
@@ -41,14 +43,17 @@ public class ChoicePanel extends EntityPanel
   private JButton deleteChoiceButton;
   private JLabel nameLabel;
   private FocusTraversalManager tabOrder;
+  private JScrollPane descriptionScrollPane;
+  private JLabel lblDescription;
+  private JTextArea descriptionTextArea;
 
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{0, 93, 93, 0, 100, 85, 0};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
+    gridBagLayout.columnWeights = new double[]{1.0, 1.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     nameLabel = new JLabel("Name:");
@@ -76,12 +81,34 @@ public class ChoicePanel extends EntityPanel
     gbc_deleteChoiceButton.gridy = 0;
     add(deleteChoiceButton, gbc_deleteChoiceButton);
     
+    lblDescription = new JLabel("Description");
+    GridBagConstraints gbc_lblDescription = new GridBagConstraints();
+    gbc_lblDescription.insets = new Insets(0, 0, 5, 5);
+    gbc_lblDescription.gridx = 0;
+    gbc_lblDescription.gridy = 1;
+    add(lblDescription, gbc_lblDescription);
+    
+    descriptionScrollPane = new JScrollPane();
+    descriptionScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    GridBagConstraints gbc_descriptionScrollPane = new GridBagConstraints();
+    gbc_descriptionScrollPane.gridwidth = 3;
+    gbc_descriptionScrollPane.insets = new Insets(0, 0, 5, 5);
+    gbc_descriptionScrollPane.fill = GridBagConstraints.BOTH;
+    gbc_descriptionScrollPane.gridx = 1;
+    gbc_descriptionScrollPane.gridy = 1;
+    add(descriptionScrollPane, gbc_descriptionScrollPane);
+    
+    descriptionTextArea = new JTextArea();
+    descriptionTextArea.setWrapStyleWord(true);
+    descriptionTextArea.setLineWrap(true);
+    descriptionScrollPane.setViewportView(descriptionTextArea);
+    
     saveButton = new JButton("Save");
     GridBagConstraints gbc_saveButton = new GridBagConstraints();
     gbc_saveButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_saveButton.insets = new Insets(0, 0, 5, 5);
     gbc_saveButton.gridx = 1;
-    gbc_saveButton.gridy = 1;
+    gbc_saveButton.gridy = 2;
     add(saveButton, gbc_saveButton);
     
     refreshButton = new JButton("Refresh");
@@ -89,7 +116,7 @@ public class ChoicePanel extends EntityPanel
     gbc_refreshButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_refreshButton.insets = new Insets(0, 0, 5, 5);
     gbc_refreshButton.gridx = 2;
-    gbc_refreshButton.gridy = 1;
+    gbc_refreshButton.gridy = 2;
     add(refreshButton, gbc_refreshButton);
     
     addOptionButton = new JButton("Add Option");
@@ -97,7 +124,7 @@ public class ChoicePanel extends EntityPanel
     gbc_addOptionButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_addOptionButton.insets = new Insets(0, 0, 5, 5);
     gbc_addOptionButton.gridx = 1;
-    gbc_addOptionButton.gridy = 3;
+    gbc_addOptionButton.gridy = 4;
     add(addOptionButton, gbc_addOptionButton);
     
     renameOptionButton = new JButton("Rename Option");
@@ -105,14 +132,14 @@ public class ChoicePanel extends EntityPanel
     gbc_renameOptionButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_renameOptionButton.insets = new Insets(0, 0, 5, 5);
     gbc_renameOptionButton.gridx = 2;
-    gbc_renameOptionButton.gridy = 3;
+    gbc_renameOptionButton.gridy = 4;
     add(renameOptionButton, gbc_renameOptionButton);
     
     deleteOptionButton = new JButton("Delete Option");
     GridBagConstraints gbc_deleteOptionButton = new GridBagConstraints();
     gbc_deleteOptionButton.insets = new Insets(0, 0, 5, 0);
     gbc_deleteOptionButton.gridx = 5;
-    gbc_deleteOptionButton.gridy = 3;
+    gbc_deleteOptionButton.gridy = 4;
     add(deleteOptionButton, gbc_deleteOptionButton);
     
     scrollPane = new JScrollPane();
@@ -120,7 +147,7 @@ public class ChoicePanel extends EntityPanel
     gbc_scrollPane.gridwidth = 6;
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
     gbc_scrollPane.gridx = 0;
-    gbc_scrollPane.gridy = 4;
+    gbc_scrollPane.gridy = 5;
     add(scrollPane, gbc_scrollPane);
     
     optionTable = new JTable();
@@ -181,6 +208,7 @@ public class ChoicePanel extends EntityPanel
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
         this.nameField,
+        this.descriptionTextArea,
         this.saveButton,
         this.refreshButton,
         this.addOptionButton,
@@ -218,12 +246,13 @@ public class ChoicePanel extends EntityPanel
     
     if (choice == null)
     {
-      JOptionPane.showMessageDialog(this, "Error, this challenge no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(this, "Error, this choice no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
       this.owner.removeTab(this);
       return;
     }
     
     this.nameField.setText(choice.getName());
+    this.descriptionTextArea.setText(choice.getDescription());
     
     List<Pair<ChoiceOption,BigDecimal>> options = this.choiceControl.getOptionsWithTotals(true);
     
@@ -249,7 +278,7 @@ public class ChoicePanel extends EntityPanel
   
   public void saveContent()
   {
-    this.choiceControl.updateData(this.nameField.getText());
+    this.choiceControl.updateData(this.nameField.getText(), this.descriptionTextArea.getText());
     this.refreshContent();
   }
   

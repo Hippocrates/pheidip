@@ -78,6 +78,7 @@ CREATE TABLE SpeedRun
 (
   speedRunId INTEGER,
   name VARCHAR(63),
+  description VARCHAR(1024),
 
   CONSTRAINT SpeedRunNameUnique UNIQUE (name),
   CONSTRAINT SpeedRunNameLowerCase CHECK (name = lower(name)),
@@ -90,6 +91,7 @@ CREATE TABLE Choice
   choiceId INTEGER,
   speedRunId INTEGER,
   name VARCHAR(63),
+  description VARCHAR(1024),
 
   CONSTRAINT ChoiceFKSpeedRun FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
   CONSTRAINT ChoiceNameUnique UNIQUE (speedRunId, name),
@@ -117,6 +119,7 @@ CREATE TABLE Challenge
   speedRunId INTEGER,
   name VARCHAR(63),
   goalAmount DECIMAL(19,2),
+  description VARCHAR(1024),
   
   CONSTRAINT ChallengeFKSpeedRun FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
   CONSTRAINT ChallengeNameUnique UNIQUE (speedRunId, name),
@@ -158,6 +161,8 @@ CREATE TABLE Prize
 (
   prizeId INTEGER,
   name VARCHAR(63),
+  imageURL VARCHAR(1024),
+  description VARCHAR(1024),
   
   CONSTRAINT PrizeNameUnique UNIQUE(name),
   CONSTRAINT PrizeNameLowerCase CHECK(name = lower(name)),

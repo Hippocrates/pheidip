@@ -7,12 +7,14 @@ public class Choice implements Bid
 	private String name;
   private int id;
   private int speedRunId;
+  private String description;
 
-	public Choice(int id, String name, int speedRunId)
+	public Choice(int id, String name, String description, int speedRunId)
 	{
 	  this.id = id;
 		this.name = name == null ? null : name.toLowerCase();
 		this.speedRunId = speedRunId;
+		this.description = description;
 	}
 	
 	public String getName()
@@ -28,6 +30,11 @@ public class Choice implements Bid
   public int getId()
   {
     return id;
+  }
+  
+  public String getDescription()
+  {
+    return this.description;
   }
 
   @Override

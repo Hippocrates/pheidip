@@ -58,7 +58,7 @@ public class TestDonationControl extends TestCase
     DonationControl control = new DonationControl(this.manager, donationId);
     
     String commentText = "Some new comment text";
-    BigDecimal amount = new BigDecimal("3.50");
+    BigDecimal amount = new BigDecimal("500.50");
     
     control.updateData(amount, commentText, false);
     

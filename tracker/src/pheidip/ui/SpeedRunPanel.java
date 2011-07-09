@@ -26,6 +26,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.List;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JTextArea;
 
 @SuppressWarnings("serial")
 public class SpeedRunPanel extends EntityPanel
@@ -45,14 +47,17 @@ public class SpeedRunPanel extends EntityPanel
   private JScrollPane bidsScrollPane;
   private ActionHandler actionHandler;
   private FocusTraversalManager tabOrder;
+  private JScrollPane descriptionScrollPane;
+  private JLabel lblDescription;
+  private JTextArea descriptionTextArea;
 
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{94, 110, 116, 114, 85, 0};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 131, 0};
-    gridBagLayout.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.columnWidths = new int[]{72, 110, 116, 114, 85, 0};
+    gridBagLayout.rowHeights = new int[]{0, 41, 0, 0, 0, 131, 0};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     JLabel nameLabel = new JLabel("Name:");
@@ -81,19 +86,41 @@ public class SpeedRunPanel extends EntityPanel
     gbc_deleteButton.gridy = 0;
     add(deleteButton, gbc_deleteButton);
     
+    lblDescription = new JLabel("Description:");
+    GridBagConstraints gbc_lblDescription = new GridBagConstraints();
+    gbc_lblDescription.insets = new Insets(0, 0, 5, 5);
+    gbc_lblDescription.gridx = 0;
+    gbc_lblDescription.gridy = 1;
+    add(lblDescription, gbc_lblDescription);
+    
+    descriptionScrollPane = new JScrollPane();
+    descriptionScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    GridBagConstraints gbc_descriptionScrollPane = new GridBagConstraints();
+    gbc_descriptionScrollPane.gridwidth = 2;
+    gbc_descriptionScrollPane.insets = new Insets(0, 0, 5, 5);
+    gbc_descriptionScrollPane.fill = GridBagConstraints.BOTH;
+    gbc_descriptionScrollPane.gridx = 1;
+    gbc_descriptionScrollPane.gridy = 1;
+    add(descriptionScrollPane, gbc_descriptionScrollPane);
+    
+    descriptionTextArea = new JTextArea();
+    descriptionTextArea.setWrapStyleWord(true);
+    descriptionTextArea.setLineWrap(true);
+    descriptionScrollPane.setViewportView(descriptionTextArea);
+    
     saveButton = new JButton("Save");
     GridBagConstraints gbc_saveButton = new GridBagConstraints();
     gbc_saveButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_saveButton.insets = new Insets(0, 0, 5, 5);
     gbc_saveButton.gridx = 1;
-    gbc_saveButton.gridy = 1;
+    gbc_saveButton.gridy = 2;
     add(saveButton, gbc_saveButton);
     
     refreshButton = new JButton("Refresh");
     GridBagConstraints gbc_refreshButton = new GridBagConstraints();
     gbc_refreshButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_refreshButton.insets = new Insets(0, 0, 5, 5);
-    gbc_refreshButton.gridx = 1;
+    gbc_refreshButton.gridx = 2;
     gbc_refreshButton.gridy = 2;
     add(refreshButton, gbc_refreshButton);
     
@@ -122,12 +149,12 @@ public class SpeedRunPanel extends EntityPanel
     add(newChallengeButton, gbc_newChallengeButton);
     
     bidsScrollPane = new JScrollPane();
-    GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-    gbc_scrollPane.gridwidth = 5;
-    gbc_scrollPane.fill = GridBagConstraints.BOTH;
-    gbc_scrollPane.gridx = 0;
-    gbc_scrollPane.gridy = 5;
-    add(bidsScrollPane, gbc_scrollPane);
+    GridBagConstraints gbc_bidsScrollPane = new GridBagConstraints();
+    gbc_bidsScrollPane.gridwidth = 5;
+    gbc_bidsScrollPane.fill = GridBagConstraints.BOTH;
+    gbc_bidsScrollPane.gridx = 0;
+    gbc_bidsScrollPane.gridy = 5;
+    add(bidsScrollPane, gbc_bidsScrollPane);
     
     bidTable = new JTable();
     bidsScrollPane.setViewportView(bidTable);
@@ -199,6 +226,7 @@ public class SpeedRunPanel extends EntityPanel
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.nameField,
+      this.descriptionTextArea,
       this.saveButton,
       this.refreshButton,
       this.openBidButton,
@@ -247,6 +275,7 @@ public class SpeedRunPanel extends EntityPanel
     }
     
     this.nameField.setText(data.getName());
+    this.descriptionTextArea.setText(data.getDescription());
     
     cachedRelatedBids = this.speedRunControl.getAllBids();
     
@@ -297,7 +326,7 @@ public class SpeedRunPanel extends EntityPanel
   
   public void saveContent()
   {
-    this.speedRunControl.updateData(this.nameField.getText());
+    this.speedRunControl.updateData(this.nameField.getText(), this.descriptionTextArea.getText());
     this.refreshContent();
   }
 

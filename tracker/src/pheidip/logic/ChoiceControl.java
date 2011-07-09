@@ -86,12 +86,12 @@ public class ChoiceControl
     this.bids.deleteChoice(this.choiceId);
   }
 
-  public void updateData(String text)
+  public void updateData(String name, String description)
   {
     try
     {
       Choice c = this.getData();
-      this.bids.updateChoice(new Choice(this.choiceId, text, c.getSpeedRunId()));
+      this.bids.updateChoice(new Choice(this.choiceId, name, description, c.getSpeedRunId()));
     }
     catch (DonationDataConstraintException e)
     {

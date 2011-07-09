@@ -129,7 +129,7 @@ public class MainWindow extends JFrame implements Reporter
     searchRunButton = new JMenuItem("Search Run...");
     searchMenu.add(searchRunButton);
     
-    searchBidButton = new JMenuItem("SearchBid...");
+    searchBidButton = new JMenuItem("Search Bid...");
     searchMenu.add(searchBidButton);
    
     this.setJMenuBar(this.menuBar);
@@ -280,6 +280,7 @@ public class MainWindow extends JFrame implements Reporter
     this.exitButton.addActionListener(this.actionHandler);
     this.searchDonorButton.addActionListener(this.actionHandler);
     this.searchDonationButton.addActionListener(this.actionHandler);
+    this.searchBidButton.addActionListener(this.actionHandler);
     this.searchRunButton.addActionListener(this.actionHandler);
     this.createNewRunButton.addActionListener(this.actionHandler);
     this.createNewDonorButton.addActionListener(this.actionHandler);

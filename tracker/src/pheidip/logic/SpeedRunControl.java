@@ -34,9 +34,9 @@ public class SpeedRunControl
     return this.speedRuns.getSpeedRunById(this.speedRunId);
   }
   
-  public void updateData(String newName)
+  public void updateData(String newName, String description)
   {
-    this.speedRuns.updateSpeedRun(new SpeedRun(this.speedRunId, newName));
+    this.speedRuns.updateSpeedRun(new SpeedRun(this.speedRunId, newName, description));
   }
 
   public List<Bid> getAllBids()
@@ -52,7 +52,7 @@ public class SpeedRunControl
   public static int createNewSpeedRun(DonationDatabaseManager manager, String name)
   {
     int id = IdUtils.generateId();
-    manager.getDataAccess().getSpeedRuns().insertSpeedRun(new SpeedRun(id, StringUtils.nullIfEmpty(name)));
+    manager.getDataAccess().getSpeedRuns().insertSpeedRun(new SpeedRun(id, StringUtils.nullIfEmpty(name), null));
     return id;
   }
 
@@ -65,7 +65,7 @@ public class SpeedRunControl
   {
     int id = IdUtils.generateId();
     
-    this.bids.insertChallenge(new Challenge(id, result, BigDecimal.ZERO.setScale(2), this.speedRunId));
+    this.bids.insertChallenge(new Challenge(id, result, BigDecimal.ZERO.setScale(2), null, this.speedRunId));
     
     return id;
   }
@@ -74,7 +74,7 @@ public class SpeedRunControl
   {
     int id = IdUtils.generateId();
     
-    this.bids.insertChoice(new Choice(id, defaultName, this.speedRunId));
+    this.bids.insertChoice(new Choice(id, defaultName, null, this.speedRunId));
     
     return id;
   }

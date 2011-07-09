@@ -5,6 +5,8 @@ import java.util.List;
 
 import pheidip.db.BidData;
 import pheidip.objects.Bid;
+import pheidip.objects.Challenge;
+import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 import pheidip.util.EqualsFilterFunction;
 import pheidip.util.Filter;
@@ -40,6 +42,27 @@ public class BidSearch
     {
       throw new RuntimeException(e);
     }
+  }
+  
+  public Challenge createChallengeIfAble(int speedRunId, String name)
+  {
+    SpeedRunControl control = new SpeedRunControl(this.manager, speedRunId);
+    int id = control.createNewChallenge(name);
+    return this.bids.getChallengeById(id);
+  }
+  
+  public Choice createChoiceIfAble(int speedRunId, String name)
+  {
+    SpeedRunControl control = new SpeedRunControl(this.manager, speedRunId);
+    int id = control.createNewChoice(name);
+    return this.bids.getChoiceById(id);
+  }
+  
+  public ChoiceOption createOptionIfAble(int choiceId, String optionName)
+  {
+    ChoiceControl control = new ChoiceControl(this.manager, choiceId);
+    int id = control.createNewOption(optionName);
+    return this.bids.getChoiceOptionById(id);
   }
   
   public List<Bid> searchBids(Integer speedRunId, String bidName)

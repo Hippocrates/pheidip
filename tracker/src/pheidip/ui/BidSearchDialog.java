@@ -10,6 +10,7 @@ import pheidip.objects.BidType;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 import pheidip.objects.SpeedRun;
+import pheidip.util.StringUtils;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -60,18 +61,21 @@ public class BidSearchDialog extends JDialog
   private JList optionNameList;
   private ChoiceOption selectedOption;
   private boolean showOptions;
+  private JButton newOptionButton;
+  private JButton newChallengeButton;
+  private JButton newChoiceButton;
 
   private void initializeGUI()
   {
-    setBounds(100, 100, 450, 300);
+    setBounds(100, 100, 450, 325);
     
     panel = new JPanel();
-    getContentPane().add(panel, BorderLayout.CENTER);
+    getContentPane().add(panel, BorderLayout.SOUTH);
     GridBagLayout gbl_panel = new GridBagLayout();
-    gbl_panel.columnWidths = new int[]{145, 164, 9, 0};
-    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0};
+    gbl_panel.columnWidths = new int[]{141, 164, 144, 0};
+    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
     gbl_panel.columnWeights = new double[]{1.0, 1.0, 1.0, Double.MIN_VALUE};
-    gbl_panel.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gbl_panel.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     panel.setLayout(gbl_panel);
     
     speedRunLabel = new JLabel("Speed Run:");
@@ -130,7 +134,16 @@ public class BidSearchDialog extends JDialog
     bidNameList = new JList();
     bidNameScrollPane.setViewportView(bidNameList);
     
-    //if (this.showOptions)
+    newChallengeButton = new JButton("New Challenge");
+    newChallengeButton.setEnabled(false);
+    GridBagConstraints gbc_newChallengeButton = new GridBagConstraints();
+    gbc_newChallengeButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_newChallengeButton.insets = new Insets(0, 0, 5, 5);
+    gbc_newChallengeButton.gridx = 1;
+    gbc_newChallengeButton.gridy = 3;
+    panel.add(newChallengeButton, gbc_newChallengeButton);
+    
+    if (this.showOptions)
     {
       optionNameLabel = new JLabel("Option Name:");
       GridBagConstraints gbc_optionNameLabel = new GridBagConstraints();
@@ -160,6 +173,27 @@ public class BidSearchDialog extends JDialog
       
       optionNameList = new JList();
       optionNameScrollPane.setViewportView(optionNameList);
+
+      newOptionButton = new JButton("New Option");
+      newOptionButton.setEnabled(false);
+      GridBagConstraints gbc_newOptionButton = new GridBagConstraints();
+      gbc_newOptionButton.fill = GridBagConstraints.HORIZONTAL;
+      gbc_newOptionButton.insets = new Insets(0, 0, 5, 0);
+      gbc_newOptionButton.gridx = 2;
+      gbc_newOptionButton.gridy = 3;
+      panel.add(newOptionButton, gbc_newOptionButton);
+    }
+    else
+    {
+      newChoiceButton = new JButton("New Choice");
+      newChoiceButton.setEnabled(false);
+      GridBagConstraints gbc_newChoiceButton = new GridBagConstraints();
+      gbc_newChoiceButton.anchor = GridBagConstraints.BELOW_BASELINE;
+      gbc_newChoiceButton.fill = GridBagConstraints.HORIZONTAL;
+      gbc_newChoiceButton.insets = new Insets(0, 0, 5, 5);
+      gbc_newChoiceButton.gridx = 1;
+      gbc_newChoiceButton.gridy = 4;
+      panel.add(newChoiceButton, gbc_newChoiceButton);
     }
     
     okButton = new JButton("OK");
@@ -168,7 +202,7 @@ public class BidSearchDialog extends JDialog
     gbc_btnOk.fill = GridBagConstraints.HORIZONTAL;
     gbc_btnOk.insets = new Insets(0, 0, 0, 5);
     gbc_btnOk.gridx = 0;
-    gbc_btnOk.gridy = 3;
+    gbc_btnOk.gridy = 5;
     panel.add(okButton, gbc_btnOk);
     
     cancelButton = new JButton("Cancel");
@@ -176,8 +210,29 @@ public class BidSearchDialog extends JDialog
     gbc_btnCancel.insets = new Insets(0, 0, 0, 5);
     gbc_btnCancel.fill = GridBagConstraints.HORIZONTAL;
     gbc_btnCancel.gridx = 1;
-    gbc_btnCancel.gridy = 3;
+    gbc_btnCancel.gridy = 5;
     panel.add(cancelButton, gbc_btnCancel);
+  }
+  
+  private void updateUIState()
+  {
+    okButton.setEnabled(
+        (getCurrentBid() != null && (getCurrentChoice() == null || !showOptions)) ||
+        (getCurrentChoice() != null && getCurrentOption() != null));
+  
+    boolean createBideEnabled = getCurrentSpeedRun() != null && 
+      !StringUtils.isEmptyOrNull(bidNameField.getText());
+    
+    newChallengeButton.setEnabled(createBideEnabled);
+    
+    if (showOptions)
+    {
+      newOptionButton.setEnabled(getCurrentChoice() != null && !StringUtils.isEmptyOrNull(optionNameField.getText()));
+    }
+    else
+    {
+      newChoiceButton.setEnabled(createBideEnabled);
+    }
   }
   
   private class ActionHandler implements DocumentListener, ActionListener, ListSelectionListener
@@ -196,6 +251,8 @@ public class BidSearchDialog extends JDialog
       {
         runOptionFilter();
       }
+      
+      updateUIState();
     }
     
     public void changedUpdate(DocumentEvent ev)
@@ -218,13 +275,32 @@ public class BidSearchDialog extends JDialog
     @Override
     public void actionPerformed(ActionEvent ev)
     {
-      if (ev.getSource() == okButton)
+      try
       {
-        returnSelectedBid();
+        if (ev.getSource() == okButton)
+        {
+          returnSelectedBid();
+        }
+        else if (ev.getSource() == cancelButton)
+        {
+          closeDialog();
+        }
+        else if (ev.getSource() == newChallengeButton)
+        {
+          createNewChallenge();
+        }
+        else if (ev.getSource() == newChoiceButton)
+        {
+          createNewChoice();
+        }
+        else if (ev.getSource() == newOptionButton)
+        {
+          createNewOption();
+        }
       }
-      else if (ev.getSource() == cancelButton)
+      catch (Exception e)
       {
-        closeDialog();
+        JOptionPane.showMessageDialog(BidSearchDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       }
     }
 
@@ -247,10 +323,8 @@ public class BidSearchDialog extends JDialog
           runOptionFilter();
         }
       }
-        
-      okButton.setEnabled(
-            (getCurrentBid() != null && (getCurrentChoice() == null || !showOptions)) ||
-            (getCurrentChoice() != null && getCurrentOption() != null));
+      
+      updateUIState();
     }
   }
   
@@ -264,10 +338,17 @@ public class BidSearchDialog extends JDialog
     this.cancelButton.addActionListener(this.actionHandler);
     this.speedRunList.addListSelectionListener(this.actionHandler);
     this.bidNameList.addListSelectionListener(this.actionHandler);
+    this.newChallengeButton.addActionListener(this.actionHandler);
     
     if (this.showOptions)
     {
+      this.optionNameField.getDocument().addDocumentListener(this.actionHandler);
       this.optionNameList.addListSelectionListener(this.actionHandler);
+      this.newOptionButton.addActionListener(this.actionHandler);
+    }
+    else 
+    {
+      this.newChoiceButton.addActionListener(this.actionHandler);
     }
     
     if (this.showOptions)
@@ -278,8 +359,11 @@ public class BidSearchDialog extends JDialog
         this.speedRunList,
         this.bidNameField,
         this.bidNameList,
+        this.newChallengeButton,
+        this.newChoiceButton,
         this.optionNameField,
         this.optionNameList,
+        this.newOptionButton,
         this.okButton,
         this.cancelButton
       });
@@ -292,6 +376,8 @@ public class BidSearchDialog extends JDialog
         this.speedRunList,
         this.bidNameField,
         this.bidNameList,
+        this.newChallengeButton,
+        this.newChoiceButton,
         this.okButton,
         this.cancelButton
       });
@@ -322,6 +408,33 @@ public class BidSearchDialog extends JDialog
     
     this.runSpeedRunFilter();
     this.runBidFilter();
+  }
+  
+  private void createNewChallenge()
+  {
+    this.selectedBid = this.searcher.createChallengeIfAble(this.getCurrentSpeedRun().getId(), this.bidNameField.getText());
+    this.closeDialog();
+  }
+  
+  private void createNewChoice()
+  {
+    this.selectedBid = this.searcher.createChoiceIfAble(this.getCurrentSpeedRun().getId(), this.bidNameField.getText());
+    this.closeDialog();
+  }
+  
+  private void createNewOption()
+  {
+    Choice c = this.getCurrentChoice();
+    if (c != null)
+    {
+      this.selectedBid = c;
+      this.selectedOption = this.searcher.createOptionIfAble(c.getId(), this.optionNameField.getText());
+      this.closeDialog();
+    }
+    else
+    {
+      throw new RuntimeException("Error, no choice is set to create this option.");
+    }
   }
   
   private Integer getCurrentSpeedRunId()

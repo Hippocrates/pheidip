@@ -10,13 +10,15 @@ public class Challenge implements Bid
   private int speedRunId;
   private String name;
   private BigDecimal goalAmount;
+  private String description;
   
-  public Challenge(int id, String name, BigDecimal goalAmount, int speedRunId)
+  public Challenge(int id, String name, BigDecimal goalAmount, String description, int speedRunId)
   {
     this.id = id;
     this.name = name == null ? null : name.toLowerCase();
     this.speedRunId = speedRunId;
     this.goalAmount = goalAmount;
+    this.description = description;
   }
 
   public String getName()
@@ -37,6 +39,11 @@ public class Challenge implements Bid
   public BigDecimal getGoalAmount()
   {
     return this.goalAmount;
+  }
+
+  public String getDescription()
+  {
+    return this.description;
   }
 
   @Override

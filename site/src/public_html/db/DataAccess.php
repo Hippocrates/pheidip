@@ -8,7 +8,7 @@ class DataAccess
   {
     $this->db = $db;
   }
-  
+
   function getAllSpeedRuns()
   {
     $queryString = "SELECT * FROM SpeedRun;";

@@ -4,11 +4,13 @@ public class SpeedRun
 {
   private int id;
   private String name;
+  private String description;
   
-  public SpeedRun(int id, String name)
+  public SpeedRun(int id, String name, String description)
   {
     this.id = id;
     this.name = name == null ? null : name.toLowerCase();
+    this.description = description;
   }
 
   public int getId()
@@ -19,6 +21,11 @@ public class SpeedRun
   public String getName()
   {
     return name;
+  }
+
+  public String getDescription()
+  {
+    return this.description;
   }
   
   public String toString()
