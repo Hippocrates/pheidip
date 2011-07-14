@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import pheidip.objects.ChallengeBid;
@@ -39,6 +40,7 @@ public class DonationData extends DataInterface
   private PreparedStatement deleteDonationChoiceBidStatement;
   private PreparedStatement selectDonationsWithBidPendingStatement;
   private PreparedStatement selectDonationsWithReadPendingStatement;
+  private PreparedStatement selectDonationsInTimeRange;
 
   public DonationData(DonationDataAccess manager)
   {
@@ -49,6 +51,8 @@ public class DonationData extends DataInterface
   {
     try
     {
+      this.selectDonationsInTimeRange = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE (? IS NULL OR ? <= Donation.timeReceived) AND (? IS NULL OR ? >= Donation.timeReceived);");
+      
       this.selectAllDonations = this.getConnection().prepareStatement("SELECT * FROM Donation");
       this.updateDonationReadState = this.getConnection().prepareStatement("UPDATE Donation SET readState = ? WHERE Donation.donationId = ?;");
       this.selectDonationsWithReadPendingStatement = this.getConnection().prepareStatement("SELECT * FROM Donation WHERE (Donation.readState = 'PENDING' OR Donation.readState = 'FLAGGED') OR (Donation.readState = 'AMOUNT_READ' AND Donation.comment IS NOT NULL);");
@@ -592,6 +596,32 @@ public class DonationData extends DataInterface
     {
       this.getManager().handleSQLException(e);
     }
+  }
+  
+  public synchronized List<Donation> getDonationsInTimeRange(Date lo, Date hi)
+  {
+    List<Donation> list = null;
+    
+    try
+    {
+      Timestamp loTimestamp = lo == null ? null : new Timestamp(lo.getTime());
+      Timestamp hiTimestamp = hi == null ? null : new Timestamp(hi.getTime());
+      
+      this.selectDonationsInTimeRange.setTimestamp(1, loTimestamp);
+      this.selectDonationsInTimeRange.setTimestamp(2, loTimestamp);
+      this.selectDonationsInTimeRange.setTimestamp(3, hiTimestamp);
+      this.selectDonationsInTimeRange.setTimestamp(4, hiTimestamp);
+      
+      ResultSet results = this.selectDonationsInTimeRange.executeQuery();
+      
+      list = extractDonationList(results);
+    }
+    catch(SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    return list;
   }
 
   public synchronized List<Donation> getAllDonations()

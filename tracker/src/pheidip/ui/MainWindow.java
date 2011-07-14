@@ -32,6 +32,8 @@ import pheidip.logic.DonationReadTask;
 import pheidip.logic.DonationSearch;
 import pheidip.logic.DonorControl;
 import pheidip.logic.DonorSearch;
+import pheidip.logic.PrizeControl;
+import pheidip.logic.PrizeSearch;
 import pheidip.logic.ProgramInstance;
 import pheidip.logic.SpeedRunControl;
 import pheidip.logic.SpeedRunSearch;
@@ -76,6 +78,8 @@ public class MainWindow extends JFrame implements Reporter
   private JMenuItem processBidsButton;
   private JMenuItem readDonationsButton;
   private JMenuItem searchBidButton;
+  private JMenuItem createNewPrizeButton;
+  private JMenuItem searchPrizeButton;
   
   private void shutdown()
   {
@@ -131,6 +135,9 @@ public class MainWindow extends JFrame implements Reporter
     
     searchBidButton = new JMenuItem("Search Bid...");
     searchMenu.add(searchBidButton);
+    
+    searchPrizeButton = new JMenuItem("Search Prize...");
+    searchMenu.add(searchPrizeButton);
    
     this.setJMenuBar(this.menuBar);
     
@@ -143,6 +150,9 @@ public class MainWindow extends JFrame implements Reporter
     
     createNewRunButton = new JMenuItem("Create New Run");
     createMenu.add(createNewRunButton);
+    
+    createNewPrizeButton = new JMenuItem("Create New Prize");
+    createMenu.add(createNewPrizeButton);
     
     tasksMenu = new JMenu("Tasks");
     tasksMenu.setEnabled(false);
@@ -254,6 +264,14 @@ public class MainWindow extends JFrame implements Reporter
         {
           MainWindow.this.openSearchBidDialog();
         }
+        else if (ev.getSource() == createNewPrizeButton)
+        {
+          MainWindow.this.createNewPrize();
+        }
+        else if (ev.getSource() == searchPrizeButton)
+        {
+          MainWindow.this.openPrizeSearchDialog();
+        }
       }
       catch(Exception e)
       {
@@ -291,6 +309,8 @@ public class MainWindow extends JFrame implements Reporter
     this.processBidsButton.addActionListener(this.actionHandler);
     this.tabbedPane.addChangeListener(this.actionHandler);
     this.readDonationsButton.addActionListener(this.actionHandler);
+    this.createNewPrizeButton.addActionListener(this.actionHandler);
+    this.searchPrizeButton.addActionListener(this.actionHandler);
   }
 
   public MainWindow()
@@ -529,6 +549,19 @@ public class MainWindow extends JFrame implements Reporter
       this.openSpeedRunTab(result.getId());
     }
   }
+  
+  private void openPrizeSearchDialog()
+  {
+    PrizeSearch searcher = new PrizeSearch(this.instance.getDonationDatabase());
+    PrizeSearchDialog dialog = new PrizeSearchDialog(this, searcher);
+    
+    dialog.setVisible(true);
+    
+    if (dialog.getSelectedPrize() != null)
+    {
+      this.openPrizeTab(dialog.getSelectedPrize().getId());
+    }
+  }
 
   private void openReadDonationsTab()
   {
@@ -640,6 +673,24 @@ public class MainWindow extends JFrame implements Reporter
     this.insertTab(panel);
   }
   
+  protected void openPrizeTab(int prizeId)
+  {
+    // prevent opening the same tab twice
+    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    {
+      Component target = this.tabbedPane.getComponentAt(i);
+      if (target instanceof PrizePanel && ((PrizePanel)target).getPrizeId() == prizeId)
+      {
+        this.focusOnTab(i);
+        return;
+      }
+    }
+    
+    PrizeControl ctrl = new PrizeControl(this.instance.getDonationDatabase(), prizeId);
+    PrizePanel panel = new PrizePanel(this, ctrl);
+    this.insertTab(panel);
+  }
+  
   protected void openDonationTab(int donationId)
   {
     // prevent opening the same tab twice
@@ -680,6 +731,12 @@ public class MainWindow extends JFrame implements Reporter
     }
   }
 
+  private void createNewPrize()
+  {
+    int newId = PrizeControl.createNewPrize(this.instance.getDonationDatabase());
+    this.openPrizeTab(newId);
+  }
+  
   protected void createNewSpeedRun()
   {
     int newId = SpeedRunControl.createNewSpeedRun(this.instance.getDonationDatabase());

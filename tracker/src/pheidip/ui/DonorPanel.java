@@ -4,6 +4,7 @@ import pheidip.logic.DonorControl;
 
 import pheidip.objects.Donation;
 import pheidip.objects.Donor;
+import pheidip.objects.Prize;
 import pheidip.util.StringUtils;
 
 import java.awt.FocusTraversalPolicy;
@@ -66,6 +67,7 @@ public class DonorPanel extends EntityPanel
   private MainWindow owner;
   private JButton addDonationButton;
   private ActionHandler actionHandler;
+  private JButton openPrizeButton;
 
   private void initializeGUI()
   {
@@ -154,6 +156,14 @@ public class DonorPanel extends EntityPanel
     gbc_prizeField.gridy = 1;
     add(prizeField, gbc_prizeField);
     prizeField.setColumns(10);
+    
+    openPrizeButton = new JButton("Open Prize");
+    GridBagConstraints gbc_openPrizeButton = new GridBagConstraints();
+    gbc_openPrizeButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_openPrizeButton.insets = new Insets(0, 0, 5, 5);
+    gbc_openPrizeButton.gridx = 5;
+    gbc_openPrizeButton.gridy = 1;
+    add(openPrizeButton, gbc_openPrizeButton);
     
     aliasLabel = new JLabel("Alias:");
     GridBagConstraints gbc_lblAlias = new GridBagConstraints();
@@ -262,6 +272,10 @@ public class DonorPanel extends EntityPanel
         {
           DonorPanel.this.createNewDonation();
         }
+        else if (event.getSource() == openPrizeButton)
+        {
+          DonorPanel.this.openPrize();
+        }
       }
       catch (Exception e)
       {
@@ -299,6 +313,7 @@ public class DonorPanel extends EntityPanel
     donationTable.addMouseListener(this.actionHandler);
     deleteDonorButton.addActionListener(this.actionHandler);
     addDonationButton.addActionListener(this.actionHandler);
+    this.openPrizeButton.addActionListener(this.actionHandler);
     
     this.donationTable.addKeyListener(new TabTraversalKeyListener(this.donationTable));
     
@@ -344,6 +359,16 @@ public class DonorPanel extends EntityPanel
   {
     return this.donorControl.getDonorId();
   }
+  
+  private void openPrize()
+  {
+    Prize won = this.donorControl.getPrizeWon();
+    
+    if (won != null)
+    {
+      this.owner.openPrizeTab(won.getId());
+    }
+  }
 
   public void refreshContent()
   {
@@ -364,7 +389,19 @@ public class DonorPanel extends EntityPanel
     this.emailField.setEditable(this.donorControl.allowEmailUpdate());
     
     this.totalDonatedField.setText(this.donorControl.getTotalDonated().toString());
-    this.prizeField.setText("NOT IMPLEMENTED YET.");
+    
+    Prize prizeWon = this.donorControl.getPrizeWon();
+    
+    if (prizeWon != null)
+    {
+      this.prizeField.setText(prizeWon.getName());
+      this.openPrizeButton.setEnabled(true);
+    }
+    else
+    {
+      this.prizeField.setText("");
+      this.openPrizeButton.setEnabled(false);
+    }
     
     List<Donation> donations = this.donorControl.getDonorDonations();
     CustomTableModel tableData = new CustomTableModel(new String[]

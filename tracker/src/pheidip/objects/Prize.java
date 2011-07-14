@@ -10,7 +10,7 @@ public class Prize
   public Prize(int id, String name, String imageURL, String description)
   {
     this.id = id;
-    this.name = name;
+    this.name = name == null ? "" : name.toLowerCase();
     this.imageURL = imageURL;
     this.description = description;
   }
@@ -33,5 +33,10 @@ public class Prize
   public String getDescription()
   {
     return this.description;
+  }
+  
+  public String toString()
+  {
+    return this.name;
   }
 }

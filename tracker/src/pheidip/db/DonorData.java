@@ -8,22 +8,19 @@ import java.util.List;
 
 import pheidip.objects.Donor;
 
-// TODO: 
-// All of the error conditions need better exception messages
-// for example, we can generally identify what the issue is, based 
-// on which method we're in, and the sql code
-
 public class DonorData extends DataInterface
 {
   private PreparedStatement selectDonorByID;
   private PreparedStatement selectDonorByEmail;
   private PreparedStatement selectDonorByAlias;
   private PreparedStatement selectAllDonors;
+  private PreparedStatement selectAllDonorsWithoutPrizes;
   private PreparedStatement deleteDonorStatement;
   private PreparedStatement createDonorStatement;
   private PreparedStatement updateDonorStatement;
   private PreparedStatement deleteAllDonorsStatement;
   private PreparedStatement allowDeleteDonorStatement;
+  private PreparedStatement selectPrizeWinnerStatement;
   
   public DonorData(DonationDataAccess manager)
   {
@@ -34,7 +31,8 @@ public class DonorData extends DataInterface
   {
     try
     {
-      this.allowDeleteDonorStatement = this.getConnection().prepareStatement("SELECT COUNT(*) FROM Donation WHERE Donation.donorId = ?;");
+      this.selectAllDonorsWithoutPrizes = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.donorId NOT IN (SELECT PrizeWinner.donorId FROM PrizeWinner);");
+      this.allowDeleteDonorStatement = this.getConnection().prepareStatement("SELECT COUNT(*) FROM Donation, PrizeWinner WHERE Donation.donorId = ? OR PrizeWinner.donorId = ?;");
       this.selectDonorByID = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.donorId = ?;");
       this.selectDonorByEmail = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.email = ?;");
       this.selectDonorByAlias = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.alias = ?;");
@@ -45,6 +43,8 @@ public class DonorData extends DataInterface
       
       this.createDonorStatement = this.getConnection().prepareStatement("INSERT INTO Donor (donorId, email, alias, firstName, lastName) VALUES(?,?,?,?,?);");
       this.updateDonorStatement = this.getConnection().prepareStatement("UPDATE Donor SET email = ?, alias = ?, firstName = ?, lastName = ? WHERE donorId = ?;");
+    
+      this.selectPrizeWinnerStatement = this.getConnection().prepareStatement("SELECT * FROM Donor, PrizeWinner WHERE PrizeWinner.prizeId = ? AND PrizeWinner.donorId = Donor.donorId;");
     } 
     catch (SQLException e)
     {
@@ -138,6 +138,24 @@ public class DonorData extends DataInterface
     
     return result;
   }
+  
+  synchronized public List<Donor> getDonorsWithoutPrizes()
+  {
+    List<Donor> result = null;
+    
+    try
+    {
+      ResultSet rows = this.selectAllDonorsWithoutPrizes.executeQuery();
+      
+      result = DonorData.extractDonorList(rows);
+    } 
+    catch (SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    return result;
+  }
 
   synchronized public void deleteDonor(int id)
   {
@@ -209,6 +227,29 @@ public class DonorData extends DataInterface
     {
       this.getManager().handleSQLException(e);
     }
+  }
+  
+  synchronized public Donor getPrizeWinner(int prizeId)
+  {
+    Donor result = null;
+    
+    try
+    {
+      this.selectPrizeWinnerStatement.setInt(1, prizeId);
+      
+      ResultSet rows = this.selectPrizeWinnerStatement.executeQuery();
+      
+      if (rows.next())
+      {
+        result = DonorData.extractDonor(rows);
+      }
+    } 
+    catch (SQLException e)
+    {
+      this.getManager().handleSQLException(e);
+    }
+    
+    return result;
   }
   
   private static List<Donor> extractDonorList(ResultSet rows) throws SQLException

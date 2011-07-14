@@ -7,11 +7,13 @@ import java.util.List;
 import pheidip.db.DonationData;
 import pheidip.db.DonationDataConstraintException;
 import pheidip.db.DonorData;
+import pheidip.db.PrizeData;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationReadState;
 import pheidip.objects.Donor;
+import pheidip.objects.Prize;
 import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
 
@@ -21,6 +23,7 @@ public class DonorControl
   private DonorData donors;
   private DonationData donations;
   private int donorId;
+  private PrizeData prizes;
   
   public static int createNewDonor(DonationDatabaseManager donationDatabase)
   {
@@ -44,6 +47,7 @@ public class DonorControl
     this.donors = this.donationDatabase.getDataAccess().getDonorData();
     this.donations = this.donationDatabase.getDataAccess().getDonationData();
     this.donorId = donorId;
+    this.prizes = this.donationDatabase.getDataAccess().getPrizeData();
   }
   
   public int getDonorId()
@@ -76,6 +80,11 @@ public class DonorControl
     {
       this.donationDatabase.reportMessage(e.getMessage());
     }
+  }
+  
+  public Prize getPrizeWon()
+  {
+    return this.prizes.getPrizeByDonorId(this.donorId);
   }
   
   public void deleteDonor()

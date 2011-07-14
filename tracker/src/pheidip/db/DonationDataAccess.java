@@ -16,6 +16,7 @@ public class DonationDataAccess
   private DonationData donations;
   private BidData bids;
   private SpeedRunData speedRuns;
+  private PrizeData prizes;
   
   public DonationDataAccess()
   {
@@ -26,6 +27,7 @@ public class DonationDataAccess
     this.donations = null;
     this.speedRuns = null;
     this.bids = null;
+    this.prizes = null;
   }
   
   synchronized public DonorData getDonorData()
@@ -68,6 +70,16 @@ public class DonationDataAccess
     return this.speedRuns;
   }
   
+  synchronized public PrizeData getPrizeData()
+  {
+    if (this.prizes == null)
+    {
+      this.prizes = new PrizeData(this);
+    }
+    
+    return this.prizes;
+  }
+  
   protected void finalize()
   {
     if (this.isConnected())
@@ -103,6 +115,11 @@ public class DonationDataAccess
     if (this.bids != null)
     {
       this.bids.setConnection(this.connection);
+    }
+    
+    if (this.prizes != null)
+    {
+      this.prizes.setConnection(this.connection);
     }
   }
   
