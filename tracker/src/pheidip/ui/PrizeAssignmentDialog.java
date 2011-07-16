@@ -250,7 +250,7 @@ public class PrizeAssignmentDialog extends JDialog
     params.excludeIfAlreadyWon = true;
     params.donatedAfter = this.donatedAfterCheckBox.isSelected() ? (Date) this.donatedAfterTimeField.getValue() : null;
     params.donatedBefore = this.donatedBeforeCheckBox.isSelected() ? (Date) this.donatedBeforeTimeField.getValue() : null;
-    params.singleDonationsAbove = this.minimumDonationCheckBox.isSelected() ? (BigDecimal) this.minimumDonationField.getValue() : null;
+    params.singleDonationsAbove = this.minimumDonationCheckBox.isSelected() ? new BigDecimal(this.minimumDonationField.getText()) : null;
     
     List<Donor> candidates = this.assigner.getAllCandidates(params);
     

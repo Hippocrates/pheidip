@@ -31,8 +31,8 @@ public class DonorData extends DataInterface
   {
     try
     {
-      this.selectAllDonorsWithoutPrizes = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.donorId NOT IN (SELECT PrizeWinner.donorId FROM PrizeWinner);");
-      this.allowDeleteDonorStatement = this.getConnection().prepareStatement("SELECT COUNT(*) FROM Donation, PrizeWinner WHERE Donation.donorId = ? OR PrizeWinner.donorId = ?;");
+      this.selectAllDonorsWithoutPrizes = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.donorId NOT IN (SELECT Prize.donorId FROM Prize);");
+      this.allowDeleteDonorStatement = this.getConnection().prepareStatement("SELECT COUNT(*) FROM Donation, Prize WHERE Donation.donorId = ? OR Prize.donorId = ?;");
       this.selectDonorByID = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.donorId = ?;");
       this.selectDonorByEmail = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.email = ?;");
       this.selectDonorByAlias = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.alias = ?;");
@@ -44,7 +44,7 @@ public class DonorData extends DataInterface
       this.createDonorStatement = this.getConnection().prepareStatement("INSERT INTO Donor (donorId, email, alias, firstName, lastName) VALUES(?,?,?,?,?);");
       this.updateDonorStatement = this.getConnection().prepareStatement("UPDATE Donor SET email = ?, alias = ?, firstName = ?, lastName = ? WHERE donorId = ?;");
     
-      this.selectPrizeWinnerStatement = this.getConnection().prepareStatement("SELECT * FROM Donor, PrizeWinner WHERE PrizeWinner.prizeId = ? AND PrizeWinner.donorId = Donor.donorId;");
+      this.selectPrizeWinnerStatement = this.getConnection().prepareStatement("SELECT * FROM Donor, Prize WHERE Prize.prizeId = ? AND Prize.donorId = Donor.donorId;");
     } 
     catch (SQLException e)
     {
@@ -162,6 +162,7 @@ public class DonorData extends DataInterface
     try
     {
       this.allowDeleteDonorStatement.setInt(1, id);
+      this.allowDeleteDonorStatement.setInt(2, id);
       
       ResultSet results = this.allowDeleteDonorStatement.executeQuery();
       

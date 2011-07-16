@@ -163,19 +163,11 @@ CREATE TABLE Prize
   name VARCHAR(63),
   imageURL VARCHAR(1024),
   description VARCHAR(1024),
+  donorId INTEGER,
   
   CONSTRAINT PrizeNameUnique UNIQUE(name),
   CONSTRAINT PrizeNameLowerCase CHECK(name = lower(name)),
+  CONSTRAINT PrizeFKDonor FOREIGN KEY (donorId) REFERENCES Donor (donorId),
   
   CONSTRAINT PrizePK PRIMARY KEY(prizeId)
-);
-
-CREATE TABLE PrizeWinner
-(
-  prizeId INTEGER,
-  donorId INTEGER,
-  
-  CONSTRAINT PrizeWinnerFKDonor FOREIGN KEY (donorId) REFERENCES Donor (donorId),
-  
-  CONSTRAINT PrizeWinnerPK PRIMARY KEY(prizeId)
 );

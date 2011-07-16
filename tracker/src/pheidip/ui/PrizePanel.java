@@ -46,6 +46,7 @@ public class PrizePanel extends EntityPanel
   private FocusTraversalManager tabOrder;
   private JTextField imageURLField;
   private JLabel lblImageUrl;
+  private Donor winner;
 
   private void initializeGUI()
   {
@@ -339,7 +340,7 @@ public class PrizePanel extends EntityPanel
     
     this.setHeaderText("Prize: " + data.getName());
     
-    Donor winner = this.control.getPrizeWinner();
+    this.winner = this.control.getPrizeWinner();
     
     this.nameField.setText(data.getName());
     this.imageURLField.setText(data.getImageURL());
@@ -366,7 +367,7 @@ public class PrizePanel extends EntityPanel
   @Override
   public void saveContent()
   {
-    this.control.updateData(this.nameField.getText(), this.imageURLField.getText(), this.descriptionTextArea.getText());
+    this.control.updateData(this.nameField.getText(), this.imageURLField.getText(), this.descriptionTextArea.getText(), this.winner == null ? null : this.winner.getId());
     this.refreshContent();
   }
 

@@ -57,8 +57,12 @@ public class PrizeAssign
     
     for (Donation d : donationsSingleAboveAmount)
     {
-      List<Donation> targetList = donorMap.get(d.getDonorId()).getSecond();
-      targetList.add(d);
+      Pair<Donor,List<Donation> > pair = donorMap.get(d.getDonorId());
+      if (pair != null)
+      {
+        List<Donation> targetList = donorMap.get(d.getDonorId()).getSecond();
+        targetList.add(d);
+      }
     }
     
     List<Donor> finalFilter = new ArrayList<Donor>();
@@ -88,8 +92,15 @@ public class PrizeAssign
   
   public Donor pickRandomCandidate(List<Donor> candidates)
   {
-    // select a random number in the range (using _secure_ random this time)
-    Random rand = new SecureRandom();
-    return candidates.get(rand.nextInt(candidates.size()));
+    if (candidates.size() > 0)
+    {
+      // select a random number in the range (using _secure_ random this time)
+      Random rand = new SecureRandom();
+      return candidates.get(rand.nextInt(candidates.size()));
+    }
+    else
+    {
+      throw new RuntimeException("Error, no donors found that match the criteria.");
+    }
   }
 }

@@ -30,7 +30,7 @@ public class PrizeData extends DataInterface
   {
     try
     {
-      this.allowDeletePrizeStatement = this.getConnection().prepareStatement("SELECT COUNT(*) FROM PrizeWinner WHERE PrizeWinner.prizeId = ?;");
+      this.allowDeletePrizeStatement = this.getConnection().prepareStatement("SELECT COUNT(*) FROM Prize WHERE Prize.prizeId = ? AND Prize.donorId IS NOT NULL;");
       this.selectPrizeByIdStatement = this.getConnection().prepareStatement("SELECT * FROM Prize WHERE Prize.prizeId = ?;");
     
       this.insertPrizeStatement = this.getConnection().prepareStatement("INSERT INTO Prize (prizeId,name,imageURL,description) VALUES (?,?,?,?);");
@@ -39,9 +39,9 @@ public class PrizeData extends DataInterface
       
       this.deletePrizeStatement = this.getConnection().prepareStatement("DELETE FROM Prize WHERE Prize.prizeId = ?;");
     
-      this.selectPrizeByDonorIdStatement = this.getConnection().prepareStatement("SELECT Prize.prizeId, Prize.name, Prize.imageURL, Prize.description FROM Prize, PrizeWinner WHERE PrizeWinner.donorId = ? AND Prize.prizeId = PrizeWinner.prizeId;");
-      this.attachWinnerToPrizeStatement = this.getConnection().prepareStatement("INSERT INTO PrizeWinner (prizeId, donorId) VALUES (?,?);");
-      this.removeWinnerFromPrizeStatement = this.getConnection().prepareStatement("DELETE FROM PrizeWinner WHERE PrizeWinner.prizeId = ?;");
+      this.selectPrizeByDonorIdStatement = this.getConnection().prepareStatement("SELECT * FROM Prize WHERE Prize.donorId = ?;");
+      this.attachWinnerToPrizeStatement = this.getConnection().prepareStatement("UPDATE Prize SET donorId = ? WHERE Prize.prizeId = ?;");
+      this.removeWinnerFromPrizeStatement = this.getConnection().prepareStatement("UPDATE Prize SET donorId = NULL WHERE Prize.prizeId = ?;");
       
       this.selectAllPrizesStatement = this.getConnection().prepareStatement("SELECT * FROM PRIZE;");
     }
@@ -53,7 +53,7 @@ public class PrizeData extends DataInterface
   
   private static Prize extractPrize(ResultSet set) throws SQLException
   {
-    return new Prize(set.getInt("prizeId"), set.getString("name"), set.getString("imageURL"), set.getString("description"));
+    return new Prize(set.getInt("prizeId"), set.getString("name"), set.getString("imageURL"), set.getString("description"), (Integer) set.getObject("donorId"));
   }
   
   public synchronized void insertPrize(Prize toAdd)
@@ -171,8 +171,8 @@ public class PrizeData extends DataInterface
   {
     try
     {
-      this.attachWinnerToPrizeStatement.setInt(1, prizeId);
-      this.attachWinnerToPrizeStatement.setInt(2, donorId);
+      this.attachWinnerToPrizeStatement.setInt(2, prizeId);
+      this.attachWinnerToPrizeStatement.setInt(1, donorId);
       
       int updated = this.attachWinnerToPrizeStatement.executeUpdate();
       
@@ -219,7 +219,7 @@ public class PrizeData extends DataInterface
         int count = results.getInt(1);
         if (count > 0)
         {
-          throw new SQLException("Error, violated constraint : '" + DonationDataConstraint.PrizeWinnerFKDonor.toString() + "'", "", JDBCManager.getCodeForError(this.getManager().getConnectionType(), SQLError.FOREIGN_KEY_VIOLATION));
+          throw new SQLException("Error, violated constraint : '" + DonationDataConstraint.PrizeFKDonor.toString() + "'", "", JDBCManager.getCodeForError(this.getManager().getConnectionType(), SQLError.FOREIGN_KEY_VIOLATION));
         }
       }
       

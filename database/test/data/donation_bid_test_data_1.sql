@@ -39,9 +39,6 @@ INSERT INTO ChallengeBid VALUES(1, 1, 1, 10.00);
 INSERT INTO ChallengeBid VALUES(2, 1, 1, 10.00);
 INSERT INTO ChallengeBid VALUES(3, 2, 1, 10.00);
 
-INSERT INTO Prize VALUES(1, 'a prize', NULL, NULL);
-INSERT INTO Prize VALUES(2, 'another prize', NULL, NULL);
-INSERT INTO Prize VALUES(3, 'one more prize', NULL, NULL);
-
-INSERT INTO PrizeWinner VALUES(1, 2);
-INSERT INTO PrizeWinner VALUES(3, 1);
+INSERT INTO Prize VALUES(1, 'a prize', NULL, NULL, 2);
+INSERT INTO Prize VALUES(2, 'another prize', NULL, NULL, NULL);
+INSERT INTO Prize VALUES(3, 'one more prize', NULL, NULL, 1);

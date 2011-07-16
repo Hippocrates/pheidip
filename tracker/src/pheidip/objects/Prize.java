@@ -6,13 +6,15 @@ public class Prize
   private String name;
   private String imageURL;
   private String description;
+  private Integer winner;
   
-  public Prize(int id, String name, String imageURL, String description)
+  public Prize(int id, String name, String imageURL, String description, Integer winner)
   {
     this.id = id;
     this.name = name == null ? "" : name.toLowerCase();
     this.imageURL = imageURL;
     this.description = description;
+    this.winner = winner;
   }
   
   public int getId()
@@ -33,6 +35,11 @@ public class Prize
   public String getDescription()
   {
     return this.description;
+  }
+  
+  public Integer getWinner()
+  {
+    return this.winner;
   }
   
   public String toString()
