@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import pheidip.db.BidData;
+import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
@@ -36,7 +37,7 @@ public class TestBidData extends DonationDatabaseTest
     
     assertNull(this.bids.getChoiceById(newId));
     
-    this.bids.insertChoice(new Choice(newId, name, null, speedRunId));
+    this.bids.insertChoice(new Choice(newId, name, null, BidState.OPENED, speedRunId));
   
     Choice choice = this.bids.getChoiceById(newId);
     
@@ -57,7 +58,7 @@ public class TestBidData extends DonationDatabaseTest
     assertFalse(newName.equals(oldChoice.getName()));
     assertFalse(anotherRun == oldChoice.getSpeedRunId());
     
-    this.bids.updateChoice(new Choice(choiceId, newName, null, anotherRun));
+    this.bids.updateChoice(new Choice(choiceId, newName, null, BidState.OPENED, anotherRun));
     
     Choice choice = this.bids.getChoiceById(choiceId);
     
@@ -174,7 +175,7 @@ public class TestBidData extends DonationDatabaseTest
     
     assertNull(this.bids.getChallengeById(newId));
     
-    this.bids.insertChallenge(new Challenge(newId, name, amount, null, speedRunId));
+    this.bids.insertChallenge(new Challenge(newId, name, amount, null, BidState.OPENED, speedRunId));
   
     Challenge challenge = this.bids.getChallengeById(newId);
     
@@ -197,7 +198,7 @@ public class TestBidData extends DonationDatabaseTest
     assertFalse(newAmount.equals(oldChallenge.getGoalAmount()));
     assertFalse(anotherRun == oldChallenge.getSpeedRunId());
     
-    this.bids.updateChallenge(new Challenge(challengeId, newName, newAmount, null, anotherRun));
+    this.bids.updateChallenge(new Challenge(challengeId, newName, newAmount, null, BidState.OPENED, anotherRun));
     
     Challenge challenge = this.bids.getChallengeById(challengeId);
     

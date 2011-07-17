@@ -11,19 +11,19 @@ INSERT INTO SpeedRun VALUES(1, 'run 1', NULL);
 INSERT INTO SpeedRun VALUES(2, 'run 2', NULL);
 INSERT INTO SpeedRun VALUES(3, 'yet another run', NULL);
 
-INSERT INTO Choice VALUES(1, 1, 'naming something', NULL);
-INSERT INTO Choice VALUES(2, 1, 'naming something else', NULL);
-INSERT INTO Choice VALUES(3, 1, 'a path of some sort', NULL);
-INSERT INTO Choice VALUES(4, 2, 'not part of game 1', NULL);
+INSERT INTO Choice VALUES(1, 1, 'naming something', NULL, 'OPENED');
+INSERT INTO Choice VALUES(2, 1, 'naming something else', NULL, 'OPENED');
+INSERT INTO Choice VALUES(3, 1, 'a path of some sort', NULL, 'OPENED');
+INSERT INTO Choice VALUES(4, 2, 'not part of game 1', NULL, 'OPENED');
 
 INSERT INTO ChoiceOption VALUES(1, 1, 'name 1');
 INSERT INTO ChoiceOption VALUES(2, 1, 'name 2');
 INSERT INTO ChoiceOption VALUES(3, 2, 'name 1');
 
-INSERT INTO Challenge VALUES(1, 2, 'challenge 1', 20.00, NULL);
-INSERT INTO Challenge VALUES(2, 1, 'challenge 2', 50.00, NULL);
-INSERT INTO Challenge VALUES(3, 2, 'challenge 2', 100.00, NULL);
-INSERT INTO Challenge VALUES(4, 2, 'challenge whatever', 150.00, NULL);
+INSERT INTO Challenge VALUES(1, 2, 'challenge 1', 20.00, NULL, 'OPENED');
+INSERT INTO Challenge VALUES(2, 1, 'challenge 2', 50.00, NULL, 'OPENED');
+INSERT INTO Challenge VALUES(3, 2, 'challenge 2', 100.00, NULL, 'OPENED');
+INSERT INTO Challenge VALUES(4, 2, 'challenge whatever', 150.00, NULL, 'OPENED');
 
 INSERT INTO Donation VALUES(1, 1, 'LOCAL', NULL, 'PENDING', 'PENDING', 50.40, '2004-10-18 23:32:34', NULL);
 INSERT INTO Donation VALUES(2, 2, 'LOCAL', NULL, 'PENDING', 'PENDING', 25.00, '2006-10-18 00:32:34', NULL);

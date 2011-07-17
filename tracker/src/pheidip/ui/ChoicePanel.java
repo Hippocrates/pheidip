@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import pheidip.logic.ChoiceControl;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
+import pheidip.objects.BidState;
 import pheidip.util.Pair;
 
 import java.awt.Component;
@@ -25,6 +26,7 @@ import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.JComboBox;
 
 @SuppressWarnings("serial")
 public class ChoicePanel extends EntityPanel
@@ -46,14 +48,16 @@ public class ChoicePanel extends EntityPanel
   private JScrollPane descriptionScrollPane;
   private JLabel lblDescription;
   private JTextArea descriptionTextArea;
+  private JLabel stateLabel;
+  private JComboBox stateComboBox;
 
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{0, 93, 93, 0, 100, 85, 0};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{1.0, 1.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+    gridBagLayout.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     nameLabel = new JLabel("Name:");
@@ -103,12 +107,29 @@ public class ChoicePanel extends EntityPanel
     descriptionTextArea.setLineWrap(true);
     descriptionScrollPane.setViewportView(descriptionTextArea);
     
+    stateLabel = new JLabel("State:");
+    GridBagConstraints gbc_stateLabel = new GridBagConstraints();
+    gbc_stateLabel.anchor = GridBagConstraints.EAST;
+    gbc_stateLabel.insets = new Insets(0, 0, 5, 5);
+    gbc_stateLabel.gridx = 0;
+    gbc_stateLabel.gridy = 2;
+    add(stateLabel, gbc_stateLabel);
+    
+    stateComboBox = new JComboBox(BidState.values());
+    GridBagConstraints gbc_stateComboBox = new GridBagConstraints();
+    gbc_stateComboBox.gridwidth = 3;
+    gbc_stateComboBox.insets = new Insets(0, 0, 5, 5);
+    gbc_stateComboBox.fill = GridBagConstraints.HORIZONTAL;
+    gbc_stateComboBox.gridx = 1;
+    gbc_stateComboBox.gridy = 2;
+    add(stateComboBox, gbc_stateComboBox);
+    
     saveButton = new JButton("Save");
     GridBagConstraints gbc_saveButton = new GridBagConstraints();
     gbc_saveButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_saveButton.insets = new Insets(0, 0, 5, 5);
     gbc_saveButton.gridx = 1;
-    gbc_saveButton.gridy = 2;
+    gbc_saveButton.gridy = 3;
     add(saveButton, gbc_saveButton);
     
     refreshButton = new JButton("Refresh");
@@ -116,7 +137,7 @@ public class ChoicePanel extends EntityPanel
     gbc_refreshButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_refreshButton.insets = new Insets(0, 0, 5, 5);
     gbc_refreshButton.gridx = 2;
-    gbc_refreshButton.gridy = 2;
+    gbc_refreshButton.gridy = 3;
     add(refreshButton, gbc_refreshButton);
     
     addOptionButton = new JButton("Add Option");
@@ -124,7 +145,7 @@ public class ChoicePanel extends EntityPanel
     gbc_addOptionButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_addOptionButton.insets = new Insets(0, 0, 5, 5);
     gbc_addOptionButton.gridx = 1;
-    gbc_addOptionButton.gridy = 4;
+    gbc_addOptionButton.gridy = 5;
     add(addOptionButton, gbc_addOptionButton);
     
     renameOptionButton = new JButton("Rename Option");
@@ -132,14 +153,14 @@ public class ChoicePanel extends EntityPanel
     gbc_renameOptionButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_renameOptionButton.insets = new Insets(0, 0, 5, 5);
     gbc_renameOptionButton.gridx = 2;
-    gbc_renameOptionButton.gridy = 4;
+    gbc_renameOptionButton.gridy = 5;
     add(renameOptionButton, gbc_renameOptionButton);
     
     deleteOptionButton = new JButton("Delete Option");
     GridBagConstraints gbc_deleteOptionButton = new GridBagConstraints();
     gbc_deleteOptionButton.insets = new Insets(0, 0, 5, 0);
     gbc_deleteOptionButton.gridx = 5;
-    gbc_deleteOptionButton.gridy = 4;
+    gbc_deleteOptionButton.gridy = 5;
     add(deleteOptionButton, gbc_deleteOptionButton);
     
     scrollPane = new JScrollPane();
@@ -147,7 +168,7 @@ public class ChoicePanel extends EntityPanel
     gbc_scrollPane.gridwidth = 6;
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
     gbc_scrollPane.gridx = 0;
-    gbc_scrollPane.gridy = 5;
+    gbc_scrollPane.gridy = 6;
     add(scrollPane, gbc_scrollPane);
     
     optionTable = new JTable();
@@ -253,6 +274,7 @@ public class ChoicePanel extends EntityPanel
     
     this.nameField.setText(choice.getName());
     this.descriptionTextArea.setText(choice.getDescription());
+    this.stateComboBox.setSelectedItem(choice.getBidState());
     
     List<Pair<ChoiceOption,BigDecimal>> options = this.choiceControl.getOptionsWithTotals(true);
     
@@ -278,7 +300,7 @@ public class ChoicePanel extends EntityPanel
   
   public void saveContent()
   {
-    this.choiceControl.updateData(this.nameField.getText(), this.descriptionTextArea.getText());
+    this.choiceControl.updateData(this.nameField.getText(), this.descriptionTextArea.getText(), (BidState) this.stateComboBox.getSelectedItem());
     this.refreshContent();
   }
   

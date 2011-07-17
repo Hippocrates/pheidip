@@ -20,6 +20,19 @@ class DataAccess
     return $games;
   }
   
+  function getAllSpeedRunsWithBids()
+  {
+  	$queryString = "SELECT * FROM SpeedRun WHERE " .
+  		"EXISTS(SELECT * FROM Choice WHERE Choice.speedRunId = SpeedRun.speedRunId AND Choice.bidState <> 'HIDDEN') OR " .
+  		"EXISTS(SELECT * FROM Challenge WHERE Challenge.speedRunId = SpeedRun.speedRunId AND Challenge.bidState <> 'HIDDEN');";
+    
+    $queryResult = $this->db->query($queryString);
+    
+    $games = $queryResult->fetchAll();
+    
+    return $games;
+  }
+  
   function getSpeedRun($id)
   {
     $queryString = "SELECT * FROM SpeedRun WHERE SpeedRun.speedRunId = $id;";
@@ -40,7 +53,7 @@ class DataAccess
   
   function getSpeedRunChoices($speedRunId)
   {
-    $queryString = "SELECT * FROM Choice WHERE Choice.speedRunId = $speedRunId;\n";
+    $queryString = "SELECT * FROM Choice WHERE Choice.speedRunId = $speedRunId AND Choice.bidState <> 'Hidden';\n";
     
     $queryResult = $this->db->query($queryString);
     
@@ -62,7 +75,7 @@ class DataAccess
   
   function getSpeedRunChallenges($speedRunId)
   {
-    $queryString = "SELECT * FROM Challenge WHERE Challenge.speedRunId = $speedRunId;\n";
+    $queryString = "SELECT * FROM Challenge WHERE Challenge.speedRunId = $speedRunId AND Challenge.bidState <> 'Hidden';\n";
     
     $queryResult = $this->db->query($queryString);
     

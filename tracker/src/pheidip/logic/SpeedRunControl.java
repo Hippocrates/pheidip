@@ -7,6 +7,7 @@ import java.util.List;
 import pheidip.db.BidData;
 import pheidip.db.SpeedRunData;
 import pheidip.objects.Bid;
+import pheidip.objects.BidState;
 import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
@@ -65,7 +66,7 @@ public class SpeedRunControl
   {
     int id = IdUtils.generateId();
     
-    this.bids.insertChallenge(new Challenge(id, result, BigDecimal.ZERO.setScale(2), null, this.speedRunId));
+    this.bids.insertChallenge(new Challenge(id, result, BigDecimal.ZERO.setScale(2), null, BidState.OPENED, this.speedRunId));
     
     return id;
   }
@@ -74,7 +75,7 @@ public class SpeedRunControl
   {
     int id = IdUtils.generateId();
     
-    this.bids.insertChoice(new Choice(id, defaultName, null, this.speedRunId));
+    this.bids.insertChoice(new Choice(id, defaultName, null, BidState.OPENED, this.speedRunId));
     
     return id;
   }

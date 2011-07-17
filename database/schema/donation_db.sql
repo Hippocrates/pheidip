@@ -86,16 +86,28 @@ CREATE TABLE SpeedRun
   CONSTRAINT SpeedRunPK PRIMARY KEY (speedRunId)
 );
 
+CREATE TABLE BidState
+(
+  bidStateId VARCHAR(16),
+  PRIMARY KEY (bidStateId)
+);
+
+INSERT INTO BidState VALUES('HIDDEN');
+INSERT INTO BidState VALUES('OPENED');
+INSERT INTO BidState VALUES('CLOSED');
+
 CREATE TABLE Choice
 (
   choiceId INTEGER,
   speedRunId INTEGER,
   name VARCHAR(63),
   description VARCHAR(1024),
+  bidState VARCHAR(16),
 
   CONSTRAINT ChoiceFKSpeedRun FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
   CONSTRAINT ChoiceNameUnique UNIQUE (speedRunId, name),
   CONSTRAINT ChoiceNameLowerCase CHECK (name = lower(name)),
+  CONSTRAINT ChoiceFKBidState FOREIGN KEY (bidState) REFERENCES BidState(bidStateId),
   
   CONSTRAINT ChoicePK PRIMARY KEY (choiceId)
 );
@@ -120,11 +132,13 @@ CREATE TABLE Challenge
   name VARCHAR(63),
   goalAmount DECIMAL(19,2),
   description VARCHAR(1024),
+  bidState VARCHAR(16),
   
   CONSTRAINT ChallengeFKSpeedRun FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
   CONSTRAINT ChallengeNameUnique UNIQUE (speedRunId, name),
   CONSTRAINT ChallengeNameLowerCase CHECK (name = lower(name)),
   CONSTRAINT ChallengeAmountValid CHECK(goalAmount >= 0),
+  CONSTRAINT ChallengeFKBidState FOREIGN KEY (bidState) REFERENCES BidState(bidStateId),
   
   CONSTRAINT ChallengePK PRIMARY KEY (challengeId)
 );

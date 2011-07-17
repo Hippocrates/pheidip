@@ -8,6 +8,7 @@ import java.util.List;
 
 import pheidip.db.BidData;
 import pheidip.db.DonationDataConstraintException;
+import pheidip.objects.BidState;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 import pheidip.util.IdUtils;
@@ -86,12 +87,12 @@ public class ChoiceControl
     this.bids.deleteChoice(this.choiceId);
   }
 
-  public void updateData(String name, String description)
+  public void updateData(String name, String description, BidState newState)
   {
     try
     {
       Choice c = this.getData();
-      this.bids.updateChoice(new Choice(this.choiceId, name, description, c.getSpeedRunId()));
+      this.bids.updateChoice(new Choice(this.choiceId, name, description, newState, c.getSpeedRunId()));
     }
     catch (DonationDataConstraintException e)
     {

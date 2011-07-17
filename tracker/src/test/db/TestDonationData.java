@@ -28,7 +28,7 @@ public class TestDonationData extends DonationDatabaseTest
 
     assertEquals(id, d.getId());
     assertEquals(1, d.getDonorId());
-    assertEquals(new BigDecimal("12.40"), d.getAmount());
+    assertEquals(new BigDecimal("50.40"), d.getAmount());
     assertEquals(DonationDomain.LOCAL, d.getDomain());
     // domain Id should be null for local donations (they don't have 
     // any specific Id)
@@ -101,7 +101,7 @@ public class TestDonationData extends DonationDatabaseTest
     
     Donation d = this.donations.getDonationById(id);
     
-    assertEquals(new BigDecimal("12.40"), d.getAmount());
+    assertEquals(new BigDecimal("50.40"), d.getAmount());
     
     BigDecimal newAmount = new BigDecimal("5.55");
     

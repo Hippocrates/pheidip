@@ -498,13 +498,16 @@ public class MainWindow extends JFrame implements Reporter
     
     Bid result = dialog.getSelectedBid();
     
-    if (result.getType() == BidType.CHALLENGE)
+    if (result != null)
     {
-      this.openChallengeTab(result.getId());
-    }
-    else
-    {
-      this.openChoiceTab(result.getId());
+      if (result.getType() == BidType.CHALLENGE)
+      {
+        this.openChallengeTab(result.getId());
+      }
+      else
+      {
+        this.openChoiceTab(result.getId());
+      }
     }
   }
 
