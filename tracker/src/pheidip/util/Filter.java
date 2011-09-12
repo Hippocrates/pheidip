@@ -10,7 +10,7 @@ public final class Filter
   public static <T> List<T> filterList(List<T> input, FilterFunction<T> filterFunc)
   {
     ArrayList<T> output = new ArrayList<T>();
-    
+      
     for (T x : input)
     {
       if (filterFunc.predicate(x))

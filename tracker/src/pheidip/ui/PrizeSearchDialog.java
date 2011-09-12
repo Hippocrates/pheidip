@@ -45,6 +45,7 @@ public class PrizeSearchDialog extends JDialog
   private JScrollPane prizeScrollPane;
   private JLabel nameLabel;
   private FocusTraversalManager traversalManager;
+  private JButton createNewButton;
 
   private void initializeGUI()
   {
@@ -55,9 +56,9 @@ public class PrizeSearchDialog extends JDialog
     getContentPane().add(contentPanel, BorderLayout.CENTER);
     GridBagLayout gbl_contentPanel = new GridBagLayout();
     gbl_contentPanel.columnWidths = new int[]{87, 211, 137, 0};
-    gbl_contentPanel.rowHeights = new int[]{0, 0, 0};
+    gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0};
     gbl_contentPanel.columnWeights = new double[]{0.0, 1.0, 1.0, Double.MIN_VALUE};
-    gbl_contentPanel.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
+    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_contentPanel);
     {
       nameLabel = new JLabel("Name:");
@@ -81,8 +82,7 @@ public class PrizeSearchDialog extends JDialog
     {
       prizeScrollPane = new JScrollPane();
       GridBagConstraints gbc_prizeScrollPane = new GridBagConstraints();
-      gbc_prizeScrollPane.gridheight = 2;
-      gbc_prizeScrollPane.insets = new Insets(0, 0, 5, 0);
+      gbc_prizeScrollPane.gridheight = 3;
       gbc_prizeScrollPane.fill = GridBagConstraints.BOTH;
       gbc_prizeScrollPane.gridx = 2;
       gbc_prizeScrollPane.gridy = 0;
@@ -91,6 +91,15 @@ public class PrizeSearchDialog extends JDialog
         prizeList = new JList();
         prizeScrollPane.setViewportView(prizeList);
       }
+    }
+    {
+      createNewButton = new JButton("Create New...");
+      GridBagConstraints gbc_createNewButton = new GridBagConstraints();
+      gbc_createNewButton.anchor = GridBagConstraints.WEST;
+      gbc_createNewButton.insets = new Insets(0, 0, 5, 5);
+      gbc_createNewButton.gridx = 1;
+      gbc_createNewButton.gridy = 1;
+      contentPanel.add(createNewButton, gbc_createNewButton);
     }
     {
       JPanel buttonPane = new JPanel();
@@ -120,6 +129,10 @@ public class PrizeSearchDialog extends JDialog
         if (ev.getSource() == okButton)
         {
           returnSelectedPrize();
+        }
+        else if (ev.getSource() == createNewButton)
+        {
+          createFromFields();
         }
         else if (ev.getSource() == cancelButton)
         {
@@ -232,6 +245,14 @@ public class PrizeSearchDialog extends JDialog
     }
     
     this.prizeList.setModel(listData);
+  }
+  
+  private void createFromFields()
+  {
+    Prize p = this.searcher.createIfAble(this.nameField.getText());
+    
+    this.selectedPrize = p;
+    this.closeDialog();
   }
   
   private void returnSelectedPrize()

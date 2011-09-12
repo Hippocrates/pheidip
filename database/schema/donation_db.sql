@@ -50,6 +50,17 @@ INSERT INTO DonationReadState VALUES ('AMOUNT_READ');
 INSERT INTO DonationReadState VALUES ('COMMENT_READ');
 INSERT INTO DonationReadState VALUES ('FLAGGED');
 
+CREATE TABLE DonationCommentState
+(
+  donationCommentStateId VARCHAR(16),
+  PRIMARY KEY (donationCommentStateId)
+);
+
+INSERT INTO DonationCommentState VALUES ('PENDING');
+INSERT INTO DonationCommentState VALUES ('ACCEPTED');
+INSERT INTO DonationCommentState VALUES ('DENIED');
+
+
 CREATE TABLE Donation
 (
   donationId INTEGER,
@@ -59,6 +70,7 @@ CREATE TABLE Donation
   
   bidState VARCHAR(16),
   readState VARCHAR(16),
+  commentState VARCHAR(16),
   
   amount DECIMAL(19,2),
   timeReceived DATETIME,
@@ -69,6 +81,7 @@ CREATE TABLE Donation
   CONSTRAINT DonationDomainIdUnique UNIQUE (domain, domainId),
   CONSTRAINT DonationFKBidState FOREIGN KEY (bidState) REFERENCES DonationBidState (donationBidStateId),
   CONSTRAINT DonationFKReadState FOREIGN KEY (readState) REFERENCES DonationReadState (donationReadStateId),
+  CONSTRAINT DonationFKCommentState FOREIGN KEY (commentState) REFERENCES DonationCommentState (donationCommentStateId),
   CONSTRAINT DonationAmountValid CHECK (amount > 0 OR amount = null),
   
   CONSTRAINT DonationPK PRIMARY KEY (donationId)

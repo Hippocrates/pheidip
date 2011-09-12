@@ -31,7 +31,7 @@ public class DonorData extends DataInterface
   {
     try
     {
-      this.selectAllDonorsWithoutPrizes = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.donorId NOT IN (SELECT Prize.donorId FROM Prize);");
+      this.selectAllDonorsWithoutPrizes = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE NOT EXISTS (SELECT Prize.donorId FROM Prize WHERE Prize.donorId = Donor.donorId);");
       this.allowDeleteDonorStatement = this.getConnection().prepareStatement("SELECT COUNT(*) FROM Donation, Prize WHERE Donation.donorId = ? OR Prize.donorId = ?;");
       this.selectDonorByID = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.donorId = ?;");
       this.selectDonorByEmail = this.getConnection().prepareStatement("SELECT * FROM Donor WHERE Donor.email = ?;");

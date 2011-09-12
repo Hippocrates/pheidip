@@ -10,6 +10,7 @@ import pheidip.db.DonorData;
 import pheidip.db.PrizeData;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
+import pheidip.objects.DonationCommentState;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationReadState;
 import pheidip.objects.Donor;
@@ -102,6 +103,7 @@ public class DonorControl
         "" + donationId,
         DonationBidState.PENDING,
         DonationReadState.PENDING,
+        DonationCommentState.PENDING,
         BigDecimal.ZERO,
         new Date(),
         this.donorId,

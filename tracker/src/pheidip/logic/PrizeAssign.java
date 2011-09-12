@@ -81,7 +81,7 @@ public class PrizeAssign
         }
       }
       
-      if (params.totalDoantionsAbove == null || sum.compareTo(params.totalDoantionsAbove) >= 0)
+      if (it.getSecond().size() > 0 && (params.totalDoantionsAbove == null || sum.compareTo(params.totalDoantionsAbove) >= 0))
       {
         finalFilter.add(it.getFirst());
       }

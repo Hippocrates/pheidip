@@ -1,5 +1,9 @@
 package pheidip.ui;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -14,7 +18,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
+import java.awt.event.KeyAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -184,7 +188,7 @@ public class MainWindow extends JFrame implements Reporter
     this.getContentPane().add(this.messageArea, BorderLayout.SOUTH);
   }
   
-  private class ActionHandler extends MouseAdapter implements ActionListener, ChangeListener
+  private class ActionHandler extends KeyAdapter implements ActionListener, ChangeListener
   {
     @Override
     public void actionPerformed(ActionEvent ev)
@@ -289,7 +293,7 @@ public class MainWindow extends JFrame implements Reporter
       }
     }
   }
-  
+
   private void initializeGUIEvents()
   {
     this.actionHandler = new ActionHandler();
@@ -311,7 +315,70 @@ public class MainWindow extends JFrame implements Reporter
     this.readDonationsButton.addActionListener(this.actionHandler);
     this.createNewPrizeButton.addActionListener(this.actionHandler);
     this.searchPrizeButton.addActionListener(this.actionHandler);
+
+    Action deleteAction = new AbstractAction() 
+    {
+        public void actionPerformed(ActionEvent e) 
+        {
+          MainWindow.this.deleteCurrentEntity();
+        }
+    };
+    Action closeAction = new AbstractAction() 
+    {
+        public void actionPerformed(ActionEvent e) 
+        {
+          MainWindow.this.closeCurrentTab();
+        }
+    };
+    Action saveAction = new AbstractAction()
+    {
+      public void actionPerformed(ActionEvent e) 
+      {
+        MainWindow.this.saveCurrentTab();
+      }
+    };
+    Action refreshAction = new AbstractAction()
+    {
+      public void actionPerformed(ActionEvent e) 
+      {
+        MainWindow.this.refreshCurrentTab();
+      }
+    };
+    Action chipinWebsiteMergeAction = new AbstractAction()
+    {
+      public void actionPerformed(ActionEvent e) 
+      {
+        try
+        {
+          MainWindow.this.runChipinWebsiteMerge();
+        }
+        catch(Exception error)
+        {
+          MainWindow.this.report(error);
+        }
+      }
+    };
+
+    this.tabbedPane.getActionMap().put(HotkeyAction.DELETE.toString(), deleteAction);
+    this.tabbedPane.getActionMap().put(HotkeyAction.CLOSE.toString(), closeAction);
+    this.tabbedPane.getActionMap().put(HotkeyAction.SAVE.toString(), saveAction);
+    this.tabbedPane.getActionMap().put(HotkeyAction.REFRESH.toString(), refreshAction);
+    this.tabbedPane.getActionMap().put(HotkeyAction.CHIPIN_MERGE.toString(), chipinWebsiteMergeAction);
+    
+    InputMap[] inputMaps = new InputMap[] {
+      this.tabbedPane.getInputMap(JComponent.WHEN_FOCUSED),
+      this.tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT),
+      //this.tabbedPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW),
+    };
+    for(InputMap i : inputMaps) 
+    {
+      for (HotkeyAction a : HotkeyAction.values())
+      {
+        i.put(a.getKeyStroke(), a.toString());
+      }
+    }
   }
+
 
   public MainWindow()
   {
@@ -322,6 +389,23 @@ public class MainWindow extends JFrame implements Reporter
     this.initializeGUIEvents();
     
     this.updateUIState();
+  }
+  
+  private void deleteCurrentEntity()
+  {
+    Component panel = this.tabbedPane.getSelectedComponent();
+    
+    if (panel instanceof EntityPanel)
+    {
+      EntityPanel entityHandle = (EntityPanel) panel;
+      entityHandle.deleteContent();
+    }
+  }
+  
+  private void closeCurrentTab()
+  {
+    Component panel = this.tabbedPane.getSelectedComponent();
+    this.removeTab(panel);
   }
 
   private void insertTab(Component panel)
@@ -340,6 +424,17 @@ public class MainWindow extends JFrame implements Reporter
       
       this.tabbedPane.setTabComponentAt(index, header);
       this.focusOnTab(index);
+    }
+  }
+  
+
+  private void saveCurrentTab()
+  {
+    Component current = this.tabbedPane.getSelectedComponent();
+    
+    if (current != null && current instanceof EntityPanel)
+    {
+      ((EntityPanel)current).saveContent();
     }
   }
   
@@ -378,7 +473,7 @@ public class MainWindow extends JFrame implements Reporter
     }
     else
     {
-      throw new RuntimeException("Error, not logged in.");
+      throw new RuntimeException("Cannot merge: not logged in to www.chipin.com.");
     }
   }
  

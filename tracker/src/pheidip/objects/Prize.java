@@ -11,7 +11,7 @@ public class Prize
   public Prize(int id, String name, String imageURL, String description, Integer winner)
   {
     this.id = id;
-    this.name = name == null ? "" : name.toLowerCase();
+    this.name = name == null ? null : name.toLowerCase();
     this.imageURL = imageURL;
     this.description = description;
     this.winner = winner;
@@ -44,6 +44,6 @@ public class Prize
   
   public String toString()
   {
-    return this.name;
+    return this.name == null ? "Prize#" + this.id : this.name;
   }
 }

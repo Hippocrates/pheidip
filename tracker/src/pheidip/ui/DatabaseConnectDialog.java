@@ -36,14 +36,6 @@ public class DatabaseConnectDialog extends JDialog
   private JPanel connectionTypePanel;
   private JPanel contentPanel;
   private ActionHandler actionHandler;
-
-  public static void main(String[] args)
-  {
-    UIConfiguration.setDefaultConfiguration();
-    DatabaseConnectDialog dialog = new DatabaseConnectDialog(null, new DonationDatabaseManager());
-    dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    dialog.setVisible(true);
-  }
   
   private void initializeGUI()
   {

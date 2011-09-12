@@ -38,6 +38,7 @@ public class FormattedInputDialog extends JDialog
     panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
     
     okButton = new JButton("OK");
+    okButton.setActionCommand("OK");
     okButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) 
       {

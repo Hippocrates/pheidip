@@ -338,7 +338,7 @@ public class PrizePanel extends EntityPanel
   {
     Prize data = this.control.getData();
     
-    this.setHeaderText("Prize: " + data.getName());
+    this.setHeaderText("Prize: " + data.toString());
     
     this.winner = this.control.getPrizeWinner();
     

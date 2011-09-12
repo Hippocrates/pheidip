@@ -11,6 +11,6 @@ public class PrizeSearchParams implements FilterFunction<Prize>
   @Override
   public boolean predicate(Prize x)
   {
-    return StringUtils.isEmptyOrNull(this.name) ? true : x.getName().toUpperCase().contains(name.toUpperCase());
+    return StringUtils.isEmptyOrNull(this.name) ? true : x.getName() == null ? false : x.getName().toUpperCase().contains(name.toUpperCase());
   }
 }

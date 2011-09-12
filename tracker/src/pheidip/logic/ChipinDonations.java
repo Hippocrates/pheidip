@@ -16,6 +16,7 @@ import pheidip.db.DonorData;
 import pheidip.objects.ChipinDonation;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
+import pheidip.objects.DonationCommentState;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationReadState;
 import pheidip.objects.Donor;
@@ -186,6 +187,7 @@ public final class ChipinDonations
                 chipinDonation.getChipinId(),
                 DonationBidState.PENDING, 
                 DonationReadState.PENDING,
+                DonationCommentState.PENDING,
                 chipinDonation.getAmount(),
                 chipinDonation.getTimeStamp(),
                 donor.getId(),

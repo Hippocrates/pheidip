@@ -48,6 +48,8 @@ public class PrizeAssignmentDialog extends JDialog
   private FocusTraversalManager tabOrder;
   private Donor selectedDonor;
   private PrizeAssign assigner;
+  private JLabel lblExcludeIfAlready;
+  private JCheckBox excludeIfWonCheckBox;
 
   private void initializeGUI()
   {
@@ -58,9 +60,9 @@ public class PrizeAssignmentDialog extends JDialog
     getContentPane().add(contentPanel, BorderLayout.CENTER);
     GridBagLayout gbl_contentPanel = new GridBagLayout();
     gbl_contentPanel.columnWidths = new int[]{64, 32, 0, 0};
-    gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0, 0};
+    gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
     gbl_contentPanel.columnWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
-    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_contentPanel);
     {
       lblDonatedAfter = new JLabel("Donated After:");
@@ -120,7 +122,7 @@ public class PrizeAssignmentDialog extends JDialog
       lblSingleDonationAbove = new JLabel("Minimum Donation:");
       GridBagConstraints gbc_lblSingleDonationAbove = new GridBagConstraints();
       gbc_lblSingleDonationAbove.anchor = GridBagConstraints.EAST;
-      gbc_lblSingleDonationAbove.insets = new Insets(0, 0, 0, 5);
+      gbc_lblSingleDonationAbove.insets = new Insets(0, 0, 5, 5);
       gbc_lblSingleDonationAbove.gridx = 0;
       gbc_lblSingleDonationAbove.gridy = 3;
       contentPanel.add(lblSingleDonationAbove, gbc_lblSingleDonationAbove);
@@ -129,7 +131,7 @@ public class PrizeAssignmentDialog extends JDialog
       minimumDonationCheckBox = new JCheckBox("");
       minimumDonationCheckBox.setSelected(true);
       GridBagConstraints gbc_minimumDonationCheckBox = new GridBagConstraints();
-      gbc_minimumDonationCheckBox.insets = new Insets(0, 0, 0, 5);
+      gbc_minimumDonationCheckBox.insets = new Insets(0, 0, 5, 5);
       gbc_minimumDonationCheckBox.gridx = 1;
       gbc_minimumDonationCheckBox.gridy = 3;
       contentPanel.add(minimumDonationCheckBox, gbc_minimumDonationCheckBox);
@@ -139,11 +141,29 @@ public class PrizeAssignmentDialog extends JDialog
       minimumDonationField.setText("5.00");
       minimumDonationField.setHorizontalAlignment(SwingConstants.TRAILING);
       GridBagConstraints gbc_minimumDonationField = new GridBagConstraints();
+      gbc_minimumDonationField.insets = new Insets(0, 0, 5, 0);
       gbc_minimumDonationField.fill = GridBagConstraints.HORIZONTAL;
       gbc_minimumDonationField.gridx = 2;
       gbc_minimumDonationField.gridy = 3;
       contentPanel.add(minimumDonationField, gbc_minimumDonationField);
       minimumDonationField.setColumns(10);
+    }
+    {
+      lblExcludeIfAlready = new JLabel("Exclude If Already Won:");
+      GridBagConstraints gbc_lblExcludeIfAlready = new GridBagConstraints();
+      gbc_lblExcludeIfAlready.insets = new Insets(0, 0, 0, 5);
+      gbc_lblExcludeIfAlready.gridx = 0;
+      gbc_lblExcludeIfAlready.gridy = 4;
+      contentPanel.add(lblExcludeIfAlready, gbc_lblExcludeIfAlready);
+    }
+    {
+      excludeIfWonCheckBox = new JCheckBox("");
+      excludeIfWonCheckBox.setSelected(true);
+      GridBagConstraints gbc_excludeIfWonCheckBox = new GridBagConstraints();
+      gbc_excludeIfWonCheckBox.insets = new Insets(0, 0, 0, 5);
+      gbc_excludeIfWonCheckBox.gridx = 1;
+      gbc_excludeIfWonCheckBox.gridy = 4;
+      contentPanel.add(excludeIfWonCheckBox, gbc_excludeIfWonCheckBox);
     }
     {
       JPanel buttonPane = new JPanel();
@@ -247,7 +267,7 @@ public class PrizeAssignmentDialog extends JDialog
   private void runDrawing()
   {
     PrizeAssignParams params = new PrizeAssignParams();
-    params.excludeIfAlreadyWon = true;
+    params.excludeIfAlreadyWon = this.excludeIfWonCheckBox.isSelected();
     params.donatedAfter = this.donatedAfterCheckBox.isSelected() ? (Date) this.donatedAfterTimeField.getValue() : null;
     params.donatedBefore = this.donatedBeforeCheckBox.isSelected() ? (Date) this.donatedBeforeTimeField.getValue() : null;
     params.singleDonationsAbove = this.minimumDonationCheckBox.isSelected() ? new BigDecimal(this.minimumDonationField.getText()) : null;

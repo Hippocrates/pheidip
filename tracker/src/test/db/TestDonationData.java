@@ -8,6 +8,7 @@ import java.util.List;
 import pheidip.db.DonationData;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
+import pheidip.objects.DonationCommentState;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationReadState;
 
@@ -135,6 +136,7 @@ public class TestDonationData extends DonationDatabaseTest
         null, 
         DonationBidState.PENDING, 
         DonationReadState.PENDING,
+        DonationCommentState.PENDING,
         new BigDecimal("3.50"),
         timeStamp, 
         1,
@@ -155,11 +157,12 @@ public class TestDonationData extends DonationDatabaseTest
     final String domainId = "ffffffffffee";
     final DonationBidState bidState = DonationBidState.PENDING;
     final DonationReadState readState = DonationReadState.PENDING;
+    final DonationCommentState commentState = DonationCommentState.PENDING;
     final BigDecimal amount = new BigDecimal("13.37");
     final Date timeReceived = new Date();
     final String comment = "asdlkjhasdkjhasdsda";
     
-    Donation updated = new Donation(id, domain, domainId, bidState, readState, amount, timeReceived, donorId, comment);
+    Donation updated = new Donation(id, domain, domainId, bidState, readState, commentState, amount, timeReceived, donorId, comment);
     
     this.donations.updateDonation(updated);
     
