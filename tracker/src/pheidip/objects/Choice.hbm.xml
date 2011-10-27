@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 18-Oct-2011 3:49:18 PM by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <subclass name="pheidip.objects.Choice" extends="pheidip.objects.Bid" discriminator-value="Choice" lazy="false">
+        <set name="options" table="CHOICEOPTION" cascade="all,delete-orphan" inverse="false" lazy="true">
+            <key>
+                <column name="CHOICE" />
+            </key>
+            <one-to-many class="pheidip.objects.ChoiceOption" />
+        </set>
+    </subclass>
+</hibernate-mapping>

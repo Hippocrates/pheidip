@@ -2,25 +2,31 @@ package pheidip.objects;
 
 import java.math.BigDecimal;
 
+import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
 
 public class Challenge implements Bid
 {
-  private int id;
-  private int speedRunId;
+  private int id = IdUtils.generateId();;
+  private Integer speedRunId;
   private String name;
   private BigDecimal goalAmount;
   private String description;
   private BidState bidState;
+  private SpeedRun speedRun;
   
-  public Challenge(int id, String name, BigDecimal goalAmount, String description, BidState bidState, int speedRunId)
+  public Challenge()
   {
-    this.id = id;
-    this.name = name == null ? null : name.toLowerCase();
-    this.speedRunId = speedRunId;
-    this.goalAmount = goalAmount;
-    this.description = description;
-    this.bidState = bidState;
+  }
+  
+  public Challenge(int id, String name, BigDecimal goalAmount, String description, BidState bidState, Integer speedRunId)
+  {
+    this.setId(id);
+    this.setName(name);
+    this.setSpeedRunId(speedRunId);
+    this.setGoalAmount(goalAmount);
+    this.setDescription(description);
+    this.setBidState(bidState);
   }
 
   public String getName()
@@ -28,9 +34,19 @@ public class Challenge implements Bid
     return name;
   }
 
-  public int getSpeedRunId()
+  public void setName(String name)
+  {
+    this.name = name == null ? null : name.toLowerCase();
+  }
+
+  public Integer getSpeedRunId()
   {
     return speedRunId;
+  }
+
+  public void setSpeedRunId(int speedRunId)
+  {
+    this.speedRunId = speedRunId;
   }
 
   public int getId()
@@ -38,9 +54,19 @@ public class Challenge implements Bid
     return id;
   }
   
+  public void setId(int id)
+  {
+    this.id = id;
+  }
+
   public BigDecimal getGoalAmount()
   {
     return this.goalAmount;
+  }
+
+  public void setGoalAmount(BigDecimal goalAmount)
+  {
+    this.goalAmount = goalAmount;
   }
 
   public String getDescription()
@@ -48,11 +74,21 @@ public class Challenge implements Bid
     return this.description;
   }
 
+  public void setDescription(String description)
+  {
+    this.description = description;
+  }
+
   public BidState getBidState()
   {
     return this.bidState;
   }
   
+  public void setBidState(BidState bidState)
+  {
+    this.bidState = bidState;
+  }
+
   @Override
   public BidType getType()
   {
@@ -61,6 +97,33 @@ public class Challenge implements Bid
   
   public String toString()
   {
-    return "Challenge: " + (StringUtils.isEmptyOrNull(this.name) ? ("#" + this.id) : this.name);
+    return "Challenge: " + (StringUtils.isEmptyOrNull(this.getName()) ? ("#" + this.getId()) : this.getName());
+  }
+  
+  public int hashCode()
+  {
+    return this.getId();
+  }
+  
+  public boolean equals(Object other)
+  {
+    if (other instanceof Challenge)
+    {
+      return this.getId() == ((Challenge)other).getId();
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  public void setSpeedRun(SpeedRun speedRun)
+  {
+    this.speedRun = speedRun;
+  }
+
+  public SpeedRun getSpeedRun()
+  {
+    return speedRun;
   }
 }

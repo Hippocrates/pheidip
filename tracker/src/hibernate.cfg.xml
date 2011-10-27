@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+                                         "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+ <session-factory>
+  <mapping class="pheidip.objects.Bid" resource="pheidip/objects/Bid.hbm.xml"/>
+  <mapping class="pheidip.objects.Challenge" resource="pheidip/objects/Challenge.hbm.xml"/>
+  <mapping class="pheidip.objects.ChallengeBid" resource="pheidip/objects/ChallengeBid.hbm.xml"/>
+  <mapping class="pheidip.objects.Choice" resource="pheidip/objects/Choice.hbm.xml"/>
+  <mapping class="pheidip.objects.ChoiceBid" resource="pheidip/objects/ChoiceBid.hbm.xml"/>
+  <mapping class="pheidip.objects.Donation" resource="pheidip/objects/Donation.hbm.xml"/>
+  <mapping class="pheidip.objects.DonationBid" resource="pheidip/objects/DonationBid.hbm.xml"/>
+  <mapping class="pheidip.objects.Donor" resource="pheidip/objects/Donor.hbm.xml"/>
+  <mapping class="pheidip.objects.Prize" resource="pheidip/objects/Prize.hbm.xml"/>
+  <mapping class="pheidip.objects.SpeedRun" resource="pheidip/objects/SpeedRun.hbm.xml"/>
+  <mapping class="pheidip.objects.ChoiceOption" resource="pheidip/objects/ChoiceOption.hbm.xml"/>
+ </session-factory>
+</hibernate-configuration>
