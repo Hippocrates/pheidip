@@ -6,7 +6,7 @@ import pheidip.util.IdUtils;
 
 public class ChoiceBid implements DonationBid
 {
-  private int id = IdUtils.generateId();
+  private int id;
   private BigDecimal amount;
   private int optionId;
   private int donationId;
@@ -15,6 +15,7 @@ public class ChoiceBid implements DonationBid
   
   public ChoiceBid()
   {
+    this.id = IdUtils.generateId();
   }
   
   public ChoiceBid(int id, BigDecimal amount, int optionId, int donationId)

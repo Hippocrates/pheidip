@@ -3,7 +3,8 @@ package pheidip.db;
 public enum DBType
 {
   MYSQL,
-  HSQLDB;
+  HSQLDB,
+  H2;
   
   private static final DBType[] _list = DBType.values();
   

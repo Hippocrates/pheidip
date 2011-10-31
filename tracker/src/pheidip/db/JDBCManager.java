@@ -38,23 +38,46 @@ public class JDBCManager
   
   public static Connection connectToServer(DBType type, String server, String dbName, String userName, String password) throws SQLException
   {
-    String location = null;
-    
-    switch(type)
-    {
-    case HSQLDB:
-      location = "hsql://" + server + "/" + dbName;
-      break;
-    case MYSQL:
-      location = "//" + server + "/" + dbName;
-      break;
-    default:
-      throw new RuntimeException("Error, unsupported database type : " + type.toString());
-    }
-    
     JDBCManager.loadDrivers(type);
-    String url = "jdbc:" + type.getJDBCName() + ":" + location;
+    String url = createDriverServerURL(type, server, dbName);
     return DriverManager.getConnection(url, userName, password);
+  }
+  
+  public static String getDriverName(DBType type)
+  {
+	switch (type)
+    {
+      case MYSQL:
+        return "com.mysql.jdbc.Driver";
+      case HSQLDB:
+        return "org.hsqldb.jdbcDriver";
+      case H2:
+    	return "org.h2.Driver";
+      default:
+    	return null;
+    }
+  }
+  
+  public static String createDriverServerURL(DBType type, String server, String dbName)
+  {
+	String location = null;
+	
+	switch(type)
+	{
+	  case HSQLDB:
+		location = "hsql://" + server + "/" + dbName;
+		break;
+	  case MYSQL:
+	    location = "//" + server + "/" + dbName;
+	    break;
+	  case H2:
+		location = "tcp://" + server + "/" + dbName;
+		break;
+	  default:
+	    throw new RuntimeException("Error, unsupported database type : " + type.toString());
+	 }
+
+	 return "jdbc:" + type.getJDBCName() + ":" + location;
   }
   
   public static boolean loadDrivers(DBType type)
@@ -63,17 +86,8 @@ public class JDBCManager
     {
       try
       {
-        switch (type)
-        {
-        case MYSQL:
-          Class.forName("com.mysql.jdbc.Driver").newInstance();
-          break;
-        case HSQLDB:
-          Class.forName("org.hsqldb.jdbcDriver").newInstance();
-          break;
-        }
-        
-        driversLoaded[type.ordinal()] = true;
+    	Class.forName(getDriverName(type)).newInstance();
+    	driversLoaded[type.ordinal()] = true;
       }
       catch (ClassNotFoundException e)
       {
@@ -103,6 +117,7 @@ public class JDBCManager
     
     tables.set(DBType.HSQLDB.ordinal(), generateHSQLDBErrorTables());
     tables.set(DBType.MYSQL.ordinal(), generateMYSQLErrorTables());
+    tables.set(DBType.H2.ordinal(), generateH2ErrorTables());
     
     return tables;
   }
@@ -129,6 +144,13 @@ public class JDBCManager
     errorMap.put(1062, SQLError.UNIQUE_VIOLATION);
     errorMap.put(-8, SQLError.FOREIGN_KEY_VIOLATION);
     
+    return errorMap;
+  }
+  
+  private static Map<Integer,SQLError> generateH2ErrorTables()
+  {
+    Map<Integer,SQLError> errorMap = new TreeMap<Integer,SQLError>();
+
     return errorMap;
   }
   

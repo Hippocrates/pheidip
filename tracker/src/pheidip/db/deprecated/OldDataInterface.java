@@ -1,21 +1,22 @@
-package pheidip.db;
+package pheidip.db.deprecated;
 
 import java.sql.Connection;
 
-public abstract class DataInterface
+
+public abstract class OldDataInterface
 {
   private Connection connection;
-  private DonationDataAccess manager;
+  private OldDonationDataAccess manager;
 
   abstract void rebuildPreparedStatements();
   
-  public DataInterface(DonationDataAccess manager)
+  public OldDataInterface(OldDonationDataAccess manager)
   {
     this.manager = manager;
     this.setConnection(manager.getConnection());
   }
 
-  synchronized void setConnection(Connection connection)
+  synchronized public void setConnection(Connection connection)
   {
     this.connection = connection;
     
@@ -25,12 +26,12 @@ public abstract class DataInterface
     }
   }
 
-  Connection getConnection()
+  public Connection getConnection()
   {
     return connection;
   }
 
-  DonationDataAccess getManager()
+  public OldDonationDataAccess getManager()
   {
     return manager;
   }

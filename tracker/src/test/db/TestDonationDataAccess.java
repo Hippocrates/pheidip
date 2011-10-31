@@ -8,18 +8,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import pheidip.db.DonationDataAccess;
 import pheidip.db.DBType;
-import pheidip.db.ScriptRunner;
+import pheidip.db.deprecated.OldDonationDataAccess;
+import pheidip.db.deprecated.ScriptRunner;
 import junit.framework.TestCase;
 
 public class TestDonationDataAccess extends TestCase
 {
-  private DonationDataAccess dataAccess;
+  private OldDonationDataAccess dataAccess;
   
   public void setUp()
   {
-    this.dataAccess = new DonationDataAccess();
+    this.dataAccess = new OldDonationDataAccess();
   }
   
   public void tearDown()

@@ -8,7 +8,7 @@ import pheidip.util.StringUtils;
 
 public class Donor
 {
-  private int id = IdUtils.generateId();
+  private int id;
   private String email;
   private String firstName;
   private String lastName;
@@ -18,6 +18,7 @@ public class Donor
 
   public Donor()
   {
+    this.id = IdUtils.generateId();
   }
   
   public Donor(int id, String email, String alias, String firstName, String lastName)
@@ -88,7 +89,7 @@ public class Donor
   {
     return prizes;
   }
-
+  
   public Set<Donation> getDonations()
   {
     return this.donations;

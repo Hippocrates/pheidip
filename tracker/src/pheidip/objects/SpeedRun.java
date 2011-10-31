@@ -7,13 +7,14 @@ import pheidip.util.IdUtils;
 
 public class SpeedRun
 {
-  private int id = IdUtils.generateId();
+  private int id;
   private String name;
   private String description;
   private Set<Bid> bids = new HashSet<Bid>();
   
   public SpeedRun()
   {
+    this.id = IdUtils.generateId();
   }
   
   public SpeedRun(int id, String name, String description)

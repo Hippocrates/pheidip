@@ -13,6 +13,7 @@ public class Prize
   
   public Prize()
   {
+    //this.id
   }
   
   public Prize(int id, String name, String imageURL, String description, Integer winnerId)
@@ -22,6 +23,15 @@ public class Prize
     this.setImageURL(imageURL);
     this.setDescription(description);
     this.setWinnerId(winnerId);
+  }
+  
+  public Prize(int id, String name, String imageURL, String description, Donor winner)
+  {
+    this.setId(id);
+    this.setName(name);
+    this.setImageURL(imageURL);
+    this.setDescription(description);
+    this.setWinner(winner);
   }
   
   public int getId()
@@ -98,6 +108,16 @@ public class Prize
 
   public void setWinner(Donor winner)
   {
+    if (this.winner != null)
+    {
+      this.winner.getPrizes().remove(this);
+    }
+    
+    if (winner != null)
+    {
+      winner.getPrizes().add(this);
+    }
+    
     this.winner = winner;
   }
 

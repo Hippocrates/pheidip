@@ -8,22 +8,23 @@ import java.sql.SQLException;
 import pheidip.db.DBType;
 import pheidip.db.DonationDataAccess;
 import pheidip.db.DonationDataErrorParser;
-import pheidip.db.ScriptRunner;
+import pheidip.db.deprecated.OldDonationDataAccess;
+import pheidip.db.deprecated.ScriptRunner;
 import pheidip.util.Reporter;
 
 public class DonationDatabaseManager
 {
-  private DonationDataAccess dataAccess;
+  private OldDonationDataAccess dataAccess;
   private Reporter reporter;
 	
   public DonationDatabaseManager()
   {
-    this.dataAccess = new DonationDataAccess();
+    this.dataAccess = new OldDonationDataAccess();
   }
   
   public DonationDatabaseManager(Reporter reporter)
   {
-    this.dataAccess = new DonationDataAccess();
+    this.dataAccess = new OldDonationDataAccess();
     this.reporter = reporter;
   }
   

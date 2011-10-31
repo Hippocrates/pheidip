@@ -9,25 +9,38 @@ import pheidip.util.StringUtils;
 public class Choice implements Bid
 {
 	private String name;
-  private int id = IdUtils.generateId();
+  private int id;
   private Integer speedRunId;
   private String description;
   private BidState bidState;
-  private Set<ChoiceOption> options = new HashSet<ChoiceOption>();
+  private Set<ChoiceOption> options;
   private SpeedRun speedRun;
 
   public Choice()
   {
+    this.id = IdUtils.generateId(); 
+    this.options = new HashSet<ChoiceOption>();
   }
   
 	public Choice(int id, String name, String description, BidState bidState, Integer speedRunId)
 	{
+	  this.options = new HashSet<ChoiceOption>();
 	  this.setId(id);
 	  this.setName(name);
 		this.setSpeedRunId(speedRunId);
 		this.setDescription(description);
 		this.setBidState(bidState);
 	}
+	
+	public Choice(int id, String name, String description, BidState bidState, SpeedRun speedRun)
+  {
+	  this.options = new HashSet<ChoiceOption>();
+    this.setId(id);
+    this.setName(name);
+    this.setDescription(description);
+    this.setBidState(bidState);
+    this.setSpeedRun(speedRun);
+  }
 	
 	public String getName()
 	{
@@ -119,6 +132,16 @@ public class Choice implements Bid
 
   public void setSpeedRun(SpeedRun speedRun)
   {
+    if (this.speedRun != null)
+    {
+      this.speedRun.getBids().remove(this);
+    }
+    
+    if (speedRun != null)
+    {
+      speedRun.getBids().add(this);
+    }
+    
     this.speedRun = speedRun;
   }
 

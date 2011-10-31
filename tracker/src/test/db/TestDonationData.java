@@ -12,7 +12,7 @@ import pheidip.objects.DonationCommentState;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationReadState;
 
-public class TestDonationData extends DonationDatabaseTest
+public class TestDonationData extends OldDonationDatabaseTest
 {
   DonationData donations;
   

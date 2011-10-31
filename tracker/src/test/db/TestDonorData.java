@@ -97,8 +97,12 @@ public class TestDonorData extends DonationDatabaseTest
 	  final String alias = "ANewAlias";
 	  final String firstName = "fn";
 	  final String lastName = "ln";
-	  
-	  Donor updated = new Donor(id, email, alias, firstName, lastName);
+
+	  Donor updated = this.donors.getDonorById(id);
+	  updated.setEmail(email);
+	  updated.setAlias(alias);
+	  updated.setFirstName(firstName);
+	  updated.setLastName(lastName);
 	  
 	  this.donors.updateDonor(updated);
 	  

@@ -24,7 +24,7 @@ public class PrizeControl
   {
     int newId = IdUtils.generateId();
     PrizeData prizes = manager.getDataAccess().getPrizeData();
-    prizes.insertPrize(new Prize(newId, name, null, null, null));
+    prizes.insertPrize(new Prize(newId, name, null, null, (Integer)null));
     return newId;
   }
   

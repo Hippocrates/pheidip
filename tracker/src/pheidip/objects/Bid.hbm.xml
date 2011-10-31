@@ -22,9 +22,6 @@
                 <param name="enumClass">pheidip.objects.BidState</param>
             </type>
         </property>
-        <property name="speedRunId" type="java.lang.Integer">
-            <column name="SPEEDRUNID" />
-        </property>
         <many-to-one name="speedRun" class="pheidip.objects.SpeedRun" fetch="join">
             <column name="SPEEDRUN" />
         </many-to-one>

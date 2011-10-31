@@ -28,6 +28,16 @@ public class Challenge implements Bid
     this.setDescription(description);
     this.setBidState(bidState);
   }
+  
+  public Challenge(int id, String name, BigDecimal goalAmount, String description, BidState bidState, SpeedRun speedRun)
+  {
+    this.setId(id);
+    this.setName(name);
+    this.setGoalAmount(goalAmount);
+    this.setDescription(description);
+    this.setBidState(bidState);
+    this.setSpeedRun(speedRun);
+  }
 
   public String getName()
   {
@@ -119,6 +129,16 @@ public class Challenge implements Bid
 
   public void setSpeedRun(SpeedRun speedRun)
   {
+    if (this.speedRun != null)
+    {
+      this.speedRun.getBids().remove(this);
+    }
+    
+    if (speedRun != null)
+    {
+      speedRun.getBids().add(this);
+    }
+    
     this.speedRun = speedRun;
   }
 

@@ -9,7 +9,7 @@ import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 
-public class TestBidData extends DonationDatabaseTest
+public class TestBidData extends OldDonationDatabaseTest
 {
   private BidData bids;
   
@@ -158,7 +158,7 @@ public class TestBidData extends DonationDatabaseTest
 
   public void testGetChallengeById()
   {
-    final int challengeId = 1;
+    final int challengeId = 5;
     Challenge challenge = this.bids.getChallengeById(challengeId);
     
     assertEquals(challengeId, challenge.getId());
@@ -168,7 +168,7 @@ public class TestBidData extends DonationDatabaseTest
   
   public void testCreateChallenge()
   {
-    final int speedRunId = 1;
+    final int speedRunId = 5;
     final String name = "some thing";
     final BigDecimal amount = new BigDecimal("12.00");
     final int newId = 15;
@@ -188,7 +188,7 @@ public class TestBidData extends DonationDatabaseTest
   
   public void updateChallenge()
   {
-    final int challengeId = 1;
+    final int challengeId = 5;
     final String newName = "some other thing";
     final int anotherRun = 2;
     final BigDecimal newAmount = new BigDecimal("15.56");
@@ -220,7 +220,7 @@ public class TestBidData extends DonationDatabaseTest
   
   public void testDeleteChallenge()
   {
-    final int challengeId = 4;
+    final int challengeId = 8;
     
     assertNotNull(this.bids.getChallengeById(challengeId));
     

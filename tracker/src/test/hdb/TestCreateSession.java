@@ -9,7 +9,7 @@ import junit.framework.TestCase;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import pheidip.db.HibernateManager;
+import pheidip.db.hibernate.HibernateManager;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
 
