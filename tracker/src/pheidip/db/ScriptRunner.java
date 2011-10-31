@@ -1,4 +1,4 @@
-package pheidip.db.deprecated;
+package pheidip.db;
 
 /*
  * Added additional null checks when closing the ResultSet and Statements.

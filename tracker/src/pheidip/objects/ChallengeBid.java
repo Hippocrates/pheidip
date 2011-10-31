@@ -19,12 +19,21 @@ public class ChallengeBid implements DonationBid
   
   public ChallengeBid(int id, BigDecimal amount, int challengeId, int donationId)
   {
+    this.setId(id);
     this.setDonationId(donationId);
     this.setChallengeId(challengeId);
     this.setAmount(amount);
-    this.setId(id);
+    
   }
-
+  
+  public ChallengeBid(int id, BigDecimal amount, Challenge challenge, Donation donation)
+  {
+    this.setId(id);
+    this.setAmount(amount);
+    this.setChallenge(challenge);
+    this.setDonation(donation);
+  }
+  
   public int getId()
   {
     return id;
@@ -36,7 +45,17 @@ public class ChallengeBid implements DonationBid
   }
 
   public void setDonation(Donation donation)
-  {
+  {/*
+    if (this.donation != null)
+    {
+      this.donation.getBids().remove(this);
+    }
+    
+    if (donation != null)
+    {
+      donation.getBids().add(this);
+    }
+    */
     this.donation = donation;
   }
 

@@ -128,7 +128,7 @@ public class Challenge implements Bid
   }
 
   public void setSpeedRun(SpeedRun speedRun)
-  {
+  {/*
     if (this.speedRun != null)
     {
       this.speedRun.getBids().remove(this);
@@ -138,7 +138,7 @@ public class Challenge implements Bid
     {
       speedRun.getBids().add(this);
     }
-    
+    */
     this.speedRun = speedRun;
   }
 

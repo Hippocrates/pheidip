@@ -3,28 +3,32 @@ package pheidip.logic;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
+
+import org.hibernate.Session;
+import org.hibernate.jdbc.Work;
 
 import pheidip.db.DBType;
 import pheidip.db.DonationDataAccess;
 import pheidip.db.DonationDataErrorParser;
-import pheidip.db.deprecated.OldDonationDataAccess;
-import pheidip.db.deprecated.ScriptRunner;
+import pheidip.db.ScriptRunner;
+import pheidip.db.hibernate.HibernateDonationDataAccess;
 import pheidip.util.Reporter;
 
 public class DonationDatabaseManager
 {
-  private OldDonationDataAccess dataAccess;
+  private HibernateDonationDataAccess dataAccess;
   private Reporter reporter;
 	
   public DonationDatabaseManager()
   {
-    this.dataAccess = new OldDonationDataAccess();
+    this.dataAccess = new HibernateDonationDataAccess();
   }
   
   public DonationDatabaseManager(Reporter reporter)
   {
-    this.dataAccess = new OldDonationDataAccess();
+    this.dataAccess = new HibernateDonationDataAccess();
     this.reporter = reporter;
   }
   
@@ -82,23 +86,38 @@ public class DonationDatabaseManager
     }
   }
   
-  public void runSQLScript(String filename)
+  public void runSQLScript(final String filename)
   {
-    try
-    {
-      FileReader reader = new FileReader(filename);
-      ScriptRunner runner = new ScriptRunner(this.dataAccess.getConnection(), true, true);
-      
-      runner.runScript(reader);
-    } 
-    catch (IOException e)
-    {
-      this.reportMessage(e.getMessage());
-    } 
-    catch (SQLException e)
-    {
-      this.reportMessage(DonationDataErrorParser.parseError(e.getMessage()).getErrorMessage());
-    }
+    Session session = this.dataAccess.getSessionFactory().openSession();
+    session.beginTransaction();
+    
+    session.doWork(
+      new Work() 
+      {
+        @Override
+        public void execute(Connection connection) throws SQLException
+        {
+          try
+          {
+            FileReader reader = new FileReader(filename);
+            ScriptRunner runner = new ScriptRunner(connection, true, true);
+            
+            runner.runScript(reader);
+          } 
+          catch (IOException e)
+          {
+            DonationDatabaseManager.this.reportMessage(e.getMessage());
+          } 
+          catch (SQLException e)
+          {
+            DonationDatabaseManager.this.reportMessage(DonationDataErrorParser.parseError(e.getMessage()).getErrorMessage());
+          }
+        }
+      }
+    );
+    
+    session.getTransaction().commit();
+    session.close();
   }
   
   private void autoCloseConnection()

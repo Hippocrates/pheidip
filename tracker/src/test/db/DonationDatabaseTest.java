@@ -1,6 +1,7 @@
 package test.db;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 
 import org.hibernate.Session;
 
@@ -8,8 +9,15 @@ import pheidip.db.DonationDataAccess;
 import pheidip.db.hibernate.HibernateDonationDataAccess;
 import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
+import pheidip.objects.ChallengeBid;
 import pheidip.objects.Choice;
+import pheidip.objects.ChoiceBid;
 import pheidip.objects.ChoiceOption;
+import pheidip.objects.Donation;
+import pheidip.objects.DonationBidState;
+import pheidip.objects.DonationCommentState;
+import pheidip.objects.DonationDomain;
+import pheidip.objects.DonationReadState;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
 import pheidip.objects.SpeedRun;
@@ -71,24 +79,28 @@ public abstract class DonationDatabaseTest extends TestCase
     session.save(new Challenge(7, "challenge 2", new BigDecimal("100.00"), null, BidState.OPENED, (SpeedRun)session.load(SpeedRun.class, 2)));
     session.save(new Challenge(8, "challenge whatever", new BigDecimal("150.00"), null, BidState.OPENED, (SpeedRun)session.load(SpeedRun.class, 2)));
     
-    //session.save(new Donation(1, DonationDomain.LOCAL, null, DonationBidState.PENDING, DonationReadState.PENDING, DonationCommentState.PENDING, new BigDecimal("50.40"), new Date("yikes"
-    /*
-    INSERT INTO Donation VALUES(1, 1, 'LOCAL', NULL, 'PENDING', 'PENDING', 'PENDING', 50.40, '2004-10-18 23:32:34', NULL);
-    INSERT INTO Donation VALUES(2, 2, 'LOCAL', NULL, 'PENDING', 'PENDING', 'PENDING', 25.00, '2006-10-18 00:32:34', NULL);
-    INSERT INTO Donation VALUES(3, 4, 'LOCAL', NULL, 'PENDING', 'PENDING', 'PENDING', 25.00, '2006-10-18 00:32:34', NULL);
-    INSERT INTO Donation VALUES(4, 4, 'LOCAL', NULL, 'PENDING', 'PENDING', 'PENDING',  5.00, '2006-10-18 12:44:55', NULL);
-    INSERT INTO Donation VALUES(5, 6, 'LOCAL', NULL, 'PENDING', 'PENDING', 'PENDING', 25.00, '2006-10-18 00:32:34', NULL);
-    INSERT INTO Donation VALUES(7, 3, 'CHIPIN', '1234567890', 'PENDING', 'PENDING', 'PENDING', 15.00, '2006-11-13 10:00:00', 'Some comment text.');
-
-    INSERT INTO ChoiceBid VALUES(1, 1, 1, 10.00);
-    INSERT INTO ChoiceBid VALUES(2, 1, 1, 5.00);
-
-    INSERT INTO ChallengeBid VALUES(1, 1, 1, 10.00);
-    INSERT INTO ChallengeBid VALUES(2, 1, 1, 10.00);
-    INSERT INTO ChallengeBid VALUES(3, 2, 1, 10.00);
-
+    Calendar c = Calendar.getInstance();
     
-    */
+    c.set(2004,10,18,23,32,34);
+    session.save(new Donation(1, DonationDomain.LOCAL, null, DonationBidState.PENDING, DonationReadState.PENDING, DonationCommentState.PENDING, new BigDecimal("50.40"), c.getTime(), (Donor)session.load(Donor.class, 1), null));
+    c.set(2006,10,18,00,32,34);
+    session.save(new Donation(2, DonationDomain.LOCAL, null, DonationBidState.PENDING, DonationReadState.PENDING, DonationCommentState.PENDING, new BigDecimal("25.00"), c.getTime(), (Donor)session.load(Donor.class, 2), null));
+    c.set(2006,10,18,00,32,34);
+    session.save(new Donation(3, DonationDomain.LOCAL, null, DonationBidState.PENDING, DonationReadState.PENDING, DonationCommentState.PENDING, new BigDecimal("25.00"), c.getTime(), (Donor)session.load(Donor.class, 4), null));
+    c.set(2006,10,18,12,44,55);
+    session.save(new Donation(4, DonationDomain.LOCAL, null, DonationBidState.PENDING, DonationReadState.PENDING, DonationCommentState.PENDING, new BigDecimal("5.00"), c.getTime(), (Donor)session.load(Donor.class, 4), null));
+    c.set(2006,10,18,00,32,34);
+    session.save(new Donation(5, DonationDomain.LOCAL, null, DonationBidState.PENDING, DonationReadState.PENDING, DonationCommentState.PENDING, new BigDecimal("25.00"), c.getTime(), (Donor)session.load(Donor.class, 6), null));
+    c.set(2006,11,13,10,00,00);
+    session.save(new Donation(7, DonationDomain.CHIPIN, "1234567890", DonationBidState.PENDING, DonationReadState.PENDING, DonationCommentState.PENDING, new BigDecimal("15.00"), c.getTime(), (Donor)session.load(Donor.class, 3), "Some comment text."));
+    
+    session.save(new ChoiceBid(1, new BigDecimal("10.00"), (ChoiceOption)session.load(ChoiceOption.class, 1), (Donation)session.load(Donation.class, 1)));
+    session.save(new ChoiceBid(2, new BigDecimal("5.00"), (ChoiceOption)session.load(ChoiceOption.class, 1), (Donation)session.load(Donation.class, 1)));
+    
+    session.save(new ChallengeBid(3, new BigDecimal("10.00"), (Challenge) session.load(Challenge.class, 5), (Donation)session.load(Donation.class, 1)));
+    session.save(new ChallengeBid(4, new BigDecimal("10.00"), (Challenge) session.load(Challenge.class, 5), (Donation)session.load(Donation.class, 1)));
+    session.save(new ChallengeBid(5, new BigDecimal("10.00"), (Challenge) session.load(Challenge.class, 6), (Donation)session.load(Donation.class, 1)));
+
     session.getTransaction().commit();
     session.close();
   }

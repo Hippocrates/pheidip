@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import pheidip.db.DonationDataAccess;
+import pheidip.db.ScriptRunner;
 import pheidip.db.deprecated.OldDonationDataAccess;
-import pheidip.db.deprecated.ScriptRunner;
 import junit.framework.TestCase;
 
 public abstract class OldDonationDatabaseTest extends TestCase

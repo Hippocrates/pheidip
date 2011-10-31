@@ -17,6 +17,7 @@ import pheidip.db.DonationDataErrorParser;
 import pheidip.db.DonorData;
 import pheidip.db.JDBCManager;
 import pheidip.db.PrizeData;
+import pheidip.db.ScriptRunner;
 import pheidip.db.SpeedRunData;
 
 public class OldDonationDataAccess implements DonationDataAccess

@@ -60,7 +60,7 @@ public class ChoiceOption
   }
 
   public void setChoice(Choice choice)
-  {
+  {/*
     if (this.choice != null)
     {
       this.choice.getOptions().remove(this);
@@ -70,7 +70,7 @@ public class ChoiceOption
     {
       choice.getOptions().add(this);
     }
-    
+    */
     this.choice = choice;
   }
 

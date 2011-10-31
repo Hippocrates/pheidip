@@ -20,13 +20,13 @@
         <property name="alias" type="java.lang.String" unique="true">
             <column name="ALIAS" />
         </property>
-        <set name="donations" table="DONATION" cascade="all,delete-orphan" inverse="false" lazy="true">
+        <set name="donations" table="DONATION" cascade="all,delete-orphan" inverse="false" lazy="false">
             <key>
                 <column name="Donor" />
             </key>
             <one-to-many class="pheidip.objects.Donation" />
         </set>
-        <set name="prizes" table="PRIZE" cascade="all,delete-orphan" inverse="false" lazy="true">
+        <set name="prizes" table="PRIZE" cascade="all,delete-orphan" inverse="false" lazy="false">
             <key>
                 <column name="Winner" />
             </key>

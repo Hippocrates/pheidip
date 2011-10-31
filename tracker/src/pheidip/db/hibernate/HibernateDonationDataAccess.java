@@ -19,6 +19,9 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	
 	private HibernateDonorData donors;
 	private HibernateSpeedRunData speedRuns;
+	private HibernateDonationData donations;
+	private HibernateBidData bids;
+	private HibernatePrizeData prizes;
 	
 	public HibernateDonationDataAccess()
 	{
@@ -42,15 +45,23 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	@Override
 	public DonationData getDonationData() 
 	{
-		// TODO Auto-generated method stub
-		throw new RuntimeException("Method not supported.");
+		if (this.donations == null)
+		{
+		  this.donations = new HibernateDonationData(this);
+		}
+		
+		return this.donations;
 	}
 
 	@Override
 	public BidData getBids() 
 	{
-		// TODO Auto-generated method stub
-		throw new RuntimeException("Method not supported.");
+		if (this.bids == null)
+		{
+		  this.bids = new HibernateBidData(this);
+		}
+		
+		return this.bids;
 	}
 
 	@Override
@@ -67,8 +78,12 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	@Override
 	public PrizeData getPrizeData() 
 	{
-		// TODO Auto-generated method stub
-		throw new RuntimeException("Method not supported.");
+		if (this.prizes == null)
+		{
+		  this.prizes = new HibernatePrizeData(this);
+		}
+		
+		return this.prizes;
 	}
 
 	@Override

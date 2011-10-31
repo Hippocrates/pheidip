@@ -131,7 +131,7 @@ public class Choice implements Bid
   }
 
   public void setSpeedRun(SpeedRun speedRun)
-  {
+  {/*
     if (this.speedRun != null)
     {
       this.speedRun.getBids().remove(this);
@@ -141,7 +141,7 @@ public class Choice implements Bid
     {
       speedRun.getBids().add(this);
     }
-    
+    */
     this.speedRun = speedRun;
   }
 

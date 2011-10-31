@@ -51,7 +51,7 @@
                 <param name="enumClass">pheidip.objects.DonationCommentState</param>
             </type>
         </property>
-        <set name="bids" table="DONATIONBID" cascade="all,delete-orphan" inverse="false" lazy="true">
+        <set name="bids" table="DONATIONBID" cascade="all,delete-orphan" inverse="false" lazy="false">
             <key>
                 <column name="Donation" />
             </key>

@@ -9,8 +9,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import pheidip.db.DBType;
+import pheidip.db.ScriptRunner;
 import pheidip.db.deprecated.OldDonationDataAccess;
-import pheidip.db.deprecated.ScriptRunner;
 import junit.framework.TestCase;
 
 public class TestDonationDataAccess extends TestCase

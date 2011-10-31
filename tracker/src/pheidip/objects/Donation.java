@@ -201,7 +201,17 @@ public class Donation
   }
 
   public void setDonor(Donor donor)
-  {
+  {/*
+    if (this.donor != null)
+    {
+      this.donor.getDonations().remove(this);
+    }
+    
+    if (donor != null)
+    {
+      donor.getDonations().add(this);
+    }
+    */
     this.donor = donor;
   }
 
