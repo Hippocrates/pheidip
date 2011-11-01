@@ -190,7 +190,7 @@ public final class ChipinDonations
                 DonationCommentState.PENDING,
                 chipinDonation.getAmount(),
                 chipinDonation.getTimeStamp(),
-                donor.getId(),
+                donor,
                 StringUtils.nullIfEmpty(commentString)
                 )
               );

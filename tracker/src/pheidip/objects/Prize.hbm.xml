@@ -17,9 +17,6 @@
         <property name="description" type="java.lang.String">
             <column name="DESCRIPTION" />
         </property>
-        <property name="winnerId" type="java.lang.Integer">
-            <column name="WINNERID" />
-        </property>
         <many-to-one name="winner" class="pheidip.objects.Donor" fetch="join">
             <column name="WINNER" />
         </many-to-one>

@@ -66,7 +66,7 @@ public class SpeedRunControl
   {
     int id = IdUtils.generateId();
     
-    this.bids.insertChallenge(new Challenge(id, result, BigDecimal.ZERO.setScale(2), null, BidState.OPENED, this.speedRunId));
+    this.bids.insertChallenge(new Challenge(id, result, BigDecimal.ZERO.setScale(2), null, BidState.OPENED, this.getData()));
     
     return id;
   }
@@ -75,7 +75,7 @@ public class SpeedRunControl
   {
     int id = IdUtils.generateId();
     
-    this.bids.insertChoice(new Choice(id, defaultName, null, BidState.OPENED, this.speedRunId));
+    this.bids.insertChoice(new Choice(id, defaultName, null, BidState.OPENED, this.getData()));
     
     return id;
   }

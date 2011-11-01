@@ -79,7 +79,7 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     Session session = this.getSessionFactory().openSession();
     session.beginTransaction();
     
-    Query q = session.createQuery("from Prize as p left join p.winner as d where d.id = :donorid");
+    Query q = session.createQuery("from Prize as p where p.winner.id = :donorid");
 
     q.setInteger("donorid", donorId);
     
@@ -107,6 +107,8 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     Donor d = (Donor) session.load(Donor.class, donorId);
     
     p.setWinner(d);
+    
+    session.save(p);
     
     session.getTransaction().commit();
     session.close();

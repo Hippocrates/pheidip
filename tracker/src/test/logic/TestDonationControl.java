@@ -35,7 +35,7 @@ public class TestDonationControl extends TestCase
     Donation d = control.getData();
     
     assertEquals(donationId, d.getId());
-    assertEquals(1, d.getDonorId());
+    assertEquals(1, d.getDonor().getId());
     assertEquals(DonationDomain.LOCAL, d.getDomain());
   }
   

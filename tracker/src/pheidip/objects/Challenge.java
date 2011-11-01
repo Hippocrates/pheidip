@@ -7,8 +7,7 @@ import pheidip.util.StringUtils;
 
 public class Challenge implements Bid
 {
-  private int id = IdUtils.generateId();;
-  private Integer speedRunId;
+  private int id = IdUtils.generateId();
   private String name;
   private BigDecimal goalAmount;
   private String description;
@@ -18,17 +17,7 @@ public class Challenge implements Bid
   public Challenge()
   {
   }
-  
-  public Challenge(int id, String name, BigDecimal goalAmount, String description, BidState bidState, Integer speedRunId)
-  {
-    this.setId(id);
-    this.setName(name);
-    this.setSpeedRunId(speedRunId);
-    this.setGoalAmount(goalAmount);
-    this.setDescription(description);
-    this.setBidState(bidState);
-  }
-  
+
   public Challenge(int id, String name, BigDecimal goalAmount, String description, BidState bidState, SpeedRun speedRun)
   {
     this.setId(id);
@@ -47,16 +36,6 @@ public class Challenge implements Bid
   public void setName(String name)
   {
     this.name = name == null ? null : name.toLowerCase();
-  }
-
-  public Integer getSpeedRunId()
-  {
-    return speedRunId;
-  }
-
-  public void setSpeedRunId(int speedRunId)
-  {
-    this.speedRunId = speedRunId;
   }
 
   public int getId()

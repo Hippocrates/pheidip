@@ -35,7 +35,7 @@ public class ChallengeControl
     try
     {
       Challenge c = this.getData();
-      this.bids.updateChallenge(new Challenge(this.challengeId, name, amount, description, newState, c.getSpeedRunId()));
+      this.bids.updateChallenge(new Challenge(this.challengeId, name, amount, description, newState, c.getSpeedRun()));
     }
     catch (DonationDataConstraintException e)
     {

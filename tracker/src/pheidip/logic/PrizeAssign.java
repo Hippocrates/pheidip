@@ -57,10 +57,10 @@ public class PrizeAssign
     
     for (Donation d : donationsSingleAboveAmount)
     {
-      Pair<Donor,List<Donation> > pair = donorMap.get(d.getDonorId());
+      Pair<Donor,List<Donation> > pair = donorMap.get(d.getDonor().getId());
       if (pair != null)
       {
-        List<Donation> targetList = donorMap.get(d.getDonorId()).getSecond();
+        List<Donation> targetList = donorMap.get(d.getDonor().getId()).getSecond();
         targetList.add(d);
       }
     }

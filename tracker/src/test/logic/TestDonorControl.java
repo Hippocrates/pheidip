@@ -119,7 +119,7 @@ public class TestDonorControl extends TestCase
     assertEquals(1, donations.size());
     
     assertEquals(donationId, donations.get(0).getId());
-    assertEquals(donorId, donations.get(0).getDonorId());
+    assertEquals(donorId, donations.get(0).getDonor().getId());
     assertEquals(DonationDomain.LOCAL, donations.get(0).getDomain());
     assertEquals("" + donationId, donations.get(0).getDomainId());
     assertEquals(BigDecimal.ZERO.setScale(2), donations.get(0).getAmount());

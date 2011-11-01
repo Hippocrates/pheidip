@@ -24,7 +24,7 @@ public class PrizeControl
   {
     int newId = IdUtils.generateId();
     PrizeData prizes = manager.getDataAccess().getPrizeData();
-    prizes.insertPrize(new Prize(newId, name, null, null, (Integer)null));
+    prizes.insertPrize(new Prize(newId, name, null, null, null));
     return newId;
   }
   
@@ -77,12 +77,18 @@ public class PrizeControl
   {
     try
     {
+      Donor d = null;
+      if (winner != null)
+      {
+        d = this.donors.getDonorById(winner);
+      }
+      
       this.prizes.updatePrize(new Prize(
           this.prizeId, 
           StringUtils.nullIfEmpty(name), 
           StringUtils.nullIfEmpty(imageURL), 
           StringUtils.nullIfEmpty(description),
-          winner));
+          d));
     }
     catch(DonationDataConstraintException e)
     {

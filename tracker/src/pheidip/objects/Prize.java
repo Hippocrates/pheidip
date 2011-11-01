@@ -8,21 +8,11 @@ public class Prize
   private String name;
   private String imageURL;
   private String description;
-  private Integer winnerId;
   private Donor winner;
   
   public Prize()
   {
     //this.id
-  }
-  
-  public Prize(int id, String name, String imageURL, String description, Integer winnerId)
-  {
-    this.setId(id);
-    this.setName(name);
-    this.setImageURL(imageURL);
-    this.setDescription(description);
-    this.setWinnerId(winnerId);
   }
   
   public Prize(int id, String name, String imageURL, String description, Donor winner)
@@ -72,16 +62,6 @@ public class Prize
   public void setDescription(String description)
   {
     this.description = description;
-  }
-  
-  public Integer getWinnerId()
-  {
-    return this.winnerId;
-  }
-  
-  public void setWinnerId(Integer winnerId)
-  {
-    this.winnerId = winnerId;
   }
 
   public String toString()

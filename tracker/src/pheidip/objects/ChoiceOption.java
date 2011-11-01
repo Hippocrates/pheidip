@@ -5,7 +5,6 @@ import pheidip.util.StringUtils;
 
 public class ChoiceOption 
 {
-	private int choiceId;
 	private String name;
   private int id;
   private Choice choice;
@@ -14,29 +13,12 @@ public class ChoiceOption
   {
     this.id = IdUtils.generateId(); 
   }
-  
-	public ChoiceOption(int id, String name, int choiceId)
-	{
-	  this.setId(id);
-		this.setChoiceId(choiceId);
-		this.setName(name);
-	}
-	
+
 	public ChoiceOption(int id, String name, Choice choice)
   {
     this.setId(id);
     this.setName(name);
     this.setChoice(choice);
-  }
-	
-	public int getChoiceId()
-	{
-		return this.choiceId;
-	}
-	
-	private void setChoiceId(int choiceId)
-  {
-    this.choiceId = choiceId;
   }
 
   public String getName()

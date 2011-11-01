@@ -6,6 +6,7 @@ import java.util.List;
 
 
 import pheidip.db.DonationData;
+import pheidip.db.DonorData;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationCommentState;
@@ -15,11 +16,13 @@ import pheidip.objects.DonationReadState;
 public class TestDonationData extends DonationDatabaseTest
 {
   DonationData donations;
+  DonorData donors;
   
   public void setUp()
   {
     super.setUp();
     this.donations = this.getDataAccess().getDonationData();
+    this.donors = this.getDataAccess().getDonorData();
   }
 
   public void testGetDonationById()
@@ -139,7 +142,7 @@ public class TestDonationData extends DonationDatabaseTest
         DonationCommentState.PENDING,
         new BigDecimal("3.50"),
         timeStamp, 
-        1,
+        this.donors.getDonorById(1),
         "A comment of some sort.");
     
     this.donations.insertDonation(template);
@@ -162,7 +165,7 @@ public class TestDonationData extends DonationDatabaseTest
     final Date timeReceived = new Date();
     final String comment = "asdlkjhasdkjhasdsda";
     
-    Donation updated = new Donation(id, domain, domainId, bidState, readState, commentState, amount, timeReceived, donorId, comment);
+    Donation updated = new Donation(id, domain, domainId, bidState, readState, commentState, amount, timeReceived, this.donors.getDonorById(donorId), comment);
     
     this.donations.updateDonation(updated);
     
@@ -172,7 +175,7 @@ public class TestDonationData extends DonationDatabaseTest
   private void compareDonations(Donation a, Donation b)
   {
     assertEquals(a.getId(), b.getId());
-    assertEquals(a.getDonorId(), b.getDonorId());
+    assertEquals(a.getDonor().getId(), b.getDonor().getId());
     assertEquals(a.getDomain(), b.getDomain());
     assertEquals(a.getDomainId(), b.getDomainId());
     assertEquals(a.getBidState(), b.getBidState());

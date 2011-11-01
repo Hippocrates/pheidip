@@ -6,7 +6,6 @@ import java.util.List;
 
 import pheidip.db.BidData;
 import pheidip.db.DonationData;
-import pheidip.db.DonorData;
 import pheidip.db.SpeedRunData;
 import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
@@ -27,7 +26,6 @@ public class DonationControl
 {
   private DonationDatabaseManager donationDatabase;
   private DonationData donations;
-  private DonorData donors;
   private SpeedRunData speedRuns;
   private int donationId;
   private BidData bids;
@@ -36,7 +34,6 @@ public class DonationControl
   {
     this.donationDatabase = donationDatabase;
     this.donations = this.donationDatabase.getDataAccess().getDonationData();
-    this.donors = this.donationDatabase.getDataAccess().getDonorData();
     this.bids = this.donationDatabase.getDataAccess().getBids();
     this.speedRuns = this.donationDatabase.getDataAccess().getSpeedRuns();
     this.donationId = donationId;
@@ -54,7 +51,7 @@ public class DonationControl
   
   public Donor getDonationDonor()
   {
-    return this.donors.getDonorById(this.getData().getDonorId());
+    return this.getData().getDonor();
   }
   
   public void updateData(BigDecimal amount, String comment, boolean markAsRead)
@@ -208,15 +205,15 @@ public class DonationControl
     {
       ChoiceBid c = (ChoiceBid) b;
       ChoiceOption option = this.bids.getChoiceOptionById(c.getOptionId());
-      Choice choice = this.bids.getChoiceById(option.getChoiceId());
-      SpeedRun run = this.speedRuns.getSpeedRunById(choice.getSpeedRunId());
+      Choice choice = this.bids.getChoiceById(option.getChoice().getId());
+      SpeedRun run = this.speedRuns.getSpeedRunById(choice.getSpeedRun().getId());
       return run.getName() + " : " + choice.getName() + " : " + option.getName();
     }
     else
     {
       ChallengeBid c = (ChallengeBid) b;
       Challenge challenge = this.bids.getChallengeById(c.getChallengeId());
-      SpeedRun run = this.speedRuns.getSpeedRunById(challenge.getSpeedRunId());
+      SpeedRun run = this.speedRuns.getSpeedRunById(challenge.getSpeedRun().getId());
       return run.getName() + " : " + challenge.getName();
     }
   }

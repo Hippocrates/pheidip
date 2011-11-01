@@ -42,7 +42,7 @@ public class ChoiceControl
     try
     {
       int optionId = IdUtils.generateId();
-      ChoiceOption op = new ChoiceOption(optionId, name, this.choiceId);
+      ChoiceOption op = new ChoiceOption(optionId, name, this.getData());
       this.bids.insertChoiceOption(op);
       return optionId;
     }
@@ -62,7 +62,7 @@ public class ChoiceControl
   {
     try
     {
-      this.bids.updateChoiceOption(new ChoiceOption(id, newName, this.choiceId));
+      this.bids.updateChoiceOption(new ChoiceOption(id, newName, this.getData()));
     }
     catch (DonationDataConstraintException e)
     {
@@ -92,7 +92,7 @@ public class ChoiceControl
     try
     {
       Choice c = this.getData();
-      this.bids.updateChoice(new Choice(this.choiceId, name, description, newState, c.getSpeedRunId()));
+      this.bids.updateChoice(new Choice(this.choiceId, name, description, newState, c.getSpeedRun()));
     }
     catch (DonationDataConstraintException e)
     {

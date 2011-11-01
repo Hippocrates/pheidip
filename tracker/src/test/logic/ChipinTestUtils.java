@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 
 import pheidip.db.DonationData;
-import pheidip.db.DonorData;
 import pheidip.logic.ChipinDonations;
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.objects.ChipinDonation;
@@ -101,8 +100,7 @@ public class ChipinTestUtils
   public static boolean checkAllDonationsAreInDatabase(List<ChipinDonation> sourceDonations, DonationDatabaseManager manager)
   {
     DonationData donations = manager.getDataAccess().getDonationData();
-    DonorData donors = manager.getDataAccess().getDonorData();
-    
+
     // now try to get some of the donations by ID and check that everything checks out
     // also check that there are no duplicates of donors
 
@@ -130,7 +128,7 @@ public class ChipinTestUtils
         return false;
       }
       
-      Donor donor = donors.getDonorById(donation.getDonorId());
+      Donor donor = donation.getDonor();
       
       if (!cDonation.getEmail().equals(donor.getEmail()))
       {

@@ -23,7 +23,7 @@ public class DonationSearchParams implements FilterFunction<Donation>
   public boolean predicate(Donation x)
   {
     return 
-      (donorId == null || x.getDonorId() == donorId) &&
+      (donorId == null || x.getDonor().getId() == donorId) &&
       (domain == null || x.getDomain() == domain) &&
       (domainId == null || x.getDomainId().equals(domainId)) && 
       (loTime == null || x.getTimeReceived().compareTo(loTime) >= 0) &&

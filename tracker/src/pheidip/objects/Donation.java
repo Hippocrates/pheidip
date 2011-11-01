@@ -13,7 +13,6 @@ public class Donation
 {
 	private Date timeReceived;
 	private BigDecimal amount;
-	private int donorId;
 	private int id;
 	private String comment;
 	private DonationDomain domain;
@@ -28,20 +27,6 @@ public class Donation
   {
     this.id = IdUtils.generateId();
   }
-  
-	public Donation(int id, DonationDomain domain, String domainId, DonationBidState bidState, DonationReadState readState, DonationCommentState commentState, BigDecimal amount, Date timeReceived, int donorId, String comment)
-	{
-	  this.setId(id);
-		this.setDonorId(donorId);
-		this.setAmount(amount.setScale( 2, RoundingMode.FLOOR ));
-		this.setTimeReceived(timeReceived);
-		this.setComment(comment);
-		this.setDomain(domain);
-		this.setDomainId(domainId);
-		this.setBidState(bidState);
-		this.setReadState(readState);
-		this.setCommentState(commentState);
-	}
 	
 	public Donation(int id, DonationDomain domain, String domainId, DonationBidState bidState, DonationReadState readState, DonationCommentState commentState, BigDecimal amount, Date timeReceived, Donor donor, String comment)
   {
@@ -75,16 +60,6 @@ public class Donation
   public void setAmount(BigDecimal amount)
   {
     this.amount = amount;
-  }
-
-  public int getDonorId()
-	{
-		return this.donorId;
-	}
-	
-  public void setDonorId(int donorId)
-  {
-    this.donorId = donorId;
   }
 
   public int getId()

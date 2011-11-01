@@ -106,7 +106,7 @@ public class DonorControl
         DonationCommentState.PENDING,
         BigDecimal.ZERO,
         new Date(),
-        this.donorId,
+        this.getData(),
         "");
     
     this.donations.insertDonation(toCreate);

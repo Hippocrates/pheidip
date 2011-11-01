@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import pheidip.db.BidData;
+import pheidip.db.SpeedRunData;
 import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
@@ -12,11 +13,13 @@ import pheidip.objects.ChoiceOption;
 public class TestBidData extends DonationDatabaseTest
 {
   private BidData bids;
+  private SpeedRunData speedRuns;
   
   public void setUp()
   {
     super.setUp();
     this.bids = this.getDataAccess().getBids();
+    this.speedRuns = this.getDataAccess().getSpeedRuns();
   }
 
   public void testGetChoiceById()
@@ -37,7 +40,7 @@ public class TestBidData extends DonationDatabaseTest
     
     assertNull(this.bids.getChoiceById(newId));
     
-    this.bids.insertChoice(new Choice(newId, name, null, BidState.OPENED, speedRunId));
+    this.bids.insertChoice(new Choice(newId, name, null, BidState.OPENED, this.speedRuns.getSpeedRunById(speedRunId)));
   
     Choice choice = this.bids.getChoiceById(newId);
     
@@ -58,7 +61,7 @@ public class TestBidData extends DonationDatabaseTest
     assertFalse(newName.equals(oldChoice.getName()));
     //assertFalse(anotherRun == oldChoice.getSpeedRunId());
     
-    this.bids.updateChoice(new Choice(choiceId, newName, null, BidState.OPENED, anotherRun));
+    this.bids.updateChoice(new Choice(choiceId, newName, null, BidState.OPENED, this.speedRuns.getSpeedRunById(anotherRun)));
     
     Choice choice = this.bids.getChoiceById(choiceId);
     
@@ -101,18 +104,18 @@ public class TestBidData extends DonationDatabaseTest
   
   public void testCreateChoiceOption()
   {
-    final int speedRunId = 1;
+    final int choiceId = 1;
     final String name = "some thing";
     final int newId = 15;
     
     assertNull(this.bids.getChoiceOptionById(newId));
     
-    this.bids.insertChoiceOption(new ChoiceOption(newId, name, speedRunId));
+    this.bids.insertChoiceOption(new ChoiceOption(newId, name, this.bids.getChoiceById(choiceId)));
   
     ChoiceOption choiceOption = this.bids.getChoiceOptionById(newId);
     
     assertEquals(newId, choiceOption.getId());
-    assertEquals(speedRunId, choiceOption.getChoiceId());
+    assertEquals(choiceId, choiceOption.getChoice().getId());
     assertEquals(name, choiceOption.getName());
   }
   
@@ -125,14 +128,14 @@ public class TestBidData extends DonationDatabaseTest
     ChoiceOption oldChoiceOption = this.bids.getChoiceOptionById(choiceOptionId);
     
     assertFalse(newName.equals(oldChoiceOption.getName()));
-    assertFalse(anotherChoice == oldChoiceOption.getChoiceId());
+    assertFalse(anotherChoice == oldChoiceOption.getChoice().getId());
     
-    this.bids.updateChoiceOption(new ChoiceOption(choiceOptionId, newName, anotherChoice));
+    this.bids.updateChoiceOption(new ChoiceOption(choiceOptionId, newName, this.bids.getChoiceById(anotherChoice)));
     
     ChoiceOption choiceOption = this.bids.getChoiceOptionById(choiceOptionId);
     
     assertEquals(newName, choiceOption.getName());
-    assertEquals(anotherChoice, choiceOption.getChoiceId());
+    assertEquals(anotherChoice, choiceOption.getChoice().getId());
     assertEquals(newName, choiceOption.getName());
   }
   
@@ -175,7 +178,7 @@ public class TestBidData extends DonationDatabaseTest
     
     assertNull(this.bids.getChallengeById(newId));
     
-    this.bids.insertChallenge(new Challenge(newId, name, amount, null, BidState.OPENED, speedRunId));
+    this.bids.insertChallenge(new Challenge(newId, name, amount, null, BidState.OPENED, this.speedRuns.getSpeedRunById(speedRunId)));
   
     Challenge challenge = this.bids.getChallengeById(newId);
     
@@ -196,14 +199,14 @@ public class TestBidData extends DonationDatabaseTest
     Challenge oldChallenge = this.bids.getChallengeById(challengeId);    
     assertFalse(newName.equals(oldChallenge.getName()));
     assertFalse(newAmount.equals(oldChallenge.getGoalAmount()));
-    assertFalse(anotherRun == oldChallenge.getSpeedRunId());
+    assertFalse(anotherRun == oldChallenge.getSpeedRun().getId());
     
-    this.bids.updateChallenge(new Challenge(challengeId, newName, newAmount, null, BidState.OPENED, anotherRun));
+    this.bids.updateChallenge(new Challenge(challengeId, newName, newAmount, null, BidState.OPENED, this.speedRuns.getSpeedRunById(anotherRun)));
     
     Challenge challenge = this.bids.getChallengeById(challengeId);
     
     assertEquals(challengeId, challenge.getId());
-    assertEquals(anotherRun, (int)challenge.getSpeedRunId());
+    assertEquals(anotherRun, (int)challenge.getSpeedRun().getId());
     assertEquals(newAmount, challenge.getGoalAmount());
     assertEquals(newName, challenge.getName());
     assertEquals(null, challenge.getDescription());

@@ -12,7 +12,6 @@ public class AllDBTests
     //$JUnit-BEGIN$
     suite.addTestSuite(TestSpeedRunData.class);
     suite.addTestSuite(TestBidData.class);
-    suite.addTestSuite(TestDonationDataAccess.class);
     suite.addTestSuite(TestJDBCManager.class);
     suite.addTestSuite(TestDonationData.class);
     suite.addTestSuite(TestDonorData.class);

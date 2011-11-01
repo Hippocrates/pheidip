@@ -7,6 +7,7 @@ import org.hibernate.Session;
 
 import pheidip.db.DonorData;
 import pheidip.objects.Donor;
+import pheidip.objects.Prize;
 
 public class HibernateDonorData extends HibernateDataInterface implements DonorData 
 {
@@ -156,8 +157,16 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	@Override
 	public Donor getPrizeWinner(int prizeId) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+    Session session = this.getSessionFactory().openSession();
+    session.beginTransaction();
+    
+    Prize p = (Prize) session.load(Prize.class, prizeId);
+    Donor d = p.getWinner();
+    
+    session.getTransaction().commit();
+    session.close();
+    
+    return d;
 	}
 
 	@Override

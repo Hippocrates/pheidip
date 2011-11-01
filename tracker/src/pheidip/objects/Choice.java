@@ -10,7 +10,6 @@ public class Choice implements Bid
 {
 	private String name;
   private int id;
-  private Integer speedRunId;
   private String description;
   private BidState bidState;
   private Set<ChoiceOption> options;
@@ -22,16 +21,6 @@ public class Choice implements Bid
     this.options = new HashSet<ChoiceOption>();
   }
   
-	public Choice(int id, String name, String description, BidState bidState, Integer speedRunId)
-	{
-	  this.options = new HashSet<ChoiceOption>();
-	  this.setId(id);
-	  this.setName(name);
-		this.setSpeedRunId(speedRunId);
-		this.setDescription(description);
-		this.setBidState(bidState);
-	}
-	
 	public Choice(int id, String name, String description, BidState bidState, SpeedRun speedRun)
   {
 	  this.options = new HashSet<ChoiceOption>();
@@ -51,16 +40,6 @@ public class Choice implements Bid
 	{
 	  this.name = name == null ? null : name.toLowerCase();
 	}
-
-  public Integer getSpeedRunId()
-  {
-    return speedRunId;
-  }
-  
-  public void setSpeedRunId(int speedRunId)
-  {
-    this.speedRunId = speedRunId;
-  }
 
   public int getId()
   {
