@@ -57,14 +57,18 @@ public class TestDonationControl extends TestCase
     
     DonationControl control = new DonationControl(this.manager, donationId);
     
+    Donation d = control.getData();
     String commentText = "Some new comment text";
     BigDecimal amount = new BigDecimal("500.50");
+    d.setComment(commentText);
+    d.setAmount(amount);
+
+    control.updateData(d);
     
-    control.updateData(amount, commentText, false);
-    
-    Donation newData = control.getData();
+    Donation newData = control.refreshData();
     
     assertEquals(commentText, newData.getComment());
+    assertEquals(amount, newData.getAmount());
   }
   
   public void testDeleteDonation()

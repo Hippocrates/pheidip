@@ -245,8 +245,15 @@ public class ChallengePanel extends EntityPanel
     return true;
   }
 
+
   @Override
   public void refreshContent()
+  {
+    this.redrawContent();
+  }
+  
+  @Override
+  public void redrawContent()
   {
     Challenge data = this.challengeControl.getData();
     

@@ -1,5 +1,6 @@
 package pheidip.objects;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -115,6 +116,18 @@ public class Donor
     {
       return false;
     }
+  }
+  
+  public BigDecimal getDonationTotal()
+  {
+    BigDecimal sum = BigDecimal.ZERO;
+    
+    for (Donation d : this.getDonations())
+    {
+      sum = sum.add(d.getAmount());
+    }
+    
+    return sum;
   }
 
   public String toString()

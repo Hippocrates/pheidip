@@ -268,9 +268,14 @@ public class DonationTaskPanel extends EntityPanel
   {
     return true;
   }
-
+  
   @Override
   public void refreshContent()
+  {
+    this.redrawContent();
+  }
+    
+  public void redrawContent()
   {
     Donation oldInstance = this.getSelectedDonation();
     

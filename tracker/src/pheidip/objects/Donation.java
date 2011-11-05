@@ -176,17 +176,7 @@ public class Donation
   }
 
   public void setDonor(Donor donor)
-  {/*
-    if (this.donor != null)
-    {
-      this.donor.getDonations().remove(this);
-    }
-    
-    if (donor != null)
-    {
-      donor.getDonations().add(this);
-    }
-    */
+  {
     this.donor = donor;
   }
 
@@ -198,5 +188,24 @@ public class Donation
   public Set<DonationBid> getBids()
   {
     return bids;
+  }
+  
+  public void markAsRead(boolean set)
+  {
+    if (set)
+    {
+      if (this.getComment() != null)
+      {
+        this.readState = DonationReadState.COMMENT_READ;
+      }
+      else
+      {
+        this.readState = DonationReadState.AMOUNT_READ;
+      }
+    }
+    else
+    {
+      this.readState = DonationReadState.PENDING;
+    }
   }
 }

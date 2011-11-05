@@ -12,9 +12,6 @@
         <property name="amount" type="java.math.BigDecimal">
             <column name="AMOUNT" />
         </property>
-        <property name="donationId" type="int">
-            <column name="DONATIONID" />
-        </property>
         <many-to-one name="donation" class="pheidip.objects.Donation" fetch="join">
             <column name="DONATION" />
         </many-to-one>

@@ -1,13 +1,13 @@
 package pheidip.logic;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import pheidip.db.DonationData;
 import pheidip.db.DonationDataConstraintException;
 import pheidip.db.DonorData;
-import pheidip.db.PrizeData;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationCommentState;
@@ -23,8 +23,9 @@ public class DonorControl
   private DonationDatabaseManager donationDatabase;
   private DonorData donors;
   private DonationData donations;
+
   private int donorId;
-  private PrizeData prizes;
+  private Donor cachedDonor;
   
   public static int createNewDonor(DonationDatabaseManager donationDatabase)
   {
@@ -48,7 +49,16 @@ public class DonorControl
     this.donors = this.donationDatabase.getDataAccess().getDonorData();
     this.donations = this.donationDatabase.getDataAccess().getDonationData();
     this.donorId = donorId;
-    this.prizes = this.donationDatabase.getDataAccess().getPrizeData();
+    this.cachedDonor = null;
+  }
+  
+  public DonorControl(DonationDatabaseManager donationDatabase, Donor data)
+  {
+    this.donationDatabase = donationDatabase;
+    this.donors = this.donationDatabase.getDataAccess().getDonorData();
+    this.donations = this.donationDatabase.getDataAccess().getDonationData();
+    this.donorId = data.getId();
+    this.cachedDonor = data;
   }
   
   public int getDonorId()
@@ -58,24 +68,37 @@ public class DonorControl
   
   public Donor getData()
   {
-    return this.donors.getDonorById(this.donorId);
+    if (this.cachedDonor == null)
+    {
+      return this.refreshData();
+    }
+    else
+    {
+      return this.cachedDonor;
+    }
+  }
+  
+  public Donor refreshData()
+  {
+    return this.cachedDonor = this.donors.getDonorById(this.donorId);
   }
 
   public List<Donation> getDonorDonations()
   {
-    return this.donations.getDonorDonations(this.donorId);
+    return new ArrayList<Donation>(this.getData().getDonations());
   }
 
   public BigDecimal getTotalDonated()
   {
-    return this.donations.getDonorDonationTotal(this.donorId);
+    return this.getData().getDonationTotal();
   }
 
-  public void updateData(String email, String alias, String firstName, String lastName)
+  public void updateData(Donor data)
   {
     try
     {
-      this.donors.updateDonor(new Donor(this.donorId, StringUtils.nullIfEmpty(email), StringUtils.nullIfEmpty(alias), firstName, lastName));
+      this.donors.updateDonor(data);
+      this.refreshData();
     }
     catch(DonationDataConstraintException e)
     {
@@ -85,11 +108,21 @@ public class DonorControl
   
   public Prize getPrizeWon()
   {
-    return this.prizes.getPrizeByDonorId(this.donorId);
+    Donor d = this.getData();
+    
+    if (!d.getPrizes().isEmpty())
+    {
+      return d.getPrizes().iterator().next();
+    }
+    else
+    {
+      return null;
+    }
   }
   
   public void deleteDonor()
   {
+    this.cachedDonor = null;
     this.donors.deleteDonor(this.donorId);
   }
 
@@ -109,6 +142,7 @@ public class DonorControl
         this.getData(),
         "");
     
+    this.getData().getDonations().add(toCreate);
     this.donations.insertDonation(toCreate);
     
     return donationId;
@@ -116,9 +150,9 @@ public class DonorControl
 
   public boolean allowEmailUpdate()
   {
-    List<Donation> donations = this.getDonorDonations();
+    Donor donor = this.getData();
     
-    for (Donation d : donations)
+    for (Donation d : donor.getDonations())
     {
       if (d.getDomain() == DonationDomain.CHIPIN)
       {

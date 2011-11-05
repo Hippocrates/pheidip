@@ -87,17 +87,7 @@ public class Prize
   }
 
   public void setWinner(Donor winner)
-  {/*
-    if (this.winner != null)
-    {
-      this.winner.getPrizes().remove(this);
-    }
-    
-    if (winner != null)
-    {
-      winner.getPrizes().add(this);
-    }
-    */
+  {
     this.winner = winner;
   }
 

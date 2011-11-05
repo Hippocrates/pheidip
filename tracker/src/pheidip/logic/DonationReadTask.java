@@ -26,7 +26,10 @@ public class DonationReadTask implements DonationTask
   @Override
   public void clearTask(int donationId)
   {
-    this.getControl(donationId).markDonationAsRead();
+    DonationControl control = getControl(donationId);
+    Donation d = control.getData();
+    d.markAsRead(true);
+    control.updateData(d);
   }
 
   @Override

@@ -10,8 +10,6 @@ public interface DonationBid
   void setId(int id);
   BigDecimal getAmount();
   void setAmount(BigDecimal amount);
-  int getDonationId();
-  void setDonationId(int donationId);
   Donation getDonation();
   void setDonation(Donation donation);
 }

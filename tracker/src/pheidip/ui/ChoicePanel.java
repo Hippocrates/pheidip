@@ -259,9 +259,14 @@ public class ChoicePanel extends EntityPanel
     this.initializeGUIEvents();
   }
 
-
   @Override
   public void refreshContent()
+  {
+    this.redrawContent();
+  }
+
+  @Override
+  public void redrawContent()
   {
     Choice choice = this.choiceControl.getData();
     

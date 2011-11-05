@@ -369,8 +369,14 @@ public class DonorPanel extends EntityPanel
       this.owner.openPrizeTab(won.getId());
     }
   }
-
+  
   public void refreshContent()
+  {
+    this.donorControl.refreshData();
+    this.redrawContent();
+  }
+
+  public void redrawContent()
   {
     Donor data = this.donorControl.getData();
     
@@ -452,12 +458,13 @@ public class DonorPanel extends EntityPanel
   public void saveContent()
   {
     this.donorControl.updateData(
+        new Donor(this.donorControl.getDonorId(),
         this.emailField.getText(),
         this.aliasField.getText(),
         this.firstNameField.getText(),
-        this.lastNameField.getText());
+        this.lastNameField.getText()));
     
-    this.refreshContent();
+    this.redrawContent();
   }
   
   private void openDonation()

@@ -333,8 +333,15 @@ public class PrizePanel extends EntityPanel
     return this.control.getPrizeId();
   }
 
+
   @Override
   public void refreshContent()
+  {
+    this.redrawContent();
+  }
+  
+  @Override
+  public void redrawContent()
   {
     Prize data = this.control.getData();
     

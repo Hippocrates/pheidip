@@ -8,22 +8,11 @@ public class ChallengeBid implements DonationBid
 {
   private int id = IdUtils.generateId();
   private BigDecimal amount;
-  private int challengeId;
-  private int donationId;
   private Donation donation;
   private Challenge challenge;
   
   public ChallengeBid()
   {
-  }
-  
-  public ChallengeBid(int id, BigDecimal amount, int challengeId, int donationId)
-  {
-    this.setId(id);
-    this.setDonationId(donationId);
-    this.setChallengeId(challengeId);
-    this.setAmount(amount);
-    
   }
   
   public ChallengeBid(int id, BigDecimal amount, Challenge challenge, Donation donation)
@@ -72,26 +61,6 @@ public class ChallengeBid implements DonationBid
   public void setAmount(BigDecimal amount)
   {
     this.amount = amount;
-  }
-
-  public int getChallengeId()
-  {
-    return challengeId;
-  }
-
-  public void setChallengeId(int challengeId)
-  {
-    this.challengeId = challengeId;
-  }
-
-  public int getDonationId()
-  {
-    return donationId;
-  }
-
-  public void setDonationId(int donationId)
-  {
-    this.donationId = donationId;
   }
 
   @Override

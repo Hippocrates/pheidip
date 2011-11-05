@@ -261,9 +261,15 @@ public class SpeedRunPanel extends EntityPanel
   {
     return true;
   }
-
+  
   @Override
   public void refreshContent()
+  {
+    this.redrawContent();
+  }
+
+  @Override
+  public void redrawContent()
   {
     SpeedRun data = this.speedRunControl.getData();
     

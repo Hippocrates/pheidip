@@ -6,7 +6,6 @@ import java.util.List;
 
 import pheidip.db.BidData;
 import pheidip.db.DonationData;
-import pheidip.db.SpeedRunData;
 import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
 import pheidip.objects.ChallengeBid;
@@ -26,17 +25,18 @@ public class DonationControl
 {
   private DonationDatabaseManager donationDatabase;
   private DonationData donations;
-  private SpeedRunData speedRuns;
-  private int donationId;
   private BidData bids;
+  
+  private int donationId;
+  private Donation cachedData;
 
   public DonationControl(DonationDatabaseManager donationDatabase, int donationId)
   {
     this.donationDatabase = donationDatabase;
     this.donations = this.donationDatabase.getDataAccess().getDonationData();
     this.bids = this.donationDatabase.getDataAccess().getBids();
-    this.speedRuns = this.donationDatabase.getDataAccess().getSpeedRuns();
     this.donationId = donationId;
+    this.cachedData = null;
   }
   
   public int getDonationId()
@@ -46,7 +46,14 @@ public class DonationControl
   
   public Donation getData()
   {
-    return this.donations.getDonationById(this.donationId);
+    if (this.cachedData == null)
+    {
+      return this.refreshData();
+    }
+    else
+    {
+      return this.cachedData;
+    }
   }
   
   public Donor getDonationDonor()
@@ -54,32 +61,28 @@ public class DonationControl
     return this.getData().getDonor();
   }
   
-  public void updateData(BigDecimal amount, String comment, boolean markAsRead)
+  public void updateData(Donation data)
   {
     if (this.allowUpdateData())
     {
-      if (amount.compareTo(BigDecimal.ZERO) < 0)
+      if (data.getAmount().compareTo(BigDecimal.ZERO) < 0)
       {
         throw new RuntimeException("Error, donation amonut must be non-negative.");
       }
       
-      if (sumBids(this.getAttachedBids()).compareTo(amount) > 0)
+      if (sumBids(this.getAttachedBids()).compareTo(data.getAmount()) > 0)
       {
         throw new RuntimeException("Error, change in amount would invalidate the sum of the attached bids.");
       }
-
-      this.donations.setDonationAmount(this.donationId, amount);
-      this.donations.setDonationComment(this.donationId, comment);
     }
     
-    if (markAsRead)
-    {
-      this.markDonationAsRead();
-    }
-    else
-    {
-      this.clearDonationRead();
-    }
+    this.donations.updateDonation(data);
+    this.cachedData = this.refreshData();
+  }
+  
+  public Donation refreshData()
+  {
+    return this.donations.getDonationById(this.donationId);
   }
 
   public void clearDonationRead()
@@ -104,12 +107,14 @@ public class DonationControl
   public int attachNewChallengeBid(int challengeId, BigDecimal amount)
   {
     int newId = IdUtils.generateId();
-    ChallengeBid created = new ChallengeBid(newId, amount, challengeId, this.donationId);
     
     Donation data = this.getData();
+    
+    ChallengeBid created = new ChallengeBid(newId, amount, this.bids.getChallengeById(challengeId), data);
 
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
+      data.getBids().add(created);
       this.donations.attachChallengeBid(created);
       this.donations.setDonationBidState(this.donationId, DonationBidState.PROCESSED);
     }
@@ -124,12 +129,13 @@ public class DonationControl
   public int attachNewChoiceBid(int choiceId, BigDecimal amount)
   {
     int newId = IdUtils.generateId();
-    ChoiceBid created = new ChoiceBid(newId, amount, choiceId, this.donationId);
-    
     Donation data = this.getData();
+    
+    ChoiceBid created = new ChoiceBid(newId, amount, this.bids.getChoiceOptionById(choiceId), data);
 
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
+      data.getBids().add(created);
       this.donations.attachChoiceBid(created);
       this.markAsBidsHandled();
     }
@@ -204,16 +210,16 @@ public class DonationControl
     if (b.getType() == BidType.CHOICE)
     {
       ChoiceBid c = (ChoiceBid) b;
-      ChoiceOption option = this.bids.getChoiceOptionById(c.getOptionId());
-      Choice choice = this.bids.getChoiceById(option.getChoice().getId());
-      SpeedRun run = this.speedRuns.getSpeedRunById(choice.getSpeedRun().getId());
+      ChoiceOption option = c.getOption();
+      Choice choice = option.getChoice();
+      SpeedRun run = choice.getSpeedRun();
       return run.getName() + " : " + choice.getName() + " : " + option.getName();
     }
     else
     {
       ChallengeBid c = (ChallengeBid) b;
-      Challenge challenge = this.bids.getChallengeById(c.getChallengeId());
-      SpeedRun run = this.speedRuns.getSpeedRunById(challenge.getSpeedRun().getId());
+      Challenge challenge = c.getChallenge();
+      SpeedRun run = challenge.getSpeedRun();
       return run.getName() + " : " + challenge.getName();
     }
   }
@@ -234,17 +240,13 @@ public class DonationControl
       }
     }
     
+    this.cachedData = null;
     this.donations.deleteDonation(this.donationId);
   }
   
   public List<DonationBid> getAttachedBids()
   {
-    List<DonationBid> attachedBids = new ArrayList<DonationBid>();
-    
-    attachedBids.addAll(this.donations.getChallengeBidsByDonationId(this.donationId));
-    attachedBids.addAll(this.donations.getChoiceBidsByDonationId(this.donationId));
-    
-    return attachedBids;
+    return new ArrayList<DonationBid>(this.getData().getBids());
   }
   
   public BigDecimal getTotalUsed()
@@ -267,20 +269,6 @@ public class DonationControl
     }
     
     return sum;
-  }
-
-  public void markDonationAsRead()
-  {
-    Donation d = this.getData();
-    
-    if (d.getComment() != null)
-    {
-      this.donations.setDonationReadState(this.donationId, DonationReadState.COMMENT_READ);
-    }
-    else
-    {
-      this.donations.setDonationReadState(this.donationId, DonationReadState.AMOUNT_READ);
-    }
   }
   
   public void markAsBidsHandled()

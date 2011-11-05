@@ -289,7 +289,7 @@ public class MainWindow extends JFrame implements Reporter
       if (ev.getSource() == tabbedPane)
       {
         messageArea.setText("");
-        refreshCurrentTab();
+        redrawCurrentTab();
       }
     }
   }
@@ -341,7 +341,7 @@ public class MainWindow extends JFrame implements Reporter
     {
       public void actionPerformed(ActionEvent e) 
       {
-        MainWindow.this.refreshCurrentTab();
+        MainWindow.this.redrawCurrentTab();
       }
     };
     Action chipinWebsiteMergeAction = new AbstractAction()
@@ -438,13 +438,13 @@ public class MainWindow extends JFrame implements Reporter
     }
   }
   
-  private void refreshCurrentTab()
+  private void redrawCurrentTab()
   {
     Component current = this.tabbedPane.getSelectedComponent();
     
-    if (current != null && current instanceof EntityPanel)
+    if (current != null && current instanceof TabPanel)
     {
-      ((EntityPanel)current).refreshContent();
+      ((TabPanel)current).redrawContent();
     }
   }
   

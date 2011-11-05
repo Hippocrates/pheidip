@@ -4,9 +4,6 @@
 <!-- Generated 18-Oct-2011 3:55:43 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <subclass name="pheidip.objects.ChallengeBid" extends="pheidip.objects.DonationBid" discriminator-value="ChallengeBid" lazy="false">
-        <property name="challengeId" type="int">
-            <column name="CHALLENGEID" />
-        </property>
         <many-to-one name="challenge" class="pheidip.objects.Challenge" fetch="join">
             <column name="CHALLENGE" />
         </many-to-one>

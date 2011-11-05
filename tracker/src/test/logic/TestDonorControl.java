@@ -86,7 +86,7 @@ public class TestDonorControl extends TestCase
     assertFalse(newAlias.equalsIgnoreCase(oldData.getAlias()));
     assertFalse(newEmail.equalsIgnoreCase(oldData.getEmail()));
     
-    control.updateData(newEmail, newAlias, oldData.getFirstName(), oldData.getLastName());
+    control.updateData(new Donor(donorId, newEmail, newAlias, oldData.getFirstName(), oldData.getLastName()));
     
     Donor newData = control.getData();
     

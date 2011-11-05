@@ -56,4 +56,5 @@ public abstract class TabPanel extends JPanel
   }
 
   public abstract boolean confirmClose();
+  public abstract void redrawContent();
 }

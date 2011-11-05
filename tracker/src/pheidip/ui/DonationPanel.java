@@ -301,9 +301,15 @@ public class DonationPanel extends EntityPanel
   {
     return true;
   }
-
+  
   @Override
   public void refreshContent()
+  {
+    this.donationControl.refreshData();
+    this.redrawContent();
+  }
+  
+  public void redrawContent()
   {
     Donation result = this.donationControl.getData();
     
@@ -340,10 +346,13 @@ public class DonationPanel extends EntityPanel
   {
     if (this.donationControl.allowUpdateData())
     {
-      this.donationControl.updateData(
-          new BigDecimal(this.amountField.getText()),
-          this.commentTextArea.getText(),
-          this.markAsReadCheckBox.isSelected());
+      Donation d = this.donationControl.getData();
+      
+      d.setAmount(new BigDecimal(this.amountField.getText()));
+      d.setComment(this.commentTextArea.getText());
+      d.markAsRead(this.markAsReadCheckBox.isSelected());
+      
+      this.donationControl.updateData(d);
     }
     
     this.refreshContent();

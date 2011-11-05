@@ -137,10 +137,10 @@ public class ScriptRunner
     } catch (SQLException e)
     {
       throw e;
-    } catch (Exception e)
+    }/* catch (Exception e)
     {
       throw new RuntimeException("Error running script. Cause: " + e, e);
-    }
+    }*/
   }
 
   /**

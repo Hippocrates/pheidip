@@ -166,4 +166,10 @@ public class ChipinMergeTab extends TabPanel
       this.repaint();
     }
   }
+
+  @Override
+  public void redrawContent()
+  {
+    // TODO: is this neccessary?
+  }
 }

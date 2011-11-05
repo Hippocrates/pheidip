@@ -8,8 +8,6 @@ public class ChoiceBid implements DonationBid
 {
   private int id;
   private BigDecimal amount;
-  private int optionId;
-  private int donationId;
   private Donation donation;
   private ChoiceOption option;
   
@@ -17,15 +15,7 @@ public class ChoiceBid implements DonationBid
   {
     this.id = IdUtils.generateId();
   }
-  
-  public ChoiceBid(int id, BigDecimal amount, int optionId, int donationId)
-  {
-    this.setId(id);
-    this.setDonationId(donationId);
-    this.setOptionId(optionId);
-    this.setAmount(amount);
-  }
-  
+
   public ChoiceBid(int id, BigDecimal amount, ChoiceOption option, Donation donation)
   {
     this.setId(id);
@@ -54,26 +44,6 @@ public class ChoiceBid implements DonationBid
     this.amount = amount;
   }
 
-  public int getOptionId()
-  {
-    return optionId;
-  }
-
-  public void setOptionId(int optionId)
-  {
-    this.optionId = optionId;
-  }
-
-  public int getDonationId()
-  {
-    return donationId;
-  }
-
-  public void setDonationId(int donationId)
-  {
-    this.donationId = donationId;
-  }
-
   public int getId()
   {
     return id;
@@ -85,17 +55,7 @@ public class ChoiceBid implements DonationBid
   }
 
   public void setDonation(Donation donation)
-  {/*
-    if (this.donation != null)
-    {
-      this.donation.getBids().remove(this);
-    }
-    
-    if (donation != null)
-    {
-      donation.getBids().add(this);
-    }
-    */
+  {
     this.donation = donation;
   }
 
