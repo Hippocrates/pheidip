@@ -38,7 +38,7 @@ public class Choice implements Bid
 	
 	public void setName(String name)
 	{
-	  this.name = name == null ? null : name.toLowerCase();
+	  this.name = StringUtils.canonicalize(name);
 	}
 
   public int getId()
@@ -58,7 +58,7 @@ public class Choice implements Bid
 
   public void setDescription(String description)
   {
-    this.description = description;
+    this.description = StringUtils.nullIfEmpty(description);
   }
   
   public BidState getBidState()
@@ -110,17 +110,7 @@ public class Choice implements Bid
   }
 
   public void setSpeedRun(SpeedRun speedRun)
-  {/*
-    if (this.speedRun != null)
-    {
-      this.speedRun.getBids().remove(this);
-    }
-    
-    if (speedRun != null)
-    {
-      speedRun.getBids().add(this);
-    }
-    */
+  {
     this.speedRun = speedRun;
   }
 

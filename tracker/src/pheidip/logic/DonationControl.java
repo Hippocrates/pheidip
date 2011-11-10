@@ -44,16 +44,21 @@ public class DonationControl
     return this.donationId;
   }
   
+  
+  public Donation refreshData()
+  {
+    this.cachedData = this.donations.getDonationById(this.donationId);
+    return this.cachedData;
+  }
+  
   public Donation getData()
   {
     if (this.cachedData == null)
     {
-      return this.refreshData();
+      this.refreshData();
     }
-    else
-    {
-      return this.cachedData;
-    }
+
+    return this.cachedData;
   }
   
   public Donor getDonationDonor()
@@ -78,11 +83,6 @@ public class DonationControl
     
     this.donations.updateDonation(data);
     this.cachedData = this.refreshData();
-  }
-  
-  public Donation refreshData()
-  {
-    return this.donations.getDonationById(this.donationId);
   }
 
   public void clearDonationRead()
@@ -135,8 +135,8 @@ public class DonationControl
 
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
-      data.getBids().add(created);
       this.donations.attachChoiceBid(created);
+      data.getBids().add(created);
       this.markAsBidsHandled();
     }
     else

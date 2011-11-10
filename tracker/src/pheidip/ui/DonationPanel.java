@@ -315,7 +315,7 @@ public class DonationPanel extends EntityPanel
     
     if (result != null)
     {
-      Donor donor = this.donationControl.getDonationDonor();
+      Donor donor = result.getDonor();
       
       this.amountField.setText(result.getAmount().toString());
       this.timeField.setText(result.getTimeReceived().toString());

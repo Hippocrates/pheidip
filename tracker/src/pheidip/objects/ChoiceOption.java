@@ -26,7 +26,7 @@ public class ChoiceOption
 		return this.name;
 	}
 
-  private void setName(String name)
+  public void setName(String name)
   {
     this.name = name == null ? null : name.toLowerCase();
   }

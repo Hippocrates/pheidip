@@ -38,7 +38,7 @@ public class Donor
   
   public void setAlias(String alias)
   {
-    this.alias = alias == null ? null : alias.toLowerCase();
+    this.alias = StringUtils.canonicalize(alias);
   }
 
   public String getFirstName()
@@ -48,7 +48,7 @@ public class Donor
   
   public void setFirstName(String firstName)
   {
-    this.firstName = firstName;
+    this.firstName = StringUtils.nullIfEmpty(firstName);
   }
 
   public String getLastName()
@@ -58,7 +58,7 @@ public class Donor
 
   public void setLastName(String lastName)
   {
-    this.lastName = lastName;
+    this.lastName = StringUtils.nullIfEmpty(lastName);
   }
 
   public String getEmail()
@@ -68,7 +68,7 @@ public class Donor
 
   public void setEmail(String email)
   {
-    this.email = email == null ? null : email.toLowerCase();
+    this.email = StringUtils.canonicalize(email);
   }
 
   public int getId()

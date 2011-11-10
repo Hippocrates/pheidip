@@ -35,7 +35,7 @@ public class Challenge implements Bid
 
   public void setName(String name)
   {
-    this.name = name == null ? null : name.toLowerCase();
+    this.name = StringUtils.canonicalize(name);
   }
 
   public int getId()
@@ -65,7 +65,7 @@ public class Challenge implements Bid
 
   public void setDescription(String description)
   {
-    this.description = description;
+    this.description = StringUtils.nullIfEmpty(description);
   }
 
   public BidState getBidState()

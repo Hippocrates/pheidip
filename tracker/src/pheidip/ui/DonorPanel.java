@@ -480,8 +480,6 @@ public class DonorPanel extends EntityPanel
   @Override
   public boolean confirmClose()
   {
-    // this could open a JOptionPane to prevent the user from closing a tab with 
-    // pending modifications ...
     return true;
   }
 }

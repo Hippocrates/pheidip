@@ -1,6 +1,7 @@
 package pheidip.objects;
 
 import pheidip.util.IdUtils;
+import pheidip.util.StringUtils;
 
 public class Prize
 {
@@ -12,7 +13,6 @@ public class Prize
   
   public Prize()
   {
-    //this.id
   }
   
   public Prize(int id, String name, String imageURL, String description, Donor winner)
@@ -41,7 +41,7 @@ public class Prize
   
   public void setName(String name)
   {
-    this.name = name == null ? null : name.toLowerCase();
+    this.name = StringUtils.canonicalize(name);
   }
 
   public String getImageURL()
@@ -51,7 +51,7 @@ public class Prize
 
   public void setImageURL(String imageURL)
   {
-    this.imageURL = imageURL;
+    this.imageURL = StringUtils.nullIfEmpty(imageURL);
   }
 
   public String getDescription()
@@ -61,7 +61,7 @@ public class Prize
   
   public void setDescription(String description)
   {
-    this.description = description;
+    this.description = StringUtils.nullIfEmpty(description);
   }
 
   public String toString()

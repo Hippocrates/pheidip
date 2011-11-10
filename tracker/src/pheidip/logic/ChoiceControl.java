@@ -8,7 +8,6 @@ import java.util.List;
 
 import pheidip.db.BidData;
 import pheidip.db.DonationDataConstraintException;
-import pheidip.objects.BidState;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 import pheidip.util.IdUtils;
@@ -19,22 +18,35 @@ public class ChoiceControl
   private DonationDatabaseManager donationDatabase;
   private BidData bids;
   private int choiceId;
+  private Choice cachedData;
 
   public ChoiceControl(DonationDatabaseManager donationDatabase, int choiceId)
   {
     this.donationDatabase = donationDatabase;
     this.choiceId = choiceId;
     this.bids = this.donationDatabase.getDataAccess().getBids();
+    this.cachedData = null;
+  }
+  
+  public Choice refreshData()
+  {
+    this.cachedData = this.bids.getChoiceById(this.choiceId);
+    return this.cachedData;
   }
   
   public Choice getData()
   {
-    return this.bids.getChoiceById(this.choiceId);
+    if (this.cachedData == null)
+    {
+      this.refreshData();
+    }
+    
+    return this.cachedData;
   }
   
   public List<ChoiceOption> getOptions()
   {
-    return this.bids.getChoiceOptionsByChoiceId(this.choiceId);
+    return new ArrayList<ChoiceOption>(this.getData().getOptions());
   }
   
   public int createNewOption(String name)
@@ -58,41 +70,23 @@ public class ChoiceControl
     return this.bids.getChoiceOptionTotal(choiceOptionId);
   }
   
-  public void renameOption(int id, String newName)
+  public void deleteOption(ChoiceOption option)
   {
-    try
-    {
-      this.bids.updateChoiceOption(new ChoiceOption(id, newName, this.getData()));
-    }
-    catch (DonationDataConstraintException e)
-    {
-      this.donationDatabase.reportMessage(e.getMessage());
-    }
-  }
-  
-  public void deleteOption(int id)
-  {
-     this.bids.deleteChoiceOption(id);
+     this.bids.deleteChoiceOption(option.getId());
+     this.getData().getOptions().remove(option);
   }
   
   public void deleteChoice()
   {
-    List<ChoiceOption> allOptions = this.getOptions();
-    
-    for (ChoiceOption option : allOptions)
-    {
-      this.bids.deleteChoiceOption(option.getId());
-    }
-    
     this.bids.deleteChoice(this.choiceId);
+    this.cachedData = null;
   }
 
-  public void updateData(String name, String description, BidState newState)
+  public void updateData(Choice data)
   {
     try
     {
-      Choice c = this.getData();
-      this.bids.updateChoice(new Choice(this.choiceId, name, description, newState, c.getSpeedRun()));
+      this.bids.updateChoice(data);
     }
     catch (DonationDataConstraintException e)
     {

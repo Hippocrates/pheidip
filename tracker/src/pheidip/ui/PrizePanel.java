@@ -281,7 +281,7 @@ public class PrizePanel extends EntityPanel
   
   private void openWinner()
   {
-    Donor winner = this.control.getPrizeWinner();
+    Donor winner = this.control.getData().getWinner();
     
     if (winner != null)
     {
@@ -302,8 +302,8 @@ public class PrizePanel extends EntityPanel
   
   private void assignPrizeToDonor(Donor d)
   {
-    this.control.setPrizeWinner(d.getId());
-    this.refreshContent();
+    this.control.getData().setWinner(d);
+    this.redrawContent();
   }
   
   private void assignWinner()
@@ -337,6 +337,7 @@ public class PrizePanel extends EntityPanel
   @Override
   public void refreshContent()
   {
+    this.control.refreshData();
     this.redrawContent();
   }
   
@@ -347,7 +348,7 @@ public class PrizePanel extends EntityPanel
     
     this.setHeaderText("Prize: " + data.toString());
     
-    this.winner = this.control.getPrizeWinner();
+    this.winner = data.getWinner();
     
     this.nameField.setText(data.getName());
     this.imageURLField.setText(data.getImageURL());
@@ -374,7 +375,12 @@ public class PrizePanel extends EntityPanel
   @Override
   public void saveContent()
   {
-    this.control.updateData(this.nameField.getText(), this.imageURLField.getText(), this.descriptionTextArea.getText(), this.winner == null ? null : this.winner.getId());
+    Prize data = this.control.getData();
+    data.setName(this.nameField.getText());
+    data.setImageURL(this.imageURLField.getText());
+    data.setDescription(this.descriptionTextArea.getText());
+    data.setWinner(this.winner);
+    this.control.updateData(data);
     this.refreshContent();
   }
 

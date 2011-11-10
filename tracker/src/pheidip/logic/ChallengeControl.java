@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 import pheidip.db.BidData;
 import pheidip.db.DonationDataConstraintException;
-import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
 
 public class ChallengeControl
@@ -12,17 +11,30 @@ public class ChallengeControl
   private DonationDatabaseManager donationDatabase;
   private BidData bids;
   private int challengeId;
+  private Challenge cachedData;
 
   public ChallengeControl(DonationDatabaseManager donationDatabase, int challengeId)
   {
     this.donationDatabase = donationDatabase;
     this.challengeId = challengeId;
     this.bids = this.donationDatabase.getDataAccess().getBids();
+    this.cachedData = null;
+  }
+  
+  public Challenge refreshData()
+  {
+    this.cachedData = this.bids.getChallengeById(this.challengeId);
+    return this.cachedData;
   }
   
   public Challenge getData()
   {
-    return this.bids.getChallengeById(this.challengeId);
+    if (this.cachedData == null)
+    {
+      this.refreshData();
+    }
+    
+    return this.cachedData;
   }
 
   public void deleteChallenge()
@@ -30,12 +42,11 @@ public class ChallengeControl
     this.bids.deleteChallenge(this.challengeId);
   }
 
-  public void updateData(String name, BigDecimal amount, String description, BidState newState)
+  public void updateData(Challenge data)
   {
     try
     {
-      Challenge c = this.getData();
-      this.bids.updateChallenge(new Challenge(this.challengeId, name, amount, description, newState, c.getSpeedRun()));
+      this.bids.updateChallenge(data);
     }
     catch (DonationDataConstraintException e)
     {

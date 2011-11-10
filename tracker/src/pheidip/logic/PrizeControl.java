@@ -1,19 +1,16 @@
 package pheidip.logic;
 
 import pheidip.db.DonationDataConstraintException;
-import pheidip.db.DonorData;
 import pheidip.db.PrizeData;
-import pheidip.objects.Donor;
 import pheidip.objects.Prize;
 import pheidip.util.IdUtils;
-import pheidip.util.StringUtils;
 
 public class PrizeControl
 {
   private DonationDatabaseManager manager;
   private int prizeId;
   private PrizeData prizes;
-  private DonorData donors;
+  private Prize cachedData;
   
   public static int createNewPrize(DonationDatabaseManager manager)
   {
@@ -33,7 +30,7 @@ public class PrizeControl
     this.manager = manager;
     this.prizes = this.manager.getDataAccess().getPrizeData();
     this.prizeId = prizeId;
-    this.donors = this.manager.getDataAccess().getDonorData();
+    this.cachedData = null;
   }
 
   public int getPrizeId()
@@ -43,22 +40,23 @@ public class PrizeControl
   
   public Prize getData()
   {
-    return this.prizes.getPrizeById(this.prizeId);
+    if (this.cachedData == null)
+    {
+      this.refreshData();
+    }
+    
+    return this.cachedData;
   }
   
-  public Donor getPrizeWinner()
+  public Prize refreshData()
   {
-    return this.donors.getPrizeWinner(this.prizeId);
+    this.cachedData = this.prizes.getPrizeById(this.prizeId);
+    return this.cachedData;
   }
-  
-  public void setPrizeWinner(int donorId)
-  {
-    this.prizes.setPrizeWinner(this.prizeId, donorId);
-  }
-  
+
   public void removePrizeWinner()
   {
-    this.prizes.removePrizeWinner(this.prizeId);
+    this.getData().setWinner(null);
   }
   
   public void deletePrize()
@@ -73,22 +71,11 @@ public class PrizeControl
     }
   }
 
-  public void updateData(String name, String imageURL, String description, Integer winner)
+  public void updateData(Prize data)
   {
     try
     {
-      Donor d = null;
-      if (winner != null)
-      {
-        d = this.donors.getDonorById(winner);
-      }
-      
-      this.prizes.updatePrize(new Prize(
-          this.prizeId, 
-          StringUtils.nullIfEmpty(name), 
-          StringUtils.nullIfEmpty(imageURL), 
-          StringUtils.nullIfEmpty(description),
-          d));
+      this.prizes.updatePrize(data);
     }
     catch(DonationDataConstraintException e)
     {

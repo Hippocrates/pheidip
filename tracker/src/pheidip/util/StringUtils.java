@@ -116,4 +116,9 @@ public final class StringUtils
       return filename.substring(dotlocation + 1);
     }
   }
+  
+  public static String canonicalize(String s)
+  {
+    return nullIfEmpty(s) == null ? null : s.toLowerCase();
+  }
 }

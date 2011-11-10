@@ -262,6 +262,7 @@ public class ChoicePanel extends EntityPanel
   @Override
   public void refreshContent()
   {
+    this.choiceControl.refreshData();
     this.redrawContent();
   }
 
@@ -305,7 +306,11 @@ public class ChoicePanel extends EntityPanel
   
   public void saveContent()
   {
-    this.choiceControl.updateData(this.nameField.getText(), this.descriptionTextArea.getText(), (BidState) this.stateComboBox.getSelectedItem());
+    Choice data = this.choiceControl.getData();
+    data.setName(this.nameField.getText());
+    data.setDescription(this.descriptionTextArea.getText());
+    data.setBidState((BidState) this.stateComboBox.getSelectedItem());
+    this.choiceControl.updateData(data);
     this.refreshContent();
   }
   
@@ -319,15 +324,15 @@ public class ChoicePanel extends EntityPanel
       this.refreshContent();
     }
   }
-  
-  private Integer getSelectedOptionId()
+
+  private ChoiceOption getSelectedOption()
   {
     int rowId = this.optionTable.getSelectedRow();
-    Integer result = null;
+    ChoiceOption result = null;
     
     if (rowId != -1)
     {
-      result = ((ChoiceOption)this.optionTable.getValueAt(rowId, 0)).getId();
+      result = (ChoiceOption) this.optionTable.getValueAt(rowId, 0);
     }
     
     return result;
@@ -335,31 +340,31 @@ public class ChoicePanel extends EntityPanel
   
   private void renameCurrentOption()
   {
-    Integer selectedId = getSelectedOptionId();
+    ChoiceOption selected = getSelectedOption();
     
-    if (selectedId != null)
+    if (selected != null)
     {
       String name = JOptionPane.showInputDialog(this, "Please enter a new name for this option.", "Rename Option", JOptionPane.OK_CANCEL_OPTION);
       
       if (name != null)
       {
-        this.choiceControl.renameOption(selectedId, name);
-        this.refreshContent();
+        selected.setName(name);
+        this.redrawContent();
       }
     }
   }
   
   private void deleteCurrentOption()
   {
-    Integer selectedId = getSelectedOptionId();
+    ChoiceOption selected = getSelectedOption();
     
-    if (selectedId != null)
+    if (selected != null)
     {
       int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this option?", "Delete Option?", JOptionPane.YES_NO_OPTION);
       
       if (result == JOptionPane.YES_OPTION)
       {
-        this.choiceControl.deleteOption(selectedId);
+        this.choiceControl.deleteOption(selected);
         this.refreshContent();
       }
     }

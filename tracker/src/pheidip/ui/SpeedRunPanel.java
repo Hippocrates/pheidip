@@ -265,6 +265,7 @@ public class SpeedRunPanel extends EntityPanel
   @Override
   public void refreshContent()
   {
+    this.speedRunControl.refreshData();
     this.redrawContent();
   }
 
@@ -332,7 +333,10 @@ public class SpeedRunPanel extends EntityPanel
   
   public void saveContent()
   {
-    this.speedRunControl.updateData(this.nameField.getText(), this.descriptionTextArea.getText());
+    SpeedRun data = this.speedRunControl.getData();
+    data.setName(this.nameField.getText());
+    data.setDescription(this.descriptionTextArea.getText());
+    this.speedRunControl.updateData(data);
     this.refreshContent();
   }
 

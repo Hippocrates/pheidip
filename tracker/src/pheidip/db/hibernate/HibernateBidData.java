@@ -257,8 +257,8 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     Session session = this.getSessionFactory().openSession();
     session.beginTransaction();
     
-    Query q = session.createQuery("select sum(b.amount) from ChoiceOption o left join ChoiceBid b where o.id = :id");
-
+    Query q = session.createQuery("select sum(b.amount) from ChoiceBid b left join b.option where b.option.id = :id");
+    
     q.setInteger("id", optionId);
     
     //@SuppressWarnings("unchecked")
@@ -267,8 +267,8 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     
     session.getTransaction().commit();
     session.close();
-    
-    return (BigDecimal) listing.get(0);
+
+    return listing.get(0) == null ? BigDecimal.ZERO : (BigDecimal) listing.get(0);
   }
 
   @Override
@@ -277,8 +277,8 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     Session session = this.getSessionFactory().openSession();
     session.beginTransaction();
     
-    Query q = session.createQuery("select sum(b.amount) from Challenge c left join ChallengeBid b where c.id = :id");
-
+    Query q = session.createQuery("select sum(b.amount) from ChallengeBid b left join b.challenge where b.challenge.id = :id");
+    
     q.setInteger("id", challengeId);
     
     //@SuppressWarnings("unchecked")
@@ -288,7 +288,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     session.getTransaction().commit();
     session.close();
     
-    return (BigDecimal) listing.get(0);
+    return listing.get(0) == null ? BigDecimal.ZERO : (BigDecimal) listing.get(0);
   }
 
   @Override

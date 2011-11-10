@@ -8,7 +8,6 @@ import pheidip.db.BidData;
 import pheidip.db.SpeedRunData;
 import pheidip.objects.Bid;
 import pheidip.objects.BidState;
-import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.SpeedRun;
@@ -21,6 +20,7 @@ public class SpeedRunControl
   private SpeedRunData speedRuns;
   private BidData bids;
   private int speedRunId;
+  private SpeedRun cachedData;
   
   public SpeedRunControl(DonationDatabaseManager manager, int speedRunId)
   {
@@ -28,26 +28,33 @@ public class SpeedRunControl
     this.speedRuns = this.donationDatabase.getDataAccess().getSpeedRuns();
     this.bids = this.donationDatabase.getDataAccess().getBids();
     this.speedRunId = speedRunId;
+    this.cachedData = null;
   }
 
   public SpeedRun getData()
   {
-    return this.speedRuns.getSpeedRunById(this.speedRunId);
+    if (this.cachedData == null)
+    {
+      this.refreshData();
+    }
+    
+    return this.cachedData;
   }
   
-  public void updateData(String newName, String description)
+  public SpeedRun refreshData()
   {
-    this.speedRuns.updateSpeedRun(new SpeedRun(this.speedRunId, newName, description));
+    this.cachedData = this.speedRuns.getSpeedRunById(this.speedRunId);
+    return this.cachedData;
+  }
+  
+  public void updateData(SpeedRun data)
+  {
+    this.speedRuns.updateSpeedRun(data);
   }
 
   public List<Bid> getAllBids()
   {
-    List<Bid> bids = new ArrayList<Bid>();
-    
-    bids.addAll(this.bids.getChallengesBySpeedrun(this.speedRunId));
-    bids.addAll(this.bids.getChoicesBySpeedrun(this.speedRunId));
-    
-    return bids;
+    return new ArrayList<Bid>(this.getData().getBids());
   }
   
   public static int createNewSpeedRun(DonationDatabaseManager manager, String name)
@@ -66,7 +73,10 @@ public class SpeedRunControl
   {
     int id = IdUtils.generateId();
     
-    this.bids.insertChallenge(new Challenge(id, result, BigDecimal.ZERO.setScale(2), null, BidState.OPENED, this.getData()));
+    Challenge inserted = new Challenge(id, result, BigDecimal.ZERO.setScale(2), null, BidState.OPENED, this.getData());
+    this.getData().getBids().add(inserted);
+    
+    this.bids.insertChallenge(inserted);
     
     return id;
   }
@@ -75,29 +85,18 @@ public class SpeedRunControl
   {
     int id = IdUtils.generateId();
     
-    this.bids.insertChoice(new Choice(id, defaultName, null, BidState.OPENED, this.getData()));
+    Choice inserted = new Choice(id, defaultName, null, BidState.OPENED, this.getData());
+    
+    this.bids.insertChoice(inserted);
+    this.getData().getBids().add(inserted);
     
     return id;
   }
 
   public void deleteSpeedRun()
   {
-    List<Bid> allBids = this.getAllBids();
-    
-    for (Bid b : allBids)
-    {
-      if (b.getType() == BidType.CHALLENGE)
-      {
-        this.bids.deleteChallenge(b.getId());
-      }
-      else
-      {
-        ChoiceControl control = new ChoiceControl(this.donationDatabase, b.getId());
-        control.deleteChoice();
-      }
-    }
-    
     this.speedRuns.deleteSpeedRun(this.speedRunId);
+    this.cachedData = null;
   }
   
   public ChoiceControl getChoiceControl(int choiceId)

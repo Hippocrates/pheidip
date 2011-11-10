@@ -200,7 +200,6 @@ public class ChallengePanel extends EntityPanel
     }
   }
   
-  
   private void initializeGUIEvents()
   {
     this.actionHandler = new ActionHandler();
@@ -249,6 +248,7 @@ public class ChallengePanel extends EntityPanel
   @Override
   public void refreshContent()
   {
+    this.challengeControl.refreshData();
     this.redrawContent();
   }
   
@@ -291,6 +291,11 @@ public class ChallengePanel extends EntityPanel
 
   public void saveContent()
   {
-    this.challengeControl.updateData(this.nameField.getText(), new BigDecimal(this.amountField.getText()), this.descriptionTextArea.getText(), (BidState)this.bidStateComboBox.getSelectedItem());
+    Challenge data = this.challengeControl.getData();
+    data.setName(this.nameField.getText());
+    data.setGoalAmount(new BigDecimal(this.amountField.getText()));
+    data.setDescription(this.descriptionTextArea.getText());
+    data.setBidState((BidState)this.bidStateComboBox.getSelectedItem());
+    this.challengeControl.updateData(data);
   }
 }
