@@ -4,6 +4,7 @@ import java.util.List;
 
 import pheidip.db.DonationData;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationSearchParams;
 
 public class DonationBidTask implements DonationTask
 {
@@ -18,15 +19,15 @@ public class DonationBidTask implements DonationTask
   }
   
   @Override
-  public DonationControl getControl(int donationId)
+  public DonationControl getControl(Donation d)
   {
-    return new DonationControl(this.manager, donationId);
+    return new DonationControl(this.manager, d);
   }
 
   @Override
-  public void clearTask(int donationId)
+  public void clearTask(Donation d)
   {
-    this.getControl(donationId).markAsBidsHandled();
+    this.getControl(d).markAsBidsHandled();
   }
   
   public boolean isTaskCleared(Donation d)
@@ -37,7 +38,10 @@ public class DonationBidTask implements DonationTask
   @Override
   public List<Donation> refreshTaskList()
   {
-    return this.donations.getDonationsWithPendingBids();
+    DonationSearchParams params = new DonationSearchParams();
+    params.onlyIfUnbid = true;
+    
+    return this.donations.searchDonations(params);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package pheidip.db.hibernate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -7,7 +8,9 @@ import org.hibernate.Session;
 
 import pheidip.db.DonorData;
 import pheidip.objects.Donor;
+import pheidip.objects.DonorSearchParams;
 import pheidip.objects.Prize;
+import pheidip.util.StringUtils;
 
 public class HibernateDonorData extends HibernateDataInterface implements DonorData 
 {
@@ -181,4 +184,53 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
     session.getTransaction().commit();
     session.close();
 	}
+
+  @Override
+  public List<Donor> searchDonors(DonorSearchParams params)
+  {
+    String queryString = "from Donor d";
+    List<String> whereClause = new ArrayList<String>();
+    
+    if (params.firstName != null)
+      whereClause.add("d.firstName like :firstName");
+    
+    if (params.lastName != null)
+      whereClause.add("d.lastName like :lastName");
+    
+    if (params.email != null)
+      whereClause.add("d.email like :email");
+    
+    if (params.alias != null)
+      whereClause.add("d.alias like :alias");
+    
+    if (whereClause.size() > 0)
+    {
+      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
+    }
+    
+    Session session = this.getSessionFactory().openSession();
+    session.beginTransaction();
+    
+    Query q = session.createQuery(queryString + " order by d.alias, d.email, d.firstName, d.lastName");
+
+    if (params.firstName != null)
+      q.setString("firstName", StringUtils.sqlInnerStringMatch(params.firstName));
+    
+    if (params.lastName != null)
+      q.setString("lastName", StringUtils.sqlInnerStringMatch(params.lastName));
+    
+    if (params.email != null)
+      q.setString("email", StringUtils.sqlInnerStringMatch(params.email));
+    
+    if (params.alias != null)
+      q.setString("alias", StringUtils.sqlInnerStringMatch(params.alias));
+    
+    @SuppressWarnings("unchecked")
+    List<Donor> listing = q.list();
+    
+    session.getTransaction().commit();
+    session.close();
+    
+    return listing;
+  }
 }

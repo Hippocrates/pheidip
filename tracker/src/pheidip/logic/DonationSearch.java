@@ -4,7 +4,7 @@ import java.util.List;
 
 import pheidip.db.DonationData;
 import pheidip.objects.Donation;
-import pheidip.util.Filter;
+import pheidip.objects.DonationSearchParams;
 
 public class DonationSearch
 {
@@ -16,7 +16,6 @@ public class DonationSearch
   {
     this.manager = manager;
     this.donations = this.manager.getDataAccess().getDonationData();
-    this.cachedDonations = this.donations.getAllDonations();
   }
   
   public DonorSearch createDonorSearch()
@@ -26,6 +25,6 @@ public class DonationSearch
   
   public List<Donation> searchDonations(DonationSearchParams param)
   {
-    return Filter.filterList(this.cachedDonations, param);
+    return this.donations.searchDonations(param);
   }
 }

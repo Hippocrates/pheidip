@@ -4,6 +4,7 @@ import java.util.List;
 
 import pheidip.db.DonationData;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationSearchParams;
 
 public class DonationReadTask implements DonationTask
 {
@@ -18,16 +19,15 @@ public class DonationReadTask implements DonationTask
   }
   
   @Override
-  public DonationControl getControl(int donationId)
+  public DonationControl getControl(Donation d)
   {
-    return new DonationControl(this.manager, donationId);
+    return new DonationControl(this.manager, d);
   }
 
   @Override
-  public void clearTask(int donationId)
+  public void clearTask(Donation d)
   {
-    DonationControl control = getControl(donationId);
-    Donation d = control.getData();
+    DonationControl control = getControl(d);
     d.markAsRead(true);
     control.updateData(d);
   }
@@ -35,7 +35,10 @@ public class DonationReadTask implements DonationTask
   @Override
   public List<Donation> refreshTaskList()
   {
-    return this.donations.getDonationsToBeRead();
+    DonationSearchParams params = new DonationSearchParams();
+    params.onlyIfUnread = true;
+    
+    return this.donations.searchDonations(params);
   }
   
   public boolean isTaskCleared(Donation d)

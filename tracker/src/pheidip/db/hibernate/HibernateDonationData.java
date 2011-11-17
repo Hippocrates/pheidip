@@ -18,7 +18,9 @@ import pheidip.objects.DonationBid;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationReadState;
+import pheidip.objects.DonationSearchParams;
 import pheidip.objects.Donor;
+import pheidip.util.StringUtils;
 
 public class HibernateDonationData extends HibernateDataInterface implements DonationData
 {
@@ -148,12 +150,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   {
     Session session = this.getSessionFactory().openSession();
     session.beginTransaction();
-/*
-    session.update(d.getDonor());
-    
-    d.getDonor().getDonations().add(d);
-    session.update(d.getDonor());
-    */
+
     session.save(d);
 
     session.getTransaction().commit();
@@ -180,7 +177,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     Session session = this.getSessionFactory().openSession();
     session.beginTransaction();
     
-    Query q = session.createQuery("from Donation d where d.domain = :domain and d.domainId = :domainid");
+    Query q = session.createQuery("from Donation d inner join fetch d.donor where d.domain = :domain and d.domainId = :domainid");
     q.setString("domain", domain.toString());
     q.setString("domainid", domainId);
     
@@ -305,6 +302,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     session.beginTransaction();
     
     DonationBid b = (DonationBid) session.load(DonationBid.class, challengeBidId);
+    b.getDonation().getBids().remove(b);
     session.delete(b);
 
     session.getTransaction().commit();
@@ -318,46 +316,11 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     session.beginTransaction();
     
     DonationBid b = (DonationBid) session.load(DonationBid.class, choiceBidId);
+    b.getDonation().getBids().remove(b);
     session.delete(b);
 
     session.getTransaction().commit();
     session.close();
-  }
-
-  @Override
-  public List<Donation> getDonationsWithPendingBids()
-  {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
-    
-    Query q = session.createQuery("from Donation d where d.bidState = :bidstate");
-    q.setString("bidstate", DonationBidState.PENDING.toString());
-    
-    @SuppressWarnings("unchecked")
-    List<Donation> listing = q.list();
-    
-    session.getTransaction().commit();
-    session.close();
-    
-    return listing;
-  }
-
-  @Override
-  public List<Donation> getDonationsToBeRead()
-  {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
-    
-    Query q = session.createQuery("from Donation d where d.readState = :readstate");
-    q.setString("readstate", DonationReadState.PENDING.toString());
-    
-    @SuppressWarnings("unchecked")
-    List<Donation> listing = q.list();
-    
-    session.getTransaction().commit();
-    session.close();
-    
-    return listing;
   }
 
   @Override
@@ -400,6 +363,86 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     session.beginTransaction();
     
     Query q = session.createQuery("from Donation");
+    
+    @SuppressWarnings("unchecked")
+    List<Donation> listing = q.list();
+    
+    session.getTransaction().commit();
+    session.close();
+    
+    return listing;
+  }
+
+  @Override
+  public List<Donation> searchDonations(DonationSearchParams params)
+  {
+    String queryString = "from Donation d inner join fetch d.donor";
+    List<String> whereClause = new ArrayList<String>();
+    
+    if (params.donor != null)
+      whereClause.add("d.donor = :donor");
+    
+    if (params.domain != null)
+      whereClause.add("d.domain = :domain");
+    
+    if (params.domainId != null)
+      whereClause.add("d.domainId like :domainId");
+    
+    if (params.loTime != null)
+      whereClause.add("d.timeReceived >= :loTime");
+    
+    if (params.hiTime != null)
+      whereClause.add("d.timeReceived <= :hiTime");
+    
+    if (params.loAmount != null)
+      whereClause.add("d.amount >= :loAmount");
+    
+    if (params.hiAmount != null)
+      whereClause.add("d.amount <= :hiAmount");
+    
+    // TODO: change this to actually check for the comment and stuff for these to mirror the client behavior
+    if (params.onlyIfUnbid)
+      whereClause.add("d.bidState = :bidState");
+    
+    if (params.onlyIfUnread)
+      whereClause.add("d.readState = :readState");
+    
+    if (whereClause.size() > 0)
+    {
+      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
+    }
+    
+    Session session = this.getSessionFactory().openSession();
+    session.beginTransaction();
+    
+    Query q = session.createQuery(queryString + " order by d.timeReceived, d.domain, d.domainId");
+
+    if (params.donor != null)
+      q.setParameter("donor", params.donor);
+    
+    if (params.domain != null)
+      q.setParameter("domain", params.domain);
+    
+    if (params.domainId != null)
+      q.setString("domainId", params.domainId);
+    
+    if (params.loTime != null)
+      q.setDate("loTime", params.loTime);
+    
+    if (params.hiTime != null)
+      q.setDate("hiTime", params.hiTime);
+
+    if (params.loAmount != null)
+      q.setBigDecimal("loAmount", params.loAmount);
+    
+    if (params.hiAmount != null)
+      q.setBigDecimal("hiAmount", params.hiAmount);
+    
+    if (params.onlyIfUnbid)
+      q.setParameter("bidState", DonationBidState.PENDING);
+    
+    if (params.onlyIfUnread)
+      q.setParameter("readState", DonationReadState.PENDING);
     
     @SuppressWarnings("unchecked")
     List<Donation> listing = q.list();

@@ -1,6 +1,5 @@
-package pheidip.logic;
+package pheidip.objects;
 
-import pheidip.objects.Prize;
 import pheidip.util.FilterFunction;
 import pheidip.util.StringUtils;
 

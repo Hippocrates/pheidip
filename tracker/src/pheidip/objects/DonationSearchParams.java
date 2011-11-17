@@ -1,15 +1,13 @@
-package pheidip.logic;
+package pheidip.objects;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-import pheidip.objects.Donation;
-import pheidip.objects.DonationDomain;
 import pheidip.util.FilterFunction;
 
 public class DonationSearchParams implements FilterFunction<Donation>
 {
-  public Integer donorId;
+  public Donor donor;
   public DonationDomain domain;
   public String domainId;
   public Date loTime;
@@ -23,7 +21,7 @@ public class DonationSearchParams implements FilterFunction<Donation>
   public boolean predicate(Donation x)
   {
     return 
-      (donorId == null || x.getDonor().getId() == donorId) &&
+      (donor == null || x.getDonor().equals(donor)) &&
       (domain == null || x.getDomain() == domain) &&
       (domainId == null || x.getDomainId().equals(domainId)) && 
       (loTime == null || x.getTimeReceived().compareTo(loTime) >= 0) &&

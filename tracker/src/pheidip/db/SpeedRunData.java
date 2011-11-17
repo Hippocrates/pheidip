@@ -3,6 +3,7 @@ package pheidip.db;
 import java.util.List;
 
 import pheidip.objects.SpeedRun;
+import pheidip.objects.SpeedRunSearchParams;
 
 public interface SpeedRunData {
 
@@ -16,4 +17,5 @@ public interface SpeedRunData {
 
 	public List<SpeedRun> getAllSpeedRuns();
 
+	public List<SpeedRun> searchSpeedRuns(SpeedRunSearchParams params);
 }

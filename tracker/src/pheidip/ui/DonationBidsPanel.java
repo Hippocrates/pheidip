@@ -167,14 +167,7 @@ public class DonationBidsPanel extends JPanel
       
       if (result == JOptionPane.YES_OPTION)
       {
-        if (selected.getType() == BidType.CHOICE)
-        {
-          this.control.removeChoiceBid(selected.getId());
-        }
-        else
-        {
-          this.control.removeChallengeBid(selected.getId());
-        }
+        this.control.removeBid(selected);
         
         this.refreshContent();
       }

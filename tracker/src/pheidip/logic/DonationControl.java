@@ -39,6 +39,15 @@ public class DonationControl
     this.cachedData = null;
   }
   
+  public DonationControl(DonationDatabaseManager donationDatabase, Donation donation)
+  {
+    this.donationDatabase = donationDatabase;
+    this.donations = this.donationDatabase.getDataAccess().getDonationData();
+    this.bids = this.donationDatabase.getDataAccess().getBids();
+    this.donationId = donation.getId();
+    this.cachedData = donation;
+  }
+  
   public int getDonationId()
   {
     return this.donationId;
@@ -171,16 +180,20 @@ public class DonationControl
     }
   }
   
-  public void removeChallengeBid(int challengeBidId)
+  public void removeBid(DonationBid bid)
   {
-    this.donations.removeChallengeBid(challengeBidId);
+    if (bid.getType() == BidType.CHALLENGE)
+    {
+      this.donations.removeChallengeBid(bid.getId());
+    }
+    else
+    {
+      this.donations.removeChoiceBid(bid.getId());
+    }
+    
+    this.getData().getBids().remove(bid);
   }
-  
-  public void removeChoiceBid(int choiceBidId)
-  {
-    this.donations.removeChoiceBid(choiceBidId);
-  }
-  
+
   private boolean checkChangeInBidIsBelowDonationAmount(int donationBidId, BidType type, BigDecimal newAmount)
   {
     Donation data = this.getData();
@@ -230,14 +243,7 @@ public class DonationControl
     
     for (DonationBid b : attachedBids)
     {
-      if (b.getType() == BidType.CHALLENGE)
-      {
-        this.removeChallengeBid(b.getId());
-      }
-      else
-      {
-        this.removeChoiceBid(b.getId());
-      }
+      this.removeBid((ChallengeBid)b);
     }
     
     this.cachedData = null;

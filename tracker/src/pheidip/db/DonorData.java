@@ -3,6 +3,7 @@ package pheidip.db;
 import java.util.List;
 
 import pheidip.objects.Donor;
+import pheidip.objects.DonorSearchParams;
 
 public interface DonorData 
 {
@@ -27,4 +28,5 @@ public interface DonorData
 
 	public void deleteAllDonors();
 
+	public List<Donor> searchDonors(DonorSearchParams params);
 }

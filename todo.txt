@@ -11,12 +11,16 @@ Tracker App TODO:
       - start with test cases, I created a packaged called hdb under test.  Eventually, the hibernate implementation should supercede the other one, so I don't think another 'db' package would be worthwhile
     - It's pretty straightforward.  Basically, all that's required should just be to modify the 'Control' and 'Search' classes to use Hibernate instead (and remove the stupid 2nd order linking since they act like normal objects now).
     - There will be some issues with the use of lazy-loading, but I think I can work around them
+    - Its almost all in place, some of the bid assignment and donation tasks need testing, but we are almost back where we were.
+    - The last step will be to re-work the chipin merge function to work faster, but this will be part of the tuning in the next step
 
 - UPGRADE: Data access layer speed
   - fix accesses to avoid round-trips to the server
   - remove the 'pre-cache' of all elements in most of the search dialogs
   - Priority: Highest
   - Difficulty: Highest
+  - Notes:
+    - This needs to be tested extensively with a remote DB, to identify and remove as many round-trips as possible
 
 - UPGRADE: Try retrieving game times (and names) from the google docs spreadsheet
   - what to do about games added removed?

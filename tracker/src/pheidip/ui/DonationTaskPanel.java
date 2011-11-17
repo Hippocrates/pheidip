@@ -219,7 +219,7 @@ public class DonationTaskPanel extends EntityPanel
     
     if (d != null)
     {
-      this.task.clearTask(d.getId());
+      this.task.clearTask(d);
     }
     
     if (selectedIndex + 1 == this.donationList.getModel().getSize())
@@ -244,7 +244,7 @@ public class DonationTaskPanel extends EntityPanel
     
     if (d != null)
     {
-      this.control = this.task.getControl(d.getId());
+      this.control = this.task.getControl(d);
     }
     else
     {

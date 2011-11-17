@@ -1,47 +1,26 @@
 package pheidip.logic;
 
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import pheidip.db.BidData;
 import pheidip.objects.Bid;
+import pheidip.objects.BidSearchParams;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
-import pheidip.util.EqualsFilterFunction;
+import pheidip.objects.ChoiceOptionSearchParams;
 import pheidip.util.Filter;
-import pheidip.util.InnerStringMatchFilter;
-import pheidip.util.StringUtils;
 
 public class BidSearch
 {
   private DonationDatabaseManager manager;
   private BidData bids;
-  private List<Bid> cachedBids;
-  private Method nameMethod;
-  private Method speedRunIdMethod;
-  private Method optionNameMethod;
-  private Method choiceIdMethod;
-  private List<ChoiceOption> cachedOptions;
 
   public BidSearch(DonationDatabaseManager manager)
   {
     this.manager = manager;
     this.bids = this.manager.getDataAccess().getBids();
-    this.cachedBids = this.bids.getAllBids();
-    this.cachedOptions = this.bids.getAllChoiceOptions();
-
-    try
-    {
-      this.speedRunIdMethod = Bid.class.getMethod("getSpeedRunId");
-      this.nameMethod = Bid.class.getMethod("getName");
-      this.optionNameMethod = ChoiceOption.class.getMethod("getName");
-      this.choiceIdMethod = ChoiceOption.class.getMethod("getChoiceId");
-    } 
-    catch (Exception e)
-    {
-      throw new RuntimeException(e);
-    }
   }
   
   public Challenge createChallengeIfAble(int speedRunId, String name)
@@ -65,37 +44,19 @@ public class BidSearch
     return this.bids.getChoiceOptionById(id);
   }
   
-  public List<Bid> searchBids(Integer speedRunId, String bidName)
+  public List<Bid> searchBids(BidSearchParams params)
   {
-    List<Bid> filtered = this.cachedBids;
-    
-    if (speedRunId != null)
-    {
-      filtered = Filter.filterList(filtered, new EqualsFilterFunction<Integer>(speedRunId), this.speedRunIdMethod);
-    }
-    
-    if (!StringUtils.isEmptyOrNull(bidName))
-    {
-      filtered = Filter.filterList(filtered, new InnerStringMatchFilter(bidName), this.nameMethod);
-    }
-    
-    return filtered;
+    return this.bids.searchBids(params);
   }
   
-  public List<ChoiceOption> searchChoiceOptions(Integer choiceId, String optionName)
+  public List<Bid> filterBids(BidSearchParams params)
   {
-    List<ChoiceOption> filtered = this.cachedOptions;
-    
-    if (choiceId != null)
-    {
-      filtered = Filter.filterList(filtered, new EqualsFilterFunction<Integer>(choiceId), this.choiceIdMethod);
-    }
-    
-    if (!StringUtils.isEmptyOrNull(optionName))
-    {
-      filtered = Filter.filterList(filtered, new InnerStringMatchFilter(optionName), this.optionNameMethod);
-    }
-    
-    return filtered;
+    return Filter.filterList(new ArrayList<Bid>(params.owner.getBids()), params);
+  }
+  
+  // params.owner must not be null
+  public List<ChoiceOption> filterChoiceOptions(ChoiceOptionSearchParams params)
+  {
+    return Filter.filterList(new ArrayList<ChoiceOption>(params.owner.getOptions()), params);
   }
 }

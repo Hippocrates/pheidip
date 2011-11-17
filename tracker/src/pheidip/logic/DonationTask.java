@@ -6,9 +6,9 @@ import pheidip.objects.Donation;
 
 public interface DonationTask
 {
-  DonationControl getControl(int donationId);
-  void clearTask(int donationId);
-  public boolean isTaskCleared(Donation d);
+  DonationControl getControl(Donation d);
+  void clearTask(Donation d);
+  boolean isTaskCleared(Donation d);
   List<Donation> refreshTaskList();
   String taskName();
 }

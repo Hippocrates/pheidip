@@ -1,9 +1,22 @@
 package pheidip.util;
 
+import java.util.List;
 import java.util.Random;
 
 public final class StringUtils
 {
+  public static boolean innerStringMatch(String whole, String part)
+  {
+    if (whole != null)
+    {
+      return whole.toUpperCase().contains(part.toUpperCase());
+    }
+    else
+    {
+      return false;
+    }
+  }
+  
   public static String symbolToNatural(String symbol)
   {
     char[] array = symbol.toCharArray();
@@ -120,5 +133,33 @@ public final class StringUtils
   public static String canonicalize(String s)
   {
     return nullIfEmpty(s) == null ? null : s.toLowerCase();
+  }
+  
+  public static String sqlInnerStringMatch(String s)
+  {
+    return "%" + emptyIfNull(s) + "%";
+  }
+  
+  public static String joinSeperated(List<String> strings, String seperator)
+  {
+    StringBuilder acculm = new StringBuilder();
+    
+    boolean started = false;
+    
+    for (String s : strings)
+    {
+      if (started)
+      {
+        acculm.append(seperator);
+      }
+      else
+      {
+        started = true;
+      }
+      
+      acculm.append(s);
+    }
+    
+    return acculm.toString();
   }
 }

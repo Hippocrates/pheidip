@@ -5,6 +5,7 @@ import java.util.List;
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.logic.SpeedRunSearch;
 import pheidip.objects.SpeedRun;
+import pheidip.objects.SpeedRunSearchParams;
 import test.db.DBTestConfiguration;
 import junit.framework.TestCase;
 
@@ -36,7 +37,7 @@ public class TestSpeedRunSearch extends TestCase
   
   public void testSearchSpeedRunsName()
   {
-    List<SpeedRun> runs = this.searcher.searchSpeedRuns("yet");
+    List<SpeedRun> runs = this.searcher.searchSpeedRuns(new SpeedRunSearchParams("yet"));
     
     assertEquals(1, runs.size());
     

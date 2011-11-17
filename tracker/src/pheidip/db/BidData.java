@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import pheidip.objects.Bid;
+import pheidip.objects.BidSearchParams;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
@@ -48,4 +49,7 @@ public interface BidData {
 
 	public List<ChoiceOption> getAllChoiceOptions();
 
+	public List<Bid> searchBids(BidSearchParams params);
+	
+	//public List<ChoiceOption> searchChoiceOptions
 }

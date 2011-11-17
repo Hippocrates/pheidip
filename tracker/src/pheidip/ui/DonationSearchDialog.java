@@ -11,11 +11,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import pheidip.logic.DonationSearch;
-import pheidip.logic.DonationSearchParams;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationSearchParams;
 import pheidip.objects.Donor;
 import pheidip.util.FormatUtils;
 
+import java.awt.Component;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
@@ -27,8 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.JCheckBox;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
@@ -67,6 +66,8 @@ public class DonationSearchDialog extends JDialog
   private JLabel lblAmountBelow;
   private JLabel lblOnlyIfUnread;
   private JLabel lblOnlyIfPending;
+  private JButton searchButton;
+  private FocusTraversalManager tabOrder;
   
   private void initializeGUI()
   {
@@ -77,9 +78,9 @@ public class DonationSearchDialog extends JDialog
     getContentPane().add(panel, BorderLayout.CENTER);
     GridBagLayout gbl_panel = new GridBagLayout();
     gbl_panel.columnWidths = new int[]{107, 23, 113, 76, 85, 80, 0};
-    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     gbl_panel.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
     panel.setLayout(gbl_panel);
     
     lblDonor = new JLabel("Donor:");
@@ -121,7 +122,7 @@ public class DonationSearchDialog extends JDialog
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
     gbc_scrollPane.gridwidth = 2;
     gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
-    gbc_scrollPane.gridheight = 8;
+    gbc_scrollPane.gridheight = 9;
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
     gbc_scrollPane.gridx = 4;
     gbc_scrollPane.gridy = 0;
@@ -263,12 +264,20 @@ public class DonationSearchDialog extends JDialog
     gbc_onlyIfBidPendingCheckBox.gridy = 6;
     panel.add(onlyIfBidPendingCheckBox, gbc_onlyIfBidPendingCheckBox);
     
+    searchButton = new JButton("Search");
+    GridBagConstraints gbc_searchButton = new GridBagConstraints();
+    gbc_searchButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_searchButton.insets = new Insets(0, 0, 5, 5);
+    gbc_searchButton.gridx = 3;
+    gbc_searchButton.gridy = 8;
+    panel.add(searchButton, gbc_searchButton);
+    
     okButton = new JButton("OK");
     GridBagConstraints gbc_okButton = new GridBagConstraints();
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
     gbc_okButton.gridx = 3;
-    gbc_okButton.gridy = 8;
+    gbc_okButton.gridy = 9;
     panel.add(okButton, gbc_okButton);
     
     cancelButton = new JButton("Cancel");
@@ -276,12 +285,12 @@ public class DonationSearchDialog extends JDialog
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_cancelButton.insets = new Insets(0, 0, 0, 5);
     gbc_cancelButton.gridx = 4;
-    gbc_cancelButton.gridy = 8;
+    gbc_cancelButton.gridy = 9;
     panel.add(cancelButton, gbc_cancelButton);
     
   }
   
-  private class ActionHandler implements ActionListener, ChangeListener, DocumentListener
+  private class ActionHandler implements ActionListener, ChangeListener
   {
     private void runEvent(Object source)
     {
@@ -290,7 +299,6 @@ public class DonationSearchDialog extends JDialog
         if (source == browseDonorButton)
         {
           openDonorSearch();
-          runFilters();
         }
         else if (source == okButton)
         {
@@ -300,9 +308,9 @@ public class DonationSearchDialog extends JDialog
         {
           cancelDialog();
         }
-        else
+        else if (source == searchButton)
         {
-          runFilters();
+          runSearch();
         }
       }
       catch (Exception e)
@@ -321,24 +329,6 @@ public class DonationSearchDialog extends JDialog
     {
       runEvent(ev.getSource());
     }
-
-    @Override
-    public void changedUpdate(DocumentEvent ev)
-    {
-      runEvent(ev.getDocument());
-    }
-
-    @Override
-    public void insertUpdate(DocumentEvent ev)
-    {
-      runEvent(ev.getDocument());
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent ev)
-    {
-      runEvent(ev.getDocument());
-    }
   }
   
   private void initializeGUIEvents()
@@ -348,8 +338,6 @@ public class DonationSearchDialog extends JDialog
     this.browseDonorButton.addActionListener(this.actionHandler);
     this.donatedAfterField.addChangeListener(this.actionHandler);
     this.donatedAfterField.addChangeListener(this.actionHandler);
-    this.amountAboveField.getDocument().addDocumentListener(this.actionHandler);
-    this.amountBelowField.getDocument().addDocumentListener(this.actionHandler);
     this.onlyIfBidPendingCheckBox.addActionListener(this.actionHandler);
     this.onlyIfUnreadCheckBox.addActionListener(this.actionHandler);
     this.okButton.addActionListener(this.actionHandler);
@@ -359,6 +347,25 @@ public class DonationSearchDialog extends JDialog
     this.amountBelowCheckBox.addActionListener(this.actionHandler);
     this.donatedAfterCheckBox.addActionListener(this.actionHandler);
     this.donatedBeforeCheckBox.addActionListener(this.actionHandler);
+    this.searchButton.addActionListener(this.actionHandler);
+    
+    this.tabOrder = new FocusTraversalManager(new Component[]
+    {
+      this.donorCheckBox,
+      this.browseDonorButton,
+      this.donatedAfterCheckBox,
+      this.donatedAfterField,
+      this.donatedBeforeCheckBox,
+      this.amountAboveCheckBox,
+      this.amountAboveField,
+      this.amountBelowCheckBox,
+      this.amountBelowField,
+      this.searchButton,
+      this.okButton,
+      this.cancelButton,
+    });
+    
+    this.setFocusTraversalPolicy(this.tabOrder);
   }
 
   public DonationSearchDialog(JFrame owner, DonationSearch searcher)
@@ -368,8 +375,6 @@ public class DonationSearchDialog extends JDialog
 
     this.initializeGUI();
     this.initializeGUIEvents();
-    
-    this.runFilters();
   }
   
   public Donation getResult()
@@ -403,11 +408,11 @@ public class DonationSearchDialog extends JDialog
     this.dispose();
   }
   
-  private void runFilters()
+  private void runSearch()
   {
     DonationSearchParams params = new DonationSearchParams();
     
-    params.donorId = this.donorCheckBox.isSelected() ? this.currentDonor == null ? null : this.currentDonor.getId() : null;
+    params.donor = this.donorCheckBox.isSelected() ? this.currentDonor : null;
     params.loTime = this.donatedAfterCheckBox.isSelected() ? (Date)this.donatedAfterField.getValue() : null;
     params.hiTime = this.donatedBeforeCheckBox.isSelected() ? (Date)this.donatedBeforeField.getValue() : null;
     params.loAmount = this.amountAboveCheckBox.isSelected() ? FormatUtils.getNumberOrNull(this.amountAboveField.getText()) : null;

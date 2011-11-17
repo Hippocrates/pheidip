@@ -1,59 +1,30 @@
 package pheidip.logic;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 import pheidip.db.SpeedRunData;
 import pheidip.objects.SpeedRun;
-import pheidip.util.Filter;
-import pheidip.util.InnerStringMatchFilter;
-import pheidip.util.StringUtils;
+import pheidip.objects.SpeedRunSearchParams;
 
 public class SpeedRunSearch
 {
   private DonationDatabaseManager manager;
   private SpeedRunData speedRuns;
-  private List<SpeedRun> cachedRuns;
-  private Method nameMethod;
 
   public SpeedRunSearch(DonationDatabaseManager manager)
   {
     this.manager = manager;
     this.speedRuns = this.manager.getDataAccess().getSpeedRuns();
-    
-    this.cachedRuns = this.speedRuns.getAllSpeedRuns();
-    
-    try
-    {
-      this.nameMethod = SpeedRun.class.getMethod("getName");
-      
-    } 
-    catch (Exception e)
-    {
-      throw new RuntimeException(e);
-    }
   }
   
-  public SpeedRun createIfAble(String speedRunName)
+  public SpeedRun createIfAble(SpeedRunSearchParams params)
   {
-    int id = SpeedRunControl.createNewSpeedRun(this.manager, speedRunName);
+    int id = SpeedRunControl.createNewSpeedRun(this.manager, params.name);
     return this.speedRuns.getSpeedRunById(id);
   }
   
-  public List<SpeedRun> searchSpeedRuns(String name)
+  public List<SpeedRun> searchSpeedRuns(SpeedRunSearchParams params)
   {
-    List<SpeedRun> filtered = this.cachedRuns;
-    
-    if (!StringUtils.isEmptyOrNull(name))
-    {
-      filtered = this.searchByStringField(name, filtered, this.nameMethod);
-    }
-    
-    return filtered;
-  }
-  
-  private List<SpeedRun> searchByStringField(String firstName, List<SpeedRun> input, Method getter)
-  {
-    return Filter.filterList(input, new InnerStringMatchFilter(firstName), getter);
+    return this.speedRuns.searchSpeedRuns(params);
   }
 }

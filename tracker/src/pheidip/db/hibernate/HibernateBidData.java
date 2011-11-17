@@ -9,10 +9,12 @@ import org.hibernate.Session;
 
 import pheidip.db.BidData;
 import pheidip.objects.Bid;
+import pheidip.objects.BidSearchParams;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 import pheidip.objects.SpeedRun;
+import pheidip.util.StringUtils;
 
 public class HibernateBidData extends HibernateDataInterface implements BidData
 {
@@ -316,6 +318,43 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
 
     @SuppressWarnings("unchecked")
     List<ChoiceOption> listing = q.list();
+    
+    session.getTransaction().commit();
+    session.close();
+    
+    return listing;
+  }
+
+  @Override
+  public List<Bid> searchBids(BidSearchParams params)
+  {
+    String queryString = "from Bid b";
+    List<String> whereClause = new ArrayList<String>();
+    
+    if (params.name != null)
+      whereClause.add("b.name like :name");
+    
+    if (params.owner != null)
+      whereClause.add("b.speedRun = :owner");
+    
+    if (whereClause.size() > 0)
+    {
+      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
+    }
+    
+    Session session = this.getSessionFactory().openSession();
+    session.beginTransaction();
+    
+    Query q = session.createQuery(queryString + " order by b.name");
+
+    if (params.name != null)
+      q.setString("name", StringUtils.sqlInnerStringMatch(params.name));
+    
+    if (params.owner != null)
+      q.setParameter("owner", params.owner);
+
+    @SuppressWarnings("unchecked")
+    List<Bid> listing = q.list();
     
     session.getTransaction().commit();
     session.close();

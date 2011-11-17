@@ -10,6 +10,7 @@ import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationReadState;
+import pheidip.objects.DonationSearchParams;
 
 public interface DonationData {
 
@@ -50,14 +51,11 @@ public interface DonationData {
 
 	public void removeChoiceBid(int choiceBidId);
 
-	public List<Donation> getDonationsWithPendingBids();
-
-	public List<Donation> getDonationsToBeRead();
-
 	public void setDonationReadState(int donationId, DonationReadState readState);
 
 	public List<Donation> getDonationsInTimeRange(Date lo, Date hi);
 
 	public List<Donation> getAllDonations();
 
+	public List<Donation> searchDonations(DonationSearchParams params);
 }

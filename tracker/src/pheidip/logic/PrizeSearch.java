@@ -4,6 +4,7 @@ import java.util.List;
 
 import pheidip.db.PrizeData;
 import pheidip.objects.Prize;
+import pheidip.objects.PrizeSearchParams;
 import pheidip.util.Filter;
 
 public class PrizeSearch

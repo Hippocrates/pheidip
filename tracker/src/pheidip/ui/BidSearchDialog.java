@@ -6,10 +6,13 @@ import javax.swing.JFrame;
 import pheidip.logic.BidSearch;
 import pheidip.logic.SpeedRunSearch;
 import pheidip.objects.Bid;
+import pheidip.objects.BidSearchParams;
 import pheidip.objects.BidType;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
+import pheidip.objects.ChoiceOptionSearchParams;
 import pheidip.objects.SpeedRun;
+import pheidip.objects.SpeedRunSearchParams;
 import pheidip.util.StringUtils;
 
 import javax.swing.JPanel;
@@ -64,6 +67,7 @@ public class BidSearchDialog extends JDialog
   private JButton newOptionButton;
   private JButton newChallengeButton;
   private JButton newChoiceButton;
+  private JButton searchButton;
 
   private void initializeGUI()
   {
@@ -133,6 +137,14 @@ public class BidSearchDialog extends JDialog
     
     bidNameList = new JList();
     bidNameScrollPane.setViewportView(bidNameList);
+    
+    searchButton = new JButton("Search");
+    GridBagConstraints gbc_searchButton = new GridBagConstraints();
+    gbc_searchButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_searchButton.insets = new Insets(0, 0, 5, 5);
+    gbc_searchButton.gridx = 0;
+    gbc_searchButton.gridy = 3;
+    panel.add(searchButton, gbc_searchButton);
     
     newChallengeButton = new JButton("New Challenge");
     newChallengeButton.setEnabled(false);
@@ -220,10 +232,10 @@ public class BidSearchDialog extends JDialog
         (getCurrentBid() != null && (getCurrentChoice() == null || !showOptions)) ||
         (getCurrentChoice() != null && getCurrentOption() != null));
   
-    boolean createBideEnabled = getCurrentSpeedRun() != null && 
+    boolean createBidEnabled = getCurrentSpeedRun() != null && 
       !StringUtils.isEmptyOrNull(bidNameField.getText());
-    
-    newChallengeButton.setEnabled(createBideEnabled);
+
+    newChallengeButton.setEnabled(createBidEnabled);
     
     if (showOptions)
     {
@@ -231,47 +243,12 @@ public class BidSearchDialog extends JDialog
     }
     else
     {
-      newChoiceButton.setEnabled(createBideEnabled);
+      newChoiceButton.setEnabled(createBidEnabled);
     }
   }
   
   private class ActionHandler implements DocumentListener, ActionListener, ListSelectionListener
   {
-    private void documentUpdated(DocumentEvent ev)
-    {
-      if (ev.getDocument() == speedRunField.getDocument())
-      {
-        runSpeedRunFilter();
-      }
-      else if (ev.getDocument() == bidNameField.getDocument())
-      {
-        runBidFilter();
-      }
-      else if (ev.getDocument() == optionNameField.getDocument())
-      {
-        runOptionFilter();
-      }
-      
-      updateUIState();
-    }
-    
-    public void changedUpdate(DocumentEvent ev)
-    {
-      this.documentUpdated(ev);
-    }
-
-    @Override
-    public void insertUpdate(DocumentEvent ev)
-    {
-      this.documentUpdated(ev);
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent ev)
-    {
-      this.documentUpdated(ev);
-    }
-
     @Override
     public void actionPerformed(ActionEvent ev)
     {
@@ -297,6 +274,11 @@ public class BidSearchDialog extends JDialog
         {
           createNewOption();
         }
+        else if (ev.getSource() == searchButton)
+        {
+          runSpeedRunSearch();
+          runBidSearch();
+        }
       }
       catch (Exception e)
       {
@@ -316,9 +298,7 @@ public class BidSearchDialog extends JDialog
       }
       else if (ev.getSource() == bidNameList)
       {
-        Choice currentChoice = getCurrentChoice();
-        
-        if (currentChoice != null && showOptions)
+        if (showOptions)
         {
           runOptionFilter();
         }
@@ -326,23 +306,72 @@ public class BidSearchDialog extends JDialog
       
       updateUIState();
     }
+    
+    private void documentUpdate(DocumentEvent d)
+    {
+      /*if (d.getDocument() == speedRunField.getDocument())
+      {
+        if (!speedRunList.isSelectionEmpty())
+        {
+          runBidFilter();
+        }
+      }
+      else if (d.getDocument() == bidNameField.getDocument())
+      {
+        runBidFilter();
+        
+        if (showOptions)
+        {
+          runOptionFilter();
+        }
+      }
+      else */if (showOptions && d.getDocument() == optionNameField.getDocument())
+      {
+        runOptionFilter();
+      }
+      
+      updateUIState();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent arg0)
+    {
+      this.documentUpdate(arg0);
+    }
+
+    @Override
+    public void insertUpdate(DocumentEvent arg0)
+    {
+      this.documentUpdate(arg0);
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent arg0)
+    {
+      this.documentUpdate(arg0);
+    }
   }
   
   private void initializeGUIEvents()
   {
     this.actionHandler = new ActionHandler();
     
-    this.speedRunField.getDocument().addDocumentListener(this.actionHandler);
-    this.bidNameField.getDocument().addDocumentListener(this.actionHandler);
     this.okButton.addActionListener(this.actionHandler);
     this.cancelButton.addActionListener(this.actionHandler);
     this.speedRunList.addListSelectionListener(this.actionHandler);
     this.bidNameList.addListSelectionListener(this.actionHandler);
     this.newChallengeButton.addActionListener(this.actionHandler);
+    this.searchButton.addActionListener(this.actionHandler);
+    this.speedRunField.getDocument().addDocumentListener(this.actionHandler);
+    this.bidNameField.getDocument().addDocumentListener(this.actionHandler);
     
     if (this.showOptions)
     {
       this.optionNameField.getDocument().addDocumentListener(this.actionHandler);
+    }
+    
+    if (this.showOptions)
+    {
       this.optionNameList.addListSelectionListener(this.actionHandler);
       this.newOptionButton.addActionListener(this.actionHandler);
     }
@@ -359,6 +388,7 @@ public class BidSearchDialog extends JDialog
         this.speedRunList,
         this.bidNameField,
         this.bidNameList,
+        this.searchButton,
         this.newChallengeButton,
         this.newChoiceButton,
         this.optionNameField,
@@ -376,6 +406,7 @@ public class BidSearchDialog extends JDialog
         this.speedRunList,
         this.bidNameField,
         this.bidNameList,
+        this.searchButton,
         this.newChallengeButton,
         this.newChoiceButton,
         this.okButton,
@@ -405,9 +436,6 @@ public class BidSearchDialog extends JDialog
 
     this.initializeGUI();
     this.initializeGUIEvents();
-    
-    this.runSpeedRunFilter();
-    this.runBidFilter();
   }
   
   private void createNewChallenge()
@@ -437,19 +465,6 @@ public class BidSearchDialog extends JDialog
     }
   }
   
-  private Integer getCurrentSpeedRunId()
-  {
-    SpeedRun s = getCurrentSpeedRun();
-    if (s != null)
-    {
-      return s.getId();
-    }
-    else
-    {
-      return null;
-    }
-  }
-  
   private SpeedRun getCurrentSpeedRun()
   {
     return (SpeedRun) this.speedRunList.getSelectedValue();
@@ -458,19 +473,6 @@ public class BidSearchDialog extends JDialog
   private Bid getCurrentBid()
   {
     return (Bid) this.bidNameList.getSelectedValue();
-  }
-  
-  private Integer getCurrentChoiceId()
-  {
-    Choice c = getCurrentChoice();
-    if (c != null)
-    {
-      return c.getId();
-    }
-    else
-    {
-      return null;
-    }
   }
   
   private Choice getCurrentChoice()
@@ -492,9 +494,9 @@ public class BidSearchDialog extends JDialog
     return (ChoiceOption) this.optionNameList.getSelectedValue();
   }
   
-  private void runSpeedRunFilter()
+  private void runSpeedRunSearch()
   {
-    List<SpeedRun> filtered = this.speedRunSearcher.searchSpeedRuns(this.speedRunField.getText());
+    List<SpeedRun> filtered = this.speedRunSearcher.searchSpeedRuns(new SpeedRunSearchParams(this.speedRunField.getText()));
   
     DefaultListModel data = new DefaultListModel();
     
@@ -506,9 +508,9 @@ public class BidSearchDialog extends JDialog
     this.speedRunList.setModel(data);
   }
   
-  private void runBidFilter()
+  private void runBidSearch()
   {
-    List<Bid> filtered = this.searcher.searchBids(this.getCurrentSpeedRunId(), this.bidNameField.getText());
+    List<Bid> filtered = this.searcher.searchBids(new BidSearchParams(this.bidNameField.getText(), this.getCurrentSpeedRun()));
     
     DefaultListModel data = new DefaultListModel();
     
@@ -520,18 +522,43 @@ public class BidSearchDialog extends JDialog
     this.bidNameList.setModel(data);
   }
   
+  private void runBidFilter()
+  {
+    DefaultListModel data = new DefaultListModel();
+    SpeedRun run = this.getCurrentSpeedRun();
+    Bid currentBid = this.getCurrentBid();
+    
+    if (run != null)
+    {
+      List<Bid> filtered = this.searcher.filterBids(new BidSearchParams(this.bidNameField.getText(), run));
+      
+      for (Bid s : filtered)
+      {
+        data.addElement(s);
+      }
+    }
+    
+    this.bidNameList.setModel(data);
+    this.bidNameList.setSelectedValue(currentBid, true);
+  }
+  
   private void runOptionFilter()
   {
-    List<ChoiceOption> filtered = this.searcher.searchChoiceOptions(this.getCurrentChoiceId(), this.optionNameField.getText());
-    
     DefaultListModel data = new DefaultListModel();
+    Choice currentChoice = this.getCurrentChoice();
+    ChoiceOption currentOption = this.getCurrentOption();
     
-    for (ChoiceOption s : filtered)
+    if (currentChoice != null)
     {
-      data.addElement(s);
+      List<ChoiceOption> filtered = this.searcher.filterChoiceOptions(new ChoiceOptionSearchParams(this.optionNameField.getText(), currentChoice));
+      for (ChoiceOption s : filtered)
+      {
+        data.addElement(s);
+      }
     }
     
     this.optionNameList.setModel(data);
+    this.optionNameList.setSelectedValue(currentOption, true);
   }
   
   public void returnSelectedBid()

@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 
 import pheidip.logic.DonorSearch;
 import pheidip.objects.Donor;
+import pheidip.objects.DonorSearchParams;
 
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
@@ -19,8 +20,6 @@ import java.awt.Insets;
 import javax.swing.JTextField;
 import javax.swing.JList;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -52,6 +51,7 @@ public class DonorSearchDialog extends JDialog
   private ActionHandler actionHandler;
   private FocusTraversalManager tabOrder;
   private JButton createNewButton;
+  private JButton searchButton;
   
   private void initializeGUI()
   {
@@ -65,9 +65,9 @@ public class DonorSearchDialog extends JDialog
     
     GridBagLayout gbl_panel = new GridBagLayout();
     gbl_panel.columnWidths = new int[]{0, 66, 112, 90, 76, 0};
-    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
     gbl_panel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_panel);
 
     firstNameLabel = new JLabel("First Name:");
@@ -92,7 +92,7 @@ public class DonorSearchDialog extends JDialog
     donorScrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
-    gbc_scrollPane.gridheight = 6;
+    gbc_scrollPane.gridheight = 7;
     gbc_scrollPane.gridwidth = 2;
     gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
     gbc_scrollPane.gridx = 3;
@@ -157,12 +157,20 @@ public class DonorSearchDialog extends JDialog
     contentPanel.add(emailField, gbc_textField_3);
     emailField.setColumns(10);
     
+    searchButton = new JButton("Search");
+    GridBagConstraints gbc_searchButton = new GridBagConstraints();
+    gbc_searchButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_searchButton.insets = new Insets(0, 0, 5, 5);
+    gbc_searchButton.gridx = 1;
+    gbc_searchButton.gridy = 4;
+    contentPanel.add(searchButton, gbc_searchButton);
+    
     createNewButton = new JButton("Create New");
     GridBagConstraints gbc_createNewButton = new GridBagConstraints();
     gbc_createNewButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_createNewButton.insets = new Insets(0, 0, 5, 5);
     gbc_createNewButton.gridx = 1;
-    gbc_createNewButton.gridy = 4;
+    gbc_createNewButton.gridy = 5;
     contentPanel.add(createNewButton, gbc_createNewButton);
 
     okButton = new JButton("OK");
@@ -170,7 +178,7 @@ public class DonorSearchDialog extends JDialog
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
     gbc_okButton.gridx = 3;
-    gbc_okButton.gridy = 6;
+    gbc_okButton.gridy = 7;
     contentPanel.add(okButton, gbc_okButton);
     getRootPane().setDefaultButton(okButton);
 
@@ -178,11 +186,11 @@ public class DonorSearchDialog extends JDialog
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_cancelButton.gridx = 4;
-    gbc_cancelButton.gridy = 6;
+    gbc_cancelButton.gridy = 7;
     contentPanel.add(cancelButton, gbc_cancelButton);
   }
   
-  private class ActionHandler implements ActionListener, DocumentListener, ListSelectionListener
+  private class ActionHandler implements ActionListener, ListSelectionListener
   {
     public void actionPerformed(ActionEvent ev)
     {
@@ -200,33 +208,17 @@ public class DonorSearchDialog extends JDialog
         {
           createFromFields();
         }
+        else if (ev.getSource() == searchButton)
+        {
+          runSearch();
+        }
       }
       catch (Exception e)
       {
         JOptionPane.showMessageDialog(DonorSearchDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       }
     }
-
-    private void documentChanged(DocumentEvent ev)
-    {
-      DonorSearchDialog.this.runFilters();
-    }
-
-    public void changedUpdate(DocumentEvent ev)
-    {
-      this.documentChanged(ev);
-    }
-
-    public void insertUpdate(DocumentEvent ev)
-    {
-      this.documentChanged(ev);
-    }
-
-    public void removeUpdate(DocumentEvent ev)
-    {
-      this.documentChanged(ev);
-    }
-
+    
     @Override
     public void valueChanged(ListSelectionEvent ev)
     {
@@ -241,13 +233,10 @@ public class DonorSearchDialog extends JDialog
   {
     this.actionHandler = new ActionHandler();
     
-    this.firstNameField.getDocument().addDocumentListener(this.actionHandler);
-    this.lastNameField.getDocument().addDocumentListener(this.actionHandler);
-    this.aliasField.getDocument().addDocumentListener(this.actionHandler);
-    this.emailField.getDocument().addDocumentListener(this.actionHandler);
+    this.searchButton.addActionListener(this.actionHandler);
     this.createNewButton.addActionListener(this.actionHandler);
-    okButton.addActionListener(this.actionHandler);
-    cancelButton.addActionListener(this.actionHandler);
+    this.okButton.addActionListener(this.actionHandler);
+    this.cancelButton.addActionListener(this.actionHandler);
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
@@ -256,6 +245,7 @@ public class DonorSearchDialog extends JDialog
       this.aliasField,
       this.emailField,
       this.donorList,
+      this.searchButton,
       this.createNewButton,
       this.okButton,
       this.cancelButton,
@@ -286,8 +276,6 @@ public class DonorSearchDialog extends JDialog
     
     this.initializeGUI();
     this.initializeGUIEvents();
-    
-    this.runFilters();
   }
   
   public Donor getResult()
@@ -297,11 +285,11 @@ public class DonorSearchDialog extends JDialog
   
   private void createFromFields()
   {
-    Donor result = this.searcher.createIfAble(        
+    Donor result = this.searcher.createIfAble(new DonorSearchParams(    
         this.firstNameField.getText(),
         this.lastNameField.getText(),
         this.emailField.getText(),
-        this.aliasField.getText());
+        this.aliasField.getText()));
     
     this.resultDonor = result;
     this.closeDialog();
@@ -327,13 +315,13 @@ public class DonorSearchDialog extends JDialog
     this.dispose();
   }
   
-  private void runFilters()
+  private void runSearch()
   {
-    List<Donor> filtered = this.searcher.searchDonors(
+    List<Donor> filtered = this.searcher.searchDonors(new DonorSearchParams(
         this.firstNameField.getText(),
         this.lastNameField.getText(),
         this.emailField.getText(),
-        this.aliasField.getText());
+        this.aliasField.getText()));
     
     DefaultListModel listData = new DefaultListModel();
     
