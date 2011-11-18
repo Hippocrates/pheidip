@@ -21,13 +21,13 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
   @Override
   public SpeedRun getSpeedRunById(int runId)
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     SpeedRun s = (SpeedRun) session.get(SpeedRun.class, runId);
 
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
     
     return s;
   }
@@ -35,13 +35,13 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
   @Override
   public void insertSpeedRun(SpeedRun speedRun)
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     session.save(speedRun);
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
   }
 
   @Override
@@ -49,40 +49,40 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
   {
     SpeedRun s = this.getSpeedRunById(runId);
     
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     session.delete(s);
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
   }
 
   @Override
   public void updateSpeedRun(SpeedRun run)
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     session.merge(run);
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
   }
 
   @Override
   public List<SpeedRun> getAllSpeedRuns()
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     Query q = session.createQuery("From SpeedRun order by id");
     
     @SuppressWarnings("unchecked")
     List<SpeedRun> listing = q.list();
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
     
     return listing;
   }
@@ -101,8 +101,8 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
       queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
     }
     
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     Query q = session.createQuery(queryString + " order by s.name");
 
@@ -112,8 +112,8 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
     @SuppressWarnings("unchecked")
     List<SpeedRun> listing = q.list();
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
     
     return listing;
   }

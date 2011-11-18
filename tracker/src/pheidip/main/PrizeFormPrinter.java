@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import pheidip.db.DonorData;
 import pheidip.db.PrizeData;
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.objects.Donor;
@@ -45,8 +44,7 @@ public final class PrizeFormPrinter
         String template = fileData.toString();
         
         PrizeData prizeData = db.getDataAccess().getPrizeData();
-        DonorData donorData = db.getDataAccess().getDonorData();
-        
+
         List<Prize> prizes = prizeData.getAllPrizes();
         
         List<Donor> winners = new ArrayList<Donor>();
@@ -61,7 +59,7 @@ public final class PrizeFormPrinter
             maxPrizeSize = Math.max(maxPrizeSize, p.getName().length());
           }
           
-          Donor d = donorData.getPrizeWinner(p.getId());
+          Donor d = p.getWinner();
           
           if (d != null)
           {

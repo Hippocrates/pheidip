@@ -19,37 +19,37 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   @Override
   public void insertPrize(Prize toAdd)
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     session.save(toAdd);
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
   }
 
   @Override
   public void updatePrize(Prize toUpdate)
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     session.update(toUpdate);
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
   }
 
   @Override
   public Prize getPrizeById(int prizeId)
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     Prize p = (Prize) session.get(Prize.class, prizeId);
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
     
     return p;
   }
@@ -57,16 +57,16 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   @Override
   public List<Prize> getAllPrizes()
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     Query q = session.createQuery("from Prize");
 
     @SuppressWarnings("unchecked")
     List<Prize> listing = q.list();
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
     
     return listing;
   }
@@ -76,8 +76,8 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   {
     Prize result = null;
     
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     Query q = session.createQuery("from Prize as p where p.winner.id = :donorid");
 
@@ -91,8 +91,8 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
       result = listing.get(0);
     }
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
     
     return result;
   }
@@ -100,8 +100,8 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   @Override
   public void setPrizeWinner(int prizeId, int donorId)
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     Prize p = (Prize) session.load(Prize.class, prizeId);
     Donor d = (Donor) session.load(Donor.class, donorId);
@@ -110,36 +110,36 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     
     session.save(p);
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
   }
 
   @Override
   public void removePrizeWinner(int prizeId)
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     Prize p = (Prize) session.load(Prize.class, prizeId);
 
     p.setWinner(null);
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
   }
 
   @Override
   public void deletePrize(int prizeId)
   {
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    Session session = this.beginTransaction();
+    
     
     Prize p = (Prize) session.load(Prize.class, prizeId);
 
     session.delete(p);
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
   }
 
 }

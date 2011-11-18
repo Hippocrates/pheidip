@@ -89,7 +89,7 @@ public class DonationDatabaseManager
   public void runSQLScript(final String filename)
   {
     Session session = this.dataAccess.getSessionFactory().openSession();
-    session.beginTransaction();
+    
     
     session.doWork(
       new Work() 
@@ -115,8 +115,7 @@ public class DonationDatabaseManager
         }
       }
     );
-    
-    session.getTransaction().commit();
+
     session.close();
   }
   

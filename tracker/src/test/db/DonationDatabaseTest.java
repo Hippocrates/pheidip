@@ -48,7 +48,7 @@ public abstract class DonationDatabaseTest extends TestCase
   public void populate()
   {
     Session session = this.dataAccess.getSessionFactory().openSession();
-    session.beginTransaction();
+    
     
     session.save(new Donor(1, "test1@test.com", "smk", "Stephen", "Kiazyk"));
     session.save(new Donor(2, "test2@test.com", "analias", "Stefan", "Ksiazyk"));
@@ -102,7 +102,7 @@ public abstract class DonationDatabaseTest extends TestCase
     session.save(new ChallengeBid(5, new BigDecimal("10.00"), (Challenge) session.load(Challenge.class, 6), (Donation)session.load(Donation.class, 1)));
 
     session.getTransaction().commit();
-    session.close();
+    //session.close();
   }
 
   public void tearDown()

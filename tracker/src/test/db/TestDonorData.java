@@ -112,13 +112,14 @@ public class TestDonorData extends DonationDatabaseTest
   public void testDeleteDonor()
   {
     // can't delete one of them due to fk constraint, try again
-    this.donors.deleteDonor(5);
+    Donor d = donors.getDonorById(5);
+    this.donors.deleteDonor(d);
       
     assertNull(donors.getDonorById(5));
       
     try
     {
-      this.donors.deleteDonor(5);
+      this.donors.deleteDonor(d);
       fail("Did not throw on non-present donor.");
     }
     catch(Exception e)

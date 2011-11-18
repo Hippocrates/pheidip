@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 
 import pheidip.db.DonorData;
 import pheidip.objects.Donor;
 import pheidip.objects.DonorSearchParams;
-import pheidip.objects.Prize;
 import pheidip.util.StringUtils;
 
 public class HibernateDonorData extends HibernateDataInterface implements DonorData 
@@ -22,13 +22,12 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	@Override
 	public Donor getDonorById(int donorId) 
 	{
-	  Session session = this.getSessionFactory().openSession();
-	  session.beginTransaction();
+	  Session session = this.beginTransaction();
+	  
 	  
 	  Donor d = (Donor) session.get(Donor.class, donorId);
 
-	  session.getTransaction().commit();
-	  session.close();
+	  this.endTransaction();
 	  
 	  return d;
 	}
@@ -38,9 +37,8 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	{
 	  Donor result = null;
 	  
-	  Session session = this.getSessionFactory().openSession();
-	  session.beginTransaction();
-	  
+	  Session session = this.beginTransaction();
+
 	  Query q = session.createQuery("from Donor d where d.email = :email");
 
 	  q.setString("email", email);
@@ -53,8 +51,7 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	    result = listing.get(0);
 	  }
 	  
-	  session.getTransaction().commit();
-	  session.close();
+	  this.endTransaction();
 		  
 	  return result;
 	}
@@ -64,9 +61,8 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	{
     Donor result = null;
     
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
-    
+    Session session = this.beginTransaction();
+
     Query q = session.createQuery("from Donor d where alias = :alias");
 
     q.setString("alias", alias);
@@ -79,25 +75,24 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
       result = listing.get(0);
     }
     
-    session.getTransaction().commit();
-    session.close();
-      
+    this.endTransaction();
+
     return result;
 	}
 
 	@Override
 	public List<Donor> getAllDonors() 
 	{
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+	  StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
+    dedicatedSession.beginTransaction();
     
-    Query q = session.createQuery("from Donor order by id");
+    Query q = dedicatedSession.createQuery("from Donor order by id");
 
     @SuppressWarnings("unchecked")
     List<Donor> listing = q.list();
     
-    session.getTransaction().commit();
-    session.close();
+    dedicatedSession.getTransaction().commit();
+    dedicatedSession.close();
       
     return listing;
 	}
@@ -105,84 +100,52 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	@Override
 	public List<Donor> getDonorsWithoutPrizes() 
 	{
-	  Session session = this.getSessionFactory().openSession();
-	  session.beginTransaction();
-	  
+	  Session session = this.beginTransaction();
     Query q = session.createQuery("from Donor d where exists elements(d.prizes) order by id");
 
     @SuppressWarnings("unchecked")
     List<Donor> listing = q.list();
     
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
+    //session.close();
     
     return listing;
 	}
 
 	@Override
-	public void deleteDonor(int id) 
+	public void deleteDonor(Donor d) 
 	{
-	  Donor d = this.getDonorById(id);
-	  
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
-    
+	  Session session = this.beginTransaction();
     session.delete(d);
-    
-    session.getTransaction().commit();
-    session.close();
+    this.endTransaction();
 	}
 
 	@Override
 	public void createDonor(Donor newDonor) 
 	{
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
-    
+	  Session session = this.beginTransaction();
     session.save(newDonor);
-    
-    session.getTransaction().commit();
-    session.close();
+      
+    this.endTransaction();
 	}
 
 	@Override
 	public void updateDonor(Donor donor) 
 	{
-	  Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
-    
+	  Session session = this.beginTransaction();
     session.merge(donor);
-    
-    session.getTransaction().commit();
-    session.close();
-	}
-
-	@Override
-	public Donor getPrizeWinner(int prizeId) 
-	{
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
-    
-    Prize p = (Prize) session.load(Prize.class, prizeId);
-    Donor d = p.getWinner();
-    
-    session.getTransaction().commit();
-    session.close();
-    
-    return d;
+    this.endTransaction();
 	}
 
 	@Override
 	public void deleteAllDonors() 
 	{
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
-    
-    Query q = session.createQuery("delete Donor");
+	  Session session = this.beginTransaction();
+      
+	  Query q = session.createQuery("delete Donor");
     q.executeUpdate();
-    
-    session.getTransaction().commit();
-    session.close();
+      
+    this.endTransaction();
 	}
 
   @Override
@@ -208,10 +171,10 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
       queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
     }
     
-    Session session = this.getSessionFactory().openSession();
-    session.beginTransaction();
+    StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
+    dedicatedSession.beginTransaction();
     
-    Query q = session.createQuery(queryString + " order by d.alias, d.email, d.firstName, d.lastName");
+    Query q = dedicatedSession.createQuery(queryString + " order by d.alias, d.email, d.firstName, d.lastName");
 
     if (params.firstName != null)
       q.setString("firstName", StringUtils.sqlInnerStringMatch(params.firstName));
@@ -228,9 +191,32 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
     @SuppressWarnings("unchecked")
     List<Donor> listing = q.list();
     
-    session.getTransaction().commit();
-    session.close();
+    dedicatedSession.getTransaction().commit();
+    dedicatedSession.close();
     
     return listing;
+  }
+
+  @Override
+  public void insertMultipleDonors(List<Donor> toInsert)
+  {
+    StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
+    dedicatedSession.beginTransaction();
+
+    for (Donor donor : toInsert)
+    {
+      try
+      {
+        dedicatedSession.insert(donor);
+      }
+      catch(Exception e)
+      {
+        System.out.println(e.getMessage());
+        throw new RuntimeException(e);
+      }
+    }
+    
+    dedicatedSession.getTransaction().commit();
+    dedicatedSession.close();
   }
 }

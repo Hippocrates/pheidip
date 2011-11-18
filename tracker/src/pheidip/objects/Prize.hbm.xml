@@ -1,24 +1,25 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:55:43 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
-    <class name="pheidip.objects.Prize" table="PRIZE">
-        <id name="id" type="int">
-            <column name="ID" />
-            <generator class="assigned" />
-        </id>
-        <property name="name" type="java.lang.String" unique="true">
-            <column name="NAME" />
-        </property>
-        <property name="imageURL" type="java.lang.String">
-            <column name="IMAGEURL" />
-        </property>
-        <property name="description" type="java.lang.String">
-            <column name="DESCRIPTION" />
-        </property>
-        <many-to-one name="winner" class="pheidip.objects.Donor" fetch="join">
-            <column name="WINNER" />
-        </many-to-one>
-    </class>
+ <class name="pheidip.objects.Prize" table="PRIZE">
+  <id name="id" type="int">
+   <column name="ID"/>
+   <generator class="assigned"/>
+  </id>
+  <property generated="never" lazy="false" name="name"
+   type="java.lang.String" unique="true">
+   <column name="NAME" unique="true"/>
+  </property>
+  <property generated="never" lazy="false" name="imageURL" type="java.lang.String">
+   <column name="IMAGEURL"/>
+  </property>
+  <property generated="never" lazy="false" name="description" type="java.lang.String">
+   <column name="DESCRIPTION"/>
+  </property>
+  <many-to-one class="pheidip.objects.Donor" fetch="join" name="winner">
+   <column name="WINNER"/>
+  </many-to-one>
+ </class>
 </hibernate-mapping>

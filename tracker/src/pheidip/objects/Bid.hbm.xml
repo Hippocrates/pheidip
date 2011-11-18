@@ -1,29 +1,30 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:55:43 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
-    <class name="pheidip.objects.Bid" table="BID" abstract="true">
-        <id name="id" type="int">
-            <column name="ID" />
-            <generator class="assigned" />
-        </id>
-        <discriminator column="BidType" type="string" />
-        <property name="name" type="java.lang.String" unique="true">
-            <column name="NAME" />
-        </property>
-        <property name="description" type="java.lang.String">
-            <column name="DESCRIPTION" />
-        </property>
-        <property name="bidState">
-            <column name="BIDSTATE" />
-            <type name="org.hibernate.type.EnumType">
-                <param name="type">12</param>
-                <param name="enumClass">pheidip.objects.BidState</param>
-            </type>
-        </property>
-        <many-to-one name="speedRun" class="pheidip.objects.SpeedRun" fetch="join">
-            <column name="SPEEDRUN" />
-        </many-to-one>
-    </class>
+ <class abstract="true" name="pheidip.objects.Bid" table="BID">
+  <id name="id" type="int">
+   <column name="ID"/>
+   <generator class="assigned"/>
+  </id>
+  <discriminator column="BidType" force="false" insert="true" not-null="true"/>
+  <property generated="never" lazy="false" name="name"
+   type="java.lang.String" unique="true">
+   <column name="NAME" unique="true"/>
+  </property>
+  <property generated="never" lazy="false" name="description" type="java.lang.String">
+   <column name="DESCRIPTION"/>
+  </property>
+  <property generated="never" lazy="false" name="bidState">
+   <column name="BIDSTATE"/>
+   <type name="org.hibernate.type.EnumType">
+    <param name="type">12</param>
+    <param name="enumClass">pheidip.objects.BidState</param>
+   </type>
+  </property>
+  <many-to-one class="pheidip.objects.SpeedRun" fetch="join" name="speedRun">
+   <column name="SPEEDRUN"/>
+  </many-to-one>
+ </class>
 </hibernate-mapping>

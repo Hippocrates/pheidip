@@ -2,6 +2,7 @@ package pheidip.db.hibernate;
 
 import java.io.File;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import pheidip.db.BidData;
@@ -22,10 +23,12 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	private HibernateDonationData donations;
 	private HibernateBidData bids;
 	private HibernatePrizeData prizes;
+  private Session session;
 	
 	public HibernateDonationDataAccess()
 	{
 	  this.sessionFactory = null;
+	  this.session = null;
 	  this.databaseConnectionType = null;
 	  
 	  this.donors = null;
@@ -91,6 +94,7 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 			String dbname, String user, String password) 
 	{
 	  this.sessionFactory = HibernateManager.createServerSessionFactory(type, server, dbname, user, password);
+	  this.session = this.sessionFactory.openSession();
 	  this.databaseConnectionType = type;
 	}
 
@@ -105,6 +109,7 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	public void createMemoryDatabase() 
 	{
 		this.sessionFactory = HibernateManager.createMemorySessionFactory();
+		this.session = this.sessionFactory.openSession();
 		this.databaseConnectionType = DBType.H2;
 	}
 
@@ -123,6 +128,7 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	@Override
 	public void closeConnection() 
 	{
+	  this.session.close();
 		this.sessionFactory.close();
 	}
 
@@ -130,5 +136,16 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	{
 		return this.sessionFactory;
 	}
-
+	
+	public Session getSession()
+	{
+	  return this.session;
+	}
+	
+	public void resetSession()
+	{
+	  //this.session.flush();
+	  this.session.close();
+	  this.session = this.sessionFactory.openSession();
+	}
 }

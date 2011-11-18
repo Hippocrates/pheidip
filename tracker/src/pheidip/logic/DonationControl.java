@@ -96,7 +96,9 @@ public class DonationControl
 
   public void clearDonationRead()
   {
-    this.donations.setDonationReadState(this.donationId, DonationReadState.PENDING);
+    Donation d = this.getData();
+    d.setReadState(DonationReadState.PENDING);
+    this.donations.updateDonation(d);
   }
 
   public boolean allowUpdateData()
@@ -124,8 +126,8 @@ public class DonationControl
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
       data.getBids().add(created);
-      this.donations.attachChallengeBid(created);
-      this.donations.setDonationBidState(this.donationId, DonationBidState.PROCESSED);
+      data.setBidState(DonationBidState.PROCESSED);
+      this.donations.updateDonation(data);
     }
     else
     {
@@ -144,9 +146,9 @@ public class DonationControl
 
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
-      this.donations.attachChoiceBid(created);
       data.getBids().add(created);
       this.markAsBidsHandled();
+      this.donations.updateDonation(data);
     }
     else
     {
@@ -156,23 +158,12 @@ public class DonationControl
     return newId;
   }
   
-  public void updateChallengeBidAmount(int challengeBidId, BigDecimal newAmount)
+  public void updateDonationBidAmount(DonationBid choiceBid, BigDecimal newAmount)
   {
-    if (checkChangeInBidIsBelowDonationAmount(challengeBidId, BidType.CHALLENGE, newAmount))
+    if (checkChangeInBidIsBelowDonationAmount(choiceBid, newAmount))
     {
-      this.donations.updateChallengeBidAmount(challengeBidId, newAmount);
-    }
-    else
-    {
-      throw new RuntimeException("Total of all bids cannot exceed donation amount.");
-    }
-  }
-  
-  public void updateChoiceBidAmount(int choiceBidId, BigDecimal newAmount)
-  {
-    if (checkChangeInBidIsBelowDonationAmount(choiceBidId, BidType.CHOICE, newAmount))
-    {
-      this.donations.updateChoiceBidAmount(choiceBidId, newAmount);
+      choiceBid.setAmount(newAmount);
+      this.donations.updateDonation(this.getData());
     }
     else
     {
@@ -182,38 +173,16 @@ public class DonationControl
   
   public void removeBid(DonationBid bid)
   {
-    if (bid.getType() == BidType.CHALLENGE)
-    {
-      this.donations.removeChallengeBid(bid.getId());
-    }
-    else
-    {
-      this.donations.removeChoiceBid(bid.getId());
-    }
-    
     this.getData().getBids().remove(bid);
+    this.donations.updateDonation(this.getData());
   }
 
-  private boolean checkChangeInBidIsBelowDonationAmount(int donationBidId, BidType type, BigDecimal newAmount)
+  private boolean checkChangeInBidIsBelowDonationAmount(DonationBid donationBid, BigDecimal newAmount)
   {
     Donation data = this.getData();
     List<DonationBid> currentBids = getAttachedBids();
-    DonationBid found = null;
-
-    for (DonationBid b : currentBids)
-    {
-      if (b.getType() == type && b.getId() == donationBidId)
-      {
-        found = b;
-      }
-    }
     
-    if (found == null)
-    {
-      throw new RuntimeException("Error, donation bid not found.");
-    }
-    
-    BigDecimal newTotal = sumBids(currentBids).subtract(found.getAmount()).add(newAmount);
+    BigDecimal newTotal = sumBids(currentBids).subtract(donationBid.getAmount()).add(newAmount);
     
     return newTotal.compareTo(data.getAmount()) <= 0;
   }

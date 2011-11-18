@@ -18,13 +18,13 @@ public interface DonorData
 
 	public List<Donor> getDonorsWithoutPrizes();
 
-	public void deleteDonor(int id);
+	public void deleteDonor(Donor id);
 
 	public void createDonor(Donor newDonor);
+	
+	public void insertMultipleDonors(List<Donor> toInsert);
 
 	public void updateDonor(Donor donor);
-
-	public Donor getPrizeWinner(int prizeId);
 
 	public void deleteAllDonors();
 

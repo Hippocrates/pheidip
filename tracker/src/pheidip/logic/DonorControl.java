@@ -123,7 +123,7 @@ public class DonorControl
   public void deleteDonor()
   {
     this.cachedDonor = null;
-    this.donors.deleteDonor(this.donorId);
+    this.donors.deleteDonor(this.getData());
   }
 
   public int createNewLocalDonation()

@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 
 import pheidip.logic.DonationControl;
-import pheidip.objects.BidType;
 import pheidip.objects.DonationBid;
 import pheidip.util.FormatUtils;
 import pheidip.util.StringUtils;
@@ -225,14 +224,7 @@ public class DonationBidsPanel extends JPanel
       
       if (!StringUtils.isEmptyOrNull(amount))
       {
-        if (selected.getType() == BidType.CHOICE)
-        {
-          this.control.updateChoiceBidAmount(selected.getId(), new BigDecimal(amount));
-        }
-        else
-        {
-          this.control.updateChallengeBidAmount(selected.getId(), new BigDecimal(amount));
-        }
+        this.control.updateDonationBidAmount(selected, new BigDecimal(amount));
         this.refreshContent();
       }
     }

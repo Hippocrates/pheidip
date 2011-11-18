@@ -355,7 +355,7 @@ public class DonationPanel extends EntityPanel
       this.donationControl.updateData(d);
     }
     
-    this.refreshContent();
+    this.redrawContent();
   }
 
   private void openDonor()

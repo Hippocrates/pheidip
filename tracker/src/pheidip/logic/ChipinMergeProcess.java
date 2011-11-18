@@ -1,12 +1,16 @@
 package pheidip.logic;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.jsoup.nodes.Document;
 
+import pheidip.db.DonationData;
+import pheidip.db.DonorData;
 import pheidip.objects.ChipinDonation;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationDomain;
+import pheidip.objects.DonationSearchParams;
 import pheidip.objects.Donor;
 
 public class ChipinMergeProcess implements Runnable
@@ -63,27 +67,51 @@ public class ChipinMergeProcess implements Runnable
       Thread.sleep(0);
       this.setState(ChipinMergeState.EXTRACTING, 0.2);
 
-      List<ChipinDonation> donations = ChipinDonations.extractDonations(html);
+      List<ChipinDonation> chipinDonations = ChipinDonations.extractDonations(html);
       
       Thread.sleep(0);
       this.setState(ChipinMergeState.COMPARING, 0.3);
       
-      int current = 0;
+      //int current = 0;
       
-      Map<String,Donation> donationTable = ChipinDonations.generateDonationSet(this.donationDatabase.getDataAccess().getDonationData());
-      Map<String,Donor> donorTable = ChipinDonations.generateDonorSet(this.donationDatabase.getDataAccess().getDonorData());
+      DonationData donations = this.donationDatabase.getDataAccess().getDonationData();
+      DonorData donors = this.donationDatabase.getDataAccess().getDonorData();
+      DonationSearchParams params = new DonationSearchParams();
+      params.domain = DonationDomain.CHIPIN;
       
+      List<Donation> databaseDonations = donations.searchDonations(params);
+      List<Donor> allDonors = donors.getAllDonors();
+      List<Donation> donationsToInsert = new ArrayList<Donation>();
+      List<Donation> donationsToUpdate = new ArrayList<Donation>();
+      List<Donor> donorsToInsert = new ArrayList<Donor>();
+      
+      ChipinDonations.buildMergeTables(chipinDonations, databaseDonations, allDonors, donorsToInsert, donationsToInsert, donationsToUpdate);
+
+      Thread.sleep(0);
       this.setState(ChipinMergeState.MERGING, 0.4);
       
-      for (ChipinDonation d : donations)
+      donors.insertMultipleDonors(donorsToInsert);
+      donations.insertMultipleDonations(donationsToInsert);
+      donations.updateMultiplDonations(donationsToUpdate);
+      
+      Thread.sleep(0);
+      this.setState(ChipinMergeState.MERGING, 0.8);
+      
+      donations.updateMultiplDonations(donationsToUpdate);
+      
+      
+      Thread.sleep(0);
+      
+      /*
+      for (ChipinDonation d : chipinDonations)
       {
         Thread.sleep(0);
-        this.setState(ChipinMergeState.MERGING, 0.4 + (((double)current / (double)donations.size()) * 0.6));
+        this.setState(ChipinMergeState.MERGING, 0.4 + (((double)current / (double)chipinDonations.size()) * 0.6));
         
         ChipinDonations.mergeDonation(this.donationDatabase, d, donorTable, donationTable);
         ++current;
       }
-      
+      */
       this.setState(ChipinMergeState.COMPLETED, 1.0);
     }
     catch (InterruptedException e)

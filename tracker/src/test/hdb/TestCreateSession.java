@@ -55,7 +55,7 @@ public class TestCreateSession extends TestCase
     System.out.println();
 
     Session session = sessionFactory.openSession();
-    session.beginTransaction();
+    
     
     for (Donor d : donors)
     {
@@ -63,7 +63,7 @@ public class TestCreateSession extends TestCase
     }
     
     session.getTransaction().commit();
-    session.close();
+    //session.close();
     
     Session session2 = sessionFactory.openSession();
     session2.beginTransaction();

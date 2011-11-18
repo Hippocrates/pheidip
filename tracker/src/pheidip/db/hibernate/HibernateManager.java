@@ -8,6 +8,8 @@ import pheidip.db.JDBCManager;
 
 public class HibernateManager
 {
+  //public static final int JDBC_BATCH_SIZE = 20;
+  
   private static String getDialect(DBType type)
   {
 	switch (type)
@@ -32,6 +34,7 @@ public class HibernateManager
     cfg.setProperty("hibernate.connection.password", "");
     cfg.setProperty("hibernate.dialect", getDialect(DBType.H2));
     cfg.setProperty("hibernate.hbm2ddl.auto", "create");
+    //cfg.setProperty("hibernate.jdbc.batch_size", "" + JDBC_BATCH_SIZE);
 
     return cfg.buildSessionFactory();
   }
@@ -48,6 +51,7 @@ public class HibernateManager
     cfg.setProperty("hibernate.connection.username", userName);
     cfg.setProperty("hibernate.connection.password", password);
     cfg.setProperty("hibernate.dialect", getDialect(type));
+    //cfg.setProperty("hibernate.jdbc.batch_size", "" + JDBC_BATCH_SIZE);
 
     return cfg.buildSessionFactory();
   }

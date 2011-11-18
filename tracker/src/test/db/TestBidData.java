@@ -1,7 +1,6 @@
 package test.db;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import pheidip.db.BidData;
 import pheidip.db.SpeedRunData;
@@ -71,15 +70,6 @@ public class TestBidData extends DonationDatabaseTest
     assertEquals(null, choice.getDescription());
   }
   
-  public void testSearchChoicesBySpeedRun()
-  {
-    final int speedRunId = 1;
-    
-    List<Choice> choices = this.bids.getChoicesBySpeedrun(speedRunId);
-    
-    assertEquals(3, choices.size());
-  }
-  
   public void testDeleteChoice()
   {
     final int choiceId = 4;
@@ -138,16 +128,7 @@ public class TestBidData extends DonationDatabaseTest
     assertEquals(anotherChoice, choiceOption.getChoice().getId());
     assertEquals(newName, choiceOption.getName());
   }
-  
-  public void testSearchChoiceOptionsByChoice()
-  {
-    final int choiceId = 1;
-    
-    List<ChoiceOption> choiceOptions = this.bids.getChoiceOptionsByChoiceId(choiceId);
-    
-    assertEquals(2, choiceOptions.size());
-  }
-  
+
   public void testDeleteChoiceOption()
   {
     final int choiceOptionId = 3;
@@ -211,16 +192,7 @@ public class TestBidData extends DonationDatabaseTest
     assertEquals(newName, challenge.getName());
     assertEquals(null, challenge.getDescription());
   }
-  
-  public void testSearchChallengesBySpeedRun()
-  {
-    final int speedRunId = 1;
-    
-    List<Challenge> Challenges = this.bids.getChallengesBySpeedrun(speedRunId);
-    
-    assertEquals(1, Challenges.size());
-  }
-  
+
   public void testDeleteChallenge()
   {
     final int challengeId = 8;

@@ -7,6 +7,8 @@ import pheidip.util.StringUtils;
 
 public class ChipinDonation
 {
+  public static final int MAX_COMMENT_LENGTH = 4096;
+  
   private String name;
   private String email;
   private String comment;
@@ -60,10 +62,5 @@ public class ChipinDonation
   public Date getTimeStamp()
   {
     return this.timeStamp;
-  }
-  
-  public static int maxCommentLength()
-  {
-    return 4096;
   }
 }
