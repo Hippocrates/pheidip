@@ -3,12 +3,12 @@
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:49:18 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
-    <subclass name="pheidip.objects.Choice" extends="pheidip.objects.Bid" discriminator-value="Choice" lazy="false">
+    <union-subclass name="pheidip.objects.Choice" extends="pheidip.objects.Bid" lazy="false">
         <set name="options" table="CHOICEOPTION" cascade="all,delete-orphan" inverse="false" lazy="false">
             <key>
                 <column name="CHOICE" />
             </key>
             <one-to-many class="pheidip.objects.ChoiceOption" />
         </set>
-    </subclass>
+    </union-subclass>
 </hibernate-mapping>

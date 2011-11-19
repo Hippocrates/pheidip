@@ -10,7 +10,7 @@
   </id>
   <property generated="never" lazy="false" name="name"
    type="java.lang.String" unique="true">
-   <column name="NAME" unique="true"/>
+   <column check="NAME = lower(NAME)" name="NAME" unique="true"/>
   </property>
   <property generated="never" lazy="false" name="imageURL" type="java.lang.String">
    <column name="IMAGEURL"/>
@@ -18,7 +18,8 @@
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
   </property>
-  <many-to-one class="pheidip.objects.Donor" fetch="join" name="winner">
+  <many-to-one class="pheidip.objects.Donor" fetch="join"
+   foreign-key="PrizeFKDonor" name="winner">
    <column name="WINNER"/>
   </many-to-one>
  </class>

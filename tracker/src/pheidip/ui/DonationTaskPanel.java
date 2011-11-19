@@ -199,6 +199,8 @@ public class DonationTaskPanel extends EntityPanel
     tabArray.add(this.nextButton);
     tabArray.add(this.donationList);
     tabArray.add(this.donationBidsPanel);
+    
+    this.donationBidsPanel.setFocusCycleRoot(false);
 
     this.tabOrder = new FocusTraversalManager(tabArray.toArray(new Component[tabArray.size()]));
     this.setFocusTraversalPolicy(this.tabOrder);

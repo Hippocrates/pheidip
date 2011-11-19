@@ -15,17 +15,17 @@
    <column name="AMOUNT"/>
   </property>
   <property generated="never" lazy="false" name="comment" type="java.lang.String">
-   <column name="COMMENT"/>
+   <column length="4096" name="COMMENT"/>
   </property>
   <property generated="never" lazy="false" name="domain">
-   <column name="DOMAIN"/>
+   <column name="DOMAIN" unique-key="DonationDomainIdUnique"/>
    <type name="org.hibernate.type.EnumType">
     <param name="type">12</param>
     <param name="enumClass">pheidip.objects.DonationDomain</param>
    </type>
   </property>
   <property generated="never" lazy="false" name="domainId" type="java.lang.String">
-   <column name="DOMAINID" unique="true"/>
+   <column name="DOMAINID" unique-key="DonationDomainIdUnique"/>
   </property>
   <property generated="never" lazy="false" name="bidState">
    <column name="BIDSTATE"/>
@@ -55,7 +55,8 @@
    </key>
    <one-to-many class="pheidip.objects.DonationBid"/>
   </set>
-  <many-to-one class="pheidip.objects.Donor" fetch="join" name="donor">
+  <many-to-one class="pheidip.objects.Donor" fetch="join"
+   foreign-key="DonationFKDonor" name="donor">
    <column name="DONOR"/>
   </many-to-one>
  </class>

@@ -8,10 +8,8 @@
    <column name="ID"/>
    <generator class="assigned"/>
   </id>
-  <discriminator column="BidType" force="false" insert="true" not-null="true"/>
-  <property generated="never" lazy="false" name="name"
-   type="java.lang.String" unique="true">
-   <column name="NAME" unique="true"/>
+  <property generated="never" lazy="false" name="name" type="java.lang.String">
+   <column check="NAME = lower(NAME)" name="NAME" unique-key="ChoiceNameUnique"/>
   </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
@@ -23,8 +21,9 @@
     <param name="enumClass">pheidip.objects.BidState</param>
    </type>
   </property>
-  <many-to-one class="pheidip.objects.SpeedRun" fetch="join" name="speedRun">
-   <column name="SPEEDRUN"/>
+  <many-to-one class="pheidip.objects.SpeedRun" fetch="join"
+   foreign-key="BidFKSpeedRun" name="speedRun">
+   <column name="SPEEDRUN" unique-key="ChoiceNameUnique"/>
   </many-to-one>
  </class>
 </hibernate-mapping>

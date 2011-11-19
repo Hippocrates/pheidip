@@ -10,7 +10,7 @@
   </id>
   <property generated="never" lazy="false" name="email"
    type="java.lang.String" unique="true">
-   <column name="EMAIL" unique="true"/>
+   <column check="EMAIL = lower(EMAIL)" name="EMAIL" unique="true"/>
   </property>
   <property generated="never" lazy="false" name="firstName" type="java.lang.String">
    <column name="FIRSTNAME"/>
@@ -20,7 +20,7 @@
   </property>
   <property generated="never" lazy="false" name="alias"
    type="java.lang.String" unique="true">
-   <column name="ALIAS" unique="true"/>
+   <column check="ALIAS = lower(ALIAS)" name="ALIAS" unique="true"/>
   </property>
   <set cascade="all,delete-orphan" lazy="true" name="donations"
    sort="unsorted" table="DONATION">

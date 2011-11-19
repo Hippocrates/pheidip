@@ -1,18 +1,19 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:49:18 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
-    <class name="pheidip.objects.ChoiceOption" table="CHOICEOPTION">
-        <id name="id" type="int">
-            <column name="ID" />
-            <generator class="assigned" />
-        </id>
-        <property name="name" type="java.lang.String">
-            <column name="NAME" />
-        </property>
-        <many-to-one name="choice" class="pheidip.objects.Choice" fetch="join">
-            <column name="CHOICE" />
-        </many-to-one>
-    </class>
+ <class name="pheidip.objects.ChoiceOption" table="CHOICEOPTION">
+  <id name="id" type="int">
+   <column name="ID"/>
+   <generator class="assigned"/>
+  </id>
+  <property generated="never" lazy="false" name="name" type="java.lang.String">
+   <column check="NAME = lower(NAME)" name="NAME" unique-key="OptionNameUnique"/>
+  </property>
+  <many-to-one class="pheidip.objects.Choice" fetch="join"
+   foreign-key="ChoiceOptionFKChoice" name="choice">
+   <column name="CHOICE" unique-key="OptionNameUnique"/>
+  </many-to-one>
+ </class>
 </hibernate-mapping>

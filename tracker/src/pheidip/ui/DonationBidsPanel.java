@@ -130,7 +130,7 @@ public class DonationBidsPanel extends JPanel
     this.tabOrder = new FocusTraversalManager(tabArray);
     this.setFocusTraversalPolicy(this.tabOrder);
     this.setFocusTraversalPolicyProvider(true);
-    this.setFocusCycleRoot(false);
+    this.setFocusCycleRoot(true);
   }
   
   

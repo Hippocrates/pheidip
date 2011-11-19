@@ -1,200 +1,22 @@
 -- SQL Table definitions for the donation database
 
--- MySQL does not allow inline constraints, so I must put them seperately
--- Also, there is no general support for ignorecase fields in sql, so that
--- must be handled externally
+-- This was generated automatically by hibernate, so it'll look pretty bad
 
-CREATE TABLE Donor
-(
-  donorId INTEGER,
-  email VARCHAR(128),
-  alias VARCHAR(31),
-  firstName VARCHAR(31),
-  lastName VARCHAR(31),
-
-  CONSTRAINT DonorEmailUnique UNIQUE (email),
-  CONSTRAINT DonorEmailLowerCase CHECK (email = lower(email)),
-  CONSTRAINT DonorAliasUnique UNIQUE (alias),
-  CONSTRAINT DonorAliasLowerCase CHECK (alias = lower(alias)),
-  
-  CONSTRAINT DonorPK PRIMARY KEY (donorId)
-);
-
-CREATE TABLE DonationDomain
-(
-  donationDomainId VARCHAR (16),
-  PRIMARY KEY (donationDomainId)
-);
-
-INSERT INTO DonationDomain VALUES('LOCAL');
-INSERT INTO DonationDomain VALUES('CHIPIN');
-
-CREATE TABLE DonationBidState
-(
-  donationBidStateId VARCHAR(16),
-  PRIMARY KEY (donationBidStateId)
-);
-
-INSERT INTO DonationBidState VALUES ('PENDING');
-INSERT INTO DonationBidState VALUES ('PROCESSED');
-INSERT INTO DonationBidState VALUES ('FLAGGED');
-
-CREATE TABLE DonationReadState
-(
-  donationReadStateId VARCHAR(16),
-  PRIMARY KEY (donationReadStateId)
-);
-
-INSERT INTO DonationReadState VALUES ('PENDING');
-INSERT INTO DonationReadState VALUES ('AMOUNT_READ');
-INSERT INTO DonationReadState VALUES ('COMMENT_READ');
-INSERT INTO DonationReadState VALUES ('FLAGGED');
-
-CREATE TABLE DonationCommentState
-(
-  donationCommentStateId VARCHAR(16),
-  PRIMARY KEY (donationCommentStateId)
-);
-
-INSERT INTO DonationCommentState VALUES ('PENDING');
-INSERT INTO DonationCommentState VALUES ('ACCEPTED');
-INSERT INTO DonationCommentState VALUES ('DENIED');
-
-
-CREATE TABLE Donation
-(
-  donationId INTEGER,
-  donorId INTEGER,
-  domain VARCHAR(16),
-  domainId VARCHAR(160),
-  
-  bidState VARCHAR(16),
-  readState VARCHAR(16),
-  commentState VARCHAR(16),
-  
-  amount DECIMAL(19,2),
-  timeReceived DATETIME,
-  comment VARCHAR(4096),
-
-  CONSTRAINT DonationFKDonor FOREIGN KEY (donorId) REFERENCES Donor(donorId),
-  CONSTRAINT DonationFKDomain FOREIGN KEY (domain) REFERENCES DonationDomain (donationDomainId),
-  CONSTRAINT DonationDomainIdUnique UNIQUE (domain, domainId),
-  CONSTRAINT DonationFKBidState FOREIGN KEY (bidState) REFERENCES DonationBidState (donationBidStateId),
-  CONSTRAINT DonationFKReadState FOREIGN KEY (readState) REFERENCES DonationReadState (donationReadStateId),
-  CONSTRAINT DonationFKCommentState FOREIGN KEY (commentState) REFERENCES DonationCommentState (donationCommentStateId),
-  CONSTRAINT DonationAmountValid CHECK (amount > 0 OR amount = null),
-  
-  CONSTRAINT DonationPK PRIMARY KEY (donationId)
-);
-
-CREATE TABLE SpeedRun
-(
-  speedRunId INTEGER,
-  name VARCHAR(63),
-  description VARCHAR(1024),
-
-  CONSTRAINT SpeedRunNameUnique UNIQUE (name),
-  CONSTRAINT SpeedRunNameLowerCase CHECK (name = lower(name)),
-  
-  CONSTRAINT SpeedRunPK PRIMARY KEY (speedRunId)
-);
-
-CREATE TABLE BidState
-(
-  bidStateId VARCHAR(16),
-  PRIMARY KEY (bidStateId)
-);
-
-INSERT INTO BidState VALUES('HIDDEN');
-INSERT INTO BidState VALUES('OPENED');
-INSERT INTO BidState VALUES('CLOSED');
-
-CREATE TABLE Choice
-(
-  choiceId INTEGER,
-  speedRunId INTEGER,
-  name VARCHAR(63),
-  description VARCHAR(1024),
-  bidState VARCHAR(16),
-
-  CONSTRAINT ChoiceFKSpeedRun FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
-  CONSTRAINT ChoiceNameUnique UNIQUE (speedRunId, name),
-  CONSTRAINT ChoiceNameLowerCase CHECK (name = lower(name)),
-  CONSTRAINT ChoiceFKBidState FOREIGN KEY (bidState) REFERENCES BidState(bidStateId),
-  
-  CONSTRAINT ChoicePK PRIMARY KEY (choiceId)
-);
-
-CREATE TABLE ChoiceOption
-(
-  optionId INTEGER,
-  choiceId INTEGER,
-  name VARCHAR(63),
-  
-  CONSTRAINT OptionFKChoice FOREIGN KEY (choiceId) REFERENCES Choice(choiceId),
-  CONSTRAINT OptionNameUnique UNIQUE(choiceId, name),
-  CONSTRAINT OptionNameLowerCase CHECK (name = lower(name)),
-  
-  CONSTRAINT OptionPK PRIMARY KEY (optionId)
-);
-
-CREATE TABLE Challenge
-(
-  challengeId INTEGER,
-  speedRunId INTEGER,
-  name VARCHAR(63),
-  goalAmount DECIMAL(19,2),
-  description VARCHAR(1024),
-  bidState VARCHAR(16),
-  
-  CONSTRAINT ChallengeFKSpeedRun FOREIGN KEY (speedRunId) REFERENCES SpeedRun(speedRunId),
-  CONSTRAINT ChallengeNameUnique UNIQUE (speedRunId, name),
-  CONSTRAINT ChallengeNameLowerCase CHECK (name = lower(name)),
-  CONSTRAINT ChallengeAmountValid CHECK(goalAmount >= 0),
-  CONSTRAINT ChallengeFKBidState FOREIGN KEY (bidState) REFERENCES BidState(bidStateId),
-  
-  CONSTRAINT ChallengePK PRIMARY KEY (challengeId)
-);
-
-CREATE TABLE ChoiceBid
-(
-  choiceBidId INTEGER,
-  optionId INTEGER,
-  donationId INTEGER,
-  amount DECIMAL(19,2),
-
-  CONSTRAINT ChoiceBidFKDonation FOREIGN KEY (donationId) REFERENCES Donation(donationId),
-  CONSTRAINT ChoiceBidFKOption FOREIGN KEY (optionId) REFERENCES ChoiceOption(optionId),
-  CONSTRAINT ChoiceBidAmountValid CHECK (amount > 0),
-
-  CONSTRAINT ChoiceBidPK PRIMARY KEY (choiceBidId)
-);
-
-CREATE TABLE ChallengeBid
-(
-  challengeBidId INTEGER,
-  challengeId INTEGER,
-  donationId INTEGER,
-  amount DECIMAL(19,2),
-
-  CONSTRAINT ChallengeBidFKDonation FOREIGN KEY (donationId) REFERENCES Donation(donationId),
-  CONSTRAINT ChallengeBidFKChallenge FOREIGN KEY (challengeId) REFERENCES Challenge(challengeId),
-  CONSTRAINT ChallengeBidAmountValid CHECK (amount > 0),
-  
-  CONSTRAINT ChallengeBidPK PRIMARY KEY (challengeBidId)
-);
-
-CREATE TABLE Prize
-(
-  prizeId INTEGER,
-  name VARCHAR(63),
-  imageURL VARCHAR(1024),
-  description VARCHAR(1024),
-  donorId INTEGER,
-  
-  CONSTRAINT PrizeNameUnique UNIQUE(name),
-  CONSTRAINT PrizeNameLowerCase CHECK(name = lower(name)),
-  CONSTRAINT PrizeFKDonor FOREIGN KEY (donorId) REFERENCES Donor (donorId),
-  
-  CONSTRAINT PrizePK PRIMARY KEY(prizeId)
-);
+create table CHOICEOPTION (ID integer not null, NAME varchar(255) check (NAME = lower(NAME)), CHOICE integer, primary key (ID), unique (NAME, CHOICE));
+create table Challenge (ID integer not null, NAME varchar(255) check (NAME = lower(NAME)), DESCRIPTION varchar(255), BIDSTATE varchar(255), SPEEDRUN integer, GOALAMOUNT decimal(19,2), primary key (ID), unique (NAME, SPEEDRUN));
+create table ChallengeBid (ID integer not null, AMOUNT decimal(19,2), DONATION integer, CHALLENGE integer, primary key (ID));
+create table Choice (ID integer not null, NAME varchar(255) check (NAME = lower(NAME)), DESCRIPTION varchar(255), BIDSTATE varchar(255), SPEEDRUN integer, primary key (ID), unique (NAME, SPEEDRUN));
+create table ChoiceBid (ID integer not null, AMOUNT decimal(19,2), DONATION integer, CHOICEOPTION integer, primary key (ID));
+create table DONATION (ID integer not null, TIMERECEIVED datetime, AMOUNT decimal(19,2), COMMENT longtext, DOMAIN varchar(255), DOMAINID varchar(255), BIDSTATE varchar(255), READSTATE varchar(255), COMMENTSTATE varchar(255), DONOR integer, primary key (ID), unique (DOMAIN, DOMAINID));
+create table DONOR (ID integer not null, EMAIL varchar(255) unique check (EMAIL = lower(EMAIL)), FIRSTNAME varchar(255), LASTNAME varchar(255), ALIAS varchar(255) unique check (ALIAS = lower(ALIAS)), primary key (ID));
+create table PRIZE (ID integer not null, NAME varchar(255) unique check (NAME = lower(NAME)), IMAGEURL varchar(255), DESCRIPTION varchar(255), WINNER integer, primary key (ID));
+create table SPEEDRUN (ID integer not null, NAME varchar(255) unique check (NAME = lower(NAME)), DESCRIPTION varchar(255), primary key (ID));
+alter table CHOICEOPTION add index ChoiceOptionFKChoice (CHOICE), add constraint ChoiceOptionFKChoice foreign key (CHOICE) references Choice (ID);
+alter table Challenge add index BidFKSpeedRuncb0c9c43 (SPEEDRUN), add constraint BidFKSpeedRuncb0c9c43 foreign key (SPEEDRUN) references SPEEDRUN (ID);
+alter table ChallengeBid add index DonationBidFKDonation107d5dba (DONATION), add constraint DonationBidFKDonation107d5dba foreign key (DONATION) references DONATION (ID);
+alter table ChallengeBid add index ChallengeBidFKChallenge (CHALLENGE), add constraint ChallengeBidFKChallenge foreign key (CHALLENGE) references Challenge (ID);
+alter table Choice add index BidFKSpeedRun784249c1 (SPEEDRUN), add constraint BidFKSpeedRun784249c1 foreign key (SPEEDRUN) references SPEEDRUN (ID);
+alter table ChoiceBid add index DonationBidFKDonationaa05d77c (DONATION), add constraint DonationBidFKDonationaa05d77c foreign key (DONATION) references DONATION (ID);
+alter table ChoiceBid add index ChoiceBidFKOption (CHOICEOPTION), add constraint ChoiceBidFKOption foreign key (CHOICEOPTION) references CHOICEOPTION (ID);
+alter table DONATION add index DonationFKDonor (DONOR), add constraint DonationFKDonor foreign key (DONOR) references DONOR (ID);
+alter table PRIZE add index PrizeFKDonor (WINNER), add constraint PrizeFKDonor foreign key (WINNER) references DONOR (ID);

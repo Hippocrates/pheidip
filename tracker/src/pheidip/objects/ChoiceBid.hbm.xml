@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:49:18 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
-    <subclass name="pheidip.objects.ChoiceBid" extends="pheidip.objects.DonationBid" discriminator-value="ChoiceBid" lazy="false">
-        <many-to-one name="option" class="pheidip.objects.ChoiceOption" fetch="join">
-            <column name="CHOICEOPTION" />
-        </many-to-one>
-    </subclass>
+ <union-subclass extends="pheidip.objects.DonationBid" lazy="false" name="pheidip.objects.ChoiceBid">
+  <tuplizer class=""/>
+  <many-to-one class="pheidip.objects.ChoiceOption" fetch="join"
+   foreign-key="ChoiceBidFKOption" name="option">
+   <column name="CHOICEOPTION"/>
+  </many-to-one>
+ </union-subclass>
 </hibernate-mapping>
