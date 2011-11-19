@@ -198,11 +198,7 @@ public class DonationTaskPanel extends EntityPanel
     tabArray.add(this.refreshButton);
     tabArray.add(this.nextButton);
     tabArray.add(this.donationList);
-
-    for (Component c : this.donationBidsPanel.getTabOrder())
-    {
-      tabArray.add(c);
-    }
+    tabArray.add(this.donationBidsPanel);
 
     this.tabOrder = new FocusTraversalManager(tabArray.toArray(new Component[tabArray.size()]));
     this.setFocusTraversalPolicy(this.tabOrder);
@@ -244,7 +240,10 @@ public class DonationTaskPanel extends EntityPanel
     
     if (d != null)
     {
-      this.control = this.task.getControl(d);
+      if (this.control == null || this.control.getDonationId() != d.getId())
+      {
+        this.control = this.task.getControl(d);
+      }
     }
     else
     {
@@ -261,6 +260,8 @@ public class DonationTaskPanel extends EntityPanel
     
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.refreshContent();
   }
 
   @Override
@@ -272,17 +273,10 @@ public class DonationTaskPanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    this.redrawContent();
-  }
-    
-  public void redrawContent()
-  {
+    Donation currentInstance = null;
     Donation oldInstance = this.getSelectedDonation();
-    
     DefaultListModel listData = new DefaultListModel();
     List<Donation> pendingDonations = this.task.refreshTaskList();
-    
-    Donation currentInstance = null;
     
     for (Donation d : pendingDonations)
     {
@@ -305,8 +299,12 @@ public class DonationTaskPanel extends EntityPanel
       this.donationList.ensureIndexIsVisible(0);
     }
     
-    this.setHeaderText(this.task.taskName());
+    this.redrawContent();
+  }
     
+  public void redrawContent()
+  {
+    this.setHeaderText(this.task.taskName());
     this.openDonation();
   }
 

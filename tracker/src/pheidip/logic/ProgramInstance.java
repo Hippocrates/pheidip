@@ -34,6 +34,36 @@ public class ProgramInstance
     return this.chipinLogin;
   }
   
+  public DonorControl createDonorControl(int donorId)
+  {
+    return new DonorControl(this.donationDatabase, donorId);
+  }
+  
+  public DonationControl createDonationControl(int donationId)
+  {
+    return new DonationControl(this.donationDatabase, donationId);
+  }
+  
+  public SpeedRunControl createSpeedRunControl(int speedRunId)
+  {
+    return new SpeedRunControl(this.donationDatabase, speedRunId);
+  }
+  
+  public ChoiceControl createChoiceControl(int choiceId)
+  {
+    return new ChoiceControl(this.donationDatabase, choiceId);
+  }
+  
+  public ChallengeControl createChallengeControl(int challengeId)
+  {
+    return new ChallengeControl(this.donationDatabase, challengeId);
+  }
+  
+  public PrizeControl createPrizeControl(int prizeId)
+  {
+    return new PrizeControl(this.donationDatabase, prizeId);
+  }
+  
   public void shutdownProgram()
   {
     this.chipinLogin.logOut();

@@ -368,8 +368,8 @@ public class MainWindow extends JFrame implements Reporter
     InputMap[] inputMaps = new InputMap[] {
       this.tabbedPane.getInputMap(JComponent.WHEN_FOCUSED),
       this.tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT),
-      //this.tabbedPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW),
     };
+    
     for(InputMap i : inputMaps) 
     {
       for (HotkeyAction a : HotkeyAction.values())
@@ -417,7 +417,7 @@ public class MainWindow extends JFrame implements Reporter
     {
       TabHeader header = new TabHeader(this.tabbedPane);
       
-      if (panel instanceof EntityPanel)
+      if (panel instanceof TabPanel)
       {
         ((TabPanel)panel).setTabHeader(header);
       }
@@ -540,9 +540,20 @@ public class MainWindow extends JFrame implements Reporter
   
   private void openChipinMergeTab(ChipinDocumentSource documentSource)
   {
+    // prevent opening the same tab twice
+    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    {
+      Component target = this.tabbedPane.getComponentAt(i);
+      if (target instanceof ChipinMergeTab)
+      {
+        this.focusOnTab(i);
+        return;
+      }
+    }
+    
     ChipinMergeTab tab = new ChipinMergeTab(new ChipinMergeProcess(this.instance.getDonationDatabase(), documentSource));
+    
     this.insertTab(tab);
-    tab.setHeaderText("Chipin Merge");
   }
   
   private void openConnectDialog()
@@ -682,7 +693,7 @@ public class MainWindow extends JFrame implements Reporter
 
   private void openProcessBidsTab()
   {
- // prevent opening the same tab twice
+    // prevent opening the same tab twice
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
@@ -730,7 +741,7 @@ public class MainWindow extends JFrame implements Reporter
       }
     }
     
-    DonorControl ctrl = new DonorControl(this.instance.getDonationDatabase(), donorId);
+    DonorControl ctrl = this.instance.createDonorControl(donorId);
     DonorPanel panel = new DonorPanel(this, ctrl);
     this.insertTab(panel);
   }
@@ -748,7 +759,7 @@ public class MainWindow extends JFrame implements Reporter
       }
     }
     
-    ChoiceControl ctrl = new ChoiceControl(this.instance.getDonationDatabase(), choiceId);
+    ChoiceControl ctrl = this.instance.createChoiceControl(choiceId);
     ChoicePanel panel = new ChoicePanel(this, ctrl);
     this.insertTab(panel);
   }
@@ -766,7 +777,7 @@ public class MainWindow extends JFrame implements Reporter
       }
     }
     
-    ChallengeControl ctrl = new ChallengeControl(this.instance.getDonationDatabase(), challengeId);
+    ChallengeControl ctrl = this.instance.createChallengeControl(challengeId);
     ChallengePanel panel = new ChallengePanel(this, ctrl);
     this.insertTab(panel);
   }
@@ -784,7 +795,7 @@ public class MainWindow extends JFrame implements Reporter
       }
     }
     
-    PrizeControl ctrl = new PrizeControl(this.instance.getDonationDatabase(), prizeId);
+    PrizeControl ctrl = this.instance.createPrizeControl(prizeId);
     PrizePanel panel = new PrizePanel(this, ctrl);
     this.insertTab(panel);
   }
@@ -802,7 +813,7 @@ public class MainWindow extends JFrame implements Reporter
       }
     }
     
-    DonationControl ctrl = new DonationControl(this.instance.getDonationDatabase(), donationId);
+    DonationControl ctrl = this.instance.createDonationControl(donationId);
     DonationPanel panel = new DonationPanel(this, ctrl);
     this.insertTab(panel);
   }
@@ -810,8 +821,7 @@ public class MainWindow extends JFrame implements Reporter
   private void openDisconnectDialog()
   {
     int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to disconnect?", "Confirm Disconnect...", JOptionPane.YES_NO_OPTION);
-    
-    
+
     if (result == JOptionPane.YES_OPTION)
     {
       this.instance.getDonationDatabase().closeConnection();

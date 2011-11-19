@@ -21,7 +21,7 @@ public class DonationReadTask implements DonationTask
   @Override
   public DonationControl getControl(Donation d)
   {
-    return new DonationControl(this.manager, d);
+    return new DonationControl(this.manager, d.getId());
   }
 
   @Override
@@ -51,5 +51,4 @@ public class DonationReadTask implements DonationTask
   {
     return TASK_NAME;
   }
-
 }

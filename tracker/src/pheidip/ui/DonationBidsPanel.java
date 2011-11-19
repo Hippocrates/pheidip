@@ -35,7 +35,7 @@ public class DonationBidsPanel extends JPanel
   private JButton changeAmountButton;
   private JButton deleteBidButton;
   private List<DonationBid> cachedDonationBids;
-  private Component[] tabOrder;
+  private FocusTraversalManager tabOrder;
   
   private void initializeGUI()
   {
@@ -119,18 +119,25 @@ public class DonationBidsPanel extends JPanel
     
     this.bidTable.addKeyListener(new TabTraversalKeyListener(this.bidTable)); 
     
-    this.tabOrder = new Component[]
+    Component[] tabArray = new Component[]
     {
       this.attachBidButton,
       this.changeAmountButton,
       this.deleteBidButton,
       this.bidTable,
     };
+    
+    this.tabOrder = new FocusTraversalManager(tabArray);
+    this.setFocusTraversalPolicy(this.tabOrder);
+    this.setFocusTraversalPolicyProvider(true);
+    this.setFocusCycleRoot(false);
   }
+  
+  
   
   public Component[] getTabOrder()
   {
-    return this.tabOrder;
+    return new Component[]{};// this.tabOrder;
   }
   
   public DonationBidsPanel(MainWindow owner, DonationControl control)

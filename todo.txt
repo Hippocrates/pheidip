@@ -1,26 +1,12 @@
 Tracker App TODO:
 
-- INTERNAL UPGRADE: Use an actual ORM (current)
-  - It's pretty foolish to continue using the ad-hoc system I have in place
-  - Priority: Highest
-  - Difficulty: High
-  - Notes:
-    - I've changed all of the objects to follow the get/set convensions in preparation for the change
-    - I also changed all of the relationships to java-ones in the objects (which is nice)
-    - Now, I need to start experimenting with it, and slowly integrating the use of it with the main app
-      - start with test cases, I created a packaged called hdb under test.  Eventually, the hibernate implementation should supercede the other one, so I don't think another 'db' package would be worthwhile
-    - It's pretty straightforward.  Basically, all that's required should just be to modify the 'Control' and 'Search' classes to use Hibernate instead (and remove the stupid 2nd order linking since they act like normal objects now).
-    - There will be some issues with the use of lazy-loading, but I think I can work around them
-    - Its almost all in place, some of the bid assignment and donation tasks need testing, but we are almost back where we were.
-    - The last step will be to re-work the chipin merge function to work faster, but this will be part of the tuning in the next step
-
 - UPGRADE: Data access layer speed
   - fix accesses to avoid round-trips to the server
   - remove the 'pre-cache' of all elements in most of the search dialogs
   - Priority: Highest
   - Difficulty: Highest
   - Notes:
-    - This needs to be tested extensively with a remote DB, to identify and remove as many round-trips as possible
+    - Mostly completed as a result of the previous upgrade to hibernate, still needs testing/profiling
 
 - UPGRADE: Try retrieving game times (and names) from the google docs spreadsheet
   - what to do about games added removed?
@@ -31,6 +17,7 @@ Tracker App TODO:
 - UPGRADE: Consistent ordering of games, prizes, bids, etc...
   - Well, once we get game start/end times, we can use joins on that for ordering those things
   - Consistent ordering of donors would be helpful too (by name)
+  - Most of this is implemented, it is still listed because speedrun times might be nice to have
   
 - BUG: "donors with more than one word in a name have their names cut off"
   - this has to do with the string.split-ing going on

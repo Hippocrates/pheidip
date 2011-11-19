@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.hibernate.Session;
-import org.hibernate.jdbc.Work;
+import org.hibernate.StatelessSession;
 
 import pheidip.db.DBType;
 import pheidip.db.DonationDataAccess;
@@ -88,33 +87,32 @@ public class DonationDatabaseManager
   
   public void runSQLScript(final String filename)
   {
-    Session session = this.dataAccess.getSessionFactory().openSession();
+    // Does not work
+    StatelessSession session = this.dataAccess.getSessionFactory().openStatelessSession();
     
-    
-    session.doWork(
-      new Work() 
-      {
-        @Override
-        public void execute(Connection connection) throws SQLException
-        {
-          try
-          {
-            FileReader reader = new FileReader(filename);
-            ScriptRunner runner = new ScriptRunner(connection, true, true);
+    @SuppressWarnings("deprecation")
+    Connection connection = session.connection();
+   
+    try
+    {
+      FileReader reader = new FileReader(filename);
+      ScriptRunner runner = new ScriptRunner(connection, true, true);
             
-            runner.runScript(reader);
-          } 
-          catch (IOException e)
-          {
-            DonationDatabaseManager.this.reportMessage(e.getMessage());
-          } 
-          catch (SQLException e)
-          {
-            DonationDatabaseManager.this.reportMessage(DonationDataErrorParser.parseError(e.getMessage()).getErrorMessage());
-          }
-        }
-      }
-    );
+      runner.runScript(reader);
+    } 
+    catch (IOException e)
+    {
+      DonationDatabaseManager.this.reportMessage(e.getMessage());
+    } 
+    catch (SQLException e)
+    {
+      DonationDatabaseManager.this.reportMessage(DonationDataErrorParser.parseError(e.getMessage()).getErrorMessage());
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+      DonationDatabaseManager.this.reportMessage(e.getMessage());
+    }
 
     session.close();
   }

@@ -34,7 +34,7 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     Session session = this.beginTransaction();
     
     
-    session.update(toUpdate);
+    session.merge(toUpdate);
     
     this.endTransaction();
     //session.close();

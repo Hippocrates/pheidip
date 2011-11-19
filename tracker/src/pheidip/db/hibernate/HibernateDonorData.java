@@ -83,17 +83,15 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	@Override
 	public List<Donor> getAllDonors() 
 	{
-	  StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
-    dedicatedSession.beginTransaction();
-    
+	  StatelessSession dedicatedSession = this.beginBulkTransaction();
+	  
     Query q = dedicatedSession.createQuery("from Donor order by id");
 
     @SuppressWarnings("unchecked")
     List<Donor> listing = q.list();
     
-    dedicatedSession.getTransaction().commit();
-    dedicatedSession.close();
-      
+    this.endBulkTransaction(dedicatedSession);
+    
     return listing;
 	}
 
@@ -171,8 +169,7 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
       queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
     }
     
-    StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
-    dedicatedSession.beginTransaction();
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
     
     Query q = dedicatedSession.createQuery(queryString + " order by d.alias, d.email, d.firstName, d.lastName");
 
@@ -191,8 +188,7 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
     @SuppressWarnings("unchecked")
     List<Donor> listing = q.list();
     
-    dedicatedSession.getTransaction().commit();
-    dedicatedSession.close();
+    this.endBulkTransaction(dedicatedSession);
     
     return listing;
   }
@@ -200,8 +196,7 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
   @Override
   public void insertMultipleDonors(List<Donor> toInsert)
   {
-    StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
-    dedicatedSession.beginTransaction();
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
 
     for (Donor donor : toInsert)
     {
@@ -216,7 +211,6 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
       }
     }
     
-    dedicatedSession.getTransaction().commit();
-    dedicatedSession.close();
+    this.endBulkTransaction(dedicatedSession);
   }
 }

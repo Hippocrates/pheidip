@@ -155,7 +155,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   public void updateDonation(Donation updated)
   {
     Session session = this.beginTransaction();    
-    session.update(updated);
+    session.merge(updated);
     this.endTransaction();
     //session.close();
   }
@@ -190,14 +190,12 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   public void updateChallengeBidAmount(int challengeBidId, BigDecimal newAmount)
   {
     Session session = this.beginTransaction();
-    
-    
+
     DonationBid b = (DonationBid) session.load(DonationBid.class, challengeBidId);
     b.setAmount(newAmount);
     session.flush();
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -236,16 +234,14 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   @Override
   public List<Donation> getAllDonations()
   {
-    StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
-    dedicatedSession.beginTransaction();
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
     
     Query q = dedicatedSession.createQuery("from Donation");
     
     @SuppressWarnings("unchecked")
     List<Donation> listing = q.list();
     
-    dedicatedSession.getTransaction().commit();
-    dedicatedSession.close();
+    this.endBulkTransaction(dedicatedSession);
     
     return listing;
   }
@@ -289,10 +285,9 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
       queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
     }
 
-    StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
-    dedicatedSession.beginTransaction();
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
     
-    Query q = dedicatedSession.createQuery(queryString + " order by d.timeReceived, d.domain, d.domainId");
+    Query q = dedicatedSession.createQuery(queryString + " order by d.timeReceived");
 
     if (params.donor != null)
       q.setParameter("donor", params.donor);
@@ -324,8 +319,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     @SuppressWarnings("unchecked")
     List<Donation> listing = q.list();
     
-    dedicatedSession.getTransaction().commit();
-    dedicatedSession.close();
+    this.endBulkTransaction(dedicatedSession);
     
     return listing;
   }
@@ -333,31 +327,27 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   @Override
   public void insertMultipleDonations(List<Donation> donationsToInsert)
   {
-    StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
-    dedicatedSession.beginTransaction();
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
     
     for (Donation donation : donationsToInsert)
     {
       dedicatedSession.insert(donation);
     }
     
-    dedicatedSession.getTransaction().commit();
-    dedicatedSession.close();
+    this.endBulkTransaction(dedicatedSession);
   }
 
   @Override
   public void updateMultiplDonations(List<Donation> donationsToUpdate)
   {
-    StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
-    dedicatedSession.beginTransaction();
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
     
     for (Donation donation : donationsToUpdate)
     {
       dedicatedSession.update(donation);
     }
     
-    dedicatedSession.getTransaction().commit();
-    dedicatedSession.close();
+    this.endBulkTransaction(dedicatedSession);
   }
 
 }

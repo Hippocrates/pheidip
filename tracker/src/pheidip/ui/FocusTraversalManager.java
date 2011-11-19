@@ -12,6 +12,21 @@ public class FocusTraversalManager extends FocusTraversalPolicy
 {
   List<Component> components;
   
+  private List<Container> getSubContainers()
+  {
+    List<Container> result = new ArrayList<Container>();
+    
+    for (Component c : components)
+    {
+      if (c instanceof Container)
+      {
+        result.add((Container)c);
+      }
+    }
+    
+    return result;
+  }
+  
   public FocusTraversalManager(Component[] components)
   {
     this.components = new ArrayList<Component>();
@@ -26,33 +41,42 @@ public class FocusTraversalManager extends FocusTraversalPolicy
   {
     this.components = new ArrayList<Component>(components);
   }
-  
-  private int clampToSize(int i)
-  {
-    if (i < 0)
-    {
-      i = this.components.size() - 1;
-    }
-    
-    return i % this.components.size();
-  }
-  
+
   @Override
   public Component getComponentAfter(Container container, Component component)
   {
+    for (Container c : getSubContainers())
+    {
+      if (c.getFocusTraversalPolicy() != null)
+      {
+        Component result = c.getFocusTraversalPolicy().getComponentAfter(c, component);
+        
+        if (result != null)
+        {
+          return result;
+        }
+      }
+    }
+    
     int currentIndex = this.components.indexOf(component);
     
     if (currentIndex != -1)
     {
-      for (int i = 1; i < this.components.size(); ++i)
+      for (int i = currentIndex + 1; i < this.components.size(); ++i)
       {
-        Component current = this.components.get(this.clampToSize(currentIndex + i));
+        Component current = this.components.get(i);
         if (isComponentSelectable(current))
         {
-          return current;
+          if (current instanceof Container && ((Container)current).getFocusTraversalPolicy() != null)
+          {
+            return ((Container)current).getFocusTraversalPolicy().getFirstComponent(((Container)current));
+          }
+          else
+          {
+            return current;
+          }
         }
       }
-      return component;
     }
     
     return null;
@@ -61,19 +85,38 @@ public class FocusTraversalManager extends FocusTraversalPolicy
   @Override
   public Component getComponentBefore(Container container, Component component)
   {
+    for (Container c : getSubContainers())
+    {
+      if (c.getFocusTraversalPolicy() != null)
+      {
+        Component result = c.getFocusTraversalPolicy().getComponentBefore(c, component);
+        
+        if (result != null)
+        {
+          return result;
+        }
+      }
+    }
+    
     int currentIndex = this.components.indexOf(component);
     
     if (currentIndex != -1)
     {
-      for (int i = 1; i < this.components.size(); ++i)
+      for (int i = currentIndex - 1; i >= 0; --i)
       {
-        Component current = this.components.get(this.clampToSize(currentIndex - i));
+        Component current = this.components.get(i);
         if (isComponentSelectable(current))
         {
-          return current;
+          if (current instanceof Container && ((Container)current).getFocusTraversalPolicy() != null)
+          {
+            return ((Container)current).getFocusTraversalPolicy().getFirstComponent(((Container)current));
+          }
+          else
+          {
+            return current;
+          }
         }
       }
-      return component;
     }
     
     return null;
@@ -91,7 +134,7 @@ public class FocusTraversalManager extends FocusTraversalPolicy
     Component first = this.components.get(0);
     if (isComponentSelectable(first))
     {
-      return first;
+      return getUnderlyingComponent(first);
     }
     else
     {
@@ -102,7 +145,27 @@ public class FocusTraversalManager extends FocusTraversalPolicy
   @Override
   public Component getLastComponent(Container container)
   {
-    return this.getComponentBefore(container, this.getFirstComponent(container));
+    Component last = this.components.get(this.components.size() - 1);
+    if (isComponentSelectable(last))
+    {
+      return getUnderlyingComponent(last);
+    }
+    else
+    {
+      return this.getComponentBefore(container, last);
+    }
+  }
+  
+  private Component getUnderlyingComponent(Component current)
+  {
+    if (current instanceof Container && ((Container)current).getFocusTraversalPolicy() != null)
+    {
+      return ((Container)current).getFocusTraversalPolicy().getFirstComponent(((Container)current));
+    }
+    else
+    {
+      return current;
+    }
   }
   
   private static boolean isComponentSelectable(Component c)

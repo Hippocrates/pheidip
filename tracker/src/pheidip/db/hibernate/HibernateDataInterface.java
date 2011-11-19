@@ -2,6 +2,8 @@ package pheidip.db.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
+import org.hibernate.exception.ConstraintViolationException;
 
 abstract public class HibernateDataInterface 
 {
@@ -27,6 +29,28 @@ abstract public class HibernateDataInterface
 	  return this.manager.getSession();
 	}
 	
+	public StatelessSession beginBulkTransaction()
+	{
+	  StatelessSession dedicatedSession = this.getSessionFactory().openStatelessSession();
+    dedicatedSession.beginTransaction();
+    return dedicatedSession;
+	}
+	
+	public void endBulkTransaction(StatelessSession dedicatedSession)
+	{
+	  try
+    {
+  	  dedicatedSession.getTransaction().commit();
+      dedicatedSession.close();
+    }
+	  catch(Exception e)
+    {
+	    dedicatedSession.getTransaction().rollback();
+	    dedicatedSession.close();
+      throw new RuntimeException(e);
+    }
+	}
+	
 	public Session beginTransaction()
 	{
 	  this.manager.getSession().beginTransaction();
@@ -39,6 +63,12 @@ abstract public class HibernateDataInterface
     {
 	    this.manager.getSession().getTransaction().commit();
     }
+	  catch(ConstraintViolationException e)
+	  {
+	    this.manager.getSession().getTransaction().rollback();
+      this.getManager().resetSession();
+	    throw new RuntimeException(e.getLocalizedMessage());
+	  }
 	  catch(Exception e)
     {
 	    this.manager.getSession().getTransaction().rollback();

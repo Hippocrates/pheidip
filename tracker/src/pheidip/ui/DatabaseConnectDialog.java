@@ -212,7 +212,7 @@ public class DatabaseConnectDialog extends JDialog
      
    if (initFilename.length() > 0)
    {
-     //this.databaseManager.runSQLScript(initFilename);
+     this.databaseManager.runSQLScript(initFilename);
    }
    
    if (!this.databaseManager.isConnected())

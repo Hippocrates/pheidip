@@ -1,9 +1,12 @@
 package pheidip.db.hibernate;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.jdbc.Work;
 
 import pheidip.db.BidData;
 import pheidip.db.DBType;
@@ -101,8 +104,9 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	@Override
 	public void openFileDatabase(File location) 
 	{
-		// TODO Auto-generated method stub
-		throw new RuntimeException("Method not supported.");
+	  this.sessionFactory = HibernateManager.createFileDatabase(location);
+    this.session = this.sessionFactory.openSession();
+    this.databaseConnectionType = DBType.HSQLDB;
 	}
 
 	@Override
@@ -110,7 +114,7 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	{
 		this.sessionFactory = HibernateManager.createMemorySessionFactory();
 		this.session = this.sessionFactory.openSession();
-		this.databaseConnectionType = DBType.H2;
+		this.databaseConnectionType = DBType.HSQLDB;
 	}
 
 	@Override
@@ -128,6 +132,17 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	@Override
 	public void closeConnection() 
 	{
+	  if (this.databaseConnectionType == DBType.HSQLDB)
+	  {
+	    this.session.doWork(new Work()
+	    {
+        public void execute(Connection c) throws SQLException
+        {
+          c.createStatement().execute("SHUTDOWN COMPACT");
+        }
+	    });
+	  }
+	  
 	  this.session.close();
 		this.sessionFactory.close();
 	}
