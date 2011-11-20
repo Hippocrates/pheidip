@@ -20,6 +20,10 @@ Tracker App TODO:
   - Most of this is implemented, now that SpeedRun and Prizes have a 'sortKey' value
   - it is still listed because speedrun times from the google docs might be nice to have
   
+- BUG: fix the double-query on the donation task tabs
+  - Every time you select a list item, it runs the same query twice
+  - I think it has to do with the 'is value adjusting' semantics of JList, needs investigating
+  
 - BUG: "donors with more than one word in a name have their names cut off"
   - this has to do with the string.split-ing going on
   - Probably the best bet would be to put first in first, and then rest in last name

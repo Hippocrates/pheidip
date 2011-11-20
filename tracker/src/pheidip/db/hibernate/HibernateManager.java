@@ -77,7 +77,6 @@ public class HibernateManager
     cfg.setProperty("hibernate.connection.username", userName);
     cfg.setProperty("hibernate.connection.password", password);
     cfg.setProperty("hibernate.dialect", getDialect(type));
-    cfg.setProperty("hibernate.show_sql", "true");
 
     return cfg.buildSessionFactory();
   }
