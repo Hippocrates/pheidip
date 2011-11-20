@@ -457,12 +457,13 @@ public class DonorPanel extends EntityPanel
   
   public void saveContent()
   {
-    this.donorControl.updateData(
-        new Donor(this.donorControl.getDonorId(),
-        this.emailField.getText(),
-        this.aliasField.getText(),
-        this.firstNameField.getText(),
-        this.lastNameField.getText()));
+    Donor data = this.donorControl.getData();
+    data.setEmail(this.emailField.getText());
+    data.setAlias(this.aliasField.getText());
+    data.setFirstName(this.firstNameField.getText());
+    data.setLastName(this.lastNameField.getText());
+    
+    this.donorControl.updateData(data);
     
     this.redrawContent();
   }

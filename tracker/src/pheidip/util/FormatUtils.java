@@ -15,6 +15,11 @@ public final class FormatUtils
     return new DecimalFormat("#0.00");
   }
   
+  public static DecimalFormat getIntegerFormat()
+  {
+    return new DecimalFormat("#0");
+  }
+  
   public static BigDecimal getNumberOrNull(String formatString)
   {
     return StringUtils.isEmptyOrNull(formatString) ? null : new BigDecimal(formatString);

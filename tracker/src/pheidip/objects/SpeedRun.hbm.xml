@@ -3,7 +3,7 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:49:18 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
- <class name="pheidip.objects.SpeedRun" table="SPEEDRUN">
+ <class name="pheidip.objects.SpeedRun" table="SpeedRun">
   <id name="id" type="int">
    <column name="ID"/>
    <generator class="assigned"/>
@@ -15,8 +15,11 @@
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
   </property>
-  <set cascade="all,delete-orphan" lazy="false" name="bids"
-   sort="unsorted" table="BID">
+  <property generated="never" lazy="false" name="sortKey" type="int" unique="true">
+   <column name="sortKey" unique="true"/>
+  </property>
+  <set cascade="all,delete-orphan" lazy="false" name="bids" 
+   sort="unsorted" table="Bid" inverse="true">
    <key>
     <column name="SPEEDRUN"/>
    </key>

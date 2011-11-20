@@ -45,7 +45,7 @@ public class DonationControl
     this.donations = this.donationDatabase.getDataAccess().getDonationData();
     this.bids = this.donationDatabase.getDataAccess().getBids();
     this.donationId = donation.getId();
-    this.cachedData = donation;
+    this.cachedData = null;
   }
   
   public int getDonationId()

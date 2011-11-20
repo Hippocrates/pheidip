@@ -6,10 +6,12 @@ import pheidip.util.StringUtils;
 public class PrizeSearchParams implements FilterFunction<Prize>
 {
   public String name;
+  public boolean excludeIfWon;
 
   @Override
   public boolean predicate(Prize x)
   {
-    return StringUtils.isEmptyOrNull(this.name) ? true : x.getName() == null ? false : x.getName().toUpperCase().contains(name.toUpperCase());
+    return StringUtils.innerStringMatch(x.getName(), this.name)
+      && excludeIfWon ? (x.getWinner() == null) : true;
   }
 }

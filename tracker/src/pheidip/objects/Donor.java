@@ -48,7 +48,7 @@ public class Donor
   
   public void setFirstName(String firstName)
   {
-    this.firstName = StringUtils.nullIfEmpty(firstName);
+    this.firstName = StringUtils.emptyIfNull(firstName);
   }
 
   public String getLastName()
@@ -58,7 +58,7 @@ public class Donor
 
   public void setLastName(String lastName)
   {
-    this.lastName = StringUtils.nullIfEmpty(lastName);
+    this.lastName = StringUtils.emptyIfNull(lastName);
   }
 
   public String getEmail()
@@ -68,7 +68,7 @@ public class Donor
 
   public void setEmail(String email)
   {
-    this.email = StringUtils.canonicalize(email);
+    this.email = StringUtils.isEmptyOrNull(email) ? "#" + this.getId() : email.toLowerCase();
   }
 
   public int getId()

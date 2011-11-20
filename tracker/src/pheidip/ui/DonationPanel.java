@@ -56,11 +56,14 @@ public class DonationPanel extends EntityPanel
   private JComboBox bidStateComboBox;
   private JComboBox readStateComboBox;
   private JComboBox commentStateComboBox;
+  private JLabel lblNewLabel;
+  private JLabel lblNewLabel_1;
+  private JLabel lblNewLabel_2;
   
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{66, 113, 105, 90, 104, 0};
+    gridBagLayout.columnWidths = new int[]{37, 63, 105, 58, 48, 63};
     gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0};
     gridBagLayout.columnWeights = new double[]{1.0, 1.0, 0.0, 0.0, 0.0, 0.0};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
@@ -180,6 +183,14 @@ public class DonationPanel extends EntityPanel
         gbc_openDonorButton.gridy = 4;
         add(openDonorButton, gbc_openDonorButton);
         
+        lblNewLabel = new JLabel("Bid State:");
+        GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+        gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
+        gbc_lblNewLabel.anchor = GridBagConstraints.EAST;
+        gbc_lblNewLabel.gridx = 0;
+        gbc_lblNewLabel.gridy = 5;
+        add(lblNewLabel, gbc_lblNewLabel);
+        
         bidStateComboBox = new JComboBox(DonationBidState.values());
         GridBagConstraints gbc_bidStateComboBox = new GridBagConstraints();
         gbc_bidStateComboBox.gridwidth = 2;
@@ -189,6 +200,14 @@ public class DonationPanel extends EntityPanel
         gbc_bidStateComboBox.gridy = 5;
         add(bidStateComboBox, gbc_bidStateComboBox);
         
+        lblNewLabel_1 = new JLabel("Read State:");
+        GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
+        gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
+        gbc_lblNewLabel_1.anchor = GridBagConstraints.EAST;
+        gbc_lblNewLabel_1.gridx = 0;
+        gbc_lblNewLabel_1.gridy = 6;
+        add(lblNewLabel_1, gbc_lblNewLabel_1);
+        
         readStateComboBox = new JComboBox(DonationReadState.values());
         GridBagConstraints gbc_readStateComboBox = new GridBagConstraints();
         gbc_readStateComboBox.gridwidth = 2;
@@ -197,6 +216,14 @@ public class DonationPanel extends EntityPanel
         gbc_readStateComboBox.gridx = 1;
         gbc_readStateComboBox.gridy = 6;
         add(readStateComboBox, gbc_readStateComboBox);
+        
+        lblNewLabel_2 = new JLabel("Comment Approval:");
+        GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
+        gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
+        gbc_lblNewLabel_2.anchor = GridBagConstraints.EAST;
+        gbc_lblNewLabel_2.gridx = 0;
+        gbc_lblNewLabel_2.gridy = 7;
+        add(lblNewLabel_2, gbc_lblNewLabel_2);
         
         commentStateComboBox = new JComboBox(DonationCommentState.values());
         GridBagConstraints gbc_commentStateComboBox = new GridBagConstraints();

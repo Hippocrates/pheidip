@@ -3,7 +3,7 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:55:43 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
- <class name="pheidip.objects.Prize" table="PRIZE">
+ <class name="pheidip.objects.Prize" table="Prize">
   <id name="id" type="int">
    <column name="ID"/>
    <generator class="assigned"/>
@@ -14,6 +14,9 @@
   </property>
   <property generated="never" lazy="false" name="imageURL" type="java.lang.String">
    <column name="IMAGEURL"/>
+  </property>
+  <property generated="never" lazy="false" name="sortKey" type="int" unique="true">
+   <column name="sortKey" unique="true"/>
   </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>

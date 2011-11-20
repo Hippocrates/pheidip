@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import pheidip.logic.PrizeControl;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
+import pheidip.util.FormatUtils;
 
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
@@ -21,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextArea;
+import javax.swing.JFormattedTextField;
 
 @SuppressWarnings("serial")
 public class PrizePanel extends EntityPanel
@@ -47,14 +49,16 @@ public class PrizePanel extends EntityPanel
   private JTextField imageURLField;
   private JLabel lblImageUrl;
   private Donor winner;
+  private JLabel lblSortingKey;
+  private JFormattedTextField sortKeyField;
 
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{90, 106, 97, 0, 88, 65, 79, 0};
-    gridBagLayout.rowHeights = new int[]{21, 21, 0, 118, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowHeights = new int[]{21, 21, 0, 0, 118, 0, 0, 0, 0};
+    gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     lblName = new JLabel("Name:");
@@ -117,12 +121,29 @@ public class PrizePanel extends EntityPanel
     gbc_saveButton.gridy = 1;
     add(saveButton, gbc_saveButton);
     
+    lblSortingKey = new JLabel("Sorting Key:");
+    GridBagConstraints gbc_lblSortingKey = new GridBagConstraints();
+    gbc_lblSortingKey.anchor = GridBagConstraints.EAST;
+    gbc_lblSortingKey.insets = new Insets(0, 0, 5, 5);
+    gbc_lblSortingKey.gridx = 0;
+    gbc_lblSortingKey.gridy = 2;
+    add(lblSortingKey, gbc_lblSortingKey);
+    
+    sortKeyField = new JFormattedTextField(FormatUtils.getIntegerFormat());
+    GridBagConstraints gbc_sortKeyField = new GridBagConstraints();
+    gbc_sortKeyField.gridwidth = 2;
+    gbc_sortKeyField.insets = new Insets(0, 0, 5, 5);
+    gbc_sortKeyField.fill = GridBagConstraints.HORIZONTAL;
+    gbc_sortKeyField.gridx = 1;
+    gbc_sortKeyField.gridy = 2;
+    add(sortKeyField, gbc_sortKeyField);
+    
     lblDescription = new JLabel("Description:");
     GridBagConstraints gbc_lblDescription = new GridBagConstraints();
     gbc_lblDescription.anchor = GridBagConstraints.EAST;
     gbc_lblDescription.insets = new Insets(0, 0, 5, 5);
     gbc_lblDescription.gridx = 0;
-    gbc_lblDescription.gridy = 2;
+    gbc_lblDescription.gridy = 3;
     add(lblDescription, gbc_lblDescription);
     
     scrollPane = new JScrollPane();
@@ -133,7 +154,7 @@ public class PrizePanel extends EntityPanel
     gbc_scrollPane.gridwidth = 5;
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
     gbc_scrollPane.gridx = 1;
-    gbc_scrollPane.gridy = 2;
+    gbc_scrollPane.gridy = 3;
     add(scrollPane, gbc_scrollPane);
     
     descriptionTextArea = new JTextArea();
@@ -146,7 +167,7 @@ public class PrizePanel extends EntityPanel
     gbc_lblWinner.anchor = GridBagConstraints.EAST;
     gbc_lblWinner.insets = new Insets(0, 0, 5, 5);
     gbc_lblWinner.gridx = 0;
-    gbc_lblWinner.gridy = 4;
+    gbc_lblWinner.gridy = 5;
     add(lblWinner, gbc_lblWinner);
     
     winnerField = new JTextField();
@@ -155,7 +176,7 @@ public class PrizePanel extends EntityPanel
     gbc_winnerField.insets = new Insets(0, 0, 5, 5);
     gbc_winnerField.fill = GridBagConstraints.HORIZONTAL;
     gbc_winnerField.gridx = 1;
-    gbc_winnerField.gridy = 4;
+    gbc_winnerField.gridy = 5;
     add(winnerField, gbc_winnerField);
     winnerField.setColumns(10);
     
@@ -164,7 +185,7 @@ public class PrizePanel extends EntityPanel
     gbc_openDonorButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_openDonorButton.insets = new Insets(0, 0, 5, 5);
     gbc_openDonorButton.gridx = 4;
-    gbc_openDonorButton.gridy = 4;
+    gbc_openDonorButton.gridy = 5;
     add(openDonorButton, gbc_openDonorButton);
     
     assignWinnerButton = new JButton("Assign");
@@ -172,7 +193,7 @@ public class PrizePanel extends EntityPanel
     gbc_assignWinnerButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_assignWinnerButton.insets = new Insets(0, 0, 5, 5);
     gbc_assignWinnerButton.gridx = 1;
-    gbc_assignWinnerButton.gridy = 5;
+    gbc_assignWinnerButton.gridy = 6;
     add(assignWinnerButton, gbc_assignWinnerButton);
     
     removeWinnerButton = new JButton("Remove");
@@ -180,14 +201,14 @@ public class PrizePanel extends EntityPanel
     gbc_removeWinnerButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_removeWinnerButton.insets = new Insets(0, 0, 5, 5);
     gbc_removeWinnerButton.gridx = 2;
-    gbc_removeWinnerButton.gridy = 5;
+    gbc_removeWinnerButton.gridy = 6;
     add(removeWinnerButton, gbc_removeWinnerButton);
     
     manualAssignButton = new JButton("Manual Assign");
     GridBagConstraints gbc_manualAssignButton = new GridBagConstraints();
     gbc_manualAssignButton.insets = new Insets(0, 0, 0, 5);
     gbc_manualAssignButton.gridx = 1;
-    gbc_manualAssignButton.gridy = 6;
+    gbc_manualAssignButton.gridy = 7;
     add(manualAssignButton, gbc_manualAssignButton);
   }
   
@@ -258,11 +279,7 @@ public class PrizePanel extends EntityPanel
     });
     
     this.setFocusTraversalPolicy(this.tabOrder);
-  }
-  
-  public boolean isFocusCycleRoot()
-  {
-    return true;
+    this.setFocusCycleRoot(true);
   }
   
   public FocusTraversalPolicy getFocusTraversalPolicy() 
@@ -353,6 +370,7 @@ public class PrizePanel extends EntityPanel
     this.nameField.setText(data.getName());
     this.imageURLField.setText(data.getImageURL());
     this.descriptionTextArea.setText(data.getDescription());
+    this.sortKeyField.setText(""+data.getSortKey());
     
     if (winner != null)
     {
@@ -379,6 +397,7 @@ public class PrizePanel extends EntityPanel
     data.setName(this.nameField.getText());
     data.setImageURL(this.imageURLField.getText());
     data.setDescription(this.descriptionTextArea.getText());
+    data.setSortKey(Integer.parseInt(this.sortKeyField.getText()));
     data.setWinner(this.winner);
     this.control.updateData(data);
     this.refreshContent();

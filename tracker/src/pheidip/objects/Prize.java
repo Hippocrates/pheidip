@@ -9,19 +9,21 @@ public class Prize
   private String name;
   private String imageURL;
   private String description;
+  private int sortKey;
   private Donor winner;
   
   public Prize()
   {
   }
   
-  public Prize(int id, String name, String imageURL, String description, Donor winner)
+  public Prize(int id, String name, String imageURL, String description, int sortKey, Donor winner)
   {
     this.setId(id);
     this.setName(name);
     this.setImageURL(imageURL);
     this.setDescription(description);
     this.setWinner(winner);
+    this.setSortKey(sortKey);
   }
   
   public int getId()
@@ -41,7 +43,7 @@ public class Prize
   
   public void setName(String name)
   {
-    this.name = StringUtils.canonicalize(name);
+    this.name = StringUtils.isEmptyOrNull(name) ? "#" + this.getId() : name.toLowerCase();
   }
 
   public String getImageURL()
@@ -61,7 +63,7 @@ public class Prize
   
   public void setDescription(String description)
   {
-    this.description = StringUtils.nullIfEmpty(description);
+    this.description = StringUtils.emptyIfNull(description);
   }
 
   public String toString()
@@ -94,5 +96,15 @@ public class Prize
   public Donor getWinner()
   {
     return winner;
+  }
+
+  public void setSortKey(int sortKey)
+  {
+    this.sortKey = sortKey;
+  }
+
+  public int getSortKey()
+  {
+    return sortKey;
   }
 }

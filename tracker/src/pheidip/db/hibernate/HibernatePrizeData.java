@@ -1,13 +1,17 @@
 package pheidip.db.hibernate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 
 import pheidip.db.PrizeData;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
+import pheidip.objects.PrizeSearchParams;
+import pheidip.util.StringUtils;
 
 public class HibernatePrizeData extends HibernateDataInterface implements PrizeData
 {
@@ -140,6 +144,38 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     
     this.endTransaction();
     //session.close();
+  }
+
+  @Override
+  public List<Prize> searchPrizes(PrizeSearchParams params)
+  {
+    String queryString = "from Prize p";
+    List<String> whereClause = new ArrayList<String>();
+    
+    if (params.name != null)
+      whereClause.add("p.name like :name");
+    
+    if (params.excludeIfWon)
+      whereClause.add("p.winner is null");
+    
+    if (whereClause.size() > 0)
+    {
+      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
+    }
+    
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
+    
+    Query q = dedicatedSession.createQuery(queryString + " order by p.name");
+
+    if (params.name != null)
+      q.setString("name", params.name);
+
+    @SuppressWarnings("unchecked")
+    List<Prize> listing = q.list();
+    
+    this.endBulkTransaction(dedicatedSession);
+    
+    return listing;
   }
 
 }

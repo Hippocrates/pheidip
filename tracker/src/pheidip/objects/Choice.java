@@ -38,7 +38,7 @@ public class Choice implements Bid
 	
 	public void setName(String name)
 	{
-	  this.name = StringUtils.canonicalize(name);
+	  this.name = StringUtils.isEmptyOrNull(name) ? "#" + this.getId() : name.toLowerCase();
 	}
 
   public int getId()
@@ -58,7 +58,7 @@ public class Choice implements Bid
 
   public void setDescription(String description)
   {
-    this.description = StringUtils.nullIfEmpty(description);
+    this.description = StringUtils.emptyIfNull(description);
   }
   
   public BidState getBidState()

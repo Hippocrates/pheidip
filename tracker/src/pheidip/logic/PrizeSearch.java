@@ -5,28 +5,25 @@ import java.util.List;
 import pheidip.db.PrizeData;
 import pheidip.objects.Prize;
 import pheidip.objects.PrizeSearchParams;
-import pheidip.util.Filter;
 
 public class PrizeSearch
 {
   private DonationDatabaseManager manager;
   private PrizeData prizes;
-  private List<Prize> cachedPrizes;
 
   public PrizeSearch(DonationDatabaseManager manager)
   {
     this.manager = manager;
     this.prizes = this.manager.getDataAccess().getPrizeData();
-    
-    this.cachedPrizes = this.prizes.getAllPrizes();
   }
   
-  public List<Prize> searchPrizes(String name)
+  public List<Prize> searchPrizes(String name, boolean excludeIfWon)
   {
     PrizeSearchParams params = new PrizeSearchParams();
     params.name = name;
+    params.excludeIfWon = excludeIfWon;
     
-    return Filter.filterList(this.cachedPrizes, params);
+    return this.prizes.searchPrizes(params);
   }
   
   public Prize createIfAble(String name)

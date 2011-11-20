@@ -3,6 +3,7 @@ package pheidip.db;
 import java.util.List;
 
 import pheidip.objects.Prize;
+import pheidip.objects.PrizeSearchParams;
 
 public interface PrizeData {
 
@@ -22,4 +23,5 @@ public interface PrizeData {
 
 	public void deletePrize(int prizeId);
 
+	public List<Prize> searchPrizes(PrizeSearchParams params);
 }

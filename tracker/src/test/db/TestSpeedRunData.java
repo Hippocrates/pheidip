@@ -31,7 +31,7 @@ public class TestSpeedRunData extends DonationDatabaseTest
     final int runId = 5;
     final String runName = "another run";
     
-    this.speedRuns.insertSpeedRun(new SpeedRun(runId, runName, null));
+    this.speedRuns.insertSpeedRun(new SpeedRun(runId, runName, runId, null));
     
     SpeedRun s = this.speedRuns.getSpeedRunById(runId);
     
@@ -61,7 +61,7 @@ public class TestSpeedRunData extends DonationDatabaseTest
     
     assertFalse(newName.equals(s.getName()));
     
-    this.speedRuns.updateSpeedRun(new SpeedRun(runId, newName, null));
+    this.speedRuns.updateSpeedRun(new SpeedRun(runId, newName, runId, null));
     
     SpeedRun sprime = this.speedRuns.getSpeedRunById(runId);
     

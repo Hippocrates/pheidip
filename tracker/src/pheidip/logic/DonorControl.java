@@ -35,11 +35,12 @@ public class DonorControl
   public static int createNewDonor(DonationDatabaseManager donationDatabase, String eMail, String alias, String firstName, String lastName)
   {
     int id = IdUtils.generateId();
+
     donationDatabase.getDataAccess().getDonorData().createDonor(new Donor(id, 
-        StringUtils.nullIfEmpty(eMail), 
+        eMail, 
         StringUtils.nullIfEmpty(alias), 
-        StringUtils.nullIfEmpty(firstName), 
-        StringUtils.nullIfEmpty(lastName)));
+        firstName, 
+        lastName));
     return id;
   }
   

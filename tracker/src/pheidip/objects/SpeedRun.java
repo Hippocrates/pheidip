@@ -4,12 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import pheidip.util.IdUtils;
+import pheidip.util.StringUtils;
 
 public class SpeedRun
 {
   private int id;
   private String name;
   private String description;
+  private int sortKey;
   private Set<Bid> bids = new HashSet<Bid>();
   
   public SpeedRun()
@@ -17,11 +19,12 @@ public class SpeedRun
     this.id = IdUtils.generateId();
   }
   
-  public SpeedRun(int id, String name, String description)
+  public SpeedRun(int id, String name, int sortKey, String description)
   {
     this.setId(id);
     this.setName(name);
     this.setDescription(description);
+    this.setSortKey(sortKey);
   }
 
   public int getId()
@@ -41,7 +44,7 @@ public class SpeedRun
 
   public void setName(String name)
   {
-    this.name = name == null ? null : name.toLowerCase();
+    this.name = StringUtils.isEmptyOrNull(name) ? "" + this.getId() : name.toLowerCase();
   }
 
   public String getDescription()
@@ -51,7 +54,7 @@ public class SpeedRun
   
   public void setDescription(String description)
   {
-    this.description = description;
+    this.description = StringUtils.emptyIfNull(description);
   }
 
   public String toString()
@@ -84,5 +87,15 @@ public class SpeedRun
   public Set<Bid> getBids()
   {
     return bids;
+  }
+
+  public void setSortKey(int sortKey)
+  {
+    this.sortKey = sortKey;
+  }
+
+  public int getSortKey()
+  {
+    return sortKey;
   }
 }

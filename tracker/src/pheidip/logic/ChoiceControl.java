@@ -54,6 +54,7 @@ public class ChoiceControl
     try
     {
       int optionId = IdUtils.generateId();
+
       ChoiceOption op = new ChoiceOption(optionId, name, this.getData());
       this.bids.insertChoiceOption(op);
       return optionId;

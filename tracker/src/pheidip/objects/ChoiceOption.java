@@ -28,7 +28,7 @@ public class ChoiceOption
 
   public void setName(String name)
   {
-    this.name = name == null ? null : name.toLowerCase();
+    this.name = StringUtils.isEmptyOrNull(name) ? "#" + this.getId() : name.toLowerCase();
   }
 
   public int getId()

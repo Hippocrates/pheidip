@@ -99,7 +99,7 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	public List<Donor> getDonorsWithoutPrizes() 
 	{
 	  Session session = this.beginTransaction();
-    Query q = session.createQuery("from Donor d where exists elements(d.prizes) order by id");
+    Query q = session.createQuery("from Donor d where not exists elements(d.prizes) order by id");
 
     @SuppressWarnings("unchecked")
     List<Donor> listing = q.list();

@@ -215,18 +215,34 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   @Override
   public List<Donation> getDonationsInTimeRange(Date lo, Date hi)
   {
-    Session session = this.beginTransaction();
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
     
+    String queryString = "from Donation d ";
+    List<String> whereClause = new ArrayList<String>();
+
+    if (lo != null)
+      whereClause.add("d.timeReceived >= :lotime");
     
-    Query q = session.createQuery("from Donation d where d.timeReceived between :lotime and :hitime");
-    q.setDate("lotime", lo);
-    q.setDate("hitime", hi);
+    if (hi != null)
+      whereClause.add("d.timeReceived <= :hitime");
+    
+    if (whereClause.size() > 0)
+    {
+      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
+    }
+    
+    Query q = dedicatedSession.createQuery(queryString);
+    
+    if (lo != null)
+      q.setTimestamp("lotime", lo);
+    
+    if (hi != null)
+      q.setTimestamp("hitime", hi);
 
     @SuppressWarnings("unchecked")
     List<Donation> listing = q.list();
     
-    this.endTransaction();
-    //session.close();
+    this.endBulkTransaction(dedicatedSession);
     
     return listing;
   }
@@ -299,10 +315,10 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
       q.setString("domainId", params.domainId);
     
     if (params.loTime != null)
-      q.setDate("loTime", params.loTime);
+      q.setTimestamp("loTime", params.loTime);
     
     if (params.hiTime != null)
-      q.setDate("hiTime", params.hiTime);
+      q.setTimestamp("hiTime", params.hiTime);
 
     if (params.loAmount != null)
       q.setBigDecimal("loAmount", params.loAmount);

@@ -1,0 +1,37 @@
+Tracker App TODO:
+
+- UPGRADE: Data access layer speed
+  - fix accesses to avoid round-trips to the server
+  - remove the 'pre-cache' of all elements in most of the search dialogs
+  - Priority: Highest
+  - Difficulty: Highest
+  - Notes:
+    - Mostly completed as a result of the previous upgrade to hibernate, still needs testing/profiling
+
+- UPGRADE: Try retrieving game times (and names) from the google docs spreadsheet
+  - what to do about games added removed?
+  - well, I guess destroy removed games, and sync up in that fashion
+  - Priority: Medium
+  - Difficulty: High
+  
+- UPGRADE: Consistent ordering of games, prizes, bids, etc...
+  - Well, once we get game start/end times, we can use joins on that for ordering those things
+  - Consistent ordering of donors would be helpful too (by name)
+  - Most of this is implemented, now that SpeedRun and Prizes have a 'sortKey' value
+  - it is still listed because speedrun times from the google docs might be nice to have
+  
+- BUG: "donors with more than one word in a name have their names cut off"
+  - this has to do with the string.split-ing going on
+  - Probably the best bet would be to put first in first, and then rest in last name
+  
+- BUG: "it looked like the 'winner didn't win another prize' checkbox was gone"
+  - investigated: didn't look like anything, I'll keep it here until I can confirm it
+  - Priority: High
+  - Difficulty: Low
+  
+- Upgrade/Bug: string lowercasing avoiding
+  - Either figure out how to set up Mysql case-insensitive collatting, or do the double string set-up
+  - Priority: Low
+  - Difficulty: Medium-High
+
+
