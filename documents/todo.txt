@@ -1,12 +1,30 @@
 Tracker App TODO:
 
-- UPGRADE: Data access layer speed
-  - fix accesses to avoid round-trips to the server
-  - remove the 'pre-cache' of all elements in most of the search dialogs
-  - Priority: Highest
-  - Difficulty: Highest
-  - Notes:
-    - Mostly completed as a result of the previous upgrade to hibernate, still needs testing/profiling
+- UPGRADE: Better donation task view
+  - Right now, its fairly inflexible.
+  - A better approach might be to associate a specific search query with it, and then let the user perform whatever as needed...
+  - Even better might be to associate it in a more generic fashion
+    - I.e. have a generic 'Search' interface, that templates on the Object to Search and the searching parameters
+    - Then, whenever you open a task it can either auto-associate it with a pre-built query, or you can open a search in
+    'results' view, which will just take an entity panel, and process it in the same way...
+    - That would make processing a series of entities much easier, since it would preclude having to repeat the query
+    - In the other direction, we could make searching queries persistent tabs instead, and then just open the tabs independently
+      -> it should still be possible to search via dialog too...
+
+- UPGRADE: Pagination of search results/task listing
+  - Probably add a pair of buttons allowing scrolling to next/previous 'n' results
+  - For the tasks, maybe just limit it to returning at most 'n' elements, and then the user must refresh to get more if present
+    - Or just do paging: it shouldn't be too hard to add once the logic is in place
+    - On the hibernate end of things, its just (given query object 'q')
+    - q.setFirstResult(firstResultIndex);
+    - q.setMaxResults(numResults);
+  - Priority: Low
+  - Difficuly: Medium
+
+- UPGRADE: Make the bid searching dialog better
+  - It's pretty bad as it is now
+  - Priority: High
+  - Difficulty: Medium-High
 
 - UPGRADE: Try retrieving game times (and names) from the google docs spreadsheet
   - what to do about games added removed?
@@ -19,23 +37,30 @@ Tracker App TODO:
   - Consistent ordering of donors would be helpful too (by name)
   - Most of this is implemented, now that SpeedRun and Prizes have a 'sortKey' value
   - it is still listed because speedrun times from the google docs might be nice to have
-  
-- BUG: fix the double-query on the donation task tabs
-  - Every time you select a list item, it runs the same query twice
-  - I think it has to do with the 'is value adjusting' semantics of JList, needs investigating
-  
+
 - BUG: "donors with more than one word in a name have their names cut off"
   - this has to do with the string.split-ing going on
   - Probably the best bet would be to put first in first, and then rest in last name
   
-- BUG: "it looked like the 'winner didn't win another prize' checkbox was gone"
-  - investigated: didn't look like anything, I'll keep it here until I can confirm it
+- Upgrade/Bug: string lowercasing avoiding
+  - Either figure out how to set up Mysql case-insensitive collating, or do the double string set-up
+  - Priority: Low
+  - Difficulty: Medium-High
+  
+/ UPGRADE: Data access layer speed
+  - fix accesses to avoid round-trips to the server (the 'task' tabs still have this problem)
+  - remove the 'pre-cache' of all elements in most of the search dialogs (completed)
+  - Priority: Highest
+  - Difficulty: Highest
+  - Notes:
+    - Mostly completed as a result of the previous upgrade to hibernate, still needs testing/profiling
+  
+/ BUG: "it looked like the 'winner didn't win another prize' checkbox was gone"
+  - investigated: didn't look like anything was missing, I'll keep it here until I can confirm it
   - Priority: High
   - Difficulty: Low
   
-- Upgrade/Bug: string lowercasing avoiding
-  - Either figure out how to set up Mysql case-insensitive collatting, or do the double string set-up
-  - Priority: Low
-  - Difficulty: Medium-High
-
-
+/ BUG: fix the double-query on the donation task tabs
+  - Every time you select a list item, it runs the same query twice
+  - I think it has to do with the 'is value adjusting' semantics of JList, needs investigating
+    - It did

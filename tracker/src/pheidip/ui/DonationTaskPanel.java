@@ -175,7 +175,7 @@ public class DonationTaskPanel extends EntityPanel
     {
       try
       {
-        if (event.getSource() == donationList)
+        if (!event.getValueIsAdjusting() && event.getSource() == donationList)
         {
           openDonation();
         }

@@ -22,6 +22,7 @@ import pheidip.util.StringUtils;
 public final class ChipinDonations
 {
   public static final String CONTRIBUTOR_TABLE_ID = "contributortable";
+  public static final BigDecimal SIGNIFIGANCE_THRESHOLD = new BigDecimal("1.00");
 
   private static final int NAME_INDEX = 0;
   private static final int EMAIL_INDEX = 1;
@@ -113,12 +114,18 @@ public final class ChipinDonations
         System.out.println("Warning, truncating comment with length > "
             + ChipinDonation.MAX_COMMENT_LENGTH);
       }
-
+      
+      boolean signifigant = chipinDonation.getAmount().compareTo(SIGNIFIGANCE_THRESHOLD) >= 0;
+      
       donationsToInsert.add(new Donation(IdUtils.generateId(),
-          DonationDomain.CHIPIN, chipinDonation.getChipinId(),
-          DonationBidState.PENDING, DonationReadState.PENDING,
-          DonationCommentState.PENDING, chipinDonation.getAmount(),
-          chipinDonation.getTimeStamp(), donor, StringUtils
+          DonationDomain.CHIPIN, 
+          chipinDonation.getChipinId(),
+          signifigant ? DonationBidState.PENDING : DonationBidState.PROCESSED, 
+          signifigant ? DonationReadState.PENDING : DonationReadState.AMOUNT_READ,
+          DonationCommentState.PENDING, 
+          chipinDonation.getAmount(),
+          chipinDonation.getTimeStamp(), 
+          donor, StringUtils
               .nullIfEmpty(commentString)));
     }
   }
