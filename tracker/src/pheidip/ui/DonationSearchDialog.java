@@ -13,6 +13,9 @@ import javax.swing.JOptionPane;
 import pheidip.logic.DonationSearch;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationSearchParams;
+import pheidip.objects.DonationBidState;
+import pheidip.objects.DonationReadState;
+import pheidip.objects.DonationCommentState;
 import pheidip.objects.Donor;
 import pheidip.util.FormatUtils;
 
@@ -33,6 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingConstants;
+import javax.swing.JComboBox;
 
 @SuppressWarnings("serial")
 public class DonationSearchDialog extends JDialog
@@ -44,8 +48,8 @@ public class DonationSearchDialog extends JDialog
   private TimeControl donatedBeforeField;
   private JFormattedTextField amountAboveField;
   private JFormattedTextField amountBelowField;
-  private JCheckBox onlyIfUnreadCheckBox;
-  private JCheckBox onlyIfBidPendingCheckBox;
+  private JCheckBox bidStateCheckBox;
+  private JCheckBox readStateCheckBox;
   private JList donationList;
   private JScrollPane scrollPane;
   private JButton browseDonorButton;
@@ -68,6 +72,11 @@ public class DonationSearchDialog extends JDialog
   private JLabel lblOnlyIfPending;
   private JButton searchButton;
   private FocusTraversalManager tabOrder;
+  private JLabel lblCommentState;
+  private JCheckBox commentStateCheckBox;
+  private JComboBox bidStateComboBox;
+  private JComboBox readStateComboBox;
+  private JComboBox commentStateComboBox;
   
   private void initializeGUI()
   {
@@ -78,9 +87,9 @@ public class DonationSearchDialog extends JDialog
     getContentPane().add(panel, BorderLayout.CENTER);
     GridBagLayout gbl_panel = new GridBagLayout();
     gbl_panel.columnWidths = new int[]{107, 23, 113, 76, 85, 80, 0};
-    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     gbl_panel.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
     panel.setLayout(gbl_panel);
     
     lblDonor = new JLabel("Donor:");
@@ -122,7 +131,7 @@ public class DonationSearchDialog extends JDialog
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
     gbc_scrollPane.gridwidth = 2;
     gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
-    gbc_scrollPane.gridheight = 9;
+    gbc_scrollPane.gridheight = 10;
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
     gbc_scrollPane.gridx = 4;
     gbc_scrollPane.gridy = 0;
@@ -232,7 +241,7 @@ public class DonationSearchDialog extends JDialog
     panel.add(amountBelowField, gbc_amountBelowField);
     amountBelowField.setColumns(10);
     
-    lblOnlyIfUnread = new JLabel("Only if Unread:");
+    lblOnlyIfUnread = new JLabel("Bid State:");
     GridBagConstraints gbc_lblOnlyIfUnread = new GridBagConstraints();
     gbc_lblOnlyIfUnread.anchor = GridBagConstraints.EAST;
     gbc_lblOnlyIfUnread.insets = new Insets(0, 0, 5, 5);
@@ -240,15 +249,24 @@ public class DonationSearchDialog extends JDialog
     gbc_lblOnlyIfUnread.gridy = 5;
     panel.add(lblOnlyIfUnread, gbc_lblOnlyIfUnread);
     
-    onlyIfUnreadCheckBox = new JCheckBox("");
-    GridBagConstraints gbc_onlyIfUnreadCheckBox = new GridBagConstraints();
-    gbc_onlyIfUnreadCheckBox.anchor = GridBagConstraints.EAST;
-    gbc_onlyIfUnreadCheckBox.insets = new Insets(0, 0, 5, 5);
-    gbc_onlyIfUnreadCheckBox.gridx = 1;
-    gbc_onlyIfUnreadCheckBox.gridy = 5;
-    panel.add(onlyIfUnreadCheckBox, gbc_onlyIfUnreadCheckBox);
+    bidStateCheckBox = new JCheckBox("");
+    GridBagConstraints gbc_bidStateCheckBox = new GridBagConstraints();
+    gbc_bidStateCheckBox.anchor = GridBagConstraints.EAST;
+    gbc_bidStateCheckBox.insets = new Insets(0, 0, 5, 5);
+    gbc_bidStateCheckBox.gridx = 1;
+    gbc_bidStateCheckBox.gridy = 5;
+    panel.add(bidStateCheckBox, gbc_bidStateCheckBox);
     
-    lblOnlyIfPending = new JLabel("Only if Pending Bid:");
+    bidStateComboBox = new JComboBox(DonationBidState.values());
+    bidStateComboBox.setSelectedItem(DonationBidState.PENDING);
+    GridBagConstraints gbc_bidStateComboBox = new GridBagConstraints();
+    gbc_bidStateComboBox.insets = new Insets(0, 0, 5, 5);
+    gbc_bidStateComboBox.fill = GridBagConstraints.HORIZONTAL;
+    gbc_bidStateComboBox.gridx = 2;
+    gbc_bidStateComboBox.gridy = 5;
+    panel.add(bidStateComboBox, gbc_bidStateComboBox);
+    
+    lblOnlyIfPending = new JLabel("Read State:");
     GridBagConstraints gbc_lblOnlyIfPending = new GridBagConstraints();
     gbc_lblOnlyIfPending.anchor = GridBagConstraints.EAST;
     gbc_lblOnlyIfPending.insets = new Insets(0, 0, 5, 5);
@@ -256,20 +274,52 @@ public class DonationSearchDialog extends JDialog
     gbc_lblOnlyIfPending.gridy = 6;
     panel.add(lblOnlyIfPending, gbc_lblOnlyIfPending);
     
-    onlyIfBidPendingCheckBox = new JCheckBox("");
-    GridBagConstraints gbc_onlyIfBidPendingCheckBox = new GridBagConstraints();
-    gbc_onlyIfBidPendingCheckBox.anchor = GridBagConstraints.EAST;
-    gbc_onlyIfBidPendingCheckBox.insets = new Insets(0, 0, 5, 5);
-    gbc_onlyIfBidPendingCheckBox.gridx = 1;
-    gbc_onlyIfBidPendingCheckBox.gridy = 6;
-    panel.add(onlyIfBidPendingCheckBox, gbc_onlyIfBidPendingCheckBox);
+    readStateCheckBox = new JCheckBox("");
+    GridBagConstraints gbc_readStateCheckBox = new GridBagConstraints();
+    gbc_readStateCheckBox.anchor = GridBagConstraints.EAST;
+    gbc_readStateCheckBox.insets = new Insets(0, 0, 5, 5);
+    gbc_readStateCheckBox.gridx = 1;
+    gbc_readStateCheckBox.gridy = 6;
+    panel.add(readStateCheckBox, gbc_readStateCheckBox);
+    
+    readStateComboBox = new JComboBox(DonationReadState.values());
+    bidStateComboBox.setSelectedItem(DonationReadState.PENDING);
+    GridBagConstraints gbc_readStateComboBox = new GridBagConstraints();
+    gbc_readStateComboBox.insets = new Insets(0, 0, 5, 5);
+    gbc_readStateComboBox.fill = GridBagConstraints.HORIZONTAL;
+    gbc_readStateComboBox.gridx = 2;
+    gbc_readStateComboBox.gridy = 6;
+    panel.add(readStateComboBox, gbc_readStateComboBox);
+    
+    lblCommentState = new JLabel("Comment State:");
+    GridBagConstraints gbc_lblCommentState = new GridBagConstraints();
+    gbc_lblCommentState.insets = new Insets(0, 0, 5, 5);
+    gbc_lblCommentState.gridx = 0;
+    gbc_lblCommentState.gridy = 7;
+    panel.add(lblCommentState, gbc_lblCommentState);
+    
+    commentStateCheckBox = new JCheckBox("");
+    GridBagConstraints gbc_commentStateCheckBox = new GridBagConstraints();
+    gbc_commentStateCheckBox.insets = new Insets(0, 0, 5, 5);
+    gbc_commentStateCheckBox.gridx = 1;
+    gbc_commentStateCheckBox.gridy = 7;
+    panel.add(commentStateCheckBox, gbc_commentStateCheckBox);
+    
+    commentStateComboBox = new JComboBox(DonationCommentState.values());
+    bidStateComboBox.setSelectedItem(DonationCommentState.PENDING);
+    GridBagConstraints gbc_commentStateComboBox = new GridBagConstraints();
+    gbc_commentStateComboBox.insets = new Insets(0, 0, 5, 5);
+    gbc_commentStateComboBox.fill = GridBagConstraints.HORIZONTAL;
+    gbc_commentStateComboBox.gridx = 2;
+    gbc_commentStateComboBox.gridy = 7;
+    panel.add(commentStateComboBox, gbc_commentStateComboBox);
     
     searchButton = new JButton("Search");
     GridBagConstraints gbc_searchButton = new GridBagConstraints();
     gbc_searchButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_searchButton.insets = new Insets(0, 0, 5, 5);
     gbc_searchButton.gridx = 3;
-    gbc_searchButton.gridy = 8;
+    gbc_searchButton.gridy = 9;
     panel.add(searchButton, gbc_searchButton);
     
     okButton = new JButton("OK");
@@ -277,7 +327,7 @@ public class DonationSearchDialog extends JDialog
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
     gbc_okButton.gridx = 3;
-    gbc_okButton.gridy = 9;
+    gbc_okButton.gridy = 10;
     panel.add(okButton, gbc_okButton);
     
     cancelButton = new JButton("Cancel");
@@ -285,7 +335,7 @@ public class DonationSearchDialog extends JDialog
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_cancelButton.insets = new Insets(0, 0, 0, 5);
     gbc_cancelButton.gridx = 4;
-    gbc_cancelButton.gridy = 9;
+    gbc_cancelButton.gridy = 10;
     panel.add(cancelButton, gbc_cancelButton);
     
   }
@@ -338,8 +388,8 @@ public class DonationSearchDialog extends JDialog
     this.browseDonorButton.addActionListener(this.actionHandler);
     this.donatedAfterField.addChangeListener(this.actionHandler);
     this.donatedAfterField.addChangeListener(this.actionHandler);
-    this.onlyIfBidPendingCheckBox.addActionListener(this.actionHandler);
-    this.onlyIfUnreadCheckBox.addActionListener(this.actionHandler);
+    this.readStateCheckBox.addActionListener(this.actionHandler);
+    this.bidStateCheckBox.addActionListener(this.actionHandler);
     this.okButton.addActionListener(this.actionHandler);
     this.cancelButton.addActionListener(this.actionHandler);
     this.donorCheckBox.addActionListener(this.actionHandler);
@@ -360,7 +410,14 @@ public class DonationSearchDialog extends JDialog
       this.amountAboveField,
       this.amountBelowCheckBox,
       this.amountBelowField,
+      this.bidStateCheckBox,
+      this.bidStateComboBox,
+      this.readStateCheckBox,
+      this.readStateComboBox,
+      this.commentStateCheckBox,
+      this.commentStateComboBox,
       this.searchButton,
+      this.donationList,
       this.okButton,
       this.cancelButton,
     });
@@ -417,8 +474,9 @@ public class DonationSearchDialog extends JDialog
     params.hiTime = this.donatedBeforeCheckBox.isSelected() ? (Date)this.donatedBeforeField.getValue() : null;
     params.loAmount = this.amountAboveCheckBox.isSelected() ? FormatUtils.getNumberOrNull(this.amountAboveField.getText()) : null;
     params.hiAmount = this.amountBelowCheckBox.isSelected() ? FormatUtils.getNumberOrNull(this.amountBelowField.getText()) : null;
-    params.onlyIfUnread = this.onlyIfUnreadCheckBox.isSelected();
-    params.onlyIfUnbid = this.onlyIfBidPendingCheckBox.isSelected();
+    params.targetBidState = this.bidStateCheckBox.isSelected() ? (DonationBidState)this.bidStateComboBox.getSelectedItem() : null;
+    params.targetReadState = this.readStateCheckBox.isSelected() ? (DonationReadState)this.readStateComboBox.getSelectedItem() : null;
+    params.targetCommentState = this.commentStateCheckBox.isSelected() ? (DonationCommentState)this.commentStateComboBox.getSelectedItem() : null;
     
     List<Donation> filtered = this.searcher.searchDonations(params);
     

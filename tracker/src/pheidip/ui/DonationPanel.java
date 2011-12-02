@@ -306,6 +306,9 @@ public class DonationPanel extends EntityPanel
     List<Component> tabArray = new ArrayList<Component>();
     tabArray.add(this.amountField);
     tabArray.add(this.openDonorButton);
+    tabArray.add(this.bidStateComboBox);
+    tabArray.add(this.readStateComboBox);
+    tabArray.add(this.commentStateComboBox);
     tabArray.add(this.refreshButton);
     tabArray.add(this.saveButton);
     tabArray.add(this.commentTextArea);
@@ -340,6 +343,12 @@ public class DonationPanel extends EntityPanel
     this.initializeGUIEvents();
   }
   
+  public void setDonationControl(DonationControl control)
+  {
+    this.donationControl = control;
+    this.redrawContent();
+  }
+  
   public int getDonationId()
   {
     return this.donationControl.getDonationId();
@@ -360,7 +369,12 @@ public class DonationPanel extends EntityPanel
   
   public void redrawContent()
   {
-    Donation result = this.donationControl.getData();
+    Donation result = null;
+    
+    if (this.donationControl != null)
+    {
+      result = this.donationControl.getData();
+    }
     
     if (result != null)
     {
@@ -368,6 +382,9 @@ public class DonationPanel extends EntityPanel
       
       this.amountField.setText(result.getAmount().toString());
       this.timeField.setText(result.getTimeReceived().toString());
+      
+      this.amountField.setEnabled(true);
+      this.commentTextArea.setEnabled(true);
       
       if (this.donationControl.allowUpdateData())
       {
@@ -383,13 +400,30 @@ public class DonationPanel extends EntityPanel
       this.domainIdField.setText(result.getDomainString());
       this.donorField.setText(donor.toString());
       this.commentTextArea.setText(result.getComment());
+      this.bidStateComboBox.setEnabled(true);
       this.bidStateComboBox.setSelectedItem(result.getBidState());
+      this.readStateComboBox.setEnabled(true);
       this.readStateComboBox.setSelectedItem(result.getReadState());
+      this.commentStateComboBox.setEnabled(true);
       this.commentStateComboBox.setSelectedItem(result.getCommentState());
 
       this.donationBidsPanel.refreshContent();
 
       this.setHeaderText(result.getDomainString());
+    }
+    else
+    {
+      this.amountField.setEnabled(false);
+      this.amountField.setText("");
+      this.commentTextArea.setEnabled(false);
+      this.commentTextArea.setText("");
+      
+      this.domainIdField.setText("");
+      this.donorField.setText("");
+      this.bidStateComboBox.setEnabled(false);
+      this.readStateComboBox.setEnabled(false);
+      this.commentStateComboBox.setEnabled(false);
+      this.donationBidsPanel.refreshContent();
     }
   }
   

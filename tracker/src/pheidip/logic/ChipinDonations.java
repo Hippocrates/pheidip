@@ -77,6 +77,8 @@ public final class ChipinDonations
       if (found != null && !StringUtils.isEmptyOrNull(found.getComment()) && StringUtils.isEmptyOrNull(donation.getComment()))
       {
         donation.setComment(found.getComment());
+        donation.setReadState(DonationReadState.PENDING);
+        donation.setBidState(DonationBidState.PENDING);
         donationsToUpdate.add(donation);
       }
     }
@@ -116,17 +118,17 @@ public final class ChipinDonations
       }
       
       boolean signifigant = chipinDonation.getAmount().compareTo(SIGNIFIGANCE_THRESHOLD) >= 0;
+      boolean hasComment = !StringUtils.isEmptyOrNull(commentString);
       
       donationsToInsert.add(new Donation(IdUtils.generateId(),
           DonationDomain.CHIPIN, 
           chipinDonation.getChipinId(),
-          signifigant ? DonationBidState.PENDING : DonationBidState.PROCESSED, 
-          signifigant ? DonationReadState.PENDING : DonationReadState.AMOUNT_READ,
+          signifigant && hasComment ? DonationBidState.PENDING : DonationBidState.IGNORED, 
+          signifigant || hasComment ? DonationReadState.PENDING : DonationReadState.IGNORED,
           DonationCommentState.PENDING, 
           chipinDonation.getAmount(),
           chipinDonation.getTimeStamp(), 
-          donor, StringUtils
-              .nullIfEmpty(commentString)));
+          donor, StringUtils.nullIfEmpty(commentString)));
     }
   }
 

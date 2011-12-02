@@ -14,8 +14,9 @@ public class DonationSearchParams implements FilterFunction<Donation>
   public Date hiTime;
   public BigDecimal loAmount;
   public BigDecimal hiAmount;
-  public boolean onlyIfUnread;
-  public boolean onlyIfUnbid;
+  public DonationBidState targetBidState;
+  public DonationReadState targetReadState;
+  public DonationCommentState targetCommentState;
   
   @Override
   public boolean predicate(Donation x)
@@ -28,7 +29,8 @@ public class DonationSearchParams implements FilterFunction<Donation>
       (hiTime == null || x.getTimeReceived().compareTo(hiTime) <= 0) &&
       (loAmount == null || x.getAmount().compareTo(loAmount) >= 0) &&
       (hiAmount == null || x.getAmount().compareTo(hiAmount) <= 0) &&
-      (onlyIfUnread ? !x.isMarkedAsRead() : true) &&
-      (onlyIfUnbid ? !x.isBidStateHandled() : true);
+      (targetBidState == null || x.getBidState() == targetBidState) &&
+      (targetReadState == null || x.getReadState() == targetReadState) &&
+      (targetBidState == null || x.getCommentState() == targetCommentState);
   }
 }

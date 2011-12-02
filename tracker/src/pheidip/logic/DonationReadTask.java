@@ -4,6 +4,7 @@ import java.util.List;
 
 import pheidip.db.DonationData;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationReadState;
 import pheidip.objects.DonationSearchParams;
 
 public class DonationReadTask implements DonationTask
@@ -28,7 +29,7 @@ public class DonationReadTask implements DonationTask
   public void clearTask(Donation d)
   {
     DonationControl control = getControl(d);
-    d.markAsRead(true);
+    d.setReadState(DonationReadState.READ);
     control.updateData(d);
   }
 
@@ -36,14 +37,14 @@ public class DonationReadTask implements DonationTask
   public List<Donation> refreshTaskList()
   {
     DonationSearchParams params = new DonationSearchParams();
-    params.onlyIfUnread = true;
+    params.targetReadState = DonationReadState.PENDING;
     
     return this.donations.searchDonations(params);
   }
   
   public boolean isTaskCleared(Donation d)
   {
-    return d.isMarkedAsRead();
+    return d.getReadState() != DonationReadState.PENDING;
   }
 
   @Override

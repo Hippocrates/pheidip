@@ -109,7 +109,7 @@ public class FocusTraversalManager extends FocusTraversalPolicy
         {
           if (current instanceof Container && ((Container)current).getFocusTraversalPolicy() != null)
           {
-            return ((Container)current).getFocusTraversalPolicy().getFirstComponent(((Container)current));
+            return ((Container)current).getFocusTraversalPolicy().getLastComponent(((Container)current));
           }
           else
           {

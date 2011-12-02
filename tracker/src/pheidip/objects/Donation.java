@@ -136,18 +136,7 @@ public class Donation
   {
     return StringUtils.symbolToNatural(this.getDomain().toString()) + ":" + (this.getDomainId() == null ? "" + this.getId() : this.getDomainId());
   }
-  
-  public boolean isMarkedAsRead()
-  {
-    return this.getReadState() == DonationReadState.COMMENT_READ ||
-      (this.getComment() == null && this.getReadState() == DonationReadState.AMOUNT_READ);
-  }
-  
-  public boolean isBidStateHandled()
-  {
-    return this.getBidState() == DonationBidState.PROCESSED || this.getComment() == null;
-  }
-  
+
   public String toString()
   {
     return this.getDomain().toString() + " : $" + this.getAmount().toString() + " : " + this.getTimeReceived().toString();
@@ -188,24 +177,5 @@ public class Donation
   public Set<DonationBid> getBids()
   {
     return bids;
-  }
-  
-  public void markAsRead(boolean set)
-  {
-    if (set)
-    {
-      if (this.getComment() != null)
-      {
-        this.readState = DonationReadState.COMMENT_READ;
-      }
-      else
-      {
-        this.readState = DonationReadState.AMOUNT_READ;
-      }
-    }
-    else
-    {
-      this.readState = DonationReadState.PENDING;
-    }
   }
 }

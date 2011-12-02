@@ -147,7 +147,7 @@ public class DonationControl
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
       data.getBids().add(created);
-      this.markAsBidsHandled();
+      data.setBidState(DonationBidState.PROCESSED);
       this.donations.updateDonation(data);
     }
     else
@@ -244,15 +244,5 @@ public class DonationControl
     }
     
     return sum;
-  }
-  
-  public void markAsBidsHandled()
-  {
-    Donation d = this.getData();
-    
-    if (d.getComment() != null)
-    {
-      this.donations.setDonationBidState(d.getId(), DonationBidState.PROCESSED);
-    }
   }
 }

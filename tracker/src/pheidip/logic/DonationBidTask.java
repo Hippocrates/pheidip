@@ -4,6 +4,7 @@ import java.util.List;
 
 import pheidip.db.DonationData;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationSearchParams;
 
 public class DonationBidTask implements DonationTask
@@ -27,19 +28,21 @@ public class DonationBidTask implements DonationTask
   @Override
   public void clearTask(Donation d)
   {
-    this.getControl(d).markAsBidsHandled();
+    DonationControl control = this.getControl(d);
+    d.setBidState(DonationBidState.PROCESSED);
+    control.updateData(d);
   }
   
   public boolean isTaskCleared(Donation d)
   {
-    return d.isBidStateHandled();
+    return d.getBidState() != DonationBidState.PENDING;
   }
 
   @Override
   public List<Donation> refreshTaskList()
   {
     DonationSearchParams params = new DonationSearchParams();
-    params.onlyIfUnbid = true;
+    params.targetBidState = DonationBidState.PENDING;
     
     return this.donations.searchDonations(params);
   }

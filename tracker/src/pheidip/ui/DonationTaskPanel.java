@@ -15,9 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -32,22 +29,19 @@ public class DonationTaskPanel extends EntityPanel
   private DonationControl control;
   private JScrollPane donationScrollPane;
   private JList donationList;
-  private JTextField amountField;
   private FocusTraversalManager tabOrder;
   private JButton refreshButton;
   private JButton nextButton;
-  private JTextField donorTextField;
-  private DonationBidsPanel donationBidsPanel;
   private ActionHandler actionHandler;
-  private JTextArea commentTextArea;
+  private DonationPanel donationPanel;
 
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{89, 88, 93, 92, 99, 0, 0};
-    gridBagLayout.rowHeights = new int[]{27, 0, 223, 23, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.columnWidths = new int[]{79, 90, 295, 0};
+    gridBagLayout.rowHeights = new int[]{27, 319, 0};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     refreshButton = new JButton("Refresh");
@@ -66,28 +60,8 @@ public class DonationTaskPanel extends EntityPanel
     gbc_nextButton.gridy = 0;
     add(nextButton, gbc_nextButton);
     
-    JLabel lblDonor = new JLabel("Donor:");
-    GridBagConstraints gbc_lblDonor = new GridBagConstraints();
-    gbc_lblDonor.anchor = GridBagConstraints.EAST;
-    gbc_lblDonor.insets = new Insets(0, 0, 5, 5);
-    gbc_lblDonor.gridx = 2;
-    gbc_lblDonor.gridy = 0;
-    add(lblDonor, gbc_lblDonor);
-    
-    donorTextField = new JTextField();
-    donorTextField.setEditable(false);
-    GridBagConstraints gbc_donorTextField = new GridBagConstraints();
-    gbc_donorTextField.gridwidth = 2;
-    gbc_donorTextField.insets = new Insets(0, 0, 5, 5);
-    gbc_donorTextField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_donorTextField.gridx = 3;
-    gbc_donorTextField.gridy = 0;
-    add(donorTextField, gbc_donorTextField);
-    donorTextField.setColumns(10);
-    
     donationScrollPane = new JScrollPane();
     GridBagConstraints gbc_donationScrollPane = new GridBagConstraints();
-    gbc_donationScrollPane.gridheight = 3;
     gbc_donationScrollPane.insets = new Insets(0, 0, 0, 5);
     gbc_donationScrollPane.gridwidth = 2;
     gbc_donationScrollPane.fill = GridBagConstraints.BOTH;
@@ -98,55 +72,12 @@ public class DonationTaskPanel extends EntityPanel
     donationList = new JList();
     donationScrollPane.setViewportView(donationList);
     
-    JLabel lblComment = new JLabel("Comment:");
-    GridBagConstraints gbc_lblComment = new GridBagConstraints();
-    gbc_lblComment.insets = new Insets(0, 0, 5, 5);
-    gbc_lblComment.gridx = 2;
-    gbc_lblComment.gridy = 1;
-    add(lblComment, gbc_lblComment);
-    
-    JLabel lblAmount = new JLabel("Amount:");
-    GridBagConstraints gbc_lblAmount = new GridBagConstraints();
-    gbc_lblAmount.anchor = GridBagConstraints.EAST;
-    gbc_lblAmount.insets = new Insets(0, 0, 5, 5);
-    gbc_lblAmount.gridx = 3;
-    gbc_lblAmount.gridy = 1;
-    add(lblAmount, gbc_lblAmount);
-    
-    amountField = new JTextField();
-    amountField.setEditable(false);
-    GridBagConstraints gbc_amountField = new GridBagConstraints();
-    gbc_amountField.gridwidth = 2;
-    gbc_amountField.anchor = GridBagConstraints.NORTH;
-    gbc_amountField.insets = new Insets(0, 0, 5, 0);
-    gbc_amountField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_amountField.gridx = 4;
-    gbc_amountField.gridy = 1;
-    add(amountField, gbc_amountField);
-    amountField.setColumns(10);
-    
-    JScrollPane scrollPane = new JScrollPane();
-    GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-    gbc_scrollPane.gridwidth = 4;
-    gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
-    gbc_scrollPane.fill = GridBagConstraints.BOTH;
-    gbc_scrollPane.gridx = 2;
-    gbc_scrollPane.gridy = 2;
-    add(scrollPane, gbc_scrollPane);
-    
-    commentTextArea = new JTextArea();
-    commentTextArea.setEditable(false);
-    scrollPane.setViewportView(commentTextArea);
-    commentTextArea.setWrapStyleWord(true);
-    commentTextArea.setLineWrap(true);
-    
-    donationBidsPanel = new DonationBidsPanel(this.owner, null);
-    GridBagConstraints gbc_donationBidsPanel = new GridBagConstraints();
-    gbc_donationBidsPanel.gridwidth = 4;
-    gbc_donationBidsPanel.fill = GridBagConstraints.BOTH;
-    gbc_donationBidsPanel.gridx = 2;
-    gbc_donationBidsPanel.gridy = 3;
-    add(donationBidsPanel, gbc_donationBidsPanel);
+    donationPanel = new DonationPanel(this.owner, null);
+    GridBagConstraints gbc_donationPanel = new GridBagConstraints();
+    gbc_donationPanel.fill = GridBagConstraints.BOTH;
+    gbc_donationPanel.gridx = 2;
+    gbc_donationPanel.gridy = 1;
+    add(donationPanel, gbc_donationPanel);
   }
   
   private class ActionHandler implements ActionListener, ListSelectionListener
@@ -198,9 +129,6 @@ public class DonationTaskPanel extends EntityPanel
     tabArray.add(this.refreshButton);
     tabArray.add(this.nextButton);
     tabArray.add(this.donationList);
-    tabArray.add(this.donationBidsPanel);
-    
-    this.donationBidsPanel.setFocusCycleRoot(false);
 
     this.tabOrder = new FocusTraversalManager(tabArray.toArray(new Component[tabArray.size()]));
     this.setFocusTraversalPolicy(this.tabOrder);
@@ -314,35 +242,34 @@ public class DonationTaskPanel extends EntityPanel
   {
     if (this.control != null)
     {
-      Donation data = this.control.getData();
-      
-      this.amountField.setText(data.getAmount().toString());
-      this.donorTextField.setText(this.control.getDonationDonor().toString());
-      this.commentTextArea.setText(data.getComment());
-      
+      Donation data = this.control.refreshData();
       this.nextButton.setEnabled(!this.task.isTaskCleared(data));
     }
     else
-    {
-      this.amountField.setText("");
-      this.donorTextField.setText("");
-      this.commentTextArea.setText("");
+    {      
       this.nextButton.setEnabled(false);
     }
     
-    this.donationBidsPanel.setControl(this.control);
+    this.donationPanel.setDonationControl(this.control);
+    this.donationPanel.redrawContent();
   }
 
   @Override
   public void saveContent()
   {
-    // not used
+    if (this.control != null)
+    { 
+      this.donationPanel.saveContent();
+    }
   }
 
   @Override
   public void deleteContent()
   {
-    // not used
+    if (this.control != null)
+    {
+      this.donationPanel.deleteContent();
+    }
   }
   
   public String getTaskName()

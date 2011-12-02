@@ -244,9 +244,9 @@ public class DonorSearchDialog extends JDialog
       this.lastNameField,
       this.aliasField,
       this.emailField,
-      this.donorList,
       this.searchButton,
       this.createNewButton,
+      this.donorList,
       this.okButton,
       this.cancelButton,
     });

@@ -15,7 +15,6 @@ import pheidip.objects.Donation;
 import pheidip.objects.DonationBid;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
-import pheidip.objects.DonationReadState;
 import pheidip.objects.DonationSearchParams;
 import pheidip.objects.Donor;
 import pheidip.util.StringUtils;
@@ -289,12 +288,14 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     if (params.hiAmount != null)
       whereClause.add("d.amount <= :hiAmount");
     
-    // TODO: change this to actually check for the comment and stuff for these to mirror the client behavior
-    if (params.onlyIfUnbid)
+    if (params.targetBidState != null)
       whereClause.add("d.bidState = :bidState");
     
-    if (params.onlyIfUnread)
+    if (params.targetReadState != null)
       whereClause.add("d.readState = :readState");
+    
+    if (params.targetCommentState != null)
+      whereClause.add("d.commentState = :commentState");
     
     if (whereClause.size() > 0)
     {
@@ -326,11 +327,14 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     if (params.hiAmount != null)
       q.setBigDecimal("hiAmount", params.hiAmount);
     
-    if (params.onlyIfUnbid)
-      q.setParameter("bidState", DonationBidState.PENDING);
+    if (params.targetBidState != null)
+      q.setParameter("bidState", params.targetBidState);
     
-    if (params.onlyIfUnread)
-      q.setParameter("readState", DonationReadState.PENDING);
+    if (params.targetReadState != null)
+      q.setParameter("readState", params.targetReadState);
+    
+    if (params.targetCommentState != null)
+      q.setParameter("commentState", params.targetCommentState);
     
     @SuppressWarnings("unchecked")
     List<Donation> listing = q.list();

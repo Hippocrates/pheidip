@@ -26,6 +26,11 @@ Tracker App TODO:
   - Priority: High
   - Difficulty: Medium-High
 
+- UPGRADE: Changes to bid state enums
+  - Changed them to be more streamlined and to simplify searching
+  - Along with this, searching should be allowed to be more generalized (i.e. specify the target state (or set of states?))
+  - And then the task views should be more generalized (filter on any of the possible states...)
+
 - UPGRADE: Try retrieving game times (and names) from the google docs spreadsheet
   - what to do about games added removed?
   - well, I guess destroy removed games, and sync up in that fashion
