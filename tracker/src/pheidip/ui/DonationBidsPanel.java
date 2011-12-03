@@ -239,7 +239,7 @@ public class DonationBidsPanel extends JPanel
 
   private void attachNewBid()
   {
-    BidSearchDialog dialog = this.owner.openBidSearch();
+    OldBidSearchDialog dialog = this.owner.openBidSearch();
     
     dialog.setVisible(true);
     

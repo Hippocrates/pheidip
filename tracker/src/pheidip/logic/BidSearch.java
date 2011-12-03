@@ -10,6 +10,7 @@ import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 import pheidip.objects.ChoiceOptionSearchParams;
+import pheidip.objects.SpeedRun;
 import pheidip.util.Filter;
 
 public class BidSearch
@@ -23,18 +24,29 @@ public class BidSearch
     this.bids = this.manager.getDataAccess().getBids();
   }
   
-  public Challenge createChallengeIfAble(int speedRunId, String name)
+  public SpeedRunSearch createSpeedRunSearch()
   {
-    SpeedRunControl control = new SpeedRunControl(this.manager, speedRunId);
-    int id = control.createNewChallenge(name);
-    return this.bids.getChallengeById(id);
+    return new SpeedRunSearch(this.manager);
   }
   
-  public Choice createChoiceIfAble(int speedRunId, String name)
+  public Challenge createChallengeIfAble(SpeedRun speedRun, String name)
   {
-    SpeedRunControl control = new SpeedRunControl(this.manager, speedRunId);
-    int id = control.createNewChoice(name);
-    return this.bids.getChoiceById(id);
+    Challenge result = new Challenge();
+    result.setSpeedRun(speedRun);
+    result.setName(name);
+    this.bids.insertChallenge(result);
+    
+    return result;
+  }
+  
+  public Choice createChoiceIfAble(SpeedRun speedRun, String name)
+  {
+    Choice result = new Choice();
+    result.setSpeedRun(speedRun);
+    result.setName(name);
+    this.bids.insertChoice(result);
+    
+    return result;
   }
   
   public ChoiceOption createOptionIfAble(int choiceId, String optionName)

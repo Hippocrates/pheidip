@@ -598,7 +598,7 @@ public class MainWindow extends JFrame implements Reporter
 
   private void openSearchBidDialog()
   {
-    BidSearchDialog dialog = new BidSearchDialog(this, new SpeedRunSearch(this.instance.getDonationDatabase()), new BidSearch(this.instance.getDonationDatabase()), false);
+    BidSearchDialog dialog = new BidSearchDialog(this, new BidSearch(this.instance.getDonationDatabase()));
   
     dialog.setVisible(true);
     
@@ -647,7 +647,7 @@ public class MainWindow extends JFrame implements Reporter
   
   private void openSearchSpeedRunDialog()
   {
-    SpeedRunSearchDialog dialog = new SpeedRunSearchDialog(null, new SpeedRunSearch(this.instance.getDonationDatabase()));
+    SpeedRunSearchDialog dialog = new SpeedRunSearchDialog(this, new SpeedRunSearch(this.instance.getDonationDatabase()));
     
     dialog.setVisible(true);
     
@@ -851,9 +851,9 @@ public class MainWindow extends JFrame implements Reporter
     this.openSpeedRunTab(newId);
   }
   
-  protected BidSearchDialog openBidSearch()
+  protected OldBidSearchDialog openBidSearch()
   {
-    return new BidSearchDialog(this, new SpeedRunSearch(this.instance.getDonationDatabase()), new BidSearch(this.instance.getDonationDatabase()));
+    return new OldBidSearchDialog(this, new SpeedRunSearch(this.instance.getDonationDatabase()), new BidSearch(this.instance.getDonationDatabase()));
   }
     
   private void createNewDonor()

@@ -1,354 +1,247 @@
 package pheidip.ui;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-
-import pheidip.logic.BidSearch;
-import pheidip.logic.SpeedRunSearch;
-import pheidip.objects.Bid;
-import pheidip.objects.BidSearchParams;
-import pheidip.objects.BidType;
-import pheidip.objects.Choice;
-import pheidip.objects.ChoiceOption;
-import pheidip.objects.ChoiceOptionSearchParams;
-import pheidip.objects.SpeedRun;
-import pheidip.objects.SpeedRunSearchParams;
-import pheidip.util.StringUtils;
-
-import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import java.awt.Component;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import java.awt.GridBagLayout;
+import javax.swing.JLabel;
+
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.JCheckBox;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
-import javax.swing.border.LineBorder;
-import java.awt.Color;
+
+import pheidip.logic.BidSearch;
+import pheidip.objects.Bid;
+import pheidip.objects.BidSearchParams;
+import pheidip.objects.SpeedRun;
+import pheidip.util.StringUtils;
 
 @SuppressWarnings("serial")
 public class BidSearchDialog extends JDialog
 {
+  private final JPanel contentPanel = new JPanel();
   private BidSearch searcher;
-  private Bid selectedBid;
-  private JPanel panel;
-  private ActionHandler actionHandler;
   private JTextField speedRunField;
-  private JTextField bidNameField;
-  private SpeedRunSearch speedRunSearcher;
-  private JScrollPane bidNameScrollPane;
-  private JList speedRunList;
-  private JList bidNameList;
+  private JTextField bidField;
+  private ActionHandler actionHandler;
+  private FocusTraversalManager tabOrder;
+  private JList bidList;
+  private JCheckBox bidCheckBox;
+  private JButton newChoiceButton;
+  private JButton newChallengeButton;
+  private JButton searchButton;
   private JButton okButton;
   private JButton cancelButton;
-  private JScrollPane speedRunScrollPane;
-  private JLabel bidNameLabel;
-  private JLabel speedRunLabel;
-  private FocusTraversalManager tabOrder;
-  private JLabel optionNameLabel;
-  private JTextField optionNameField;
-  private JScrollPane optionNameScrollPane;
-  private JList optionNameList;
-  private ChoiceOption selectedOption;
-  private boolean showOptions;
-  private JButton newOptionButton;
-  private JButton newChallengeButton;
-  private JButton newChoiceButton;
-  private JButton searchButton;
+  private JButton browseSpeedRunButton;
+  private JCheckBox speedRunCheckBox;
+  private SpeedRun currentRun;
+  private Bid result;
 
   private void initializeGUI()
   {
-    setBounds(100, 100, 450, 325);
+    setBounds(100, 100, 594, 361);
+    getContentPane().setLayout(new BorderLayout());
+    contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+    getContentPane().add(contentPanel, BorderLayout.CENTER);
+    GridBagLayout gbl_contentPanel = new GridBagLayout();
+    gbl_contentPanel.columnWidths = new int[]{76, 0, 136, 136, 72, 96, 103, 0};
+    gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+    gbl_contentPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+    contentPanel.setLayout(gbl_contentPanel);
     
-    panel = new JPanel();
-    getContentPane().add(panel, BorderLayout.SOUTH);
-    GridBagLayout gbl_panel = new GridBagLayout();
-    gbl_panel.columnWidths = new int[]{141, 164, 144, 0};
-    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
-    gbl_panel.columnWeights = new double[]{1.0, 1.0, 1.0, Double.MIN_VALUE};
-    gbl_panel.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-    panel.setLayout(gbl_panel);
+    JLabel lblSpeedRun = new JLabel("Speed Run:");
+    GridBagConstraints gbc_lblSpeedRun = new GridBagConstraints();
+    gbc_lblSpeedRun.anchor = GridBagConstraints.EAST;
+    gbc_lblSpeedRun.insets = new Insets(0, 0, 5, 5);
+    gbc_lblSpeedRun.gridx = 0;
+    gbc_lblSpeedRun.gridy = 0;
+    contentPanel.add(lblSpeedRun, gbc_lblSpeedRun);
     
-    speedRunLabel = new JLabel("Speed Run:");
-    GridBagConstraints gbc_speedRunLabel = new GridBagConstraints();
-    gbc_speedRunLabel.insets = new Insets(0, 0, 5, 5);
-    gbc_speedRunLabel.gridx = 0;
-    gbc_speedRunLabel.gridy = 0;
-    panel.add(speedRunLabel, gbc_speedRunLabel);
-    
-    bidNameLabel = new JLabel("Bid Name:");
-    GridBagConstraints gbc_bidNameLabel = new GridBagConstraints();
-    gbc_bidNameLabel.insets = new Insets(0, 0, 5, 5);
-    gbc_bidNameLabel.gridx = 1;
-    gbc_bidNameLabel.gridy = 0;
-    panel.add(bidNameLabel, gbc_bidNameLabel);
+    speedRunCheckBox = new JCheckBox("");
+    GridBagConstraints gbc_speedRunCheckBox = new GridBagConstraints();
+    gbc_speedRunCheckBox.insets = new Insets(0, 0, 5, 5);
+    gbc_speedRunCheckBox.gridx = 1;
+    gbc_speedRunCheckBox.gridy = 0;
+    contentPanel.add(speedRunCheckBox, gbc_speedRunCheckBox);
     
     speedRunField = new JTextField();
+    speedRunField.setEnabled(false);
+    speedRunField.setEditable(false);
     GridBagConstraints gbc_speedRunField = new GridBagConstraints();
+    gbc_speedRunField.gridwidth = 2;
     gbc_speedRunField.insets = new Insets(0, 0, 5, 5);
     gbc_speedRunField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_speedRunField.gridx = 0;
-    gbc_speedRunField.gridy = 1;
-    panel.add(speedRunField, gbc_speedRunField);
+    gbc_speedRunField.gridx = 2;
+    gbc_speedRunField.gridy = 0;
+    contentPanel.add(speedRunField, gbc_speedRunField);
     speedRunField.setColumns(10);
-   
-    speedRunScrollPane = new JScrollPane();
-    speedRunScrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
-    GridBagConstraints gbc_speedRunScrollPane = new GridBagConstraints();
-    gbc_speedRunScrollPane.insets = new Insets(0, 0, 5, 5);
-    gbc_speedRunScrollPane.fill = GridBagConstraints.BOTH;
-    gbc_speedRunScrollPane.gridx = 0;
-    gbc_speedRunScrollPane.gridy = 2;
-    panel.add(speedRunScrollPane, gbc_speedRunScrollPane);
     
-    speedRunList = new JList();
-    speedRunScrollPane.setViewportView(speedRunList);
+    browseSpeedRunButton = new JButton("Browse...");
+    GridBagConstraints gbc_browseSpeedRunButton = new GridBagConstraints();
+    gbc_browseSpeedRunButton.insets = new Insets(0, 0, 5, 5);
+    gbc_browseSpeedRunButton.gridx = 4;
+    gbc_browseSpeedRunButton.gridy = 0;
+    contentPanel.add(browseSpeedRunButton, gbc_browseSpeedRunButton);
     
-    bidNameField = new JTextField();
-    GridBagConstraints gbc_bidNameField = new GridBagConstraints();
-    gbc_bidNameField.insets = new Insets(0, 0, 5, 5);
-    gbc_bidNameField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_bidNameField.gridx = 1;
-    gbc_bidNameField.gridy = 1;
-    panel.add(bidNameField, gbc_bidNameField);
-    bidNameField.setColumns(10);
+    JScrollPane scrollPane = new JScrollPane();
+    GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+    gbc_scrollPane.gridwidth = 2;
+    gbc_scrollPane.gridheight = 6;
+    gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
+    gbc_scrollPane.fill = GridBagConstraints.BOTH;
+    gbc_scrollPane.gridx = 5;
+    gbc_scrollPane.gridy = 0;
+    contentPanel.add(scrollPane, gbc_scrollPane);
     
-    bidNameScrollPane = new JScrollPane();
-    bidNameScrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
-    GridBagConstraints gbc_bidNameScrollPane = new GridBagConstraints();
-    gbc_bidNameScrollPane.insets = new Insets(0, 0, 5, 5);
-    gbc_bidNameScrollPane.fill = GridBagConstraints.BOTH;
-    gbc_bidNameScrollPane.gridx = 1;
-    gbc_bidNameScrollPane.gridy = 2;
-    panel.add(bidNameScrollPane, gbc_bidNameScrollPane);
+    bidList = new JList();
+    scrollPane.setViewportView(bidList);
     
-    bidNameList = new JList();
-    bidNameScrollPane.setViewportView(bidNameList);
+    JLabel lblBidName = new JLabel("Bid Name:");
+    GridBagConstraints gbc_lblBidName = new GridBagConstraints();
+    gbc_lblBidName.anchor = GridBagConstraints.EAST;
+    gbc_lblBidName.insets = new Insets(0, 0, 5, 5);
+    gbc_lblBidName.gridx = 0;
+    gbc_lblBidName.gridy = 1;
+    contentPanel.add(lblBidName, gbc_lblBidName);
+    
+    bidCheckBox = new JCheckBox("");
+    GridBagConstraints gbc_bidCheckBox = new GridBagConstraints();
+    gbc_bidCheckBox.insets = new Insets(0, 0, 5, 5);
+    gbc_bidCheckBox.gridx = 1;
+    gbc_bidCheckBox.gridy = 1;
+    contentPanel.add(bidCheckBox, gbc_bidCheckBox);
+    
+    bidField = new JTextField();
+    GridBagConstraints gbc_bidField = new GridBagConstraints();
+    gbc_bidField.gridwidth = 2;
+    gbc_bidField.insets = new Insets(0, 0, 5, 5);
+    gbc_bidField.fill = GridBagConstraints.HORIZONTAL;
+    gbc_bidField.gridx = 2;
+    gbc_bidField.gridy = 1;
+    contentPanel.add(bidField, gbc_bidField);
+    bidField.setColumns(10);
+    
+    newChoiceButton = new JButton("New Choice");
+    GridBagConstraints gbc_newChoiceButton = new GridBagConstraints();
+    gbc_newChoiceButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_newChoiceButton.insets = new Insets(0, 0, 5, 5);
+    gbc_newChoiceButton.gridx = 2;
+    gbc_newChoiceButton.gridy = 2;
+    contentPanel.add(newChoiceButton, gbc_newChoiceButton);
+    
+    newChallengeButton = new JButton("New Challenge");
+    GridBagConstraints gbc_newChallengeButton = new GridBagConstraints();
+    gbc_newChallengeButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_newChallengeButton.insets = new Insets(0, 0, 5, 5);
+    gbc_newChallengeButton.gridx = 2;
+    gbc_newChallengeButton.gridy = 3;
+    contentPanel.add(newChallengeButton, gbc_newChallengeButton);
     
     searchButton = new JButton("Search");
     GridBagConstraints gbc_searchButton = new GridBagConstraints();
     gbc_searchButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_searchButton.insets = new Insets(0, 0, 5, 5);
-    gbc_searchButton.gridx = 0;
-    gbc_searchButton.gridy = 3;
-    panel.add(searchButton, gbc_searchButton);
-    
-    newChallengeButton = new JButton("New Challenge");
-    newChallengeButton.setEnabled(false);
-    GridBagConstraints gbc_newChallengeButton = new GridBagConstraints();
-    gbc_newChallengeButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_newChallengeButton.insets = new Insets(0, 0, 5, 5);
-    gbc_newChallengeButton.gridx = 1;
-    gbc_newChallengeButton.gridy = 3;
-    panel.add(newChallengeButton, gbc_newChallengeButton);
-    
-    if (this.showOptions)
-    {
-      optionNameLabel = new JLabel("Option Name:");
-      GridBagConstraints gbc_optionNameLabel = new GridBagConstraints();
-      gbc_optionNameLabel.insets = new Insets(0, 0, 5, 0);
-      gbc_optionNameLabel.gridx = 2;
-      gbc_optionNameLabel.gridy = 0;
-      panel.add(optionNameLabel, gbc_optionNameLabel);
-      
-      optionNameField = new JTextField();
-      GridBagConstraints gbc_optionNameField = new GridBagConstraints();
-      gbc_optionNameField.insets = new Insets(0, 0, 5, 0);
-      gbc_optionNameField.fill = GridBagConstraints.HORIZONTAL;
-      gbc_optionNameField.gridx = 2;
-      gbc_optionNameField.gridy = 1;
-      panel.add(optionNameField, gbc_optionNameField);
-      optionNameField.setColumns(10);
-      
-      
-      optionNameScrollPane = new JScrollPane();
-      optionNameScrollPane.setViewportBorder(new LineBorder(new Color(0, 0, 0)));
-      GridBagConstraints gbc_optionNameScrollPane = new GridBagConstraints();
-      gbc_optionNameScrollPane.insets = new Insets(0, 0, 5, 0);
-      gbc_optionNameScrollPane.fill = GridBagConstraints.BOTH;
-      gbc_optionNameScrollPane.gridx = 2;
-      gbc_optionNameScrollPane.gridy = 2;
-      panel.add(optionNameScrollPane, gbc_optionNameScrollPane);
-      
-      optionNameList = new JList();
-      optionNameScrollPane.setViewportView(optionNameList);
-
-      newOptionButton = new JButton("New Option");
-      newOptionButton.setEnabled(false);
-      GridBagConstraints gbc_newOptionButton = new GridBagConstraints();
-      gbc_newOptionButton.fill = GridBagConstraints.HORIZONTAL;
-      gbc_newOptionButton.insets = new Insets(0, 0, 5, 0);
-      gbc_newOptionButton.gridx = 2;
-      gbc_newOptionButton.gridy = 3;
-      panel.add(newOptionButton, gbc_newOptionButton);
-    }
-    else
-    {
-      newChoiceButton = new JButton("New Choice");
-      newChoiceButton.setEnabled(false);
-      GridBagConstraints gbc_newChoiceButton = new GridBagConstraints();
-      gbc_newChoiceButton.anchor = GridBagConstraints.BELOW_BASELINE;
-      gbc_newChoiceButton.fill = GridBagConstraints.HORIZONTAL;
-      gbc_newChoiceButton.insets = new Insets(0, 0, 5, 5);
-      gbc_newChoiceButton.gridx = 1;
-      gbc_newChoiceButton.gridy = 4;
-      panel.add(newChoiceButton, gbc_newChoiceButton);
-    }
+    gbc_searchButton.gridx = 4;
+    gbc_searchButton.gridy = 5;
+    contentPanel.add(searchButton, gbc_searchButton);
     
     okButton = new JButton("OK");
-    okButton.setEnabled(false);
-    GridBagConstraints gbc_btnOk = new GridBagConstraints();
-    gbc_btnOk.fill = GridBagConstraints.HORIZONTAL;
-    gbc_btnOk.insets = new Insets(0, 0, 0, 5);
-    gbc_btnOk.gridx = 0;
-    gbc_btnOk.gridy = 5;
-    panel.add(okButton, gbc_btnOk);
+    GridBagConstraints gbc_okButton = new GridBagConstraints();
+    gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_okButton.insets = new Insets(0, 0, 0, 5);
+    gbc_okButton.gridx = 4;
+    gbc_okButton.gridy = 6;
+    contentPanel.add(okButton, gbc_okButton);
     
     cancelButton = new JButton("Cancel");
-    GridBagConstraints gbc_btnCancel = new GridBagConstraints();
-    gbc_btnCancel.insets = new Insets(0, 0, 0, 5);
-    gbc_btnCancel.fill = GridBagConstraints.HORIZONTAL;
-    gbc_btnCancel.gridx = 1;
-    gbc_btnCancel.gridy = 5;
-    panel.add(cancelButton, gbc_btnCancel);
+    GridBagConstraints gbc_cancelButton = new GridBagConstraints();
+    gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_cancelButton.insets = new Insets(0, 0, 0, 5);
+    gbc_cancelButton.gridx = 5;
+    gbc_cancelButton.gridy = 6;
+    contentPanel.add(cancelButton, gbc_cancelButton);
   }
   
-  private void updateUIState()
-  {
-    okButton.setEnabled(
-        (getCurrentBid() != null && (getCurrentChoice() == null || !showOptions)) ||
-        (getCurrentChoice() != null && getCurrentOption() != null));
-  
-    boolean createBidEnabled = getCurrentSpeedRun() != null && 
-      !StringUtils.isEmptyOrNull(bidNameField.getText());
-
-    newChallengeButton.setEnabled(createBidEnabled);
-    
-    if (showOptions)
-    {
-      newOptionButton.setEnabled(getCurrentChoice() != null && !StringUtils.isEmptyOrNull(optionNameField.getText()));
-    }
-    else
-    {
-      newChoiceButton.setEnabled(createBidEnabled);
-    }
-  }
-  
-  private class ActionHandler implements DocumentListener, ActionListener, ListSelectionListener
+  private class ActionHandler implements ActionListener, ListSelectionListener, DocumentListener
   {
     @Override
     public void actionPerformed(ActionEvent ev)
     {
-      try
+      if (ev.getSource() == browseSpeedRunButton)
       {
-        if (ev.getSource() == okButton)
-        {
-          returnSelectedBid();
-        }
-        else if (ev.getSource() == cancelButton)
-        {
-          closeDialog();
-        }
-        else if (ev.getSource() == newChallengeButton)
-        {
-          createNewChallenge();
-        }
-        else if (ev.getSource() == newChoiceButton)
-        {
-          createNewChoice();
-        }
-        else if (ev.getSource() == newOptionButton)
-        {
-          createNewOption();
-        }
-        else if (ev.getSource() == searchButton)
-        {
-          runSpeedRunSearch();
-          runBidSearch();
-        }
+        openBrowseDialog();
       }
-      catch (Exception e)
+      else if (ev.getSource() == newChoiceButton)
       {
-        JOptionPane.showMessageDialog(BidSearchDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        createNewChoice();
+      }
+      else if (ev.getSource() == newChallengeButton)
+      {
+        createNewChallenge();
+      }
+      else if (ev.getSource() == searchButton)
+      {
+        runSearch();
+      }
+      else if (ev.getSource() == okButton)
+      {
+        returnValue();
+      }
+      else if (ev.getSource() == cancelButton)
+      {
+        cancelDialog();
       }
     }
 
     @Override
-    public void valueChanged(ListSelectionEvent ev)
+    public void valueChanged(ListSelectionEvent event)
     {
-      if (ev.getSource() == speedRunList)
+      if (!event.getValueIsAdjusting() && event.getSource() == bidList)
       {
-        if (!speedRunList.isSelectionEmpty())
-        {
-          runBidFilter();
-        }
+        updateUIState();
       }
-      else if (ev.getSource() == bidNameList)
-      {
-        if (showOptions)
-        {
-          runOptionFilter();
-        }
-      }
-      
-      updateUIState();
     }
     
-    private void documentUpdate(DocumentEvent d)
+    public void documentUpdate(DocumentEvent ev)
     {
-      /*if (d.getDocument() == speedRunField.getDocument())
-      {
-        if (!speedRunList.isSelectionEmpty())
-        {
-          runBidFilter();
-        }
-      }
-      else if (d.getDocument() == bidNameField.getDocument())
-      {
-        runBidFilter();
-        
-        if (showOptions)
-        {
-          runOptionFilter();
-        }
-      }
-      else */if (showOptions && d.getDocument() == optionNameField.getDocument())
-      {
-        runOptionFilter();
-      }
-      
       updateUIState();
     }
 
     @Override
     public void changedUpdate(DocumentEvent arg0)
     {
-      this.documentUpdate(arg0);
+      documentUpdate(arg0);
     }
 
     @Override
     public void insertUpdate(DocumentEvent arg0)
     {
-      this.documentUpdate(arg0);
+      documentUpdate(arg0);
     }
 
     @Override
     public void removeUpdate(DocumentEvent arg0)
     {
-      this.documentUpdate(arg0);
+      documentUpdate(arg0);
     }
   }
   
@@ -356,237 +249,139 @@ public class BidSearchDialog extends JDialog
   {
     this.actionHandler = new ActionHandler();
     
+    this.browseSpeedRunButton.addActionListener(this.actionHandler);
+    this.newChallengeButton.addActionListener(this.actionHandler);
+    this.newChoiceButton.addActionListener(this.actionHandler);
+    this.searchButton.addActionListener(this.actionHandler);
     this.okButton.addActionListener(this.actionHandler);
     this.cancelButton.addActionListener(this.actionHandler);
-    this.speedRunList.addListSelectionListener(this.actionHandler);
-    this.bidNameList.addListSelectionListener(this.actionHandler);
-    this.newChallengeButton.addActionListener(this.actionHandler);
-    this.searchButton.addActionListener(this.actionHandler);
-    this.speedRunField.getDocument().addDocumentListener(this.actionHandler);
-    this.bidNameField.getDocument().addDocumentListener(this.actionHandler);
+    this.bidList.addListSelectionListener(this.actionHandler);
+    this.bidField.getDocument().addDocumentListener(this.actionHandler);
     
-    if (this.showOptions)
+    this.tabOrder = new FocusTraversalManager(new Component[]
     {
-      this.optionNameField.getDocument().addDocumentListener(this.actionHandler);
-    }
+      this.speedRunCheckBox,
+      this.browseSpeedRunButton,
+      this.bidCheckBox,
+      this.bidField,
+      this.newChoiceButton,
+      this.newChallengeButton,
+      this.bidList,
+      this.searchButton,
+      this.okButton,
+      this.cancelButton,
+    });
     
-    if (this.showOptions)
+    this.setFocusTraversalPolicy(this.tabOrder);
+  }
+
+  private void updateUIState()
+  {
+    if (this.currentRun != null && !StringUtils.isEmptyOrNull(this.bidField.getText()))
     {
-      this.optionNameList.addListSelectionListener(this.actionHandler);
-      this.newOptionButton.addActionListener(this.actionHandler);
-    }
-    else 
-    {
-      this.newChoiceButton.addActionListener(this.actionHandler);
-    }
-    
-    if (this.showOptions)
-    {
-      this.tabOrder = new FocusTraversalManager(new Component[]
-      {
-        this.speedRunField,
-        this.speedRunList,
-        this.bidNameField,
-        this.bidNameList,
-        this.searchButton,
-        this.newChallengeButton,
-        this.newChoiceButton,
-        this.optionNameField,
-        this.optionNameList,
-        this.newOptionButton,
-        this.okButton,
-        this.cancelButton
-      });
+      this.newChallengeButton.setEnabled(true);
+      this.newChoiceButton.setEnabled(true);
     }
     else
     {
-      this.tabOrder = new FocusTraversalManager(new Component[]
-      {
-        this.speedRunField,
-        this.speedRunList,
-        this.bidNameField,
-        this.bidNameList,
-        this.searchButton,
-        this.newChallengeButton,
-        this.newChoiceButton,
-        this.okButton,
-        this.cancelButton
-      });
+      this.newChallengeButton.setEnabled(false);
+      this.newChoiceButton.setEnabled(false);
     }
-    this.setFocusTraversalPolicy(this.tabOrder);
+    
+    if (this.bidList.isSelectionEmpty())
+    {
+      this.okButton.setEnabled(false);
+    }
+    else
+    {
+      this.okButton.setEnabled(true);
+    }
   }
   
   /**
-   * @wbp.parser.constructor
+   * Create the dialog.
    */
-  public BidSearchDialog(JFrame parent, SpeedRunSearch speedRunSearcher, BidSearch searcher)
-  {
-    this(parent, speedRunSearcher, searcher, true);
-  }
-  
-  public BidSearchDialog(JFrame parent, SpeedRunSearch speedRunSearcher, BidSearch searcher, boolean showOptions)
+  public BidSearchDialog(JFrame parent, BidSearch searcher)
   {
     super(parent, true);
     
-    this.showOptions = showOptions;
     this.searcher = searcher;
-    this.speedRunSearcher = speedRunSearcher;
-    this.selectedBid = null;
-    this.selectedOption = null;
-
+    this.result = null;
+    
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.updateUIState();
   }
   
-  private void createNewChallenge()
+  public Bid getResult()
   {
-    this.selectedBid = this.searcher.createChallengeIfAble(this.getCurrentSpeedRun().getId(), this.bidNameField.getText());
-    this.closeDialog();
+    return this.result;
+  }
+
+  private void openBrowseDialog()
+  {
+    SpeedRunSearchDialog dialog = new SpeedRunSearchDialog(this, this.searcher.createSpeedRunSearch());
+    
+    dialog.setVisible(true);
+    
+    if (dialog.getResult() != null)
+    {
+      this.currentRun = dialog.getResult();
+      this.speedRunField.setText(this.currentRun.toString());
+    }
   }
   
   private void createNewChoice()
   {
-    this.selectedBid = this.searcher.createChoiceIfAble(this.getCurrentSpeedRun().getId(), this.bidNameField.getText());
-    this.closeDialog();
+    this.result = this.searcher.createChoiceIfAble(this.currentRun, this.bidField.getText());
+
+    closeDialog();
   }
   
-  private void createNewOption()
+  private void createNewChallenge()
   {
-    Choice c = this.getCurrentChoice();
-    if (c != null)
-    {
-      this.selectedBid = c;
-      this.selectedOption = this.searcher.createOptionIfAble(c.getId(), this.optionNameField.getText());
-      this.closeDialog();
-    }
-    else
-    {
-      throw new RuntimeException("Error, no choice is set to create this option.");
-    }
-  }
-  
-  private SpeedRun getCurrentSpeedRun()
-  {
-    return (SpeedRun) this.speedRunList.getSelectedValue();
-  }
-  
-  private Bid getCurrentBid()
-  {
-    return (Bid) this.bidNameList.getSelectedValue();
-  }
-  
-  private Choice getCurrentChoice()
-  {
-    Bid b = this.getCurrentBid();
-    
-    if (b != null && b.getType() == BidType.CHOICE)
-    {
-      return (Choice) b;
-    }
-    else
-    {
-      return null;
-    }
-  }
-  
-  private ChoiceOption getCurrentOption()
-  {
-    return (ChoiceOption) this.optionNameList.getSelectedValue();
-  }
-  
-  private void runSpeedRunSearch()
-  {
-    List<SpeedRun> filtered = this.speedRunSearcher.searchSpeedRuns(new SpeedRunSearchParams(this.speedRunField.getText()));
-  
-    DefaultListModel data = new DefaultListModel();
-    
-    for (SpeedRun s : filtered)
-    {
-      data.addElement(s);
-    }
-    
-    this.speedRunList.setModel(data);
-  }
-  
-  private void runBidSearch()
-  {
-    List<Bid> filtered = this.searcher.searchBids(new BidSearchParams(this.bidNameField.getText(), this.getCurrentSpeedRun()));
-    
-    DefaultListModel data = new DefaultListModel();
-    
-    for (Bid s : filtered)
-    {
-      data.addElement(s);
-    }
-    
-    this.bidNameList.setModel(data);
-  }
-  
-  private void runBidFilter()
-  {
-    DefaultListModel data = new DefaultListModel();
-    SpeedRun run = this.getCurrentSpeedRun();
-    Bid currentBid = this.getCurrentBid();
-    
-    if (run != null)
-    {
-      List<Bid> filtered = this.searcher.filterBids(new BidSearchParams(this.bidNameField.getText(), run));
-      
-      for (Bid s : filtered)
-      {
-        data.addElement(s);
-      }
-    }
-    
-    this.bidNameList.setModel(data);
-    this.bidNameList.setSelectedValue(currentBid, true);
-  }
-  
-  private void runOptionFilter()
-  {
-    DefaultListModel data = new DefaultListModel();
-    Choice currentChoice = this.getCurrentChoice();
-    ChoiceOption currentOption = this.getCurrentOption();
-    
-    if (currentChoice != null)
-    {
-      List<ChoiceOption> filtered = this.searcher.filterChoiceOptions(new ChoiceOptionSearchParams(this.optionNameField.getText(), currentChoice));
-      for (ChoiceOption s : filtered)
-      {
-        data.addElement(s);
-      }
-    }
-    
-    this.optionNameList.setModel(data);
-    this.optionNameList.setSelectedValue(currentOption, true);
-  }
-  
-  public void returnSelectedBid()
-  {
-    Bid result = this.getCurrentBid();
-    if (result == null)
-    {
-      JOptionPane.showMessageDialog(this, "No bid is selected.", "Error", JOptionPane.OK_OPTION);
-    }
-    else
-    {
-      this.selectedBid = result;
-      if (this.selectedBid.getType() == BidType.CHOICE && this.showOptions)
-      {
-        this.selectedOption = this.getCurrentOption();
-      }
-      this.closeDialog();
-    }
+    this.result = this.searcher.createChallengeIfAble(this.currentRun, this.bidField.getText());
+
+    closeDialog();
   }
   
   public Bid getSelectedBid()
   {
-    return this.selectedBid;
+    return this.result;
   }
   
-  public ChoiceOption getSelectedOption()
+  private void returnValue()
   {
-    return this.selectedOption;
+    this.result = (Bid) this.bidList.getSelectedValue();
+    
+    closeDialog();
+  }
+  
+  private void cancelDialog()
+  {
+    this.result = null;
+    
+    closeDialog();
+  }
+  
+  private void runSearch()
+  {
+    SpeedRun target = this.speedRunCheckBox.isSelected() ? this.currentRun : null;
+    String name = this.bidCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.bidField.getText()) : null;
+    
+    BidSearchParams params = new BidSearchParams(name, target);
+    
+    List<Bid> filtered = this.searcher.searchBids(params);
+    
+    DefaultListModel listData = new DefaultListModel();
+    
+    for (Bid b : filtered)
+    {
+      listData.addElement(b);
+    }
+    
+    this.bidList.setModel(listData);
   }
   
   private void closeDialog()

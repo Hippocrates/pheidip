@@ -182,7 +182,18 @@ public class SpeedRunSearchDialog extends JDialog
   public SpeedRunSearchDialog(JFrame parent, SpeedRunSearch searcher)
   {
     super(parent, true);
+    this.init(searcher);
+  }
+  
+  public SpeedRunSearchDialog(JDialog parent, SpeedRunSearch searcher)
+  {
+    super(parent, true);
     
+    this.init(searcher);
+  }
+  
+  private void init(SpeedRunSearch searcher)
+  {
     this.searcher = searcher;
     this.resultRun = null;
     
