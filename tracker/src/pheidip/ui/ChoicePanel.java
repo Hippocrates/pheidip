@@ -277,7 +277,7 @@ public class ChoicePanel extends EntityPanel
       this.owner.removeTab(this);
       return;
     }
-    
+
     this.nameField.setText(choice.getName());
     this.descriptionTextArea.setText(choice.getDescription());
     this.stateComboBox.setSelectedItem(choice.getBidState());

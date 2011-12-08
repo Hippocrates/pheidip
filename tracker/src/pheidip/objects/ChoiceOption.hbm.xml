@@ -15,5 +15,12 @@
    foreign-key="ChoiceOptionFKChoice" name="choice">
    <column name="CHOICE" unique-key="OptionNameUnique"/>
   </many-to-one>
+  
+  <set name="bids" table="ChoiceBid" cascade="all,delete-orphan" fetch="join" lazy="true">
+    <key>
+      <column name="CHOICEOPTION" />
+    </key>
+    <one-to-many class="pheidip.objects.ChoiceBid" />
+  </set>
  </class>
 </hibernate-mapping>

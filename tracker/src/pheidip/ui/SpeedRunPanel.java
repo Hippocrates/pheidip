@@ -321,7 +321,7 @@ public class SpeedRunPanel extends EntityPanel
       if (b.getType() == BidType.CHALLENGE)
       {
         ChallengeControl c = this.speedRunControl.getChallengeControl(b.getId());
-        statusString = c.getTotalCollected().toString();
+        statusString = "$" + c.getTotalCollected().toString();
       }
       else
       {

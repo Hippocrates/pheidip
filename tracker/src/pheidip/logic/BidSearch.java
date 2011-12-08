@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pheidip.db.BidData;
+import pheidip.db.SpeedRunData;
 import pheidip.objects.Bid;
 import pheidip.objects.BidSearchParams;
+import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
@@ -17,11 +19,13 @@ public class BidSearch
 {
   private DonationDatabaseManager manager;
   private BidData bids;
+  private SpeedRunData speedRuns;
 
   public BidSearch(DonationDatabaseManager manager)
   {
     this.manager = manager;
     this.bids = this.manager.getDataAccess().getBids();
+    this.speedRuns = this.manager.getDataAccess().getSpeedRuns();
   }
   
   public SpeedRunSearch createSpeedRunSearch()
@@ -34,7 +38,9 @@ public class BidSearch
     Challenge result = new Challenge();
     result.setSpeedRun(speedRun);
     result.setName(name);
-    this.bids.insertChallenge(result);
+    result.setBidState(BidState.HIDDEN);
+    speedRun.getBids().add(result);
+    this.speedRuns.updateSpeedRun(speedRun);
     
     return result;
   }
@@ -44,16 +50,20 @@ public class BidSearch
     Choice result = new Choice();
     result.setSpeedRun(speedRun);
     result.setName(name);
-    this.bids.insertChoice(result);
+    result.setBidState(BidState.HIDDEN);
+    speedRun.getBids().add(result);
+    this.speedRuns.updateSpeedRun(speedRun);
     
     return result;
   }
   
-  public ChoiceOption createOptionIfAble(int choiceId, String optionName)
+  public ChoiceOption createOptionIfAble(Choice owner, String optionName)
   {
-    ChoiceControl control = new ChoiceControl(this.manager, choiceId);
-    int id = control.createNewOption(optionName);
-    return this.bids.getChoiceOptionById(id);
+    ChoiceOption toAdd = new ChoiceOption();
+    toAdd.setName(optionName);
+    owner.getOptions().add(toAdd);
+    this.bids.updateChoice(owner);
+    return toAdd;
   }
   
   public List<Bid> searchBids(BidSearchParams params)

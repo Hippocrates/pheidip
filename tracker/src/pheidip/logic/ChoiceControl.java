@@ -49,21 +49,22 @@ public class ChoiceControl
     return new ArrayList<ChoiceOption>(this.getData().getOptions());
   }
   
-  public int createNewOption(String name)
+  public void createNewOption(String name)
   {
     try
     {
       int optionId = IdUtils.generateId();
+      
+      Choice data = this.getData();
 
       ChoiceOption op = new ChoiceOption(optionId, name, this.getData());
-      this.bids.insertChoiceOption(op);
-      return optionId;
+      data.getOptions().add(op);
+      this.bids.updateChoice(data);
     }
     catch (DonationDataConstraintException e)
     {
       this.donationDatabase.reportMessage(e.getMessage());
     }
-    return 0;
   }
   
   public BigDecimal getOptionTotal(int choiceOptionId)
@@ -102,7 +103,9 @@ public class ChoiceControl
 
   public List<Pair<ChoiceOption, BigDecimal>> getOptionsWithTotals(boolean returnSorted)
   {
-    List<ChoiceOption> options = this.getOptions();
+    Choice data = this.getData();
+
+    List<ChoiceOption> options = new ArrayList<ChoiceOption>(data.getOptions());
     
     List<Pair<ChoiceOption,BigDecimal>> result = new ArrayList<Pair<ChoiceOption,BigDecimal>>();
     

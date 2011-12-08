@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 
 import pheidip.logic.DonationControl;
+import pheidip.objects.BidType;
 import pheidip.objects.DonationBid;
 import pheidip.util.FormatUtils;
 import pheidip.util.StringUtils;
@@ -239,23 +240,23 @@ public class DonationBidsPanel extends JPanel
 
   private void attachNewBid()
   {
-    OldBidSearchDialog dialog = this.owner.openBidSearch();
+    DonationBidSearchDialog dialog = this.owner.openDonationBidSearch();
     
     dialog.setVisible(true);
     
-    if (dialog.getSelectedBid() != null)
+    if (dialog.getSelectionType() != null)
     {
       String amount = FormattedInputDialog.showDialog(this.owner, "Please enter a new amount to bid.", "Enter amount", FormatUtils.getMoneyFormat(), this.control.getTotalAvailiable().toString());
       
       if (!StringUtils.isEmptyOrNull(amount))
       {
-        if (dialog.getSelectedOption() != null)
+        if (dialog.getSelectionType() == BidType.CHOICE)
         {
-          this.control.attachNewChoiceBid(dialog.getSelectedOption().getId(), new BigDecimal(amount));
+          this.control.attachNewChoiceBid(dialog.getSelectedOption(), new BigDecimal(amount));
         }
         else
         {
-          this.control.attachNewChallengeBid(dialog.getSelectedBid().getId(), new BigDecimal(amount));
+          this.control.attachNewChallengeBid(dialog.getSelectedChallenge(), new BigDecimal(amount));
         }
         this.refreshContent();
       }

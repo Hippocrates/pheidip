@@ -206,7 +206,6 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
       }
       catch(Exception e)
       {
-        System.out.println(e.getMessage());
         throw new RuntimeException(e);
       }
     }

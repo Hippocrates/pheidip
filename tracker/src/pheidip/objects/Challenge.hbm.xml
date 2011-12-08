@@ -7,5 +7,12 @@
         <property name="goalAmount" type="java.math.BigDecimal">
             <column name="GOALAMOUNT" />
         </property>
+        
+        <set name="bids" table="ChallengeBid" cascade="all,delete-orphan" fetch="join" lazy="true">
+            <key>
+                <column name="CHALLENGE" />
+            </key>
+            <one-to-many class="pheidip.objects.ChallengeBid" />
+        </set>
     </union-subclass>
 </hibernate-mapping>

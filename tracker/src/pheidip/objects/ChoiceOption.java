@@ -1,5 +1,7 @@
 package pheidip.objects;
 
+import java.util.Set;
+
 import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
 
@@ -8,6 +10,7 @@ public class ChoiceOption
 	private String name;
   private int id;
   private Choice choice;
+  private Set<ChoiceBid> bids;
 	
   public ChoiceOption()
   {
@@ -54,5 +57,15 @@ public class ChoiceOption
   public String toString()
   {
     return StringUtils.isEmptyOrNull(this.getName()) ? "#" + this.getId() : this.getName();
+  }
+
+  public void setBids(Set<ChoiceBid> bids)
+  {
+    this.bids = bids;
+  }
+
+  public Set<ChoiceBid> getBids()
+  {
+    return bids;
   }
 }

@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import pheidip.db.BidData;
 import pheidip.db.DonationData;
 import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
@@ -25,7 +24,6 @@ public class DonationControl
 {
   private DonationDatabaseManager donationDatabase;
   private DonationData donations;
-  private BidData bids;
   
   private int donationId;
   private Donation cachedData;
@@ -34,7 +32,6 @@ public class DonationControl
   {
     this.donationDatabase = donationDatabase;
     this.donations = this.donationDatabase.getDataAccess().getDonationData();
-    this.bids = this.donationDatabase.getDataAccess().getBids();
     this.donationId = donationId;
     this.cachedData = null;
   }
@@ -43,7 +40,6 @@ public class DonationControl
   {
     this.donationDatabase = donationDatabase;
     this.donations = this.donationDatabase.getDataAccess().getDonationData();
-    this.bids = this.donationDatabase.getDataAccess().getBids();
     this.donationId = donation.getId();
     this.cachedData = null;
   }
@@ -115,13 +111,13 @@ public class DonationControl
     }
   }
   
-  public int attachNewChallengeBid(int challengeId, BigDecimal amount)
+  public ChallengeBid attachNewChallengeBid(Challenge challenge, BigDecimal amount)
   {
     int newId = IdUtils.generateId();
     
     Donation data = this.getData();
     
-    ChallengeBid created = new ChallengeBid(newId, amount, this.bids.getChallengeById(challengeId), data);
+    ChallengeBid created = new ChallengeBid(newId, amount, challenge, data);
 
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
@@ -134,15 +130,15 @@ public class DonationControl
       throw new RuntimeException("Total of all bids cannot exceed donation amount.");
     }
     
-    return newId;
+    return created;
   }
   
-  public int attachNewChoiceBid(int choiceId, BigDecimal amount)
+  public ChoiceBid attachNewChoiceBid(ChoiceOption option, BigDecimal amount)
   {
     int newId = IdUtils.generateId();
     Donation data = this.getData();
     
-    ChoiceBid created = new ChoiceBid(newId, amount, this.bids.getChoiceOptionById(choiceId), data);
+    ChoiceBid created = new ChoiceBid(newId, amount, option, data);
 
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
@@ -155,7 +151,7 @@ public class DonationControl
       throw new RuntimeException("Total of all bids cannot exceed donation amount.");
     }
     
-    return newId;
+    return created;
   }
   
   public void updateDonationBidAmount(DonationBid choiceBid, BigDecimal newAmount)
@@ -174,6 +170,17 @@ public class DonationControl
   public void removeBid(DonationBid bid)
   {
     this.getData().getBids().remove(bid);
+    
+    if (bid.getType() == BidType.CHALLENGE)
+    {
+      ((ChallengeBid)bid).getChallenge().getBids().remove(bid);
+    }
+    else
+    {
+      ((ChoiceBid)bid).getOption().getBids().remove(bid);
+    }
+    
+    bid.setDonation(null);
     this.donations.updateDonation(this.getData());
   }
 

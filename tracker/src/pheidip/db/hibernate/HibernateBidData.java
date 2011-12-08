@@ -32,8 +32,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     List<Bid> listing = q.list();
     
     this.endTransaction();
-    ////session.close();
-    
+
     return listing;
   }
 
@@ -44,8 +43,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     Choice c = (Choice) session.get(Choice.class, choiceId);
     
     this.endTransaction();
-    //session.close();
-    
+
     return c;
   }
 
@@ -111,7 +109,6 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     session.update(option);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -184,7 +181,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     this.endTransaction();
     //session.close();
 
-    return listing.get(0) == null ? BigDecimal.ZERO : (BigDecimal) listing.get(0);
+    return listing.get(0) == null ? BigDecimal.ZERO.setScale(2) : (BigDecimal) listing.get(0);
   }
 
   @Override
@@ -204,7 +201,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     this.endTransaction();
     //session.close();
     
-    return listing.get(0) == null ? BigDecimal.ZERO : (BigDecimal) listing.get(0);
+    return listing.get(0) == null ? BigDecimal.ZERO.setScale(2) : (BigDecimal) listing.get(0);
   }
 
   @Override
@@ -234,6 +231,9 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     if (params.owner != null)
       whereClause.add("b.speedRun = :owner");
     
+    if (params.state != null)
+      whereClause.add("b.bidState = :state");
+    
     if (whereClause.size() > 0)
     {
       queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
@@ -249,13 +249,15 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     
     if (params.owner != null)
       q.setParameter("owner", params.owner);
+    
+    if (params.state != null)
+      q.setParameter("state", params.state);
 
     @SuppressWarnings("unchecked")
     List<Bid> listing = q.list();
     
     this.endTransaction();
-    //session.close();
-    
+
     return listing;
   }
 

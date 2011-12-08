@@ -1,6 +1,7 @@
 package pheidip.objects;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
@@ -13,6 +14,7 @@ public class Challenge implements Bid
   private String description;
   private BidState bidState;
   private SpeedRun speedRun;
+  private Set<ChallengeBid> bids;
   
   public Challenge()
   {
@@ -114,5 +116,15 @@ public class Challenge implements Bid
   public SpeedRun getSpeedRun()
   {
     return speedRun;
+  }
+
+  public void setBids(Set<ChallengeBid> bids)
+  {
+    this.bids = bids;
+  }
+
+  public Set<ChallengeBid> getBids()
+  {
+    return bids;
   }
 }

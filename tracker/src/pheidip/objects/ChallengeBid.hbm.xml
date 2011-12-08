@@ -4,8 +4,7 @@
 <!-- Generated 18-Oct-2011 3:55:43 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
  <union-subclass extends="pheidip.objects.DonationBid" lazy="false" name="pheidip.objects.ChallengeBid">
-  <tuplizer class=""/>
-  <many-to-one class="pheidip.objects.Challenge" fetch="join"
+  <many-to-one class="pheidip.objects.Challenge" fetch="join" lazy="false"
    foreign-key="ChallengeBidFKChallenge" name="challenge">
    <column name="CHALLENGE"/>
   </many-to-one>

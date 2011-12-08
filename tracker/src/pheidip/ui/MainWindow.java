@@ -851,9 +851,9 @@ public class MainWindow extends JFrame implements Reporter
     this.openSpeedRunTab(newId);
   }
   
-  protected OldBidSearchDialog openBidSearch()
+  protected DonationBidSearchDialog openDonationBidSearch()
   {
-    return new OldBidSearchDialog(this, new SpeedRunSearch(this.instance.getDonationDatabase()), new BidSearch(this.instance.getDonationDatabase()));
+    return new DonationBidSearchDialog(this, new BidSearch(this.instance.getDonationDatabase()));
   }
     
   private void createNewDonor()

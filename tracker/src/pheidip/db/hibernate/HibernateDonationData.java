@@ -52,8 +52,6 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     
     session.update(d);
     
-    System.out.println("" + d.getDonations().size());
-
     for (Donation donation : d.getDonations())
     {
       list.add(donation);
@@ -156,7 +154,6 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     Session session = this.beginTransaction();    
     session.merge(updated);
     this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -200,8 +197,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   @Override
   public void updateChoiceBidAmount(int choiceBidId, BigDecimal newAmount)
   {
-    Session session = this.beginTransaction();
-    
+    Session session = this.beginTransaction(); 
     
     DonationBid b = (DonationBid) session.load(DonationBid.class, choiceBidId);
     b.setAmount(newAmount);
