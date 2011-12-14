@@ -8,7 +8,6 @@ import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 
 import pheidip.db.PrizeData;
-import pheidip.objects.Donor;
 import pheidip.objects.Prize;
 import pheidip.objects.PrizeSearchParams;
 import pheidip.util.StringUtils;
@@ -25,11 +24,9 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   {
     Session session = this.beginTransaction();
     
-    
     session.save(toAdd);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -37,23 +34,19 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   {
     Session session = this.beginTransaction();
     
-    
     session.merge(toUpdate);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
   public Prize getPrizeById(int prizeId)
   {
     Session session = this.beginTransaction();
-    
-    
+
     Prize p = (Prize) session.get(Prize.class, prizeId);
     
     this.endTransaction();
-    //session.close();
     
     return p;
   }
@@ -62,15 +55,13 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   public List<Prize> getAllPrizes()
   {
     Session session = this.beginTransaction();
-    
-    
+
     Query q = session.createQuery("from Prize");
 
     @SuppressWarnings("unchecked")
     List<Prize> listing = q.list();
     
     this.endTransaction();
-    //session.close();
     
     return listing;
   }
@@ -81,7 +72,6 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     Prize result = null;
     
     Session session = this.beginTransaction();
-    
     
     Query q = session.createQuery("from Prize as p where p.winner.id = :donorid");
 
@@ -96,64 +86,34 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     }
     
     this.endTransaction();
-    //session.close();
     
     return result;
   }
 
   @Override
-  public void setPrizeWinner(int prizeId, int donorId)
+  public void deletePrize(Prize prize)
   {
     Session session = this.beginTransaction();
     
-    
-    Prize p = (Prize) session.load(Prize.class, prizeId);
-    Donor d = (Donor) session.load(Donor.class, donorId);
-    
-    p.setWinner(d);
-    
-    session.save(p);
+    session.delete(prize);
     
     this.endTransaction();
-    //session.close();
-  }
-
-  @Override
-  public void removePrizeWinner(int prizeId)
-  {
-    Session session = this.beginTransaction();
-    
-    
-    Prize p = (Prize) session.load(Prize.class, prizeId);
-
-    p.setWinner(null);
-    
-    this.endTransaction();
-    //session.close();
-  }
-
-  @Override
-  public void deletePrize(int prizeId)
-  {
-    Session session = this.beginTransaction();
-    
-    
-    Prize p = (Prize) session.load(Prize.class, prizeId);
-
-    session.delete(p);
-    
-    this.endTransaction();
-    //session.close();
   }
 
   @Override
   public List<Prize> searchPrizes(PrizeSearchParams params)
   {
+    return this.searchPrizesRange(params, 0, Integer.MAX_VALUE);
+  }
+  
+  @Override
+  public List<Prize> searchPrizesRange(PrizeSearchParams params, int offset, int size)
+  {
     String queryString = "from Prize p";
     List<String> whereClause = new ArrayList<String>();
     
     if (params.name != null)
-      whereClause.add("p.name like :name");
+      whereClause.add("lower(p.name) like :name");
     
     if (params.excludeIfWon)
       whereClause.add("p.winner is null");
@@ -170,6 +130,9 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     if (params.name != null)
       q.setString("name", params.name);
 
+    q.setFirstResult(offset);
+    q.setMaxResults(size);
+    
     @SuppressWarnings("unchecked")
     List<Prize> listing = q.list();
     

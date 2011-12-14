@@ -31,6 +31,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.JCheckBox;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
@@ -77,19 +79,21 @@ public class DonationSearchDialog extends JDialog
   private JComboBox bidStateComboBox;
   private JComboBox readStateComboBox;
   private JComboBox commentStateComboBox;
+  private JButton prevButton;
+  private JButton nextButton;
   
   private void initializeGUI()
   {
-    setBounds(100, 100, 583, 300);
+    setBounds(100, 100, 583, 327);
     getContentPane().setLayout(new BorderLayout(0, 0));
     JPanel panel = new JPanel();
     panel.setBorder(new EmptyBorder(5, 5, 5, 5));
     getContentPane().add(panel, BorderLayout.CENTER);
     GridBagLayout gbl_panel = new GridBagLayout();
-    gbl_panel.columnWidths = new int[]{107, 23, 113, 76, 85, 80, 0};
-    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    gbl_panel.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_panel.columnWidths = new int[]{107, 23, 113, 84, 101, 87, 0};
+    gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    gbl_panel.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     panel.setLayout(gbl_panel);
     
     lblDonor = new JLabel("Donor:");
@@ -322,25 +326,42 @@ public class DonationSearchDialog extends JDialog
     gbc_searchButton.gridy = 9;
     panel.add(searchButton, gbc_searchButton);
     
+    prevButton = new JButton("Previous");
+    prevButton.setEnabled(false);
+    GridBagConstraints gbc_prevButton = new GridBagConstraints();
+    gbc_prevButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_prevButton.insets = new Insets(0, 0, 5, 5);
+    gbc_prevButton.gridx = 4;
+    gbc_prevButton.gridy = 10;
+    panel.add(prevButton, gbc_prevButton);
+    
+    nextButton = new JButton("Next");
+    nextButton.setEnabled(false);
+    GridBagConstraints gbc_nextButton = new GridBagConstraints();
+    gbc_nextButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_nextButton.insets = new Insets(0, 0, 5, 0);
+    gbc_nextButton.gridx = 5;
+    gbc_nextButton.gridy = 10;
+    panel.add(nextButton, gbc_nextButton);
+    
     okButton = new JButton("OK");
     GridBagConstraints gbc_okButton = new GridBagConstraints();
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
-    gbc_okButton.gridx = 3;
-    gbc_okButton.gridy = 10;
+    gbc_okButton.gridx = 4;
+    gbc_okButton.gridy = 11;
     panel.add(okButton, gbc_okButton);
     
     cancelButton = new JButton("Cancel");
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_cancelButton.insets = new Insets(0, 0, 0, 5);
-    gbc_cancelButton.gridx = 4;
-    gbc_cancelButton.gridy = 10;
+    gbc_cancelButton.gridx = 5;
+    gbc_cancelButton.gridy = 11;
     panel.add(cancelButton, gbc_cancelButton);
     
   }
   
-  private class ActionHandler implements ActionListener, ChangeListener
+  private class ActionHandler implements ActionListener, ChangeListener, ListSelectionListener
   {
     private void runEvent(Object source)
     {
@@ -362,6 +383,14 @@ public class DonationSearchDialog extends JDialog
         {
           runSearch();
         }
+        else if (source == nextButton)
+        {
+          moveNextResults();
+        }
+        else if (source == prevButton)
+        {
+          movePrevResults();
+        }
       }
       catch (Exception e)
       {
@@ -378,6 +407,15 @@ public class DonationSearchDialog extends JDialog
     public void stateChanged(ChangeEvent ev)
     {
       runEvent(ev.getSource());
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent ev)
+    {
+      if (ev.getSource() == donationList)
+      {
+        updateUIState();
+      }
     }
   }
   
@@ -398,6 +436,9 @@ public class DonationSearchDialog extends JDialog
     this.donatedAfterCheckBox.addActionListener(this.actionHandler);
     this.donatedBeforeCheckBox.addActionListener(this.actionHandler);
     this.searchButton.addActionListener(this.actionHandler);
+    this.nextButton.addActionListener(this.actionHandler);
+    this.prevButton.addActionListener(this.actionHandler);
+    this.donationList.addListSelectionListener(this.actionHandler);
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
@@ -418,6 +459,8 @@ public class DonationSearchDialog extends JDialog
       this.commentStateComboBox,
       this.searchButton,
       this.donationList,
+      this.prevButton,
+      this.nextButton,
       this.okButton,
       this.cancelButton,
     });
@@ -432,6 +475,7 @@ public class DonationSearchDialog extends JDialog
 
     this.initializeGUI();
     this.initializeGUIEvents();
+    this.updateUIState();
   }
   
   public Donation getResult()
@@ -465,6 +509,37 @@ public class DonationSearchDialog extends JDialog
     this.dispose();
   }
   
+  
+  private void updateUIState()
+  {
+    this.okButton.setEnabled(!this.donationList.isSelectionEmpty());
+    this.nextButton.setEnabled(this.searcher.hasNext());
+    this.prevButton.setEnabled(this.searcher.hasPrev());
+  }
+  
+  private void moveNextResults()
+  {
+    this.fillList(this.searcher.getNext());
+  }
+  
+  private void movePrevResults()
+  {
+    this.fillList(this.searcher.getPrev());
+  }
+
+  private void fillList(List<Donation> filtered)
+  {
+    DefaultListModel listData = new DefaultListModel();
+    
+    for (Donation d : filtered)
+    {
+      listData.addElement(d);
+    }
+    
+    this.donationList.setModel(listData);
+    updateUIState();
+  }
+
   private void runSearch()
   {
     DonationSearchParams params = new DonationSearchParams();
@@ -478,16 +553,7 @@ public class DonationSearchDialog extends JDialog
     params.targetReadState = this.readStateCheckBox.isSelected() ? (DonationReadState)this.readStateComboBox.getSelectedItem() : null;
     params.targetCommentState = this.commentStateCheckBox.isSelected() ? (DonationCommentState)this.commentStateComboBox.getSelectedItem() : null;
     
-    List<Donation> filtered = this.searcher.searchDonations(params);
-    
-    DefaultListModel listData = new DefaultListModel();
-    
-    for (Donation d : filtered)
-    {
-      listData.addElement(d);
-    }
-    
-    this.donationList.setModel(listData);
+    this.fillList(this.searcher.runSearch(params));
   }
   
   private void openDonorSearch()

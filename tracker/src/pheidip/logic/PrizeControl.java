@@ -63,7 +63,14 @@ public class PrizeControl
   {
     try
     {
-      this.prizes.deletePrize(this.prizeId);
+      Prize data = this.refreshData();
+      
+      if (data.getWinner() != null)
+      {
+        throw new RuntimeException("Error, remove the prize winner before deleting the prize.");
+      }
+      
+      this.prizes.deletePrize(this.getData());
     }
     catch(DonationDataConstraintException e)
     {

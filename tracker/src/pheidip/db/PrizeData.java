@@ -17,11 +17,9 @@ public interface PrizeData {
 
 	public Prize getPrizeByDonorId(int donorId);
 
-	public void setPrizeWinner(int prizeId, int donorId);
-
-	public void removePrizeWinner(int prizeId);
-
-	public void deletePrize(int prizeId);
+	public void deletePrize(Prize prize);
 
 	public List<Prize> searchPrizes(PrizeSearchParams params);
+
+  public List<Prize> searchPrizesRange(PrizeSearchParams params, int offset, int size);
 }

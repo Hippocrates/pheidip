@@ -214,6 +214,7 @@ public class SpeedRunPanel extends EntityPanel
       }
       catch(Exception e)
       {
+        e.printStackTrace();
         owner.report(e);
       }
     }

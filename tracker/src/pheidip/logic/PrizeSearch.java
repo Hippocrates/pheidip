@@ -6,7 +6,7 @@ import pheidip.db.PrizeData;
 import pheidip.objects.Prize;
 import pheidip.objects.PrizeSearchParams;
 
-public class PrizeSearch
+public class PrizeSearch extends AbstractSearcher<Prize, PrizeSearchParams>
 {
   private DonationDatabaseManager manager;
   private PrizeData prizes;
@@ -17,18 +17,16 @@ public class PrizeSearch
     this.prizes = this.manager.getDataAccess().getPrizeData();
   }
   
-  public List<Prize> searchPrizes(String name, boolean excludeIfWon)
-  {
-    PrizeSearchParams params = new PrizeSearchParams();
-    params.name = name;
-    params.excludeIfWon = excludeIfWon;
-    
-    return this.prizes.searchPrizes(params);
-  }
-  
   public Prize createIfAble(String name)
   {
     int newId = PrizeControl.createNewPrize(this.manager, name);
     return this.prizes.getPrizeById(newId);
+  }
+
+  @Override
+  protected List<Prize> implRunSearch(PrizeSearchParams params,
+      int searchOffset, int searchSize)
+  {
+    return this.prizes.searchPrizesRange(params, searchOffset, searchSize);
   }
 }

@@ -137,7 +137,7 @@ public final class StringUtils
   
   public static String sqlInnerStringMatch(String s)
   {
-    return "%" + emptyIfNull(s) + "%";
+    return "%" + emptyIfNull(s).toLowerCase() + "%";
   }
   
   public static String joinSeperated(List<String> strings, String seperator)

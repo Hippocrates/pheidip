@@ -12,15 +12,15 @@
    <column check="NAME = lower(NAME)" name="NAME" unique-key="OptionNameUnique"/>
   </property>
   <many-to-one class="pheidip.objects.Choice" fetch="join"
-   foreign-key="ChoiceOptionFKChoice" name="choice">
+   foreign-key="ChoiceOptionFKChoice" lazy="false" name="choice">
    <column name="CHOICE" unique-key="OptionNameUnique"/>
   </many-to-one>
-  
-  <set name="bids" table="ChoiceBid" cascade="all,delete-orphan" fetch="join" lazy="true">
-    <key>
-      <column name="CHOICEOPTION" />
-    </key>
-    <one-to-many class="pheidip.objects.ChoiceBid" />
+  <set cascade="all,delete-orphan" fetch="join" lazy="false" name="bids"
+   sort="unsorted" table="CHOICEBID" inverse="true">
+   <key>
+    <column name="CHOICEOPTION"/>
+   </key>
+   <one-to-many class="pheidip.objects.ChoiceBid"/>
   </set>
  </class>
 </hibernate-mapping>

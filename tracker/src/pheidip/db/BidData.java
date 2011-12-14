@@ -19,7 +19,7 @@ public interface BidData {
 
 	public void updateChoice(Choice choice);
 
-	public void deleteChoice(int choiceId);
+	public void deleteChoice(Choice choice);
 
 	public ChoiceOption getChoiceOptionById(int optionId);
 
@@ -27,7 +27,7 @@ public interface BidData {
 
 	public void updateChoiceOption(ChoiceOption option);
 
-	public void deleteChoiceOption(int optionId);
+	public void deleteChoiceOption(ChoiceOption option);
 
 	public Challenge getChallengeById(int challengeId);
 
@@ -39,7 +39,9 @@ public interface BidData {
 
 	public BigDecimal getChallengeTotal(int challengeId);
 
-	public void deleteChallenge(int challengeId);
+	public void deleteChallenge(Challenge challenge);
 
 	public List<Bid> searchBids(BidSearchParams params);
+
+  public List<Bid> searchBidsRange(BidSearchParams params, int offset, int size);
 }

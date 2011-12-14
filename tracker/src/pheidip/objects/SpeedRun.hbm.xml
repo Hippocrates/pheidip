@@ -18,7 +18,7 @@
   <property generated="never" lazy="false" name="sortKey" type="int" unique="true">
    <column name="sortKey" unique="true"/>
   </property>
-  <set cascade="all,delete-orphan" lazy="false" name="bids" 
+  <set cascade="all,delete-orphan" lazy="true" name="bids" 
    sort="unsorted" table="Bid" inverse="true">
    <key>
     <column name="SPEEDRUN"/>

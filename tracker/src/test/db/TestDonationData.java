@@ -2,8 +2,6 @@ package test.db;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
-
 
 import pheidip.db.DonationData;
 import pheidip.db.DonorData;
@@ -50,24 +48,6 @@ public class TestDonationData extends DonationDatabaseTest
     //assertEquals(3, d.getDonorId());
   }
 
-  public void testGetDonorDonations()
-  {
-    List<Donation> dlist = this.donations.getDonorDonations(4);
-
-    assertEquals(2, dlist.size());
-
-    for (int i = 0; i < dlist.size(); ++i)
-    {
-      assertEquals(4, dlist.get(i).getDonor().getId());
-    }
-  }
-
-  public void testGetDonorDonationTotal()
-  {
-    assertEquals(new BigDecimal("30.00"),
-        this.donations.getDonorDonationTotal(4));
-  }
-
   public void testSetDonationComment()
   {
     final int id = 1;
@@ -77,7 +57,8 @@ public class TestDonationData extends DonationDatabaseTest
     
     final String comment = "Some text, :LASDFJFLSDAKHASDGLIHASOIHJASDOUIDFSANLASDFJKHFDSALKJDFAS";
     
-    this.donations.setDonationComment(id, comment);
+    d.setComment(comment);
+    this.donations.updateDonation(d);
     
     Donation result = this.donations.getDonationById(id);
     
@@ -92,7 +73,8 @@ public class TestDonationData extends DonationDatabaseTest
     
     assertEquals(DonationBidState.PENDING, d.getBidState());
     
-    this.donations.setDonationBidState(id, DonationBidState.PROCESSED);
+    d.setBidState(DonationBidState.PROCESSED);
+    this.donations.updateDonation(d);
     
     d = this.donations.getDonationById(id);
     
@@ -109,7 +91,8 @@ public class TestDonationData extends DonationDatabaseTest
     
     BigDecimal newAmount = new BigDecimal("5.55");
     
-    this.donations.setDonationAmount(id, newAmount);
+    d.setAmount(newAmount);
+    this.donations.updateDonation(d);
     
     d = this.donations.getDonationById(id);
     
@@ -123,7 +106,7 @@ public class TestDonationData extends DonationDatabaseTest
     
     assertNotNull(d);
     
-    this.donations.deleteDonation(id);
+    this.donations.deleteDonation(d);
     
     assertNull(this.donations.getDonationById(id));
   }

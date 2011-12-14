@@ -121,14 +121,17 @@ public class DonationControl
 
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
+      challenge.getBids().add(created);
       data.getBids().add(created);
       data.setBidState(DonationBidState.PROCESSED);
-      this.donations.updateDonation(data);
+      this.donations.addDonationBid(created);
     }
     else
     {
       throw new RuntimeException("Total of all bids cannot exceed donation amount.");
     }
+    
+    this.updateData(data);
     
     return created;
   }
@@ -142,9 +145,10 @@ public class DonationControl
 
     if (sumBids(getAttachedBids()).add(amount).compareTo(data.getAmount()) <= 0)
     {
+      option.getBids().add(created);
       data.getBids().add(created);
       data.setBidState(DonationBidState.PROCESSED);
-      this.donations.updateDonation(data);
+      this.donations.addDonationBid(created);
     }
     else
     {
@@ -159,7 +163,7 @@ public class DonationControl
     if (checkChangeInBidIsBelowDonationAmount(choiceBid, newAmount))
     {
       choiceBid.setAmount(newAmount);
-      this.donations.updateDonation(this.getData());
+      this.donations.updateDonationBid(choiceBid);
     }
     else
     {
@@ -174,14 +178,16 @@ public class DonationControl
     if (bid.getType() == BidType.CHALLENGE)
     {
       ((ChallengeBid)bid).getChallenge().getBids().remove(bid);
+      ((ChallengeBid)bid).setChallenge(null);
     }
     else
     {
       ((ChoiceBid)bid).getOption().getBids().remove(bid);
+      ((ChoiceBid)bid).setOption(null);
     }
     
     bid.setDonation(null);
-    this.donations.updateDonation(this.getData());
+    this.donations.deleteDonationBid(bid);
   }
 
   private boolean checkChangeInBidIsBelowDonationAmount(DonationBid donationBid, BigDecimal newAmount)
@@ -202,7 +208,7 @@ public class DonationControl
       ChoiceOption option = c.getOption();
       Choice choice = option.getChoice();
       SpeedRun run = choice.getSpeedRun();
-      return run.getName() + " : " + choice.getName() + " : " + option.getName();
+      return (run == null ? "" : run.getName() + " : ") + choice.getName() + " : " + option.getName();
     }
     else
     {
@@ -219,11 +225,11 @@ public class DonationControl
     
     for (DonationBid b : attachedBids)
     {
-      this.removeBid((ChallengeBid)b);
+      this.removeBid(b);
     }
     
     this.cachedData = null;
-    this.donations.deleteDonation(this.donationId);
+    this.donations.deleteDonation(this.getData());
   }
   
   public List<DonationBid> getAttachedBids()

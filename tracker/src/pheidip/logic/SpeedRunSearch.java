@@ -6,7 +6,7 @@ import pheidip.db.SpeedRunData;
 import pheidip.objects.SpeedRun;
 import pheidip.objects.SpeedRunSearchParams;
 
-public class SpeedRunSearch
+public class SpeedRunSearch extends AbstractSearcher<SpeedRun, SpeedRunSearchParams>
 {
   private DonationDatabaseManager manager;
   private SpeedRunData speedRuns;
@@ -22,9 +22,11 @@ public class SpeedRunSearch
     int id = SpeedRunControl.createNewSpeedRun(this.manager, params.name);
     return this.speedRuns.getSpeedRunById(id);
   }
-  
-  public List<SpeedRun> searchSpeedRuns(SpeedRunSearchParams params)
+
+  @Override
+  protected List<SpeedRun> implRunSearch(
+      SpeedRunSearchParams params, int searchOffset, int searchSize)
   {
-    return this.speedRuns.searchSpeedRuns(params);
+    return this.speedRuns.searchSpeedRunsRange(params, searchOffset, searchSize);
   }
 }

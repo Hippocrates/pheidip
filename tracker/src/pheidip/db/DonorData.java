@@ -10,10 +10,6 @@ public interface DonorData
 
 	public Donor getDonorById(int donorId);
 
-	public Donor getDonorByEmail(String email);
-
-	public Donor getDonorByAlias(String alias);
-
 	public List<Donor> getAllDonors();
 
 	public List<Donor> getDonorsWithoutPrizes();
@@ -29,4 +25,6 @@ public interface DonorData
 	public void deleteAllDonors();
 
 	public List<Donor> searchDonors(DonorSearchParams params);
+
+  public List<Donor> searchDonorsRange(DonorSearchParams params, int searchOffset, int searchSize);
 }

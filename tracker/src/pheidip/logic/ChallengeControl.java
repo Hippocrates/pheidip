@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import pheidip.db.BidData;
 import pheidip.db.DonationDataConstraintException;
 import pheidip.objects.Challenge;
+import pheidip.objects.ChallengeBid;
 
 public class ChallengeControl
 {
@@ -39,7 +40,17 @@ public class ChallengeControl
 
   public void deleteChallenge()
   {
-    this.bids.deleteChallenge(this.challengeId);
+    Challenge c = this.refreshData();
+    
+    for (ChallengeBid b : c.getBids())
+    {
+      b.setChallenge(null);
+      b.getDonation().getBids().remove(b);
+      b.setDonation(null);
+    }
+    c.getBids().clear();
+
+    this.bids.deleteChallenge(c);
   }
 
   public void updateData(Challenge data)

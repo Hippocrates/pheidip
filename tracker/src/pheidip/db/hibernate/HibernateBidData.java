@@ -59,25 +59,22 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   public void updateChoice(Choice choice)
   {
     Session session = this.beginTransaction();
-    
-    
+
     session.update(choice);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
-  public void deleteChoice(int choiceId)
+  public void deleteChoice(Choice choice)
   {
     Session session = this.beginTransaction();
-    Choice c = (Choice) session.load(Choice.class, choiceId);
-    c.getSpeedRun().getBids().remove(c);
     
-    session.delete(c);
+    choice.getSpeedRun().getBids().remove(choice);
+
+    session.delete(choice);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -87,7 +84,6 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     ChoiceOption o = (ChoiceOption) session.get(ChoiceOption.class, optionId);
 
     this.endTransaction();
-    //session.close();
     
     return o;
   }
@@ -99,7 +95,6 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     session.save(choiceOption);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -112,31 +107,24 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   }
 
   @Override
-  public void deleteChoiceOption(int optionId)
+  public void deleteChoiceOption(ChoiceOption option)
   {
     Session session = this.beginTransaction();
-    
-    
-    ChoiceOption o = (ChoiceOption) session.load(ChoiceOption.class, optionId);
-    o.getChoice().getOptions().remove(o);
-    
-    session.delete(o);
+
+    session.delete(option);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
   public Challenge getChallengeById(int challengeId)
   {
     Session session = this.beginTransaction();
-    
-    
+
     Challenge c = (Challenge) session.get(Challenge.class, challengeId);
     
     this.endTransaction();
-    //session.close();
-    
+
     return c;
   }
 
@@ -145,11 +133,9 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   {
     Session session = this.beginTransaction();
     
-    
     session.save(challenge);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -157,11 +143,9 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   {
     Session session = this.beginTransaction();
     
-    
     session.update(challenge);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -169,17 +153,14 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   {
     Session session = this.beginTransaction();
     
-    
     Query q = session.createQuery("select sum(b.amount) from ChoiceBid b left join b.option where b.option.id = :id");
     
     q.setInteger("id", optionId);
-    
-    //@SuppressWarnings("unchecked")
+
     @SuppressWarnings("rawtypes")
     List listing = q.list();
     
     this.endTransaction();
-    //session.close();
 
     return listing.get(0) == null ? BigDecimal.ZERO.setScale(2) : (BigDecimal) listing.get(0);
   }
@@ -188,7 +169,6 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   public BigDecimal getChallengeTotal(int challengeId)
   {
     Session session = this.beginTransaction();
-    
     
     Query q = session.createQuery("select sum(b.amount) from ChallengeBid b left join b.challenge where b.challenge.id = :id");
     
@@ -199,40 +179,42 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     List listing = q.list();
     
     this.endTransaction();
-    //session.close();
-    
+
     return listing.get(0) == null ? BigDecimal.ZERO.setScale(2) : (BigDecimal) listing.get(0);
   }
 
   @Override
-  public void deleteChallenge(int challengeId)
+  public void deleteChallenge(Challenge challenge)
   {
     Session session = this.beginTransaction();
-    
-    
-    Challenge c = (Challenge) session.load(Challenge.class, challengeId);
-    c.getSpeedRun().getBids().remove(c);
-    
-    session.delete(c);
+
+    challenge.getSpeedRun().getBids().remove(challenge);
+
+    session.delete(challenge);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
   public List<Bid> searchBids(BidSearchParams params)
   {
+    return this.searchBidsRange(params, 0, Integer.MAX_VALUE);
+  }
+    
+  @Override
+  public List<Bid> searchBidsRange(BidSearchParams params, int offset, int size)
+  {
     String queryString = "from Bid b";
     List<String> whereClause = new ArrayList<String>();
     
     if (params.name != null)
-      whereClause.add("b.name like :name");
+      whereClause.add("lower(b.name) like :name");
     
     if (params.owner != null)
-      whereClause.add("b.speedRun = :owner");
+      whereClause.add("lower(b.speedRun) = :owner");
     
     if (params.state != null)
-      whereClause.add("b.bidState = :state");
+      whereClause.add("lower(b.bidState) = :state");
     
     if (whereClause.size() > 0)
     {
@@ -240,8 +222,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     }
     
     Session session = this.beginTransaction();
-    
-    
+
     Query q = session.createQuery(queryString + " order by b.name");
 
     if (params.name != null)
@@ -253,6 +234,9 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     if (params.state != null)
       q.setParameter("state", params.state);
 
+    q.setFirstResult(offset);
+    q.setMaxResults(size);
+    
     @SuppressWarnings("unchecked")
     List<Bid> listing = q.list();
     

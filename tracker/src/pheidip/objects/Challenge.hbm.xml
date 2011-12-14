@@ -8,7 +8,7 @@
             <column name="GOALAMOUNT" />
         </property>
         
-        <set name="bids" table="ChallengeBid" cascade="all,delete-orphan" fetch="join" lazy="true">
+        <set name="bids" table="ChallengeBid" cascade="all,delete-orphan" fetch="join" lazy="true" inverse="true">
             <key>
                 <column name="CHALLENGE" />
             </key>

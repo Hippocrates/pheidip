@@ -3,6 +3,7 @@ package pheidip.ui;
 import pheidip.logic.ChallengeControl;
 import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
+import pheidip.util.FormatUtils;
 
 import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
@@ -23,6 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 
 @SuppressWarnings("serial")
 public class ChallengePanel extends EntityPanel
@@ -30,7 +32,7 @@ public class ChallengePanel extends EntityPanel
   private MainWindow owner;
   private ChallengeControl challengeControl;
   private JTextField nameField;
-  private JTextField amountField;
+  private JFormattedTextField amountField;
   private JButton saveButton;
   private JButton refreshButton;
   private JLabel totalCollectedLabel;
@@ -89,7 +91,7 @@ public class ChallengePanel extends EntityPanel
     gbc_goalAmountLabel.gridy = 1;
     add(goalAmountLabel, gbc_goalAmountLabel);
     
-    amountField = new JTextField();
+    amountField = new JFormattedTextField(FormatUtils.getMoneyFormat());
     GridBagConstraints gbc_amountField = new GridBagConstraints();
     gbc_amountField.gridwidth = 3;
     gbc_amountField.insets = new Insets(0, 0, 5, 5);
@@ -195,6 +197,7 @@ public class ChallengePanel extends EntityPanel
       }
       catch(Exception e)
       {
+        e.printStackTrace();
         owner.report(e);
       }
     }

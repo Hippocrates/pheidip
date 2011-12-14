@@ -69,6 +69,8 @@ public class DonationBidSearchDialog extends JDialog
   private JLabel lblBidstate;
   private JCheckBox bidStateCheckBox;
   private JComboBox bidStateComboBox;
+  private JButton nextButton;
+  private JButton prevButton;
 
   private void initializeGUI()
   {
@@ -77,10 +79,10 @@ public class DonationBidSearchDialog extends JDialog
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     getContentPane().add(contentPanel, BorderLayout.CENTER);
     GridBagLayout gbl_contentPanel = new GridBagLayout();
-    gbl_contentPanel.columnWidths = new int[]{76, 0, 136, 72, 96, 0};
-    gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    gbl_contentPanel.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
-    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_contentPanel.columnWidths = new int[]{76, 0, 136, 72, 96, 96, 0};
+    gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    gbl_contentPanel.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_contentPanel);
     
     JLabel lblSpeedRun = new JLabel("Speed Run:");
@@ -118,6 +120,7 @@ public class DonationBidSearchDialog extends JDialog
     
     JScrollPane bidScrollPane = new JScrollPane();
     GridBagConstraints gbc_bidScrollPane = new GridBagConstraints();
+    gbc_bidScrollPane.gridwidth = 2;
     gbc_bidScrollPane.gridheight = 9;
     gbc_bidScrollPane.insets = new Insets(0, 0, 5, 0);
     gbc_bidScrollPane.fill = GridBagConstraints.BOTH;
@@ -240,19 +243,37 @@ public class DonationBidSearchDialog extends JDialog
     gbc_searchButton.gridy = 8;
     contentPanel.add(searchButton, gbc_searchButton);
     
+    prevButton = new JButton("Previous");
+    prevButton.setEnabled(false);
+    GridBagConstraints gbc_prevButton = new GridBagConstraints();
+    gbc_prevButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_prevButton.insets = new Insets(0, 0, 5, 5);
+    gbc_prevButton.gridx = 4;
+    gbc_prevButton.gridy = 9;
+    contentPanel.add(prevButton, gbc_prevButton);
+    
+    nextButton = new JButton("Next");
+    nextButton.setEnabled(false);
+    GridBagConstraints gbc_nextButton = new GridBagConstraints();
+    gbc_nextButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_nextButton.insets = new Insets(0, 0, 5, 0);
+    gbc_nextButton.gridx = 5;
+    gbc_nextButton.gridy = 9;
+    contentPanel.add(nextButton, gbc_nextButton);
+    
     okButton = new JButton("OK");
     GridBagConstraints gbc_okButton = new GridBagConstraints();
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
-    gbc_okButton.gridx = 3;
-    gbc_okButton.gridy = 9;
+    gbc_okButton.gridx = 4;
+    gbc_okButton.gridy = 10;
     contentPanel.add(okButton, gbc_okButton);
     
     cancelButton = new JButton("Cancel");
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_cancelButton.gridx = 4;
-    gbc_cancelButton.gridy = 9;
+    gbc_cancelButton.gridx = 5;
+    gbc_cancelButton.gridy = 10;
     contentPanel.add(cancelButton, gbc_cancelButton);
   }
   
@@ -284,6 +305,14 @@ public class DonationBidSearchDialog extends JDialog
       else if (ev.getSource() == cancelButton)
       {
         cancelDialog();
+      }
+      else if (ev.getSource() == prevButton)
+      {
+        movePrevResults();
+      }
+      else if (ev.getSource() == nextButton)
+      {
+        moveNextResults();
       }
     }
 
@@ -351,6 +380,8 @@ public class DonationBidSearchDialog extends JDialog
     this.optionList.addListSelectionListener(this.actionHandler);
     this.bidField.getDocument().addDocumentListener(this.actionHandler);
     this.optionField.getDocument().addDocumentListener(this.actionHandler);
+    this.nextButton.addActionListener(this.actionHandler);
+    this.prevButton.addActionListener(this.actionHandler);
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
@@ -364,6 +395,8 @@ public class DonationBidSearchDialog extends JDialog
       this.newChallengeButton,
       this.bidList,
       this.searchButton,
+      this.prevButton,
+      this.nextButton,
       this.okButton,
       this.cancelButton,
     });
@@ -373,19 +406,16 @@ public class DonationBidSearchDialog extends JDialog
 
   private void updateUIState()
   {
-    boolean canCreateBid = false;
     if (this.currentRun != null && !StringUtils.isEmptyOrNull(this.bidField.getText()))
     {
       this.newChallengeButton.setEnabled(true);
-      canCreateBid = true;
     }
     else
     {
       this.newChallengeButton.setEnabled(false);
-      canCreateBid = false;
     }
     
-    if ((this.getCurrentChoice() != null || canCreateBid) && !StringUtils.isEmptyOrNull(this.optionField.getText()))
+    if (this.getCurrentChoice() != null && !StringUtils.isEmptyOrNull(this.optionField.getText()))
     {
       this.newOptionButton.setEnabled(true);
     }
@@ -423,6 +453,9 @@ public class DonationBidSearchDialog extends JDialog
         this.okButton.setEnabled(true);
       }
     }
+    
+    this.nextButton.setEnabled(this.searcher.hasNext());
+    this.prevButton.setEnabled(this.searcher.hasPrev());
   }
   
   /**
@@ -560,16 +593,19 @@ public class DonationBidSearchDialog extends JDialog
     closeDialog();
   }
   
-  private void runSearch()
+  
+  private void moveNextResults()
   {
-    SpeedRun target = this.speedRunCheckBox.isSelected() ? this.currentRun : null;
-    String name = this.bidCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.bidField.getText()) : null;
-    BidState state = this.bidStateCheckBox.isSelected() ? (BidState)this.bidStateComboBox.getSelectedItem() : null;
-    
-    BidSearchParams params = new BidSearchParams(name, target, state);
-    
-    List<Bid> filtered = this.searcher.searchBids(params);
-    
+    this.fillList(this.searcher.getNext());
+  }
+  
+  private void movePrevResults()
+  {
+    this.fillList(this.searcher.getPrev());
+  }
+  
+  private void fillList(List<Bid> filtered)
+  {
     DefaultListModel listData = new DefaultListModel();
     
     for (Bid b : filtered)
@@ -578,6 +614,18 @@ public class DonationBidSearchDialog extends JDialog
     }
     
     this.bidList.setModel(listData);
+    updateUIState();
+  }
+  
+  private void runSearch()
+  {
+    SpeedRun target = this.speedRunCheckBox.isSelected() ? this.currentRun : null;
+    String name = this.bidCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.bidField.getText()) : null;
+    BidState state = this.bidStateCheckBox.isSelected() ? (BidState)this.bidStateComboBox.getSelectedItem() : null;
+    
+    BidSearchParams params = new BidSearchParams(name, target, state);
+    
+    this.fillList(this.searcher.runSearch(params));
   }
   
   private void closeDialog()

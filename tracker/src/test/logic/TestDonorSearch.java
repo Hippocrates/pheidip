@@ -30,14 +30,14 @@ public class TestDonorSearch extends TestCase
   
   public void testBasicSearch()
   {
-    List<Donor> result = this.searcher.searchDonors(new DonorSearchParams("ste", "", "", ""));
+    List<Donor> result = this.searcher.runSearch(new DonorSearchParams("ste", "", "", ""));
     
     assertEquals(2, result.size());
   }
   
   public void testBothNamesSearch()
   {
-    List<Donor> result = this.searcher.searchDonors(new DonorSearchParams("bro", "cra", "", ""));
+    List<Donor> result = this.searcher.runSearch(new DonorSearchParams("bro", "cra", "", ""));
     
     assertEquals(1, result.size());
     assertEquals(3, result.get(0).getId());
@@ -45,14 +45,14 @@ public class TestDonorSearch extends TestCase
   
   public void testAliasSearch()
   {
-    List<Donor> result = this.searcher.searchDonors(new DonorSearchParams("", "", "", "alias"));
+    List<Donor> result = this.searcher.runSearch(new DonorSearchParams("", "", "", "alias"));
     
     assertEquals(2, result.size());
   }
   
   public void testEmailSearch()
   {
-    List<Donor> result = this.searcher.searchDonors(new DonorSearchParams("", "", "@", null));
+    List<Donor> result = this.searcher.runSearch(new DonorSearchParams("", "", "@", null));
     
     assertEquals(4, result.size());
   }

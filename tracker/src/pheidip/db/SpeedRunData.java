@@ -18,4 +18,7 @@ public interface SpeedRunData {
 	public List<SpeedRun> getAllSpeedRuns();
 
 	public List<SpeedRun> searchSpeedRuns(SpeedRunSearchParams params);
+
+  public List<SpeedRun> searchSpeedRunsRange(SpeedRunSearchParams params, int offset,
+      int size);
 }

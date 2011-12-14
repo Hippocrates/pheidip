@@ -27,30 +27,6 @@ public class TestDonorData extends DonationDatabaseTest
     assertNull(donors.getDonorById(0));
   }
   
-  public void testGetDonorByEmail()
-  {
-    Donor result = this.donors.getDonorByEmail("test2@test.com");
-    
-    assertNotNull(result);
-    assertEquals(2, result.getId());
-    assertEquals("test2@test.com", result.getEmail());
-    assertEquals("analias", result.getAlias());
-    
-    assertNull(donors.getDonorByEmail("test5@test.com"));
-  }
-  
-  public void testGetDonorByAlias()
-  {
-    Donor result = this.donors.getDonorByAlias("anotheralias");
-    
-    assertNotNull(result);
-    assertEquals(4, result.getId());
-    assertEquals("test4@test.com", result.getEmail());
-    assertEquals("anotheralias", result.getAlias());
-    
-    assertNull(donors.getDonorByAlias("test5@test.com"));
-  }
-  
   public void testGetAllDonors()
   {
     List<Donor> result = this.donors.getAllDonors();

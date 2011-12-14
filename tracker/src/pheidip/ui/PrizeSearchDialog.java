@@ -2,7 +2,6 @@ package pheidip.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -16,6 +15,7 @@ import javax.swing.event.ListSelectionListener;
 
 import pheidip.logic.PrizeSearch;
 import pheidip.objects.Prize;
+import pheidip.objects.PrizeSearchParams;
 import pheidip.util.StringUtils;
 
 import java.awt.GridBagLayout;
@@ -48,6 +48,9 @@ public class PrizeSearchDialog extends JDialog
   private JButton createNewButton;
   private JButton searchButton;
   private JCheckBox excludeIfWonCheckBox;
+  private JCheckBox prizeNameCheckBox;
+  private JButton prevButton;
+  private JButton nextButton;
 
   private void initializeGUI()
   {
@@ -57,10 +60,10 @@ public class PrizeSearchDialog extends JDialog
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     getContentPane().add(contentPanel, BorderLayout.CENTER);
     GridBagLayout gbl_contentPanel = new GridBagLayout();
-    gbl_contentPanel.columnWidths = new int[]{72, 0, 91, 146, 0};
-    gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
-    gbl_contentPanel.columnWeights = new double[]{0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
-    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gbl_contentPanel.columnWidths = new int[]{72, 0, 0, 91, 98, 86, 0};
+    gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+    gbl_contentPanel.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_contentPanel);
     {
       nameLabel = new JLabel("Name:");
@@ -72,12 +75,20 @@ public class PrizeSearchDialog extends JDialog
       contentPanel.add(nameLabel, gbc_nameLabel);
     }
     {
+      prizeNameCheckBox = new JCheckBox("");
+      GridBagConstraints gbc_prizeNameCheckBox = new GridBagConstraints();
+      gbc_prizeNameCheckBox.insets = new Insets(0, 0, 5, 5);
+      gbc_prizeNameCheckBox.gridx = 1;
+      gbc_prizeNameCheckBox.gridy = 0;
+      contentPanel.add(prizeNameCheckBox, gbc_prizeNameCheckBox);
+    }
+    {
       nameField = new JTextField();
       GridBagConstraints gbc_nameField = new GridBagConstraints();
       gbc_nameField.gridwidth = 2;
       gbc_nameField.insets = new Insets(0, 0, 5, 5);
       gbc_nameField.fill = GridBagConstraints.HORIZONTAL;
-      gbc_nameField.gridx = 1;
+      gbc_nameField.gridx = 2;
       gbc_nameField.gridy = 0;
       contentPanel.add(nameField, gbc_nameField);
       nameField.setColumns(10);
@@ -85,9 +96,11 @@ public class PrizeSearchDialog extends JDialog
     {
       prizeScrollPane = new JScrollPane();
       GridBagConstraints gbc_prizeScrollPane = new GridBagConstraints();
+      gbc_prizeScrollPane.insets = new Insets(0, 0, 5, 0);
+      gbc_prizeScrollPane.gridwidth = 2;
       gbc_prizeScrollPane.gridheight = 5;
       gbc_prizeScrollPane.fill = GridBagConstraints.BOTH;
-      gbc_prizeScrollPane.gridx = 3;
+      gbc_prizeScrollPane.gridx = 4;
       gbc_prizeScrollPane.gridy = 0;
       contentPanel.add(prizeScrollPane, gbc_prizeScrollPane);
       {
@@ -99,7 +112,7 @@ public class PrizeSearchDialog extends JDialog
       excludeIfWonCheckBox = new JCheckBox("Exclude If Won");
       GridBagConstraints gbc_excludeIfWonCheckBox = new GridBagConstraints();
       gbc_excludeIfWonCheckBox.insets = new Insets(0, 0, 5, 5);
-      gbc_excludeIfWonCheckBox.gridx = 1;
+      gbc_excludeIfWonCheckBox.gridx = 2;
       gbc_excludeIfWonCheckBox.gridy = 1;
       contentPanel.add(excludeIfWonCheckBox, gbc_excludeIfWonCheckBox);
     }
@@ -108,7 +121,7 @@ public class PrizeSearchDialog extends JDialog
       GridBagConstraints gbc_searchButton = new GridBagConstraints();
       gbc_searchButton.fill = GridBagConstraints.HORIZONTAL;
       gbc_searchButton.insets = new Insets(0, 0, 5, 5);
-      gbc_searchButton.gridx = 1;
+      gbc_searchButton.gridx = 2;
       gbc_searchButton.gridy = 2;
       contentPanel.add(searchButton, gbc_searchButton);
     }
@@ -117,26 +130,50 @@ public class PrizeSearchDialog extends JDialog
       GridBagConstraints gbc_createNewButton = new GridBagConstraints();
       gbc_createNewButton.fill = GridBagConstraints.HORIZONTAL;
       gbc_createNewButton.insets = new Insets(0, 0, 5, 5);
-      gbc_createNewButton.gridx = 1;
+      gbc_createNewButton.gridx = 2;
       gbc_createNewButton.gridy = 3;
       contentPanel.add(createNewButton, gbc_createNewButton);
     }
     {
-      JPanel buttonPane = new JPanel();
-      buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-      getContentPane().add(buttonPane, BorderLayout.SOUTH);
-      {
-        okButton = new JButton("OK");
-        okButton.setEnabled(false);
-        okButton.setActionCommand("OK");
-        buttonPane.add(okButton);
-        getRootPane().setDefaultButton(okButton);
-      }
-      {
-        cancelButton = new JButton("Cancel");
-        cancelButton.setActionCommand("Cancel");
-        buttonPane.add(cancelButton);
-      }
+      prevButton = new JButton("Previous");
+      prevButton.setEnabled(false);
+      GridBagConstraints gbc_prevButton = new GridBagConstraints();
+      gbc_prevButton.fill = GridBagConstraints.HORIZONTAL;
+      gbc_prevButton.insets = new Insets(0, 0, 5, 5);
+      gbc_prevButton.gridx = 4;
+      gbc_prevButton.gridy = 5;
+      contentPanel.add(prevButton, gbc_prevButton);
+    }
+    {
+      nextButton = new JButton("Next");
+      nextButton.setEnabled(false);
+      GridBagConstraints gbc_nextButton = new GridBagConstraints();
+      gbc_nextButton.fill = GridBagConstraints.HORIZONTAL;
+      gbc_nextButton.insets = new Insets(0, 0, 5, 0);
+      gbc_nextButton.gridx = 5;
+      gbc_nextButton.gridy = 5;
+      contentPanel.add(nextButton, gbc_nextButton);
+    }
+    {
+      okButton = new JButton("OK");
+      GridBagConstraints gbc_okButton = new GridBagConstraints();
+      gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
+      gbc_okButton.insets = new Insets(0, 0, 0, 5);
+      gbc_okButton.gridx = 4;
+      gbc_okButton.gridy = 6;
+      contentPanel.add(okButton, gbc_okButton);
+      okButton.setEnabled(false);
+      okButton.setActionCommand("OK");
+      getRootPane().setDefaultButton(okButton);
+    }
+    {
+      cancelButton = new JButton("Cancel");
+      GridBagConstraints gbc_cancelButton = new GridBagConstraints();
+      gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
+      gbc_cancelButton.gridx = 5;
+      gbc_cancelButton.gridy = 6;
+      contentPanel.add(cancelButton, gbc_cancelButton);
+      cancelButton.setActionCommand("Cancel");
     }
   }
   
@@ -162,6 +199,14 @@ public class PrizeSearchDialog extends JDialog
         {
           runSearch();
         }
+        else if (ev.getSource() == nextButton)
+        {
+          moveNextResults();
+        }
+        else if (ev.getSource() == prevButton)
+        {
+          movePrevResults();
+        }
       }
       catch (Exception e)
       {
@@ -172,16 +217,9 @@ public class PrizeSearchDialog extends JDialog
     @Override
     public void valueChanged(ListSelectionEvent ev)
     {
-      try
+      if (ev.getSource() == prizeList)
       {
-        if (ev.getSource() == prizeList)
-        {
-          okButton.setEnabled(prizeList.getSelectedValue() != null);
-        }
-      }
-      catch (Exception e)
-      {
-        JOptionPane.showMessageDialog(PrizeSearchDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+          updateUIState();
       }
     }
   }
@@ -194,11 +232,18 @@ public class PrizeSearchDialog extends JDialog
     this.prizeList.addListSelectionListener(this.actionHandler);
     this.cancelButton.addActionListener(this.actionHandler);
     this.okButton.addActionListener(this.actionHandler);
+    this.createNewButton.addActionListener(this.actionHandler);
+    this.nextButton.addActionListener(this.actionHandler);
+    this.prevButton.addActionListener(this.actionHandler);
     
     this.traversalManager = new FocusTraversalManager(new Component[]
     {
       this.nameField,
       this.prizeList,
+      this.createNewButton,
+      this.prizeList,
+      this.prevButton,
+      this.nextButton,
       this.okButton,
       this.cancelButton,
     });
@@ -221,11 +266,19 @@ public class PrizeSearchDialog extends JDialog
   {
     return this.selectedPrize;
   }
-  
-  private void runSearch()
+
+  private void moveNextResults()
   {
-    List<Prize> filtered = this.searcher.searchPrizes(StringUtils.nullIfEmpty(this.nameField.getText()), this.excludeIfWonCheckBox.isSelected());
-    
+    this.fillList(this.searcher.getNext());
+  }
+  
+  private void movePrevResults()
+  {
+    this.fillList(this.searcher.getPrev());
+  }
+  
+  private void fillList(List<Prize> filtered)
+  {
     DefaultListModel listData = new DefaultListModel();
     
     for (Prize p : filtered)
@@ -234,6 +287,19 @@ public class PrizeSearchDialog extends JDialog
     }
     
     this.prizeList.setModel(listData);
+    this.updateUIState();
+  }
+  
+  private void updateUIState()
+  {
+    this.okButton.setEnabled(!this.prizeList.isSelectionEmpty());
+  }
+
+  private void runSearch()
+  {
+    PrizeSearchParams params = new PrizeSearchParams(this.prizeNameCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.nameField.getText()) : null, this.excludeIfWonCheckBox.isSelected());
+    
+    this.fillList(this.searcher.runSearch(params));
   }
   
   private void createFromFields()

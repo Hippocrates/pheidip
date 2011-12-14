@@ -406,8 +406,13 @@ public class PrizePanel extends EntityPanel
   @Override
   public void deleteContent()
   {
-    this.control.deletePrize();
-    this.owner.removeTab(this);
+    int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this prize?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+    
+    if (result == JOptionPane.OK_OPTION)
+    {
+      this.control.deletePrize();
+      this.owner.removeTab(this);
+    }
   }
 
   @Override

@@ -50,10 +50,16 @@ abstract public class HibernateDataInterface
       throw new RuntimeException(e);
     }
 	}
-	
+
 	public Session beginTransaction()
 	{
+	  if (this.manager.getSession().getTransaction().isActive())
+	  {
+	    this.manager.getSession().getTransaction().rollback();
+	  }
+	  
 	  this.manager.getSession().beginTransaction();
+	  
 	  return this.manager.getSession();
 	}
 	

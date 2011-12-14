@@ -76,7 +76,7 @@ public class TestBidData extends DonationDatabaseTest
     
     assertNotNull(this.bids.getChoiceById(choiceId));
     
-    this.bids.deleteChoice(choiceId);
+    this.bids.deleteChoice(this.bids.getChoiceById(choiceId));
     
     assertNull(this.bids.getChoiceById(choiceId));
   }
@@ -135,7 +135,7 @@ public class TestBidData extends DonationDatabaseTest
     
     assertNotNull(this.bids.getChoiceOptionById(choiceOptionId));
     
-    this.bids.deleteChoiceOption(choiceOptionId);
+    this.bids.deleteChoiceOption(this.bids.getChoiceOptionById(choiceOptionId));
     
     assertNull(this.bids.getChoiceOptionById(choiceOptionId));
   }
@@ -199,7 +199,7 @@ public class TestBidData extends DonationDatabaseTest
     
     assertNotNull(this.bids.getChallengeById(challengeId));
     
-    this.bids.deleteChallenge(challengeId);
+    this.bids.deleteChallenge(this.bids.getChallengeById(challengeId));
     
     assertNull(this.bids.getChallengeById(challengeId));
   }

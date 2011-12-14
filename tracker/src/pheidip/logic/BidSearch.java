@@ -1,5 +1,6 @@
 package pheidip.logic;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import pheidip.objects.ChoiceOptionSearchParams;
 import pheidip.objects.SpeedRun;
 import pheidip.util.Filter;
 
-public class BidSearch
+public class BidSearch extends AbstractSearcher<Bid, BidSearchParams>
 {
   private DonationDatabaseManager manager;
   private BidData bids;
@@ -39,6 +40,7 @@ public class BidSearch
     result.setSpeedRun(speedRun);
     result.setName(name);
     result.setBidState(BidState.HIDDEN);
+    result.setGoalAmount(BigDecimal.ZERO);
     speedRun.getBids().add(result);
     this.speedRuns.updateSpeedRun(speedRun);
     
@@ -59,21 +61,24 @@ public class BidSearch
   
   public ChoiceOption createOptionIfAble(Choice owner, String optionName)
   {
+    // this is neccessary since the speedRun in question will have been a bulk transaction result
+    owner = this.bids.getChoiceById(owner.getId());
     ChoiceOption toAdd = new ChoiceOption();
     toAdd.setName(optionName);
     owner.getOptions().add(toAdd);
     this.bids.updateChoice(owner);
     return toAdd;
   }
-  
-  public List<Bid> searchBids(BidSearchParams params)
-  {
-    return this.bids.searchBids(params);
-  }
-  
+
   public List<Bid> filterBids(BidSearchParams params)
   {
     return Filter.filterList(new ArrayList<Bid>(params.owner.getBids()), params);
+  }
+
+  @Override
+  protected List<Bid> implRunSearch(BidSearchParams params, int searchOffset, int searchSize)
+  {
+    return this.bids.searchBidsRange(params, searchOffset, searchSize);
   }
   
   // params.owner must not be null

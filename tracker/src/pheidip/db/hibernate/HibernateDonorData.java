@@ -10,6 +10,7 @@ import org.hibernate.StatelessSession;
 import pheidip.db.DonorData;
 import pheidip.objects.Donor;
 import pheidip.objects.DonorSearchParams;
+import pheidip.objects.Prize;
 import pheidip.util.StringUtils;
 
 public class HibernateDonorData extends HibernateDataInterface implements DonorData 
@@ -24,60 +25,11 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	{
 	  Session session = this.beginTransaction();
 	  
-	  
 	  Donor d = (Donor) session.get(Donor.class, donorId);
 
 	  this.endTransaction();
 	  
 	  return d;
-	}
-
-	@Override
-	public Donor getDonorByEmail(String email) 
-	{
-	  Donor result = null;
-	  
-	  Session session = this.beginTransaction();
-
-	  Query q = session.createQuery("from Donor d where d.email = :email");
-
-	  q.setString("email", email);
-	  
-	  @SuppressWarnings("unchecked")
-    List<Donor> listing = q.list();
-	  
-	  if (listing.size() == 1)
-	  {
-	    result = listing.get(0);
-	  }
-	  
-	  this.endTransaction();
-		  
-	  return result;
-	}
-
-	@Override
-	public Donor getDonorByAlias(String alias) 
-	{
-    Donor result = null;
-    
-    Session session = this.beginTransaction();
-
-    Query q = session.createQuery("from Donor d where alias = :alias");
-
-    q.setString("alias", alias);
-    
-    @SuppressWarnings("unchecked")
-    List<Donor> listing = q.list();
-    
-    if (listing.size() == 1)
-    {
-      result = listing.get(0);
-    }
-    
-    this.endTransaction();
-
-    return result;
 	}
 
 	@Override
@@ -114,6 +66,14 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	public void deleteDonor(Donor d) 
 	{
 	  Session session = this.beginTransaction();
+	  
+	  for (Prize p : d.getPrizes())
+	  {
+	    p.setWinner(null);
+	  }
+	  
+	  d.getPrizes().clear();
+	  
     session.delete(d);
     this.endTransaction();
 	}
@@ -145,24 +105,31 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
       
     this.endTransaction();
 	}
+	
 
   @Override
   public List<Donor> searchDonors(DonorSearchParams params)
+  {
+    return this.searchDonorsRange(params, 0, Integer.MAX_VALUE);
+  }
+	
+	@Override
+  public List<Donor> searchDonorsRange(DonorSearchParams params, int offset, int size)
   {
     String queryString = "from Donor d";
     List<String> whereClause = new ArrayList<String>();
     
     if (params.firstName != null)
-      whereClause.add("d.firstName like :firstName");
+      whereClause.add("lower(d.firstName) like :firstName");
     
     if (params.lastName != null)
-      whereClause.add("d.lastName like :lastName");
+      whereClause.add("lower(d.lastName) like :lastName");
     
     if (params.email != null)
-      whereClause.add("d.email like :email");
+      whereClause.add("lower(d.email) like :email");
     
     if (params.alias != null)
-      whereClause.add("d.alias like :alias");
+      whereClause.add("lower(d.alias) like :alias");
     
     if (whereClause.size() > 0)
     {
@@ -185,11 +152,14 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
     if (params.alias != null)
       q.setString("alias", StringUtils.sqlInnerStringMatch(params.alias));
     
+    q.setFirstResult(offset);
+    q.setMaxResults(size + 1);
+    
     @SuppressWarnings("unchecked")
     List<Donor> listing = q.list();
     
     this.endBulkTransaction(dedicatedSession);
-    
+
     return listing;
   }
 

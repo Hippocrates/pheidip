@@ -6,11 +6,12 @@ import pheidip.db.DonationData;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationSearchParams;
 
-public class DonationSearch
+public class DonationSearch extends AbstractSearcher<Donation, DonationSearchParams>
 {
+  public final static int DEFAULT_SEARCH_SIZE = 20;
+  
   private DonationDatabaseManager manager;
   private DonationData donations;
-  List<Donation> cachedDonations;
 
   public DonationSearch(DonationDatabaseManager manager)
   {
@@ -22,9 +23,10 @@ public class DonationSearch
   {
     return new DonorSearch(this.manager);
   }
-  
-  public List<Donation> searchDonations(DonationSearchParams param)
+
+  @Override
+  protected List<Donation> implRunSearch(DonationSearchParams params, int searchOffset, int searchSize)
   {
-    return this.donations.searchDonations(param);
+    return this.donations.searchDonationsRange(params, searchOffset, searchSize);
   }
 }

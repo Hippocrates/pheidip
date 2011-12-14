@@ -23,12 +23,10 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
   {
     Session session = this.beginTransaction();
     
-    
     SpeedRun s = (SpeedRun) session.get(SpeedRun.class, runId);
 
     this.endTransaction();
-    //session.close();
-    
+
     return s;
   }
 
@@ -37,11 +35,9 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
   {
     Session session = this.beginTransaction();
     
-    
     session.save(speedRun);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -50,39 +46,33 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
     SpeedRun s = this.getSpeedRunById(runId);
     
     Session session = this.beginTransaction();
-    
-    
+
     session.delete(s);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
   public void updateSpeedRun(SpeedRun run)
   {
     Session session = this.beginTransaction();
-    
-    
+
     session.merge(run);
     
     this.endTransaction();
-    //session.close();
   }
 
   @Override
   public List<SpeedRun> getAllSpeedRuns()
   {
     Session session = this.beginTransaction();
-    
-    
+
     Query q = session.createQuery("From SpeedRun order by id");
     
     @SuppressWarnings("unchecked")
     List<SpeedRun> listing = q.list();
     
     this.endTransaction();
-    //session.close();
     
     return listing;
   }
@@ -90,11 +80,17 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
   @Override
   public List<SpeedRun> searchSpeedRuns(SpeedRunSearchParams params)
   {
+    return this.searchSpeedRunsRange(params, 0, Integer.MAX_VALUE);
+  }
+  
+  @Override
+  public List<SpeedRun> searchSpeedRunsRange(SpeedRunSearchParams params, int offset, int size)
+  {
     String queryString = "from SpeedRun s";
     List<String> whereClause = new ArrayList<String>();
     
     if (params.name != null)
-      whereClause.add("s.name like :name");
+      whereClause.add("lower(s.name) like :name");
 
     if (whereClause.size() > 0)
     {
@@ -103,18 +99,19 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
     
     Session session = this.beginTransaction();
     
-    
     Query q = session.createQuery(queryString + " order by s.name");
 
     if (params.name != null)
       q.setString("name", StringUtils.sqlInnerStringMatch(params.name));
     
+    q.setFirstResult(offset);
+    q.setMaxResults(size);
+    
     @SuppressWarnings("unchecked")
     List<SpeedRun> listing = q.list();
     
     this.endTransaction();
-    //session.close();
-    
+
     return listing;
   }
 

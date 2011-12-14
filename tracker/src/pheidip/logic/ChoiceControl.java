@@ -9,6 +9,7 @@ import java.util.List;
 import pheidip.db.BidData;
 import pheidip.db.DonationDataConstraintException;
 import pheidip.objects.Choice;
+import pheidip.objects.ChoiceBid;
 import pheidip.objects.ChoiceOption;
 import pheidip.util.IdUtils;
 import pheidip.util.Pair;
@@ -74,13 +75,28 @@ public class ChoiceControl
   
   public void deleteOption(ChoiceOption option)
   {
-     this.bids.deleteChoiceOption(option.getId());
-     this.getData().getOptions().remove(option);
+    for (ChoiceBid b : option.getBids())
+    {
+      b.setOption(null);
+      b.getDonation().getBids().remove(b);
+      b.setDonation(null);
+    }
+    option.getBids().clear();
+
+    this.getData().getOptions().remove(option);
+    this.bids.deleteChoiceOption(option);
   }
   
   public void deleteChoice()
   {
-    this.bids.deleteChoice(this.choiceId);
+    Choice c = this.refreshData();
+    
+    for (ChoiceOption o : c.getOptions())
+    {
+      this.deleteOption(o);
+    }
+
+    this.bids.deleteChoice(this.refreshData());
     this.cachedData = null;
   }
 

@@ -8,6 +8,12 @@ public class PrizeSearchParams implements FilterFunction<Prize>
   public String name;
   public boolean excludeIfWon;
 
+  public PrizeSearchParams(String name, boolean excludeIfWon)
+  {
+    this.name = name;
+    this.excludeIfWon = excludeIfWon;
+  }
+
   @Override
   public boolean predicate(Prize x)
   {

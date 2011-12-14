@@ -21,7 +21,7 @@
     <param name="enumClass">pheidip.objects.BidState</param>
    </type>
   </property>
-  <many-to-one class="pheidip.objects.SpeedRun" fetch="join"
+  <many-to-one class="pheidip.objects.SpeedRun" fetch="join" lazy="false"
    foreign-key="BidFKSpeedRun" name="speedRun">
    <column name="SPEEDRUN" unique-key="ChoiceNameUnique"/>
   </many-to-one>

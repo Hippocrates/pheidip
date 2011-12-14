@@ -1,6 +1,7 @@
 package pheidip.objects;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 import pheidip.util.IdUtils;
@@ -14,7 +15,7 @@ public class Challenge implements Bid
   private String description;
   private BidState bidState;
   private SpeedRun speedRun;
-  private Set<ChallengeBid> bids;
+  private Set<ChallengeBid> bids = new HashSet<ChallengeBid>();
   
   public Challenge()
   {
@@ -57,7 +58,7 @@ public class Challenge implements Bid
 
   public void setGoalAmount(BigDecimal goalAmount)
   {
-    this.goalAmount = goalAmount;
+    this.goalAmount = goalAmount.setScale(2);
   }
 
   public String getDescription()

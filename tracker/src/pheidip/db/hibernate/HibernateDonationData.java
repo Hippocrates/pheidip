@@ -1,7 +1,5 @@
 package pheidip.db.hibernate;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,10 +11,8 @@ import org.hibernate.StatelessSession;
 import pheidip.db.DonationData;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBid;
-import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationSearchParams;
-import pheidip.objects.Donor;
 import pheidip.util.StringUtils;
 
 public class HibernateDonationData extends HibernateDataInterface implements DonationData
@@ -30,114 +26,23 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   public Donation getDonationById(int id)
   {
     Session session = this.beginTransaction();
-    
-    
+
     Donation d = (Donation) session.get(Donation.class, id);
 
     this.endTransaction();
-    //session.close();
     
     return d;
   }
 
   @Override
-  public List<Donation> getDonorDonations(int donorId)
-  {
-    List<Donation> list = new ArrayList<Donation>();
-    
-    Session session = this.beginTransaction();
-    
-    
-    Donor d = (Donor) session.load(Donor.class, donorId);
-    
-    session.update(d);
-    
-    for (Donation donation : d.getDonations())
-    {
-      list.add(donation);
-    }
-    
-    this.endTransaction();
-    //session.close();
-    
-    return list;
-  }
-
-  @Override
-  public BigDecimal getDonorDonationTotal(int id)
-  {
-    BigDecimal sum = BigDecimal.ZERO;
-    
-    Session session = this.beginTransaction();
-    
-    
-    Donor d = (Donor) session.load(Donor.class, id);
-
-    for (Donation donation : d.getDonations())
-    {
-      sum = sum.add(donation.getAmount());
-    }
-    
-    this.endTransaction();
-    //session.close();
-    
-    return sum.setScale(2, RoundingMode.FLOOR);
-  }
-
-  @Override
-  public void setDonationComment(int id, String comment)
+  public void deleteDonation(Donation d)
   {
     Session session = this.beginTransaction();
     
-    
-    Donation d = (Donation) session.get(Donation.class, id);
-    d.setComment(comment);
-    session.flush();
-
-    this.endTransaction();
-    //session.close();
-  }
-
-  @Override
-  public void deleteDonation(int id)
-  {
-    Session session = this.beginTransaction();
-    
-    
-    Donation d = (Donation) session.get(Donation.class, id);
     d.getDonor().getDonations().remove(d);
     session.delete(d);
 
     this.endTransaction();
-    //session.close();
-  }
-
-  @Override
-  public void setDonationBidState(int id, DonationBidState bidState)
-  {
-    Session session = this.beginTransaction();
-    
-    
-    Donation d = (Donation) session.get(Donation.class, id);
-    d.setBidState(bidState);
-    session.flush();
-
-    this.endTransaction();
-    //session.close();
-  }
-
-  @Override
-  public void setDonationAmount(int donationId, BigDecimal amount)
-  {
-    Session session = this.beginTransaction();
-    
-    
-    Donation d = (Donation) session.get(Donation.class, donationId);
-    d.setAmount(amount);
-    session.flush();
-
-    this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -162,8 +67,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     Donation result = null;
     
     Session session = this.beginTransaction();
-    
-    
+
     Query q = session.createQuery("from Donation d inner join fetch d.donor where d.domain = :domain and d.domainId = :domainid");
     q.setString("domain", domain.toString());
     q.setString("domainid", domainId);
@@ -177,34 +81,8 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     }
     
     this.endTransaction();
-    //session.close();
     
     return result;
-  }
-
-  @Override
-  public void updateChallengeBidAmount(int challengeBidId, BigDecimal newAmount)
-  {
-    Session session = this.beginTransaction();
-
-    DonationBid b = (DonationBid) session.load(DonationBid.class, challengeBidId);
-    b.setAmount(newAmount);
-    session.flush();
-    
-    this.endTransaction();
-  }
-
-  @Override
-  public void updateChoiceBidAmount(int choiceBidId, BigDecimal newAmount)
-  {
-    Session session = this.beginTransaction(); 
-    
-    DonationBid b = (DonationBid) session.load(DonationBid.class, choiceBidId);
-    b.setAmount(newAmount);
-    session.flush();
-    
-    this.endTransaction();
-    //session.close();
   }
 
   @Override
@@ -258,7 +136,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   }
 
   @Override
-  public List<Donation> searchDonations(DonationSearchParams params)
+  public List<Donation> searchDonationsRange(DonationSearchParams params, int offset, int size)
   {
     String queryString = "from Donation d inner join fetch d.donor";
     List<String> whereClause = new ArrayList<String>();
@@ -301,7 +179,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     StatelessSession dedicatedSession = this.beginBulkTransaction();
     
     Query q = dedicatedSession.createQuery(queryString + " order by d.timeReceived");
-
+    
     if (params.donor != null)
       q.setParameter("donor", params.donor);
     
@@ -332,12 +210,21 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     if (params.targetCommentState != null)
       q.setParameter("commentState", params.targetCommentState);
     
+    q.setFirstResult(offset);
+    q.setMaxResults(size);
+    
     @SuppressWarnings("unchecked")
     List<Donation> listing = q.list();
     
     this.endBulkTransaction(dedicatedSession);
     
     return listing;
+  }
+  
+  @Override
+  public List<Donation> searchDonations(DonationSearchParams params)
+  {
+    return this.searchDonationsRange(params, 0, Integer.MAX_VALUE);
   }
 
   @Override
@@ -364,6 +251,30 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
     }
     
     this.endBulkTransaction(dedicatedSession);
+  }
+
+  @Override
+  public void addDonationBid(DonationBid added)
+  {
+    Session session = this.beginTransaction();
+    session.save(added);
+    this.endTransaction();
+  }
+
+  @Override
+  public void updateDonationBid(DonationBid update)
+  {
+    Session session = this.beginTransaction();
+    session.merge(update);
+    this.endTransaction();
+  }
+
+  @Override
+  public void deleteDonationBid(DonationBid remove)
+  {
+    Session session = this.beginTransaction();
+    session.delete(remove);
+    this.endTransaction();
   }
 
 }
