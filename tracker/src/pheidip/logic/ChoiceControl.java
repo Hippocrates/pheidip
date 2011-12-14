@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import pheidip.db.BidData;
+import pheidip.db.DonationData;
 import pheidip.db.DonationDataConstraintException;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceBid;
@@ -18,6 +19,7 @@ public class ChoiceControl
 {
   private DonationDatabaseManager donationDatabase;
   private BidData bids;
+  private DonationData donations;
   private int choiceId;
   private Choice cachedData;
 
@@ -25,6 +27,7 @@ public class ChoiceControl
   {
     this.donationDatabase = donationDatabase;
     this.choiceId = choiceId;
+    this.donations = this.donationDatabase.getDataAccess().getDonationData();
     this.bids = this.donationDatabase.getDataAccess().getBids();
     this.cachedData = null;
   }
@@ -68,22 +71,30 @@ public class ChoiceControl
     }
   }
   
-  public BigDecimal getOptionTotal(int choiceOptionId)
+  public List<ChoiceBid> getAssociatedBids(ChoiceOption option)
   {
-    return this.bids.getChoiceOptionTotal(choiceOptionId);
+    return new ArrayList<ChoiceBid>(option.getBids());
+  }
+  
+  public BigDecimal getOptionTotal(ChoiceOption option)
+  {
+    BigDecimal result = BigDecimal.ZERO;
+    
+    for (ChoiceBid b : getAssociatedBids(option))
+    {
+      result = result.add(b.getAmount());
+    }
+    
+    return result.setScale(2);//this.bids.getChoiceOptionTotal(choiceOptionId);
   }
   
   public void deleteOption(ChoiceOption option)
   {
-    for (ChoiceBid b : option.getBids())
+    for (ChoiceBid b : getAssociatedBids(option))
     {
-      b.setOption(null);
-      b.getDonation().getBids().remove(b);
-      b.setDonation(null);
+      this.donations.deleteDonationBid(b);
     }
-    option.getBids().clear();
 
-    this.getData().getOptions().remove(option);
     this.bids.deleteChoiceOption(option);
   }
   
@@ -127,7 +138,7 @@ public class ChoiceControl
     
     for (ChoiceOption o : options)
     {
-      result.add(new Pair<ChoiceOption, BigDecimal>(o, this.getOptionTotal(o.getId())));
+      result.add(new Pair<ChoiceOption, BigDecimal>(o, this.getOptionTotal(o)));
     }
     
     if (returnSorted)

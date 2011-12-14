@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pheidip.db.BidData;
-import pheidip.db.SpeedRunData;
 import pheidip.objects.Bid;
 import pheidip.objects.BidSearchParams;
 import pheidip.objects.BidState;
@@ -20,13 +19,11 @@ public class BidSearch extends AbstractSearcher<Bid, BidSearchParams>
 {
   private DonationDatabaseManager manager;
   private BidData bids;
-  private SpeedRunData speedRuns;
 
   public BidSearch(DonationDatabaseManager manager)
   {
     this.manager = manager;
     this.bids = this.manager.getDataAccess().getBids();
-    this.speedRuns = this.manager.getDataAccess().getSpeedRuns();
   }
   
   public SpeedRunSearch createSpeedRunSearch()
@@ -42,7 +39,8 @@ public class BidSearch extends AbstractSearcher<Bid, BidSearchParams>
     result.setBidState(BidState.HIDDEN);
     result.setGoalAmount(BigDecimal.ZERO);
     speedRun.getBids().add(result);
-    this.speedRuns.updateSpeedRun(speedRun);
+
+    this.bids.insertChallenge(result);
     
     return result;
   }
@@ -54,7 +52,8 @@ public class BidSearch extends AbstractSearcher<Bid, BidSearchParams>
     result.setName(name);
     result.setBidState(BidState.HIDDEN);
     speedRun.getBids().add(result);
-    this.speedRuns.updateSpeedRun(speedRun);
+
+    this.bids.insertChoice(result);
     
     return result;
   }
@@ -65,8 +64,11 @@ public class BidSearch extends AbstractSearcher<Bid, BidSearchParams>
     owner = this.bids.getChoiceById(owner.getId());
     ChoiceOption toAdd = new ChoiceOption();
     toAdd.setName(optionName);
+    toAdd.setChoice(owner);
     owner.getOptions().add(toAdd);
-    this.bids.updateChoice(owner);
+
+    this.bids.insertChoiceOption(toAdd);
+
     return toAdd;
   }
 

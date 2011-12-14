@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
 import javax.swing.JScrollPane;
@@ -282,37 +283,44 @@ public class DonationBidSearchDialog extends JDialog
     @Override
     public void actionPerformed(ActionEvent ev)
     {
-      if (ev.getSource() == browseSpeedRunButton)
+      try
       {
-        openBrowseDialog();
+        if (ev.getSource() == browseSpeedRunButton)
+        {
+          openBrowseDialog();
+        }
+        else if (ev.getSource() == newOptionButton)
+        {
+          createNewOption();
+        }
+        else if (ev.getSource() == newChallengeButton)
+        {
+          createNewChallenge();
+        }
+        else if (ev.getSource() == searchButton)
+        {
+          runSearch();
+        }
+        else if (ev.getSource() == okButton)
+        {
+          returnValue();
+        }
+        else if (ev.getSource() == cancelButton)
+        {
+          cancelDialog();
+        }
+        else if (ev.getSource() == prevButton)
+        {
+          movePrevResults();
+        }
+        else if (ev.getSource() == nextButton)
+        {
+          moveNextResults();
+        }
       }
-      else if (ev.getSource() == newOptionButton)
+      catch(Exception e)
       {
-        createNewOption();
-      }
-      else if (ev.getSource() == newChallengeButton)
-      {
-        createNewChallenge();
-      }
-      else if (ev.getSource() == searchButton)
-      {
-        runSearch();
-      }
-      else if (ev.getSource() == okButton)
-      {
-        returnValue();
-      }
-      else if (ev.getSource() == cancelButton)
-      {
-        cancelDialog();
-      }
-      else if (ev.getSource() == prevButton)
-      {
-        movePrevResults();
-      }
-      else if (ev.getSource() == nextButton)
-      {
-        moveNextResults();
+        JOptionPane.showMessageDialog(DonationBidSearchDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       }
     }
 

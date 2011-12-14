@@ -9,6 +9,9 @@ import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 
 import pheidip.db.DonationData;
+import pheidip.objects.BidType;
+import pheidip.objects.ChallengeBid;
+import pheidip.objects.ChoiceBid;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBid;
 import pheidip.objects.DonationDomain;
@@ -273,6 +276,18 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   public void deleteDonationBid(DonationBid remove)
   {
     Session session = this.beginTransaction();
+    
+    if (remove.getType() == BidType.CHOICE)
+    {
+      ((ChoiceBid)remove).getOption().getBids().remove((ChoiceBid)remove);
+    }
+    else if (remove.getType() == BidType.CHALLENGE)
+    {
+      ((ChallengeBid)remove).getChallenge().getBids().remove((ChallengeBid)remove);
+    }
+    
+    remove.getDonation().getBids().remove(remove);
+    
     session.delete(remove);
     this.endTransaction();
   }

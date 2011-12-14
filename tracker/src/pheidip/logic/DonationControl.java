@@ -155,6 +155,8 @@ public class DonationControl
       throw new RuntimeException("Total of all bids cannot exceed donation amount.");
     }
     
+    this.updateData(data);
+    
     return created;
   }
   
@@ -173,20 +175,6 @@ public class DonationControl
   
   public void removeBid(DonationBid bid)
   {
-    this.getData().getBids().remove(bid);
-    
-    if (bid.getType() == BidType.CHALLENGE)
-    {
-      ((ChallengeBid)bid).getChallenge().getBids().remove(bid);
-      ((ChallengeBid)bid).setChallenge(null);
-    }
-    else
-    {
-      ((ChoiceBid)bid).getOption().getBids().remove(bid);
-      ((ChoiceBid)bid).setOption(null);
-    }
-    
-    bid.setDonation(null);
     this.donations.deleteDonationBid(bid);
   }
 

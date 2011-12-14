@@ -1,8 +1,11 @@
 package pheidip.logic;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import pheidip.db.BidData;
+import pheidip.db.DonationData;
 import pheidip.db.DonationDataConstraintException;
 import pheidip.objects.Challenge;
 import pheidip.objects.ChallengeBid;
@@ -11,6 +14,7 @@ public class ChallengeControl
 {
   private DonationDatabaseManager donationDatabase;
   private BidData bids;
+  private DonationData donations;
   private int challengeId;
   private Challenge cachedData;
 
@@ -18,6 +22,7 @@ public class ChallengeControl
   {
     this.donationDatabase = donationDatabase;
     this.challengeId = challengeId;
+    this.donations = this.donationDatabase.getDataAccess().getDonationData();
     this.bids = this.donationDatabase.getDataAccess().getBids();
     this.cachedData = null;
   }
@@ -37,19 +42,21 @@ public class ChallengeControl
     
     return this.cachedData;
   }
+  
+  public List<ChallengeBid> getAssociatedBids()
+  {
+    return new ArrayList<ChallengeBid>(this.getData().getBids());
+  }
 
   public void deleteChallenge()
   {
     Challenge c = this.refreshData();
     
-    for (ChallengeBid b : c.getBids())
+    for (ChallengeBid b : getAssociatedBids())
     {
-      b.setChallenge(null);
-      b.getDonation().getBids().remove(b);
-      b.setDonation(null);
+      this.donations.deleteDonationBid(b);
     }
-    c.getBids().clear();
-
+    
     this.bids.deleteChallenge(c);
   }
 
@@ -72,6 +79,13 @@ public class ChallengeControl
 
   public BigDecimal getTotalCollected()
   {
-    return this.bids.getChallengeTotal(this.challengeId);
+    BigDecimal total = BigDecimal.ZERO;
+    
+    for (ChallengeBid b : getAssociatedBids())
+    {
+      total = total.add(b.getAmount());
+    }
+    
+    return total.setScale(2);//this.bids.getChallengeTotal(this.challengeId);
   }
 }
