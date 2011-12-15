@@ -14,18 +14,18 @@
   <property generated="never" lazy="false" name="amount" type="java.math.BigDecimal">
    <column name="AMOUNT"/>
   </property>
-  <property generated="never" lazy="false" name="comment" type="java.lang.String">
+  <property generated="never" lazy="false" length="4096" name="comment" type="java.lang.String">
    <column length="4096" name="COMMENT"/>
   </property>
   <property generated="never" lazy="false" name="domain">
-   <column name="DOMAIN" />
+   <column name="DOMAIN"/>
    <type name="org.hibernate.type.EnumType">
     <param name="type">12</param>
     <param name="enumClass">pheidip.objects.DonationDomain</param>
    </type>
   </property>
   <property generated="never" lazy="false" name="domainId" type="java.lang.String">
-   <column name="DOMAINID" />
+   <column name="DOMAINID"/>
   </property>
   <property generated="never" lazy="false" name="bidState">
    <column name="BIDSTATE"/>
@@ -48,15 +48,15 @@
     <param name="enumClass">pheidip.objects.DonationCommentState</param>
    </type>
   </property>
-  <set cascade="all,delete-orphan" fetch="join" lazy="true" name="bids"
-   sort="unsorted" table="DonationBid" inverse="true">
+  <set cascade="all,delete-orphan" fetch="join" inverse="true"
+   lazy="true" name="bids" sort="unsorted" table="DonationBid">
    <key>
     <column name="Donation"/>
    </key>
    <one-to-many class="pheidip.objects.DonationBid"/>
   </set>
   <many-to-one class="pheidip.objects.Donor" fetch="join"
-   name="donor" foreign-key="DonationFKDonor">
+   foreign-key="DonationFKDonor" name="donor">
    <column name="DONOR"/>
   </many-to-one>
  </class>

@@ -6,12 +6,13 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.hibernate.StatelessSession;
+import org.hibernate.Session;
+import org.hibernate.jdbc.Work;
 
 import pheidip.db.DBType;
 import pheidip.db.DonationDataAccess;
 import pheidip.db.DonationDataErrorParser;
-import pheidip.db.ScriptRunner;
+import pheidip.db.SQLScriptRunner;
 import pheidip.db.hibernate.HibernateDonationDataAccess;
 import pheidip.util.Reporter;
 
@@ -88,33 +89,60 @@ public class DonationDatabaseManager
   public void runSQLScript(final String filename)
   {
     // Does not work
-    StatelessSession session = this.dataAccess.getSessionFactory().openStatelessSession();
-    
-    @SuppressWarnings("deprecation")
-    Connection connection = session.connection();
-   
+    Session session = this.dataAccess.getSessionFactory().openSession();
+
     try
     {
-      FileReader reader = new FileReader(filename);
-      ScriptRunner runner = new ScriptRunner(connection, true, true);
-            
-      runner.runScript(reader);
-    } 
-    catch (IOException e)
-    {
-      DonationDatabaseManager.this.reportMessage(e.getMessage());
-    } 
-    catch (SQLException e)
-    {
-      DonationDatabaseManager.this.reportMessage(DonationDataErrorParser.parseError(e.getMessage()).getErrorMessage());
+      session.beginTransaction();
+      session.doWork(
+          new Work() {
+              public void execute(Connection connection) throws SQLException
+              {
+                FileReader reader = null;
+                
+                try
+                {
+                  reader = new FileReader(filename);
+                  SQLScriptRunner.runScript(connection, reader);
+                }
+                catch (SQLException e)
+                {
+                  DonationDatabaseManager.this.reportMessage(DonationDataErrorParser.parseError(e.getMessage()).getErrorMessage());
+                }
+                catch (Exception e)
+                {
+                  e.printStackTrace();
+                  DonationDatabaseManager.this.reportMessage(e.getMessage());
+                }
+                finally
+                {
+                  if (reader != null)
+                  {
+                    try
+                    {
+                      reader.close();
+                    }
+                    catch (IOException e)
+                    {
+                      DonationDatabaseManager.this.reportMessage(e.getMessage());
+                    }
+                  }
+                }
+                
+              }
+          }
+      );
+      session.getTransaction().commit();
     }
-    catch (Exception e)
+    finally
     {
-      e.printStackTrace();
-      DonationDatabaseManager.this.reportMessage(e.getMessage());
+      if (session != null)
+      {
+        session.close();
+      }
     }
 
-    session.close();
+    
   }
   
   private void autoCloseConnection()

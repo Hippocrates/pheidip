@@ -38,9 +38,6 @@ public class DatabaseMemoryConnectPanel extends JPanel
     add(initializationFileLabel, gbc_lblInitializationFile);
     
     fileTextField = new JTextField();
-    fileTextField.setEditable(false);
-    fileTextField.setEnabled(false);
-    fileTextField.setText("Not implemented at the moment :(");
     GridBagConstraints gbc_textField = new GridBagConstraints();
     gbc_textField.insets = new Insets(0, 0, 0, 5);
     gbc_textField.fill = GridBagConstraints.HORIZONTAL;
@@ -50,7 +47,6 @@ public class DatabaseMemoryConnectPanel extends JPanel
     fileTextField.setColumns(10);
     
     browseButton = new JButton("Browse...");
-    browseButton.setEnabled(false);
     GridBagConstraints gbc_btnBrowse = new GridBagConstraints();
     gbc_btnBrowse.anchor = GridBagConstraints.WEST;
     gbc_btnBrowse.gridx = 2;

@@ -47,14 +47,17 @@ public class ChallengePanel extends EntityPanel
   private JLabel lblDescription;
   private JLabel stateLabel;
   private JComboBox bidStateComboBox;
+  private JLabel lblRun;
+  private JTextField runField;
+  private JButton openRunButton;
   
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{0, 107, 103, 95, 0, 93, 0};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
     gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     nameLabel = new JLabel("Name:");
@@ -83,12 +86,39 @@ public class ChallengePanel extends EntityPanel
     gbc_deleteChallengeButton.gridy = 0;
     add(deleteChallengeButton, gbc_deleteChallengeButton);
     
+    lblRun = new JLabel("Run:");
+    GridBagConstraints gbc_lblRun = new GridBagConstraints();
+    gbc_lblRun.anchor = GridBagConstraints.EAST;
+    gbc_lblRun.insets = new Insets(0, 0, 5, 5);
+    gbc_lblRun.gridx = 0;
+    gbc_lblRun.gridy = 1;
+    add(lblRun, gbc_lblRun);
+    
+    runField = new JTextField();
+    runField.setEditable(false);
+    GridBagConstraints gbc_runField = new GridBagConstraints();
+    gbc_runField.gridwidth = 2;
+    gbc_runField.insets = new Insets(0, 0, 5, 5);
+    gbc_runField.fill = GridBagConstraints.HORIZONTAL;
+    gbc_runField.gridx = 1;
+    gbc_runField.gridy = 1;
+    add(runField, gbc_runField);
+    runField.setColumns(10);
+    
+    openRunButton = new JButton("Open");
+    GridBagConstraints gbc_openRunButton = new GridBagConstraints();
+    gbc_openRunButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_openRunButton.insets = new Insets(0, 0, 5, 5);
+    gbc_openRunButton.gridx = 3;
+    gbc_openRunButton.gridy = 1;
+    add(openRunButton, gbc_openRunButton);
+    
     goalAmountLabel = new JLabel("Goal Amount:");
     GridBagConstraints gbc_goalAmountLabel = new GridBagConstraints();
     gbc_goalAmountLabel.anchor = GridBagConstraints.EAST;
     gbc_goalAmountLabel.insets = new Insets(0, 0, 5, 5);
     gbc_goalAmountLabel.gridx = 0;
-    gbc_goalAmountLabel.gridy = 1;
+    gbc_goalAmountLabel.gridy = 2;
     add(goalAmountLabel, gbc_goalAmountLabel);
     
     amountField = new JFormattedTextField(FormatUtils.getMoneyFormat());
@@ -97,7 +127,7 @@ public class ChallengePanel extends EntityPanel
     gbc_amountField.insets = new Insets(0, 0, 5, 5);
     gbc_amountField.fill = GridBagConstraints.HORIZONTAL;
     gbc_amountField.gridx = 1;
-    gbc_amountField.gridy = 1;
+    gbc_amountField.gridy = 2;
     add(amountField, gbc_amountField);
     amountField.setColumns(10);
     
@@ -106,7 +136,7 @@ public class ChallengePanel extends EntityPanel
     gbc_stateLabel.anchor = GridBagConstraints.NORTHEAST;
     gbc_stateLabel.insets = new Insets(0, 0, 5, 5);
     gbc_stateLabel.gridx = 0;
-    gbc_stateLabel.gridy = 2;
+    gbc_stateLabel.gridy = 3;
     add(stateLabel, gbc_stateLabel);
 
     bidStateComboBox = new JComboBox(BidState.values());
@@ -115,14 +145,14 @@ public class ChallengePanel extends EntityPanel
     gbc_bidStateComboBox.insets = new Insets(0, 0, 5, 5);
     gbc_bidStateComboBox.fill = GridBagConstraints.HORIZONTAL;
     gbc_bidStateComboBox.gridx = 1;
-    gbc_bidStateComboBox.gridy = 2;
+    gbc_bidStateComboBox.gridy = 3;
     add(bidStateComboBox, gbc_bidStateComboBox);
     
     lblDescription = new JLabel("Description:");
     GridBagConstraints gbc_lblDescription = new GridBagConstraints();
     gbc_lblDescription.insets = new Insets(0, 0, 5, 5);
     gbc_lblDescription.gridx = 0;
-    gbc_lblDescription.gridy = 3;
+    gbc_lblDescription.gridy = 4;
     add(lblDescription, gbc_lblDescription);
     
     descriptionScrollPane = new JScrollPane();
@@ -132,7 +162,7 @@ public class ChallengePanel extends EntityPanel
     gbc_descriptionScrollPane.insets = new Insets(0, 0, 5, 5);
     gbc_descriptionScrollPane.fill = GridBagConstraints.BOTH;
     gbc_descriptionScrollPane.gridx = 1;
-    gbc_descriptionScrollPane.gridy = 3;
+    gbc_descriptionScrollPane.gridy = 4;
     add(descriptionScrollPane, gbc_descriptionScrollPane);
     
     descriptionTextArea = new JTextArea();
@@ -145,7 +175,7 @@ public class ChallengePanel extends EntityPanel
     gbc_saveButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_saveButton.insets = new Insets(0, 0, 5, 5);
     gbc_saveButton.gridx = 1;
-    gbc_saveButton.gridy = 4;
+    gbc_saveButton.gridy = 5;
     add(saveButton, gbc_saveButton);
     
     refreshButton = new JButton("Refresh");
@@ -153,7 +183,7 @@ public class ChallengePanel extends EntityPanel
     gbc_refreshButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_refreshButton.insets = new Insets(0, 0, 5, 5);
     gbc_refreshButton.gridx = 2;
-    gbc_refreshButton.gridy = 4;
+    gbc_refreshButton.gridy = 5;
     add(refreshButton, gbc_refreshButton);
     
     totalCollectedLabel = new JLabel("Total Collected:");
@@ -161,7 +191,7 @@ public class ChallengePanel extends EntityPanel
     gbc_totalCollectedLabel.anchor = GridBagConstraints.EAST;
     gbc_totalCollectedLabel.insets = new Insets(0, 0, 0, 5);
     gbc_totalCollectedLabel.gridx = 0;
-    gbc_totalCollectedLabel.gridy = 6;
+    gbc_totalCollectedLabel.gridy = 7;
     add(totalCollectedLabel, gbc_totalCollectedLabel);
     
     totalAmountField = new JTextField();
@@ -171,7 +201,7 @@ public class ChallengePanel extends EntityPanel
     gbc_totalAmountField.gridwidth = 3;
     gbc_totalAmountField.fill = GridBagConstraints.HORIZONTAL;
     gbc_totalAmountField.gridx = 1;
-    gbc_totalAmountField.gridy = 6;
+    gbc_totalAmountField.gridy = 7;
     add(totalAmountField, gbc_totalAmountField);
     totalAmountField.setColumns(10);
   }
@@ -194,6 +224,10 @@ public class ChallengePanel extends EntityPanel
         {
           ChallengePanel.this.deleteContent();
         }
+        else if (ev.getSource() == openRunButton)
+        {
+          ChallengePanel.this.openAssociatedRun();
+        }
       }
       catch(Exception e)
       {
@@ -210,6 +244,7 @@ public class ChallengePanel extends EntityPanel
     this.saveButton.addActionListener(this.actionHandler);
     this.refreshButton.addActionListener(this.actionHandler);
     this.deleteChallengeButton.addActionListener(this.actionHandler);
+    this.openRunButton.addActionListener(this.actionHandler);
     
     this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(this.descriptionTextArea));
     
@@ -271,12 +306,18 @@ public class ChallengePanel extends EntityPanel
     }
     
     this.nameField.setText(data.getName());
+    this.runField.setText(data.getSpeedRun().getName());
     this.amountField.setText(data.getGoalAmount().toString());
     this.descriptionTextArea.setText(data.getDescription());
     this.totalAmountField.setText(this.challengeControl.getTotalCollected().toString());
     this.bidStateComboBox.setSelectedItem(data.getBidState());
     
     this.setHeaderText(data.toString());
+  }
+  
+  private void openAssociatedRun()
+  {
+    this.owner.openSpeedRunTab(this.challengeControl.getData().getSpeedRun().getId());
   }
 
   public int getChallengeId()

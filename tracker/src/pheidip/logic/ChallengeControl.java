@@ -26,7 +26,7 @@ public class ChallengeControl
     this.bids = this.donationDatabase.getDataAccess().getBids();
     this.cachedData = null;
   }
-  
+
   public Challenge refreshData()
   {
     this.cachedData = this.bids.getChallengeById(this.challengeId);

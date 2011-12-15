@@ -10,7 +10,7 @@
   </id>
   <property generated="never" lazy="false" name="name"
    type="java.lang.String" unique-key="SpeedRunNameUnique">
-   <column name="NAME"/>
+   <column name="NAME" unique="true"/>
   </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>

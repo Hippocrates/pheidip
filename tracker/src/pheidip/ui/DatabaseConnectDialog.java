@@ -17,6 +17,7 @@ import java.awt.Insets;
 
 import pheidip.logic.ConnectionType;
 import pheidip.logic.DonationDatabaseManager;
+import pheidip.util.StringUtils;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -212,7 +213,7 @@ public class DatabaseConnectDialog extends JDialog
      
    String initFilename = panel.getInitializeScriptFilename();
      
-   if (initFilename.length() > 0)
+   if (!StringUtils.isEmptyOrNull(initFilename))
    {
      this.databaseManager.runSQLScript(initFilename);
    }
