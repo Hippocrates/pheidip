@@ -95,12 +95,15 @@ public final class ChipinDonations
         
         if (toks.length > 0)
         {
-          donor.setFirstName(toks[0]);
-        }
+          StringBuilder builder = new StringBuilder();
+          
+          for (int i = 0; i < toks.length - 1; ++i)
+          {
+            builder.append(toks[i]);
+          }
+          donor.setFirstName(builder.toString());
 
-        if (toks.length > 1)
-        {
-          donor.setLastName(toks[1]);
+          donor.setLastName(toks[toks.length - 1]);
         }
         
         donorTable.put(donor.getEmail(), donor);

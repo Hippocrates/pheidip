@@ -180,6 +180,10 @@ public class SpeedRunSearchDialog extends JDialog
         {
           moveNextResults();
         }
+        else if (ev.getSource() == nameFieldCheckBox)
+        {
+          updateUIState();
+        }
       }
       catch (Exception e)
       {
@@ -232,6 +236,7 @@ public class SpeedRunSearchDialog extends JDialog
     this.prevButton.addActionListener(this.actionHandler);
     this.nextButton.addActionListener(this.actionHandler);
     this.nameField.getDocument().addDocumentListener(this.actionHandler);
+    this.nameFieldCheckBox.addActionListener(this.actionHandler);
     
     this.getRootPane().setDefaultButton(this.searchButton);
     
@@ -273,6 +278,8 @@ public class SpeedRunSearchDialog extends JDialog
     
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.updateUIState();
   }
   
   public SpeedRun getResult()
@@ -339,6 +346,7 @@ public class SpeedRunSearchDialog extends JDialog
   private void updateUIState()
   {
     this.okButton.setEnabled(!this.speedRunList.isSelectionEmpty());
+    this.nameField.setEnabled(this.nameFieldCheckBox.isSelected());
     this.createNewButton.setEnabled(!StringUtils.isEmptyOrNull(this.nameField.getText()));
     this.nextButton.setEnabled(this.searcher.hasNext());
     this.prevButton.setEnabled(this.searcher.hasPrev());

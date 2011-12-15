@@ -4,7 +4,6 @@ import java.io.File;
 
 public interface DonationDataAccess 
 {
-
 	public DonorData getDonorData();
 
 	public DonationData getDonationData();

@@ -141,6 +141,7 @@ public class DonationBidSearchDialog extends JDialog
     contentPanel.add(lblBidName, gbc_lblBidName);
     
     bidCheckBox = new JCheckBox("");
+    bidCheckBox.setSelected(true);
     GridBagConstraints gbc_bidCheckBox = new GridBagConstraints();
     gbc_bidCheckBox.insets = new Insets(0, 0, 5, 5);
     gbc_bidCheckBox.gridx = 1;
@@ -189,6 +190,7 @@ public class DonationBidSearchDialog extends JDialog
     contentPanel.add(lblOptionName, gbc_lblOptionName);
     
     optionField = new JTextField();
+    optionField.setEnabled(false);
     GridBagConstraints gbc_optionField = new GridBagConstraints();
     gbc_optionField.gridwidth = 2;
     gbc_optionField.insets = new Insets(0, 0, 5, 5);
@@ -317,6 +319,10 @@ public class DonationBidSearchDialog extends JDialog
         {
           moveNextResults();
         }
+        else if (ev.getSource() == speedRunCheckBox || ev.getSource() == bidCheckBox || ev.getSource() == bidStateCheckBox)
+        {
+          updateUIState();
+        }
       }
       catch(Exception e)
       {
@@ -390,6 +396,9 @@ public class DonationBidSearchDialog extends JDialog
     this.optionField.getDocument().addDocumentListener(this.actionHandler);
     this.nextButton.addActionListener(this.actionHandler);
     this.prevButton.addActionListener(this.actionHandler);
+    this.speedRunCheckBox.addActionListener(this.actionHandler);
+    this.bidCheckBox.addActionListener(this.actionHandler);
+    this.bidStateCheckBox.addActionListener(this.actionHandler);
     
     this.getRootPane().setDefaultButton(this.searchButton);
     
@@ -437,6 +446,7 @@ public class DonationBidSearchDialog extends JDialog
     if (this.bidList.isSelectionEmpty())
     {
       this.okButton.setEnabled(false);
+      this.optionField.setEnabled(false);
       this.optionList.setEnabled(false);
       this.optionList.setModel(new DefaultListModel());
     }
@@ -446,6 +456,7 @@ public class DonationBidSearchDialog extends JDialog
       
       if (currentChoice != null)
       {
+        this.optionField.setEnabled(true);
         this.optionList.setEnabled(true);
         
         if (this.optionList.isSelectionEmpty())
@@ -459,6 +470,7 @@ public class DonationBidSearchDialog extends JDialog
       }
       else
       {
+        this.optionField.setEnabled(false);
         this.optionList.setEnabled(false);
         this.okButton.setEnabled(true);
       }
@@ -466,6 +478,12 @@ public class DonationBidSearchDialog extends JDialog
     
     this.nextButton.setEnabled(this.searcher.hasNext());
     this.prevButton.setEnabled(this.searcher.hasPrev());
+    
+    this.speedRunField.setEnabled(this.speedRunCheckBox.isSelected());
+    this.browseSpeedRunButton.setEnabled(this.speedRunCheckBox.isSelected());
+    
+    this.bidField.setEnabled(this.bidCheckBox.isSelected());
+    this.bidStateComboBox.setEnabled(this.bidStateCheckBox.isSelected());
   }
   
   /**

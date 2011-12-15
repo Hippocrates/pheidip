@@ -9,20 +9,21 @@
    <generator class="assigned"/>
   </id>
   <property generated="never" lazy="false" name="name"
-   type="java.lang.String">
+   type="java.lang.String" unique-key="PrizeNameUnique">
    <column name="NAME"/>
   </property>
   <property generated="never" lazy="false" name="imageURL" type="java.lang.String">
    <column name="IMAGEURL"/>
   </property>
-  <property generated="never" lazy="false" name="sortKey" type="int" unique="true">
+  <property generated="never" lazy="false" name="sortKey" type="int"
+   unique="true" unique-key="PrizeSortKeyUnique">
    <column name="sortKey" unique="true"/>
   </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
   </property>
   <many-to-one class="pheidip.objects.Donor" fetch="join"
-   name="winner">
+   foreign-key="PrizeFKDonor" name="winner">
    <column name="WINNER"/>
   </many-to-one>
  </class>

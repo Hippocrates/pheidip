@@ -12,7 +12,7 @@
    <column name="NAME" />
   </property>
   <many-to-one class="pheidip.objects.Choice" fetch="join"
-   lazy="false" name="choice">
+   lazy="false" name="choice" foreign-key="OptionFKChoice">
    <column name="CHOICE" />
   </many-to-one>
   <set cascade="all,delete-orphan" fetch="join" lazy="false" name="bids"

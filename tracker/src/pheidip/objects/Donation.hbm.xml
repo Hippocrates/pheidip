@@ -56,7 +56,7 @@
    <one-to-many class="pheidip.objects.DonationBid"/>
   </set>
   <many-to-one class="pheidip.objects.Donor" fetch="join"
-   name="donor">
+   name="donor" foreign-key="DonationFKDonor">
    <column name="DONOR"/>
   </many-to-one>
  </class>

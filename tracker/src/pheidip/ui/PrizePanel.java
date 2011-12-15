@@ -171,7 +171,6 @@ public class PrizePanel extends EntityPanel
     add(lblWinner, gbc_lblWinner);
     
     winnerField = new JTextField();
-    winnerField.setEnabled(false);
     winnerField.setEditable(false);
     GridBagConstraints gbc_winnerField = new GridBagConstraints();
     gbc_winnerField.gridwidth = 3;

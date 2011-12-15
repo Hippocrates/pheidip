@@ -391,6 +391,17 @@ public class DonationSearchDialog extends JDialog
         {
           movePrevResults();
         }
+        else if (source == donorCheckBox || 
+            source == donatedAfterCheckBox ||
+            source == donatedBeforeCheckBox ||
+            source == amountAboveCheckBox ||
+            source == amountBelowCheckBox ||
+            source == bidStateCheckBox ||
+            source == readStateCheckBox ||
+            source == commentStateCheckBox)
+        {
+          updateUIState();
+        }
       }
       catch (Exception e)
       {
@@ -439,6 +450,14 @@ public class DonationSearchDialog extends JDialog
     this.nextButton.addActionListener(this.actionHandler);
     this.prevButton.addActionListener(this.actionHandler);
     this.donationList.addListSelectionListener(this.actionHandler);
+    this.donorCheckBox.addActionListener(this.actionHandler);
+    this.donatedAfterCheckBox.addActionListener(this.actionHandler);
+    this.donatedBeforeCheckBox.addActionListener(this.actionHandler);
+    this.amountAboveCheckBox.addActionListener(this.actionHandler);
+    this.amountBelowCheckBox.addActionListener(this.actionHandler);
+    this.bidStateCheckBox.addActionListener(this.actionHandler);
+    this.readStateCheckBox.addActionListener(this.actionHandler);
+    this.commentStateCheckBox.addActionListener(this.actionHandler);
     
     this.getRootPane().setDefaultButton(this.searchButton);
     
@@ -517,6 +536,15 @@ public class DonationSearchDialog extends JDialog
     this.okButton.setEnabled(!this.donationList.isSelectionEmpty());
     this.nextButton.setEnabled(this.searcher.hasNext());
     this.prevButton.setEnabled(this.searcher.hasPrev());
+    
+    this.browseDonorButton.setEnabled(this.donorCheckBox.isSelected());
+    this.donatedBeforeField.setEnabled(this.donatedBeforeCheckBox.isSelected());
+    this.donatedAfterField.setEnabled(this.donatedAfterCheckBox.isSelected());
+    this.amountAboveField.setEnabled(this.amountAboveCheckBox.isSelected());
+    this.amountBelowField.setEnabled(this.amountBelowCheckBox.isSelected());
+    this.readStateComboBox.setEnabled(this.readStateCheckBox.isSelected());
+    this.commentStateComboBox.setEnabled(this.commentStateCheckBox.isSelected());
+    this.bidStateComboBox.setEnabled(this.bidStateCheckBox.isSelected());
   }
   
   private void moveNextResults()

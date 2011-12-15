@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import pheidip.logic.DonorSearch;
 import pheidip.objects.Donor;
 import pheidip.objects.DonorSearchParams;
+import pheidip.util.StringUtils;
 
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
@@ -29,6 +30,7 @@ import java.util.List;
 import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
+import javax.swing.JCheckBox;
 
 @SuppressWarnings("serial")
 public class DonorSearchDialog extends JDialog
@@ -54,11 +56,15 @@ public class DonorSearchDialog extends JDialog
   private JButton searchButton;
   private JButton prevButton;
   private JButton nextButton;
+  private JCheckBox firstNameCheckBox;
+  private JCheckBox lastNameCheckBox;
+  private JCheckBox aliasCheckBox;
+  private JCheckBox emailCheckBox;
   
   private void initializeGUI()
   {
     this.setTitle("Find Donor...");
-    setBounds(100, 100, 450, 300);
+    setBounds(100, 100, 527, 300);
     
     contentPanel = new JPanel();
     this.setContentPane(contentPanel);
@@ -66,9 +72,9 @@ public class DonorSearchDialog extends JDialog
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     
     GridBagLayout gbl_panel = new GridBagLayout();
-    gbl_panel.columnWidths = new int[]{0, 66, 112, 90, 76, 0};
+    gbl_panel.columnWidths = new int[]{0, 0, 66, 112, 90, 76, 0};
     gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    gbl_panel.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_panel);
 
@@ -79,13 +85,21 @@ public class DonorSearchDialog extends JDialog
     gbc_lblFirstName.gridx = 0;
     gbc_lblFirstName.gridy = 0;
     contentPanel.add(firstNameLabel, gbc_lblFirstName);
+    
+    firstNameCheckBox = new JCheckBox("");
+    firstNameCheckBox.setSelected(true);
+    GridBagConstraints gbc_firstNameCheckBox = new GridBagConstraints();
+    gbc_firstNameCheckBox.insets = new Insets(0, 0, 5, 5);
+    gbc_firstNameCheckBox.gridx = 1;
+    gbc_firstNameCheckBox.gridy = 0;
+    contentPanel.add(firstNameCheckBox, gbc_firstNameCheckBox);
 
     firstNameField = new JTextField();
     GridBagConstraints gbc_textField = new GridBagConstraints();
     gbc_textField.gridwidth = 2;
     gbc_textField.insets = new Insets(0, 0, 5, 5);
     gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_textField.gridx = 1;
+    gbc_textField.gridx = 2;
     gbc_textField.gridy = 0;
     contentPanel.add(firstNameField, gbc_textField);
     firstNameField.setColumns(10);
@@ -97,7 +111,7 @@ public class DonorSearchDialog extends JDialog
     gbc_scrollPane.gridheight = 7;
     gbc_scrollPane.gridwidth = 2;
     gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
-    gbc_scrollPane.gridx = 3;
+    gbc_scrollPane.gridx = 4;
     gbc_scrollPane.gridy = 0;
     contentPanel.add(donorScrollPane, gbc_scrollPane);
     {
@@ -112,13 +126,21 @@ public class DonorSearchDialog extends JDialog
     gbc_lblLastName.gridx = 0;
     gbc_lblLastName.gridy = 1;
     contentPanel.add(lastNameLabel, gbc_lblLastName);
+    
+    lastNameCheckBox = new JCheckBox("");
+    lastNameCheckBox.setSelected(true);
+    GridBagConstraints gbc_lastNameCheckBox = new GridBagConstraints();
+    gbc_lastNameCheckBox.insets = new Insets(0, 0, 5, 5);
+    gbc_lastNameCheckBox.gridx = 1;
+    gbc_lastNameCheckBox.gridy = 1;
+    contentPanel.add(lastNameCheckBox, gbc_lastNameCheckBox);
 
     lastNameField = new JTextField();
     GridBagConstraints gbc_textField_1 = new GridBagConstraints();
     gbc_textField_1.gridwidth = 2;
     gbc_textField_1.insets = new Insets(0, 0, 5, 5);
     gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
-    gbc_textField_1.gridx = 1;
+    gbc_textField_1.gridx = 2;
     gbc_textField_1.gridy = 1;
     contentPanel.add(lastNameField, gbc_textField_1);
     lastNameField.setColumns(10);
@@ -130,13 +152,21 @@ public class DonorSearchDialog extends JDialog
     gbc_lblAlias.gridx = 0;
     gbc_lblAlias.gridy = 2;
     contentPanel.add(aliasLabel, gbc_lblAlias);
+    
+    aliasCheckBox = new JCheckBox("");
+    aliasCheckBox.setSelected(true);
+    GridBagConstraints gbc_aliasCheckBox = new GridBagConstraints();
+    gbc_aliasCheckBox.insets = new Insets(0, 0, 5, 5);
+    gbc_aliasCheckBox.gridx = 1;
+    gbc_aliasCheckBox.gridy = 2;
+    contentPanel.add(aliasCheckBox, gbc_aliasCheckBox);
 
     aliasField = new JTextField();
     GridBagConstraints gbc_textField_2 = new GridBagConstraints();
     gbc_textField_2.gridwidth = 2;
     gbc_textField_2.insets = new Insets(0, 0, 5, 5);
     gbc_textField_2.fill = GridBagConstraints.HORIZONTAL;
-    gbc_textField_2.gridx = 1;
+    gbc_textField_2.gridx = 2;
     gbc_textField_2.gridy = 2;
     contentPanel.add(aliasField, gbc_textField_2);
     aliasField.setColumns(10);
@@ -148,13 +178,21 @@ public class DonorSearchDialog extends JDialog
     gbc_lblEmail.gridx = 0;
     gbc_lblEmail.gridy = 3;
     contentPanel.add(emailLabel, gbc_lblEmail);
+    
+    emailCheckBox = new JCheckBox("");
+    emailCheckBox.setSelected(true);
+    GridBagConstraints gbc_emailCheckBox = new GridBagConstraints();
+    gbc_emailCheckBox.insets = new Insets(0, 0, 5, 5);
+    gbc_emailCheckBox.gridx = 1;
+    gbc_emailCheckBox.gridy = 3;
+    contentPanel.add(emailCheckBox, gbc_emailCheckBox);
 
     emailField = new JTextField();
     GridBagConstraints gbc_textField_3 = new GridBagConstraints();
     gbc_textField_3.gridwidth = 2;
     gbc_textField_3.insets = new Insets(0, 0, 5, 5);
     gbc_textField_3.fill = GridBagConstraints.HORIZONTAL;
-    gbc_textField_3.gridx = 1;
+    gbc_textField_3.gridx = 2;
     gbc_textField_3.gridy = 3;
     contentPanel.add(emailField, gbc_textField_3);
     emailField.setColumns(10);
@@ -163,7 +201,7 @@ public class DonorSearchDialog extends JDialog
     GridBagConstraints gbc_searchButton = new GridBagConstraints();
     gbc_searchButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_searchButton.insets = new Insets(0, 0, 5, 5);
-    gbc_searchButton.gridx = 1;
+    gbc_searchButton.gridx = 2;
     gbc_searchButton.gridy = 4;
     contentPanel.add(searchButton, gbc_searchButton);
     
@@ -171,7 +209,7 @@ public class DonorSearchDialog extends JDialog
     GridBagConstraints gbc_createNewButton = new GridBagConstraints();
     gbc_createNewButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_createNewButton.insets = new Insets(0, 0, 5, 5);
-    gbc_createNewButton.gridx = 1;
+    gbc_createNewButton.gridx = 2;
     gbc_createNewButton.gridy = 5;
     contentPanel.add(createNewButton, gbc_createNewButton);
     
@@ -180,7 +218,7 @@ public class DonorSearchDialog extends JDialog
     GridBagConstraints gbc_prevButton = new GridBagConstraints();
     gbc_prevButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_prevButton.insets = new Insets(0, 0, 5, 5);
-    gbc_prevButton.gridx = 3;
+    gbc_prevButton.gridx = 4;
     gbc_prevButton.gridy = 7;
     contentPanel.add(prevButton, gbc_prevButton);
     
@@ -189,7 +227,7 @@ public class DonorSearchDialog extends JDialog
     GridBagConstraints gbc_nextButton = new GridBagConstraints();
     gbc_nextButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_nextButton.insets = new Insets(0, 0, 5, 0);
-    gbc_nextButton.gridx = 4;
+    gbc_nextButton.gridx = 5;
     gbc_nextButton.gridy = 7;
     contentPanel.add(nextButton, gbc_nextButton);
 
@@ -198,7 +236,7 @@ public class DonorSearchDialog extends JDialog
     GridBagConstraints gbc_okButton = new GridBagConstraints();
     gbc_okButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_okButton.insets = new Insets(0, 0, 0, 5);
-    gbc_okButton.gridx = 3;
+    gbc_okButton.gridx = 4;
     gbc_okButton.gridy = 8;
     contentPanel.add(okButton, gbc_okButton);
     getRootPane().setDefaultButton(okButton);
@@ -206,7 +244,7 @@ public class DonorSearchDialog extends JDialog
     cancelButton = new JButton("Cancel");
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_cancelButton.gridx = 4;
+    gbc_cancelButton.gridx = 5;
     gbc_cancelButton.gridy = 8;
     contentPanel.add(cancelButton, gbc_cancelButton);
   }
@@ -241,6 +279,13 @@ public class DonorSearchDialog extends JDialog
         {
           moveNextResults();
         }
+        else if (ev.getSource() == firstNameCheckBox ||
+            ev.getSource() == lastNameCheckBox ||
+            ev.getSource() == aliasCheckBox ||
+            ev.getSource() == emailCheckBox)
+        {
+          updateUIState();
+        }
       }
       catch (Exception e)
       {
@@ -269,6 +314,10 @@ public class DonorSearchDialog extends JDialog
     this.prevButton.addActionListener(this.actionHandler);
     this.nextButton.addActionListener(this.actionHandler);
     this.donorList.addListSelectionListener(this.actionHandler);
+    this.firstNameCheckBox.addActionListener(this.actionHandler);
+    this.lastNameCheckBox.addActionListener(this.actionHandler);
+    this.aliasCheckBox.addActionListener(this.actionHandler);
+    this.emailCheckBox.addActionListener(this.actionHandler);
     
     this.getRootPane().setDefaultButton(this.searchButton);
     
@@ -312,6 +361,8 @@ public class DonorSearchDialog extends JDialog
     
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.updateUIState();
   }
   
   public Donor getResult()
@@ -370,6 +421,11 @@ public class DonorSearchDialog extends JDialog
     
     this.nextButton.setEnabled(this.searcher.hasNext());
     this.prevButton.setEnabled(this.searcher.hasPrev());
+    
+    this.firstNameField.setEnabled(this.firstNameCheckBox.isSelected());
+    this.lastNameField.setEnabled(this.lastNameCheckBox.isSelected());
+    this.aliasField.setEnabled(this.aliasCheckBox.isSelected());
+    this.emailField.setEnabled(this.emailCheckBox.isSelected());
   }
   
   private void moveNextResults()
@@ -385,10 +441,10 @@ public class DonorSearchDialog extends JDialog
   private void runSearch()
   {
     DonorSearchParams params = new DonorSearchParams(
-        this.firstNameField.getText(),
-        this.lastNameField.getText(),
-        this.emailField.getText(),
-        this.aliasField.getText());
+        this.firstNameCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.firstNameField.getText()) : null,
+        this.lastNameCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.lastNameField.getText()) : null,
+        this.emailCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.emailField.getText()) : null,
+        this.aliasCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.aliasField.getText()) : null);
     
     this.fillList(this.searcher.runSearch(params));
   }

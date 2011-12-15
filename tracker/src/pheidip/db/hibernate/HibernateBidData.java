@@ -212,7 +212,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
       whereClause.add("lower(b.name) like :name");
     
     if (params.owner != null)
-      whereClause.add("lower(b.speedRun) = :owner");
+      whereClause.add("b.speedRun = :owner");
     
     if (params.state != null)
       whereClause.add("lower(b.bidState) = :state");

@@ -51,6 +51,7 @@ public class PrizeSearchDialog extends JDialog
   private JCheckBox prizeNameCheckBox;
   private JButton prevButton;
   private JButton nextButton;
+  private JLabel lblExcludeIfWon;
 
   private void initializeGUI()
   {
@@ -76,6 +77,7 @@ public class PrizeSearchDialog extends JDialog
     }
     {
       prizeNameCheckBox = new JCheckBox("");
+      prizeNameCheckBox.setSelected(true);
       GridBagConstraints gbc_prizeNameCheckBox = new GridBagConstraints();
       gbc_prizeNameCheckBox.insets = new Insets(0, 0, 5, 5);
       gbc_prizeNameCheckBox.gridx = 1;
@@ -109,10 +111,18 @@ public class PrizeSearchDialog extends JDialog
       }
     }
     {
-      excludeIfWonCheckBox = new JCheckBox("Exclude If Won");
+      lblExcludeIfWon = new JLabel("Exclude If Won:");
+      GridBagConstraints gbc_lblExcludeIfWon = new GridBagConstraints();
+      gbc_lblExcludeIfWon.insets = new Insets(0, 0, 5, 5);
+      gbc_lblExcludeIfWon.gridx = 0;
+      gbc_lblExcludeIfWon.gridy = 1;
+      contentPanel.add(lblExcludeIfWon, gbc_lblExcludeIfWon);
+    }
+    {
+      excludeIfWonCheckBox = new JCheckBox("");
       GridBagConstraints gbc_excludeIfWonCheckBox = new GridBagConstraints();
       gbc_excludeIfWonCheckBox.insets = new Insets(0, 0, 5, 5);
-      gbc_excludeIfWonCheckBox.gridx = 2;
+      gbc_excludeIfWonCheckBox.gridx = 1;
       gbc_excludeIfWonCheckBox.gridy = 1;
       contentPanel.add(excludeIfWonCheckBox, gbc_excludeIfWonCheckBox);
     }
@@ -127,6 +137,7 @@ public class PrizeSearchDialog extends JDialog
     }
     {
       createNewButton = new JButton("Create New...");
+      createNewButton.setEnabled(false);
       GridBagConstraints gbc_createNewButton = new GridBagConstraints();
       gbc_createNewButton.fill = GridBagConstraints.HORIZONTAL;
       gbc_createNewButton.insets = new Insets(0, 0, 5, 5);
@@ -207,6 +218,10 @@ public class PrizeSearchDialog extends JDialog
         {
           movePrevResults();
         }
+        else if (ev.getSource() == prizeNameCheckBox)
+        {
+          updateUIState();
+        }
       }
       catch (Exception e)
       {
@@ -236,6 +251,8 @@ public class PrizeSearchDialog extends JDialog
     this.nextButton.addActionListener(this.actionHandler);
     this.prevButton.addActionListener(this.actionHandler);
     
+    this.prizeNameCheckBox.addActionListener(this.actionHandler);
+    
     this.getRootPane().setDefaultButton(this.searchButton);
     
     this.traversalManager = new FocusTraversalManager(new Component[]
@@ -262,6 +279,8 @@ public class PrizeSearchDialog extends JDialog
     
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.updateUIState();
   }
   
   public Prize getSelectedPrize()
@@ -295,6 +314,8 @@ public class PrizeSearchDialog extends JDialog
   private void updateUIState()
   {
     this.okButton.setEnabled(!this.prizeList.isSelectionEmpty());
+    
+    this.nameField.setEnabled(this.prizeNameCheckBox.isSelected());
   }
 
   private void runSearch()

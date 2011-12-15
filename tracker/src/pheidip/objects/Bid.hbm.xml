@@ -8,8 +8,9 @@
    <column name="ID"/>
    <generator class="assigned"/>
   </id>
-  <property generated="never" lazy="false" name="name" type="java.lang.String">
-   <column name="NAME" />
+  <property generated="never" lazy="false" name="name"
+   type="java.lang.String" unique-key="BidNameUnique">
+   <column name="NAME"/>
   </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
@@ -21,8 +22,8 @@
     <param name="enumClass">pheidip.objects.BidState</param>
    </type>
   </property>
-  <many-to-one class="pheidip.objects.SpeedRun" fetch="join" lazy="false"
-   foreign-key="BidFKSpeedRun" name="speedRun">
+  <many-to-one class="pheidip.objects.SpeedRun" fetch="join"
+   foreign-key="BidFKSpeedRun" lazy="false" name="speedRun" unique-key="BidNameUnique">
    <column name="SPEEDRUN"/>
   </many-to-one>
  </class>

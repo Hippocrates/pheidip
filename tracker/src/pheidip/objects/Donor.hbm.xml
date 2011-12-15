@@ -9,8 +9,8 @@
    <generator class="assigned"/>
   </id>
   <property generated="never" lazy="false" name="email"
-   type="java.lang.String" >
-   <column name="EMAIL" />
+   type="java.lang.String" unique-key="DonorEmailUnique">
+   <column name="EMAIL"/>
   </property>
   <property generated="never" lazy="false" name="firstName" type="java.lang.String">
    <column name="FIRSTNAME"/>
@@ -19,8 +19,8 @@
    <column name="LASTNAME"/>
   </property>
   <property generated="never" lazy="false" name="alias"
-   type="java.lang.String">
-   <column name="ALIAS" />
+   type="java.lang.String" unique-key="DonorAliasUnique">
+   <column name="ALIAS"/>
   </property>
   <set cascade="all,delete-orphan" lazy="true" name="donations"
    sort="unsorted" table="DONATION">

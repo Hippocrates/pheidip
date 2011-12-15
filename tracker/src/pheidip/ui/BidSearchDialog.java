@@ -92,7 +92,6 @@ public class BidSearchDialog extends JDialog
     contentPanel.add(speedRunCheckBox, gbc_speedRunCheckBox);
     
     speedRunField = new JTextField();
-    speedRunField.setEnabled(false);
     speedRunField.setEditable(false);
     GridBagConstraints gbc_speedRunField = new GridBagConstraints();
     gbc_speedRunField.gridwidth = 2;
@@ -132,6 +131,7 @@ public class BidSearchDialog extends JDialog
     contentPanel.add(lblBidName, gbc_lblBidName);
     
     bidCheckBox = new JCheckBox("");
+    bidCheckBox.setSelected(true);
     GridBagConstraints gbc_bidCheckBox = new GridBagConstraints();
     gbc_bidCheckBox.insets = new Insets(0, 0, 5, 5);
     gbc_bidCheckBox.gridx = 1;
@@ -269,6 +269,10 @@ public class BidSearchDialog extends JDialog
         {
           moveNextResults();
         }
+        else if (ev.getSource() == speedRunCheckBox || ev.getSource() == bidCheckBox || ev.getSource() == bidStateCheckBox)
+        {
+          updateUIState();
+        }
       }
       catch(Exception e)
       {
@@ -323,7 +327,10 @@ public class BidSearchDialog extends JDialog
     this.bidField.getDocument().addDocumentListener(this.actionHandler);
     this.prevButton.addActionListener(this.actionHandler);
     this.nextButton.addActionListener(this.actionHandler);
-    
+    this.speedRunCheckBox.addActionListener(this.actionHandler);
+    this.bidCheckBox.addActionListener(this.actionHandler);
+    this.bidStateCheckBox.addActionListener(this.actionHandler);
+
     this.getRootPane().setDefaultButton(this.searchButton);
     
     this.tabOrder = new FocusTraversalManager(new Component[]
@@ -362,6 +369,12 @@ public class BidSearchDialog extends JDialog
     
     this.nextButton.setEnabled(this.searcher.hasNext());
     this.prevButton.setEnabled(this.searcher.hasPrev());
+    
+    this.speedRunField.setEnabled(this.speedRunCheckBox.isSelected());
+    this.browseSpeedRunButton.setEnabled(this.speedRunCheckBox.isSelected());
+    
+    this.bidField.setEnabled(this.bidCheckBox.isSelected());
+    this.bidStateComboBox.setEnabled(this.bidStateCheckBox.isSelected());
   }
   
   /**

@@ -51,7 +51,7 @@ public class ChallengePanel extends EntityPanel
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{0, 107, 103, 32, 0, 93, 0};
+    gridBagLayout.columnWidths = new int[]{0, 107, 103, 95, 0, 93, 0};
     gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
     gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
@@ -67,7 +67,7 @@ public class ChallengePanel extends EntityPanel
     
     nameField = new JTextField();
     GridBagConstraints gbc_nameField = new GridBagConstraints();
-    gbc_nameField.gridwidth = 3;
+    gbc_nameField.gridwidth = 2;
     gbc_nameField.insets = new Insets(0, 0, 5, 5);
     gbc_nameField.fill = GridBagConstraints.HORIZONTAL;
     gbc_nameField.gridx = 1;
@@ -93,7 +93,7 @@ public class ChallengePanel extends EntityPanel
     
     amountField = new JFormattedTextField(FormatUtils.getMoneyFormat());
     GridBagConstraints gbc_amountField = new GridBagConstraints();
-    gbc_amountField.gridwidth = 3;
+    gbc_amountField.gridwidth = 2;
     gbc_amountField.insets = new Insets(0, 0, 5, 5);
     gbc_amountField.fill = GridBagConstraints.HORIZONTAL;
     gbc_amountField.gridx = 1;
@@ -111,7 +111,7 @@ public class ChallengePanel extends EntityPanel
 
     bidStateComboBox = new JComboBox(BidState.values());
     GridBagConstraints gbc_bidStateComboBox = new GridBagConstraints();
-    gbc_bidStateComboBox.gridwidth = 3;
+    gbc_bidStateComboBox.gridwidth = 2;
     gbc_bidStateComboBox.insets = new Insets(0, 0, 5, 5);
     gbc_bidStateComboBox.fill = GridBagConstraints.HORIZONTAL;
     gbc_bidStateComboBox.gridx = 1;
