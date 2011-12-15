@@ -10,13 +10,13 @@
   </id>
   <property generated="never" lazy="false" name="name"
    type="java.lang.String" unique="true">
-   <column check="NAME = lower(NAME)" name="NAME" unique="true"/>
+   <column name="NAME" />
   </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
   </property>
-  <property generated="never" lazy="false" name="sortKey" type="int" unique="true">
-   <column name="sortKey" unique="true"/>
+  <property generated="never" lazy="false" name="sortKey" type="int">
+   <column name="sortKey" />
   </property>
   <set cascade="all,delete-orphan" lazy="true" name="bids" 
    sort="unsorted" table="Bid" inverse="true">

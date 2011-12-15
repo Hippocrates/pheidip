@@ -270,6 +270,8 @@ public class DonorSearchDialog extends JDialog
     this.nextButton.addActionListener(this.actionHandler);
     this.donorList.addListSelectionListener(this.actionHandler);
     
+    this.getRootPane().setDefaultButton(this.searchButton);
+    
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.firstNameField,

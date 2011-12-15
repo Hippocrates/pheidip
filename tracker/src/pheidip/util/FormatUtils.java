@@ -12,7 +12,7 @@ public final class FormatUtils
   
   public static DecimalFormat getMoneyFormat()
   {
-    return new DecimalFormat("#0.00");
+    return new DecimalFormat(getMoneyFormatString());
   }
   
   public static DecimalFormat getIntegerFormat()

@@ -134,18 +134,10 @@ public class DonationBidsPanel extends JPanel
     this.setFocusCycleRoot(true);
   }
   
-  
-  
-  public Component[] getTabOrder()
-  {
-    return new Component[]{};// this.tabOrder;
-  }
-  
   public DonationBidsPanel(MainWindow owner, DonationControl control)
   {
     this.owner = owner;
     this.control = control;
-    
     
     this.initializeGUI();
     this.initializeGUIEvents();

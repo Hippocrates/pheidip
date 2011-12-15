@@ -324,6 +324,8 @@ public class BidSearchDialog extends JDialog
     this.prevButton.addActionListener(this.actionHandler);
     this.nextButton.addActionListener(this.actionHandler);
     
+    this.getRootPane().setDefaultButton(this.searchButton);
+    
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.speedRunCheckBox,
@@ -394,6 +396,13 @@ public class BidSearchDialog extends JDialog
       this.currentRun = dialog.getResult();
       this.speedRunField.setText(this.currentRun.toString());
     }
+    else
+    {
+      this.currentRun = null;
+      this.speedRunField.setText("");
+    }
+    
+    this.updateUIState();
   }
   
   private void moveNextResults()

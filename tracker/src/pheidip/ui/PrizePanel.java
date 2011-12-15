@@ -55,10 +55,10 @@ public class PrizePanel extends EntityPanel
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{90, 106, 97, 0, 88, 65, 79, 0};
-    gridBagLayout.rowHeights = new int[]{21, 21, 0, 0, 118, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.columnWidths = new int[]{90, 106, 85, 63, 88, 68, 24, 0};
+    gridBagLayout.rowHeights = new int[]{21, 21, 0, 118, 0, 0, 0, 0, 0, 0};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     lblName = new JLabel("Name:");
@@ -121,12 +121,36 @@ public class PrizePanel extends EntityPanel
     gbc_saveButton.gridy = 1;
     add(saveButton, gbc_saveButton);
     
+    lblDescription = new JLabel("Description:");
+    GridBagConstraints gbc_lblDescription = new GridBagConstraints();
+    gbc_lblDescription.anchor = GridBagConstraints.EAST;
+    gbc_lblDescription.insets = new Insets(0, 0, 5, 5);
+    gbc_lblDescription.gridx = 0;
+    gbc_lblDescription.gridy = 2;
+    add(lblDescription, gbc_lblDescription);
+    
+    scrollPane = new JScrollPane();
+    scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+    gbc_scrollPane.gridheight = 2;
+    gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
+    gbc_scrollPane.gridwidth = 4;
+    gbc_scrollPane.fill = GridBagConstraints.BOTH;
+    gbc_scrollPane.gridx = 1;
+    gbc_scrollPane.gridy = 2;
+    add(scrollPane, gbc_scrollPane);
+    
+    descriptionTextArea = new JTextArea();
+    descriptionTextArea.setLineWrap(true);
+    descriptionTextArea.setWrapStyleWord(true);
+    scrollPane.setViewportView(descriptionTextArea);
+    
     lblSortingKey = new JLabel("Sorting Key:");
     GridBagConstraints gbc_lblSortingKey = new GridBagConstraints();
     gbc_lblSortingKey.anchor = GridBagConstraints.EAST;
     gbc_lblSortingKey.insets = new Insets(0, 0, 5, 5);
     gbc_lblSortingKey.gridx = 0;
-    gbc_lblSortingKey.gridy = 2;
+    gbc_lblSortingKey.gridy = 4;
     add(lblSortingKey, gbc_lblSortingKey);
     
     sortKeyField = new JFormattedTextField(FormatUtils.getIntegerFormat());
@@ -135,48 +159,26 @@ public class PrizePanel extends EntityPanel
     gbc_sortKeyField.insets = new Insets(0, 0, 5, 5);
     gbc_sortKeyField.fill = GridBagConstraints.HORIZONTAL;
     gbc_sortKeyField.gridx = 1;
-    gbc_sortKeyField.gridy = 2;
+    gbc_sortKeyField.gridy = 4;
     add(sortKeyField, gbc_sortKeyField);
-    
-    lblDescription = new JLabel("Description:");
-    GridBagConstraints gbc_lblDescription = new GridBagConstraints();
-    gbc_lblDescription.anchor = GridBagConstraints.EAST;
-    gbc_lblDescription.insets = new Insets(0, 0, 5, 5);
-    gbc_lblDescription.gridx = 0;
-    gbc_lblDescription.gridy = 3;
-    add(lblDescription, gbc_lblDescription);
-    
-    scrollPane = new JScrollPane();
-    scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-    gbc_scrollPane.gridheight = 2;
-    gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
-    gbc_scrollPane.gridwidth = 5;
-    gbc_scrollPane.fill = GridBagConstraints.BOTH;
-    gbc_scrollPane.gridx = 1;
-    gbc_scrollPane.gridy = 3;
-    add(scrollPane, gbc_scrollPane);
-    
-    descriptionTextArea = new JTextArea();
-    descriptionTextArea.setLineWrap(true);
-    descriptionTextArea.setWrapStyleWord(true);
-    scrollPane.setViewportView(descriptionTextArea);
     
     lblWinner = new JLabel("Winner:");
     GridBagConstraints gbc_lblWinner = new GridBagConstraints();
     gbc_lblWinner.anchor = GridBagConstraints.EAST;
     gbc_lblWinner.insets = new Insets(0, 0, 5, 5);
     gbc_lblWinner.gridx = 0;
-    gbc_lblWinner.gridy = 5;
+    gbc_lblWinner.gridy = 6;
     add(lblWinner, gbc_lblWinner);
     
     winnerField = new JTextField();
+    winnerField.setEnabled(false);
+    winnerField.setEditable(false);
     GridBagConstraints gbc_winnerField = new GridBagConstraints();
     gbc_winnerField.gridwidth = 3;
     gbc_winnerField.insets = new Insets(0, 0, 5, 5);
     gbc_winnerField.fill = GridBagConstraints.HORIZONTAL;
     gbc_winnerField.gridx = 1;
-    gbc_winnerField.gridy = 5;
+    gbc_winnerField.gridy = 6;
     add(winnerField, gbc_winnerField);
     winnerField.setColumns(10);
     
@@ -185,7 +187,7 @@ public class PrizePanel extends EntityPanel
     gbc_openDonorButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_openDonorButton.insets = new Insets(0, 0, 5, 5);
     gbc_openDonorButton.gridx = 4;
-    gbc_openDonorButton.gridy = 5;
+    gbc_openDonorButton.gridy = 6;
     add(openDonorButton, gbc_openDonorButton);
     
     assignWinnerButton = new JButton("Assign");
@@ -193,7 +195,7 @@ public class PrizePanel extends EntityPanel
     gbc_assignWinnerButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_assignWinnerButton.insets = new Insets(0, 0, 5, 5);
     gbc_assignWinnerButton.gridx = 1;
-    gbc_assignWinnerButton.gridy = 6;
+    gbc_assignWinnerButton.gridy = 7;
     add(assignWinnerButton, gbc_assignWinnerButton);
     
     removeWinnerButton = new JButton("Remove");
@@ -201,14 +203,14 @@ public class PrizePanel extends EntityPanel
     gbc_removeWinnerButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_removeWinnerButton.insets = new Insets(0, 0, 5, 5);
     gbc_removeWinnerButton.gridx = 2;
-    gbc_removeWinnerButton.gridy = 6;
+    gbc_removeWinnerButton.gridy = 7;
     add(removeWinnerButton, gbc_removeWinnerButton);
     
     manualAssignButton = new JButton("Manual Assign");
     GridBagConstraints gbc_manualAssignButton = new GridBagConstraints();
     gbc_manualAssignButton.insets = new Insets(0, 0, 0, 5);
     gbc_manualAssignButton.gridx = 1;
-    gbc_manualAssignButton.gridy = 7;
+    gbc_manualAssignButton.gridy = 8;
     add(manualAssignButton, gbc_manualAssignButton);
   }
   
@@ -266,11 +268,14 @@ public class PrizePanel extends EntityPanel
     this.openDonorButton.addActionListener(this.actionHandler);
     this.manualAssignButton.addActionListener(this.actionHandler);
     
+    this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(this.descriptionTextArea));
+    
     this.tabOrder = new FocusTraversalManager(new Component[]
     {      
       this.nameField,
       this.imageURLField,
       this.descriptionTextArea,
+      this.sortKeyField,
       this.refreshButton,
       this.saveButton,
       this.assignWinnerButton,

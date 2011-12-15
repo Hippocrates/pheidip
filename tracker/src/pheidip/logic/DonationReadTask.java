@@ -4,8 +4,10 @@ import java.util.List;
 
 import pheidip.db.DonationData;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationCommentState;
 import pheidip.objects.DonationReadState;
 import pheidip.objects.DonationSearchParams;
+import pheidip.util.StringUtils;
 
 public class DonationReadTask implements DonationTask
 {
@@ -29,7 +31,15 @@ public class DonationReadTask implements DonationTask
   public void clearTask(Donation d)
   {
     DonationControl control = getControl(d);
-    d.setReadState(DonationReadState.READ);
+    if (d.getReadState() == DonationReadState.PENDING)
+    {
+      d.setReadState(DonationReadState.READ);
+    }
+    
+    if (d.getCommentState() == DonationCommentState.PENDING && !StringUtils.isEmptyOrNull(d.getComment()))
+    {
+      d.setCommentState(DonationCommentState.APPROVED);
+    }
     control.updateData(d);
   }
 
@@ -44,7 +54,7 @@ public class DonationReadTask implements DonationTask
   
   public boolean isTaskCleared(Donation d)
   {
-    return d.getReadState() != DonationReadState.PENDING;
+    return d.getReadState() != DonationReadState.PENDING || (d.getCommentState() != DonationCommentState.PENDING && !StringUtils.isEmptyOrNull(d.getComment()));
   }
 
   @Override

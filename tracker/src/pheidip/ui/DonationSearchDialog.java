@@ -440,6 +440,8 @@ public class DonationSearchDialog extends JDialog
     this.prevButton.addActionListener(this.actionHandler);
     this.donationList.addListSelectionListener(this.actionHandler);
     
+    this.getRootPane().setDefaultButton(this.searchButton);
+    
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.donorCheckBox,

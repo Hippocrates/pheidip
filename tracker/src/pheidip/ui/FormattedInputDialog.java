@@ -55,6 +55,8 @@ public class FormattedInputDialog extends JDialog
       }
     });
     panel.add(cancelButton);
+    
+    this.getRootPane().setDefaultButton(this.okButton);
   }
   
   /**

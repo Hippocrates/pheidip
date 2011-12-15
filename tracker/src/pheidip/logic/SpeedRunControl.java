@@ -72,7 +72,7 @@ public class SpeedRunControl
   {
     int id = IdUtils.generateId();
 
-    Challenge inserted = new Challenge(id, result, BigDecimal.ZERO.setScale(2), null, BidState.OPENED, this.getData());
+    Challenge inserted = new Challenge(id, result, BigDecimal.ZERO.setScale(2), null, BidState.HIDDEN, this.getData());
     this.getData().getBids().add(inserted);
     
     this.bids.insertChallenge(inserted);

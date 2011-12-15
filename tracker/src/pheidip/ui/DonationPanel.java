@@ -304,6 +304,8 @@ public class DonationPanel extends EntityPanel
     this.saveButton.addActionListener(this.actionHandler);
     this.deleteButton.addActionListener(this.actionHandler);
     
+    this.commentTextArea.addKeyListener(new TabTraversalKeyListener(this.commentTextArea)); 
+    
     List<Component> tabArray = new ArrayList<Component>();
     tabArray.add(this.amountField);
     tabArray.add(this.openDonorButton);
@@ -375,10 +377,14 @@ public class DonationPanel extends EntityPanel
     if (this.donationControl != null)
     {
       result = this.donationControl.getData();
-    }
-    
-    if (result != null)
-    {
+
+      if (result == null)
+      {
+        JOptionPane.showMessageDialog(this, "Error, This donation no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
+        this.owner.removeTab(this);
+        return;
+      }
+      
       Donor donor = result.getDonor();
       
       this.amountField.setText(result.getAmount().toString());

@@ -58,9 +58,9 @@ public class SpeedRunPanel extends EntityPanel
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{72, 110, 116, 114, 85, 0};
+    gridBagLayout.columnWidths = new int[]{72, 110, 116, 114, 0, 0, 85, 0};
     gridBagLayout.rowHeights = new int[]{0, 41, 0, 0, 0, 0, 131, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
@@ -86,7 +86,7 @@ public class SpeedRunPanel extends EntityPanel
     GridBagConstraints gbc_deleteButton = new GridBagConstraints();
     gbc_deleteButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_deleteButton.insets = new Insets(0, 0, 5, 0);
-    gbc_deleteButton.gridx = 4;
+    gbc_deleteButton.gridx = 6;
     gbc_deleteButton.gridy = 0;
     add(deleteButton, gbc_deleteButton);
     
@@ -100,7 +100,7 @@ public class SpeedRunPanel extends EntityPanel
     descriptionScrollPane = new JScrollPane();
     descriptionScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     GridBagConstraints gbc_descriptionScrollPane = new GridBagConstraints();
-    gbc_descriptionScrollPane.gridwidth = 2;
+    gbc_descriptionScrollPane.gridwidth = 3;
     gbc_descriptionScrollPane.insets = new Insets(0, 0, 5, 5);
     gbc_descriptionScrollPane.fill = GridBagConstraints.BOTH;
     gbc_descriptionScrollPane.gridx = 1;
@@ -164,14 +164,14 @@ public class SpeedRunPanel extends EntityPanel
     newChallengeButton = new JButton("New Challenge");
     GridBagConstraints gbc_newChallengeButton = new GridBagConstraints();
     gbc_newChallengeButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_newChallengeButton.insets = new Insets(0, 0, 5, 0);
+    gbc_newChallengeButton.insets = new Insets(0, 0, 5, 5);
     gbc_newChallengeButton.gridx = 4;
     gbc_newChallengeButton.gridy = 5;
     add(newChallengeButton, gbc_newChallengeButton);
     
     bidsScrollPane = new JScrollPane();
     GridBagConstraints gbc_bidsScrollPane = new GridBagConstraints();
-    gbc_bidsScrollPane.gridwidth = 5;
+    gbc_bidsScrollPane.gridwidth = 7;
     gbc_bidsScrollPane.fill = GridBagConstraints.BOTH;
     gbc_bidsScrollPane.gridx = 0;
     gbc_bidsScrollPane.gridy = 6;
@@ -243,12 +243,15 @@ public class SpeedRunPanel extends EntityPanel
     deleteButton.addActionListener(this.actionHandler);
     bidTable.addMouseListener(this.actionHandler);
     
+    this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(this.descriptionTextArea));
+    
     this.bidTable.addKeyListener(new TabTraversalKeyListener(this.bidTable));
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.nameField,
       this.descriptionTextArea,
+      this.sortKeyField,
       this.saveButton,
       this.refreshButton,
       this.openBidButton,

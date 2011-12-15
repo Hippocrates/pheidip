@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -124,7 +123,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     Session session = this.beginTransaction();
 
     Challenge c = (Challenge) session.get(Challenge.class, challengeId);
-    Hibernate.initialize(c.getBids());
+
     this.endTransaction();
 
     return c;

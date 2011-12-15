@@ -9,7 +9,7 @@
    <generator class="assigned"/>
   </id>
   <property generated="never" lazy="false" name="name" type="java.lang.String">
-   <column check="NAME = lower(NAME)" name="NAME" unique-key="ChoiceNameUnique"/>
+   <column name="NAME" />
   </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
@@ -23,7 +23,7 @@
   </property>
   <many-to-one class="pheidip.objects.SpeedRun" fetch="join" lazy="false"
    foreign-key="BidFKSpeedRun" name="speedRun">
-   <column name="SPEEDRUN" unique-key="ChoiceNameUnique"/>
+   <column name="SPEEDRUN"/>
   </many-to-one>
  </class>
 </hibernate-mapping>

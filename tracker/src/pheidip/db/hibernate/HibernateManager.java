@@ -2,6 +2,7 @@ package pheidip.db.hibernate;
 
 import java.io.File;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -78,7 +79,24 @@ public class HibernateManager
     cfg.setProperty("hibernate.connection.password", password);
     cfg.setProperty("hibernate.dialect", getDialect(type));
 
-    return cfg.buildSessionFactory();
+    SessionFactory result = cfg.buildSessionFactory();
+    Session session = null;
+    
+    try
+    {
+      session = result.openSession();
+      // send a do-nothing query to confirm the database connection
+      session.createSQLQuery("select 0;").list();
+      session.close();
+    }
+    catch(Exception e)
+    {
+      session.close();
+      result.close();
+      throw new RuntimeException(e.getMessage());
+    }
+    
+    return result;
   }
   
   // other methods to create file or memory or whatever else here too....

@@ -5,7 +5,7 @@
 <hibernate-mapping>
  <union-subclass extends="pheidip.objects.DonationBid" lazy="false" name="pheidip.objects.ChallengeBid">
   <many-to-one class="pheidip.objects.Challenge" fetch="join" lazy="false"
-   foreign-key="ChallengeBidFKChallenge" name="challenge">
+   name="challenge">
    <column name="CHALLENGE"/>
   </many-to-one>
  </union-subclass>

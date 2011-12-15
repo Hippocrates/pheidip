@@ -5,6 +5,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.exception.ConstraintViolationException;
 
+import pheidip.db.DonationDataConstraint;
+import pheidip.db.DonationDataConstraintException;
+import pheidip.db.DonationDataErrorParser;
+
 abstract public class HibernateDataInterface 
 {
 	private HibernateDonationDataAccess manager;
@@ -73,7 +77,19 @@ abstract public class HibernateDataInterface
 	  {
 	    this.manager.getSession().getTransaction().rollback();
       this.getManager().resetSession();
-	    throw new RuntimeException(e.getLocalizedMessage());
+      
+      String errorMessage = e.getLocalizedMessage();
+      
+      DonationDataConstraint knownConstraint = DonationDataErrorParser.parseError(errorMessage);
+      
+      if (knownConstraint != null)
+      {
+        throw new DonationDataConstraintException(knownConstraint);
+      }
+      else
+      {
+        throw new RuntimeException(e.getLocalizedMessage());
+      }
 	  }
 	  catch(Exception e)
     {

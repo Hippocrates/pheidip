@@ -58,6 +58,11 @@ public class Challenge implements Bid
 
   public void setGoalAmount(BigDecimal goalAmount)
   {
+    if (goalAmount.compareTo(BigDecimal.ZERO) < 0)
+    {
+      throw new RuntimeException("Goal amount must be greater than or equal to zero.");
+    }
+    
     this.goalAmount = goalAmount.setScale(2);
   }
 

@@ -59,6 +59,11 @@ public class Donation
 	
   public void setAmount(BigDecimal amount)
   {
+    if (amount.compareTo(BigDecimal.ZERO) < 0)
+    {
+      throw new RuntimeException("Negative donation amount invalid.");
+    }
+
     this.amount = amount;
   }
 

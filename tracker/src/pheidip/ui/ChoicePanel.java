@@ -54,10 +54,10 @@ public class ChoicePanel extends EntityPanel
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{0, 93, 93, 0, 100, 85, 0};
+    gridBagLayout.columnWidths = new int[]{83, 93, 93, 0, 100, 85, 0};
     gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     nameLabel = new JLabel("Name:");
@@ -85,11 +85,28 @@ public class ChoicePanel extends EntityPanel
     gbc_deleteChoiceButton.gridy = 0;
     add(deleteChoiceButton, gbc_deleteChoiceButton);
     
+    stateLabel = new JLabel("State:");
+    GridBagConstraints gbc_stateLabel = new GridBagConstraints();
+    gbc_stateLabel.anchor = GridBagConstraints.EAST;
+    gbc_stateLabel.insets = new Insets(0, 0, 5, 5);
+    gbc_stateLabel.gridx = 0;
+    gbc_stateLabel.gridy = 1;
+    add(stateLabel, gbc_stateLabel);
+    
+    stateComboBox = new JComboBox(BidState.values());
+    GridBagConstraints gbc_stateComboBox = new GridBagConstraints();
+    gbc_stateComboBox.gridwidth = 3;
+    gbc_stateComboBox.insets = new Insets(0, 0, 5, 5);
+    gbc_stateComboBox.fill = GridBagConstraints.HORIZONTAL;
+    gbc_stateComboBox.gridx = 1;
+    gbc_stateComboBox.gridy = 1;
+    add(stateComboBox, gbc_stateComboBox);
+    
     lblDescription = new JLabel("Description");
     GridBagConstraints gbc_lblDescription = new GridBagConstraints();
     gbc_lblDescription.insets = new Insets(0, 0, 5, 5);
     gbc_lblDescription.gridx = 0;
-    gbc_lblDescription.gridy = 1;
+    gbc_lblDescription.gridy = 2;
     add(lblDescription, gbc_lblDescription);
     
     descriptionScrollPane = new JScrollPane();
@@ -99,30 +116,13 @@ public class ChoicePanel extends EntityPanel
     gbc_descriptionScrollPane.insets = new Insets(0, 0, 5, 5);
     gbc_descriptionScrollPane.fill = GridBagConstraints.BOTH;
     gbc_descriptionScrollPane.gridx = 1;
-    gbc_descriptionScrollPane.gridy = 1;
+    gbc_descriptionScrollPane.gridy = 2;
     add(descriptionScrollPane, gbc_descriptionScrollPane);
     
     descriptionTextArea = new JTextArea();
     descriptionTextArea.setWrapStyleWord(true);
     descriptionTextArea.setLineWrap(true);
     descriptionScrollPane.setViewportView(descriptionTextArea);
-    
-    stateLabel = new JLabel("State:");
-    GridBagConstraints gbc_stateLabel = new GridBagConstraints();
-    gbc_stateLabel.anchor = GridBagConstraints.EAST;
-    gbc_stateLabel.insets = new Insets(0, 0, 5, 5);
-    gbc_stateLabel.gridx = 0;
-    gbc_stateLabel.gridy = 2;
-    add(stateLabel, gbc_stateLabel);
-    
-    stateComboBox = new JComboBox(BidState.values());
-    GridBagConstraints gbc_stateComboBox = new GridBagConstraints();
-    gbc_stateComboBox.gridwidth = 3;
-    gbc_stateComboBox.insets = new Insets(0, 0, 5, 5);
-    gbc_stateComboBox.fill = GridBagConstraints.HORIZONTAL;
-    gbc_stateComboBox.gridx = 1;
-    gbc_stateComboBox.gridy = 2;
-    add(stateComboBox, gbc_stateComboBox);
     
     saveButton = new JButton("Save");
     GridBagConstraints gbc_saveButton = new GridBagConstraints();
@@ -224,11 +224,14 @@ public class ChoicePanel extends EntityPanel
     this.renameOptionButton.addActionListener(this.actionHandler);
     this.deleteChoiceButton.addActionListener(this.actionHandler);
     
+    this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(this.descriptionTextArea));
+    
     this.optionTable.addKeyListener(new TabTraversalKeyListener(this.optionTable));
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
         this.nameField,
+        this.stateComboBox,
         this.descriptionTextArea,
         this.saveButton,
         this.refreshButton,

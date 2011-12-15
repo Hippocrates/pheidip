@@ -236,6 +236,8 @@ public class PrizeSearchDialog extends JDialog
     this.nextButton.addActionListener(this.actionHandler);
     this.prevButton.addActionListener(this.actionHandler);
     
+    this.getRootPane().setDefaultButton(this.searchButton);
+    
     this.traversalManager = new FocusTraversalManager(new Component[]
     {
       this.nameField,

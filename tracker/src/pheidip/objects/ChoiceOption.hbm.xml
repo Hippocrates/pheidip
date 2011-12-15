@@ -9,11 +9,11 @@
    <generator class="assigned"/>
   </id>
   <property generated="never" lazy="false" name="name" type="java.lang.String">
-   <column check="NAME = lower(NAME)" name="NAME" unique-key="OptionNameUnique"/>
+   <column name="NAME" />
   </property>
   <many-to-one class="pheidip.objects.Choice" fetch="join"
-   foreign-key="ChoiceOptionFKChoice" lazy="false" name="choice">
-   <column name="CHOICE" unique-key="OptionNameUnique"/>
+   lazy="false" name="choice">
+   <column name="CHOICE" />
   </many-to-one>
   <set cascade="all,delete-orphan" fetch="join" lazy="false" name="bids"
    sort="unsorted" table="CHOICEBID" inverse="true">

@@ -53,7 +53,7 @@ public class ChallengePanel extends EntityPanel
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{0, 107, 103, 32, 0, 93, 0};
     gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
@@ -211,10 +211,13 @@ public class ChallengePanel extends EntityPanel
     this.refreshButton.addActionListener(this.actionHandler);
     this.deleteChallengeButton.addActionListener(this.actionHandler);
     
+    this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(this.descriptionTextArea));
+    
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.nameField,
       this.amountField,
+      this.bidStateComboBox,
       this.descriptionTextArea,
       this.saveButton,
       this.refreshButton,

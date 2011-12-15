@@ -12,7 +12,7 @@
    <column name="AMOUNT"/>
   </property>
   <many-to-one class="pheidip.objects.Donation" fetch="join"
-   foreign-key="DonationBidFKDonation" name="donation">
+   name="donation">
    <column name="DONATION"/>
   </many-to-one>
  </class>

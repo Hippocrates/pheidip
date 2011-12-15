@@ -135,6 +135,8 @@ public class DatabaseConnectDialog extends JDialog
     connectButton.addActionListener(this.actionHandler);
     cancelButton.addActionListener(this.actionHandler);
     connectionTypeBox.addActionListener(this.actionHandler);
+    
+    this.getRootPane().setDefaultButton(this.connectButton);
   }
   
   public DatabaseConnectDialog(JFrame parent, DonationDatabaseManager databaseManager)

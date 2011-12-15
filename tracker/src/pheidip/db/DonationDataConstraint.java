@@ -18,6 +18,7 @@ public enum DonationDataConstraint
   SpeedRunNameUnique("A SpeedRun with that name already exists."),
   SpeedRunNameLowerCase("SpeedRun names must be lowercase."),
   SpeedRunPK("A SpeedRun with that ID already exists."),
+  SpeedRunSortKeyUnique("A SpeedRun with that sorting key already exists."),
   ChoiceFKSpeedRun("This SpeedRun still has a Choice linked to it."),
   ChoiceNameUnique("A Choice with that name already exists."),
   ChoiceNameLowerCase("Choice names must be lowercase."),
@@ -41,6 +42,7 @@ public enum DonationDataConstraint
   ChallengeBidPK("A ChallengeBid with that ID already exists."),
   PrizeNameUnique("A Prize with that name already exists."),
   PrizeNameLowerCase("Prize names must be lowercase."),
+  PrizeSortKeyUnique("A prize with that sorting key already exists."),
   PrizePK("A Prize with that ID already exists."),
   PrizeFKDonor("A Prize is still linked to that Donor.");
   

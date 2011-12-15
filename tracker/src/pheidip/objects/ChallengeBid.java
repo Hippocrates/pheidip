@@ -2,13 +2,8 @@ package pheidip.objects;
 
 import java.math.BigDecimal;
 
-import pheidip.util.IdUtils;
-
-public class ChallengeBid implements DonationBid
+public class ChallengeBid extends DonationBid
 {
-  private int id = IdUtils.generateId();
-  private BigDecimal amount;
-  private Donation donation;
   private Challenge challenge;
   
   public ChallengeBid()
@@ -17,52 +12,10 @@ public class ChallengeBid implements DonationBid
   
   public ChallengeBid(int id, BigDecimal amount, Challenge challenge, Donation donation)
   {
-    this.setId(id);
-    this.setAmount(amount);
+    super(id, amount, donation);
     this.setChallenge(challenge);
-    this.setDonation(donation);
   }
   
-  public int getId()
-  {
-    return id;
-  }
-
-  public void setId(int id)
-  {
-    this.id = id;
-  }
-
-  public void setDonation(Donation donation)
-  {/*
-    if (this.donation != null)
-    {
-      this.donation.getBids().remove(this);
-    }
-    
-    if (donation != null)
-    {
-      donation.getBids().add(this);
-    }
-    */
-    this.donation = donation;
-  }
-
-  public Donation getDonation()
-  {
-    return donation;
-  }
-
-  public BigDecimal getAmount()
-  {
-    return amount;
-  }
-
-  public void setAmount(BigDecimal amount)
-  {
-    this.amount = amount;
-  }
-
   @Override
   public BidType getType()
   {

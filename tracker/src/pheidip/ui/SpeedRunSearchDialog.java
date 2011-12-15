@@ -22,6 +22,8 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.JList;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.JScrollPane;
@@ -105,6 +107,7 @@ public class SpeedRunSearchDialog extends JDialog
     getContentPane().add(searchButton, gbc_searchButton);
     
     createNewButton = new JButton("Create New");
+    createNewButton.setEnabled(false);
     GridBagConstraints gbc_createNewButton = new GridBagConstraints();
     gbc_createNewButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_createNewButton.insets = new Insets(0, 0, 5, 5);
@@ -147,7 +150,7 @@ public class SpeedRunSearchDialog extends JDialog
     getContentPane().add(cancelButton, gbc_cancelButton);
   }
   
-  private class ActionHandler implements ActionListener, ListSelectionListener
+  private class ActionHandler implements ActionListener, ListSelectionListener, DocumentListener
   {
     public void actionPerformed(ActionEvent ev)
     {
@@ -192,6 +195,29 @@ public class SpeedRunSearchDialog extends JDialog
         okButton.setEnabled(!speedRunList.isSelectionEmpty());
       }
     }
+    
+    private void documentEvent(DocumentEvent ev)
+    {
+      updateUIState();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent arg0)
+    {
+      this.documentEvent(arg0);
+    }
+
+    @Override
+    public void insertUpdate(DocumentEvent arg0)
+    {
+      this.documentEvent(arg0);
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent arg0)
+    {
+      this.documentEvent(arg0);
+    }
   }
   
   private void initializeGUIEvents()
@@ -205,12 +231,15 @@ public class SpeedRunSearchDialog extends JDialog
     this.createNewButton.addActionListener(this.actionHandler);
     this.prevButton.addActionListener(this.actionHandler);
     this.nextButton.addActionListener(this.actionHandler);
+    this.nameField.getDocument().addDocumentListener(this.actionHandler);
+    
+    this.getRootPane().setDefaultButton(this.searchButton);
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.nameField,
-      this.speedRunList,
       this.searchButton,
+      this.speedRunList,
       this.createNewButton,
       this.prevButton,
       this.nextButton,
@@ -310,6 +339,7 @@ public class SpeedRunSearchDialog extends JDialog
   private void updateUIState()
   {
     this.okButton.setEnabled(!this.speedRunList.isSelectionEmpty());
+    this.createNewButton.setEnabled(!StringUtils.isEmptyOrNull(this.nameField.getText()));
     this.nextButton.setEnabled(this.searcher.hasNext());
     this.prevButton.setEnabled(this.searcher.hasPrev());
   }
