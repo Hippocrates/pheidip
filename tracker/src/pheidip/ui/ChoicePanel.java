@@ -3,9 +3,11 @@ package pheidip.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import pheidip.logic.ChoiceControl;
 import pheidip.objects.Choice;
+import pheidip.objects.ChoiceBid;
 import pheidip.objects.ChoiceOption;
 import pheidip.objects.BidState;
 import pheidip.util.Pair;
@@ -27,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JComboBox;
+import javax.swing.ListSelectionModel;
 
 @SuppressWarnings("serial")
 public class ChoicePanel extends EntityPanel
@@ -53,13 +56,17 @@ public class ChoicePanel extends EntityPanel
   private JLabel lblRun;
   private JTextField runField;
   private JButton openRunButton;
+  private JButton openDonationButton;
+  private JScrollPane bidsTableScrollPane;
+  private JTable bidsTable;
+  private int[] donationTableIds;
 
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{83, 93, 99, 104, 43, 85, 0};
+    gridBagLayout.columnWidths = new int[]{83, 93, 99, 104, 54, 43, 85, 0};
     gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
@@ -84,7 +91,7 @@ public class ChoicePanel extends EntityPanel
     deleteChoiceButton = new JButton("Delete Choice");
     GridBagConstraints gbc_deleteChoiceButton = new GridBagConstraints();
     gbc_deleteChoiceButton.insets = new Insets(0, 0, 5, 0);
-    gbc_deleteChoiceButton.gridx = 5;
+    gbc_deleteChoiceButton.gridx = 6;
     gbc_deleteChoiceButton.gridy = 0;
     add(deleteChoiceButton, gbc_deleteChoiceButton);
     
@@ -132,6 +139,14 @@ public class ChoicePanel extends EntityPanel
     gbc_stateComboBox.gridy = 2;
     add(stateComboBox, gbc_stateComboBox);
     
+    openDonationButton = new JButton("Open Donation");
+    GridBagConstraints gbc_openDonationButton = new GridBagConstraints();
+    gbc_openDonationButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_openDonationButton.insets = new Insets(0, 0, 5, 5);
+    gbc_openDonationButton.gridx = 4;
+    gbc_openDonationButton.gridy = 2;
+    add(openDonationButton, gbc_openDonationButton);
+    
     lblDescription = new JLabel("Description");
     GridBagConstraints gbc_lblDescription = new GridBagConstraints();
     gbc_lblDescription.insets = new Insets(0, 0, 5, 5);
@@ -153,6 +168,19 @@ public class ChoicePanel extends EntityPanel
     descriptionTextArea.setWrapStyleWord(true);
     descriptionTextArea.setLineWrap(true);
     descriptionScrollPane.setViewportView(descriptionTextArea);
+    
+    bidsTableScrollPane = new JScrollPane();
+    GridBagConstraints gbc_bidsTableScrollPane = new GridBagConstraints();
+    gbc_bidsTableScrollPane.gridwidth = 3;
+    gbc_bidsTableScrollPane.insets = new Insets(0, 0, 5, 5);
+    gbc_bidsTableScrollPane.fill = GridBagConstraints.BOTH;
+    gbc_bidsTableScrollPane.gridx = 4;
+    gbc_bidsTableScrollPane.gridy = 3;
+    add(bidsTableScrollPane, gbc_bidsTableScrollPane);
+    
+    bidsTable = new JTable();
+    bidsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    bidsTableScrollPane.setViewportView(bidsTable);
     
     saveButton = new JButton("Save");
     GridBagConstraints gbc_saveButton = new GridBagConstraints();
@@ -189,19 +217,20 @@ public class ChoicePanel extends EntityPanel
     deleteOptionButton = new JButton("Delete Option");
     GridBagConstraints gbc_deleteOptionButton = new GridBagConstraints();
     gbc_deleteOptionButton.insets = new Insets(0, 0, 5, 0);
-    gbc_deleteOptionButton.gridx = 5;
+    gbc_deleteOptionButton.gridx = 6;
     gbc_deleteOptionButton.gridy = 6;
     add(deleteOptionButton, gbc_deleteOptionButton);
     
     scrollPane = new JScrollPane();
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-    gbc_scrollPane.gridwidth = 6;
+    gbc_scrollPane.gridwidth = 7;
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
     gbc_scrollPane.gridx = 0;
     gbc_scrollPane.gridy = 7;
     add(scrollPane, gbc_scrollPane);
     
     optionTable = new JTable();
+    optionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     scrollPane.setViewportView(optionTable);
   }
   
@@ -245,6 +274,29 @@ public class ChoicePanel extends EntityPanel
         owner.report(e);
       }
     }
+    
+    @Override
+    public void mouseClicked(MouseEvent event)
+    {
+      try
+      {
+        if (event.getSource() == optionTable)
+        {
+          updateUIState();
+        }
+        else if (event.getSource() == bidsTable)
+        {
+          if (event.getClickCount() == 2)
+          {
+            ChoicePanel.this.openSelectedBid();
+          }
+        }
+      }
+      catch(Exception e)
+      {
+        owner.report(e);
+      }
+    }
   }
 
   private void initializeGUIEvents()
@@ -258,6 +310,10 @@ public class ChoicePanel extends EntityPanel
     this.renameOptionButton.addActionListener(this.actionHandler);
     this.deleteChoiceButton.addActionListener(this.actionHandler);
     this.openRunButton.addActionListener(this.actionHandler);
+    this.optionTable.addMouseListener(this.actionHandler);
+    
+    this.openDonationButton.addActionListener(this.actionHandler);
+    this.bidsTable.addMouseListener(this.actionHandler);
     
     this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(this.descriptionTextArea));
     
@@ -308,6 +364,50 @@ public class ChoicePanel extends EntityPanel
   {
     this.owner.openSpeedRunTab(this.choiceControl.getData().getSpeedRun().getId());
   }
+  
+  private void updateUIState()
+  {
+    ChoiceOption currentOption = this.getSelectedOption();
+    
+    CustomTableModel bidTableData = new CustomTableModel(new String[]
+    {
+      "Amount Bid",
+      "Donor",
+    },0);
+    
+    if (currentOption == null)
+    {
+      this.bidsTable.setEnabled(false);
+      this.deleteOptionButton.setEnabled(false);
+      this.renameOptionButton.setEnabled(false);
+      this.openDonationButton.setEnabled(false);
+    }
+    else
+    {
+      this.bidsTable.setEnabled(true);
+      this.deleteOptionButton.setEnabled(true);
+      this.renameOptionButton.setEnabled(true);
+      this.openDonationButton.setEnabled(true);
+      
+      int current = 0;
+      
+      this.donationTableIds = new int[currentOption.getBids().size()];
+      
+      for (ChoiceBid b : currentOption.getBids())
+      {
+        this.donationTableIds[current] = b.getDonation().getId();
+        ++current;
+        
+        bidTableData.addRow(new Object[]
+        {
+          b.getAmount(),
+          b.getDonation().getDonor().toString(),
+        });
+      }
+    }
+      
+    this.bidsTable.setModel(bidTableData);
+  }
 
   @Override
   public void redrawContent()
@@ -344,8 +444,10 @@ public class ChoicePanel extends EntityPanel
     }
     
     this.optionTable.setModel(tableData);
-    
+
     this.setHeaderText(choice.toString());
+    
+    this.updateUIState();
   }
   
   public void saveContent()
@@ -356,6 +458,16 @@ public class ChoicePanel extends EntityPanel
     data.setBidState((BidState) this.stateComboBox.getSelectedItem());
     this.choiceControl.updateData(data);
     this.refreshContent();
+  }
+
+  public void openSelectedBid()
+  {
+    int selectedRow = this.bidsTable.getSelectedRow();
+      
+    if (selectedRow != -1)
+    {
+      this.owner.openDonationTab(this.donationTableIds[selectedRow]);
+    }
   }
   
   private void addNewOption()

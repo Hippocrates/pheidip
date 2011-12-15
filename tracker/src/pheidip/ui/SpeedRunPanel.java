@@ -30,6 +30,7 @@ import java.util.List;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextArea;
 import javax.swing.JFormattedTextField;
+import javax.swing.ListSelectionModel;
 
 @SuppressWarnings("serial")
 public class SpeedRunPanel extends EntityPanel
@@ -178,6 +179,7 @@ public class SpeedRunPanel extends EntityPanel
     add(bidsScrollPane, gbc_bidsScrollPane);
     
     bidTable = new JTable();
+    bidTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     bidsScrollPane.setViewportView(bidTable);
   }
   

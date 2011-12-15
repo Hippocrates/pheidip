@@ -2,11 +2,15 @@ package pheidip.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
 import pheidip.logic.DonationControl;
 import pheidip.objects.BidType;
+import pheidip.objects.ChallengeBid;
+import pheidip.objects.ChoiceBid;
 import pheidip.objects.DonationBid;
 import pheidip.util.FormatUtils;
 import pheidip.util.StringUtils;
@@ -23,6 +27,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
 @SuppressWarnings("serial")
 public class DonationBidsPanel extends JPanel
@@ -37,13 +42,14 @@ public class DonationBidsPanel extends JPanel
   private JButton deleteBidButton;
   private List<DonationBid> cachedDonationBids;
   private FocusTraversalManager tabOrder;
+  private JButton openBidButton;
   
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{107, 100, 87, 88, 0, 0};
+    gridBagLayout.columnWidths = new int[]{107, 100, 57, 97, 0, 88, 0};
     gridBagLayout.rowHeights = new int[]{0, 39, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
@@ -63,28 +69,36 @@ public class DonationBidsPanel extends JPanel
     gbc_changeAmountButton.gridy = 0;
     add(changeAmountButton, gbc_changeAmountButton);
     
+    openBidButton = new JButton("Open Bid");
+    GridBagConstraints gbc_openBidButton = new GridBagConstraints();
+    gbc_openBidButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_openBidButton.insets = new Insets(0, 0, 5, 5);
+    gbc_openBidButton.gridx = 3;
+    gbc_openBidButton.gridy = 0;
+    add(openBidButton, gbc_openBidButton);
+    
     deleteBidButton = new JButton("Delete Bid");
     GridBagConstraints gbc_deleteBidButton = new GridBagConstraints();
-    gbc_deleteBidButton.insets = new Insets(0, 0, 5, 5);
+    gbc_deleteBidButton.insets = new Insets(0, 0, 5, 0);
     gbc_deleteBidButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_deleteBidButton.gridx = 3;
+    gbc_deleteBidButton.gridx = 5;
     gbc_deleteBidButton.gridy = 0;
     add(deleteBidButton, gbc_deleteBidButton);
     
     bidScrollPane = new JScrollPane();
     GridBagConstraints gbc_bidScrollPane = new GridBagConstraints();
-    gbc_bidScrollPane.gridwidth = 5;
-    gbc_bidScrollPane.insets = new Insets(0, 0, 0, 5);
+    gbc_bidScrollPane.gridwidth = 6;
     gbc_bidScrollPane.fill = GridBagConstraints.BOTH;
     gbc_bidScrollPane.gridx = 0;
     gbc_bidScrollPane.gridy = 1;
     add(bidScrollPane, gbc_bidScrollPane);
     
     bidTable = new JTable();
+    bidTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     bidScrollPane.setViewportView(bidTable);
   }
   
-  private class ActionHandler implements ActionListener
+  private class ActionHandler extends MouseAdapter implements ActionListener
   {
     public void actionPerformed(ActionEvent event)
     {
@@ -102,8 +116,31 @@ public class DonationBidsPanel extends JPanel
         {
           removeCurrentBid();
         }
+        else if (event.getSource() == openBidButton)
+        {
+          openSelectedBid();
+        }
       }
       catch (Exception e)
+      {
+        owner.report(e);
+      }
+    }
+    
+    @Override
+    public void mouseClicked(MouseEvent event)
+    {
+      try
+      {
+        if (event.getSource() == DonationBidsPanel.this.bidTable)
+        {
+          if (event.getClickCount() == 2)
+          {
+            DonationBidsPanel.this.openSelectedBid();
+          }
+        }
+      }
+      catch(Exception e)
       {
         owner.report(e);
       }
@@ -117,7 +154,8 @@ public class DonationBidsPanel extends JPanel
     this.attachBidButton.addActionListener(this.actionHandler);
     this.changeAmountButton.addActionListener(this.actionHandler);
     this.deleteBidButton.addActionListener(this.actionHandler);
-    
+    this.bidTable.addMouseListener(this.actionHandler);
+    this.openBidButton.addActionListener(this.actionHandler);
     this.bidTable.addKeyListener(new TabTraversalKeyListener(this.bidTable)); 
     
     Component[] tabArray = new Component[]
@@ -169,6 +207,25 @@ public class DonationBidsPanel extends JPanel
         this.control.removeBid(selected);
         
         this.refreshContent();
+      }
+    }
+  }
+
+  public void openSelectedBid()
+  {
+    int selectedRow = this.bidTable.getSelectedRow();
+      
+    if (selectedRow != -1)
+    {
+      DonationBid b = this.cachedDonationBids.get(selectedRow);
+      
+      if (b.getType() == BidType.CHALLENGE)
+      {
+        this.owner.openChallengeTab(((ChallengeBid)b).getChallenge().getId());
+      }
+      else if (b.getType() == BidType.CHOICE)
+      {
+        this.owner.openChoiceTab(((ChoiceBid)b).getOption().getChoice().getId());
       }
     }
   }

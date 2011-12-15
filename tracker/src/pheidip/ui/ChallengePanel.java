@@ -3,6 +3,7 @@ package pheidip.ui;
 import pheidip.logic.ChallengeControl;
 import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
+import pheidip.objects.ChallengeBid;
 import pheidip.util.FormatUtils;
 
 import java.awt.Component;
@@ -17,6 +18,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 
 import javax.swing.JButton;
@@ -25,6 +27,8 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
 @SuppressWarnings("serial")
 public class ChallengePanel extends EntityPanel
@@ -50,13 +54,18 @@ public class ChallengePanel extends EntityPanel
   private JLabel lblRun;
   private JTextField runField;
   private JButton openRunButton;
+  private JScrollPane bidScrollPane;
+  private JTable bidsTable;
+  private JButton openDonationButton;
+  
+  private int[] donationTableIds;
   
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{0, 107, 103, 95, 0, 93, 0};
+    gridBagLayout.columnWidths = new int[]{0, 107, 103, 95, 93, 26, 93, 0};
     gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
@@ -82,7 +91,7 @@ public class ChallengePanel extends EntityPanel
     GridBagConstraints gbc_deleteChallengeButton = new GridBagConstraints();
     gbc_deleteChallengeButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_deleteChallengeButton.insets = new Insets(0, 0, 5, 0);
-    gbc_deleteChallengeButton.gridx = 5;
+    gbc_deleteChallengeButton.gridx = 6;
     gbc_deleteChallengeButton.gridy = 0;
     add(deleteChallengeButton, gbc_deleteChallengeButton);
     
@@ -147,6 +156,27 @@ public class ChallengePanel extends EntityPanel
     gbc_bidStateComboBox.gridx = 1;
     gbc_bidStateComboBox.gridy = 3;
     add(bidStateComboBox, gbc_bidStateComboBox);
+    
+    openDonationButton = new JButton("Open Donation");
+    GridBagConstraints gbc_openBidButton = new GridBagConstraints();
+    gbc_openBidButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_openBidButton.insets = new Insets(0, 0, 5, 5);
+    gbc_openBidButton.gridx = 4;
+    gbc_openBidButton.gridy = 3;
+    add(openDonationButton, gbc_openBidButton);
+    
+    bidScrollPane = new JScrollPane();
+    GridBagConstraints gbc_bidScrollPane = new GridBagConstraints();
+    gbc_bidScrollPane.gridwidth = 3;
+    gbc_bidScrollPane.insets = new Insets(0, 0, 5, 0);
+    gbc_bidScrollPane.fill = GridBagConstraints.BOTH;
+    gbc_bidScrollPane.gridx = 4;
+    gbc_bidScrollPane.gridy = 4;
+    add(bidScrollPane, gbc_bidScrollPane);
+    
+    bidsTable = new JTable();
+    bidsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    bidScrollPane.setViewportView(bidsTable);
     
     lblDescription = new JLabel("Description:");
     GridBagConstraints gbc_lblDescription = new GridBagConstraints();
@@ -228,10 +258,33 @@ public class ChallengePanel extends EntityPanel
         {
           ChallengePanel.this.openAssociatedRun();
         }
+        else if (ev.getSource() == openDonationButton)
+        {
+          
+        }
       }
       catch(Exception e)
       {
         e.printStackTrace();
+        owner.report(e);
+      }
+    }
+    
+    @Override
+    public void mouseClicked(MouseEvent event)
+    {
+      try
+      {
+        if (event.getSource() == bidsTable)
+        {
+          if (event.getClickCount() == 2)
+          {
+            ChallengePanel.this.openSelectedBid();
+          }
+        }
+      }
+      catch(Exception e)
+      {
         owner.report(e);
       }
     }
@@ -245,6 +298,8 @@ public class ChallengePanel extends EntityPanel
     this.refreshButton.addActionListener(this.actionHandler);
     this.deleteChallengeButton.addActionListener(this.actionHandler);
     this.openRunButton.addActionListener(this.actionHandler);
+    this.openDonationButton.addActionListener(this.actionHandler);
+    this.bidsTable.addMouseListener(this.actionHandler);
     
     this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(this.descriptionTextArea));
     
@@ -260,6 +315,16 @@ public class ChallengePanel extends EntityPanel
     this.setFocusTraversalPolicy(this.tabOrder);
   }
   
+  public void openSelectedBid()
+  {
+    int selectedRow = this.bidsTable.getSelectedRow();
+      
+    if (selectedRow != -1)
+    {
+      this.owner.openDonationTab(this.donationTableIds[selectedRow]);
+    }
+  }
+
   public boolean isFocusCycleRoot()
   {
     return true;
@@ -311,6 +376,30 @@ public class ChallengePanel extends EntityPanel
     this.descriptionTextArea.setText(data.getDescription());
     this.totalAmountField.setText(this.challengeControl.getTotalCollected().toString());
     this.bidStateComboBox.setSelectedItem(data.getBidState());
+    
+    this.donationTableIds = new int[data.getBids().size()];
+    
+    CustomTableModel tableData = new CustomTableModel(new String[]
+    {
+      "Amount Bid",
+      "Donor",
+    },0);
+    
+    int current = 0;
+    
+    for (ChallengeBid b : data.getBids())
+    {
+      this.donationTableIds[current] = b.getDonation().getId();
+      ++current;
+      
+      tableData.addRow(new Object[]
+      {
+        b.getAmount(),
+        b.getDonation().getDonor().toString(),
+      });
+    }
+    
+    this.bidsTable.setModel(tableData);
     
     this.setHeaderText(data.toString());
   }

@@ -26,6 +26,7 @@ import java.awt.Component;
 import java.util.List;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.ListSelectionModel;
 
 
 @SuppressWarnings("serial")
@@ -241,6 +242,7 @@ public class DonorPanel extends EntityPanel
     add(scrollPane, gbc_scrollPane);
     
     donationTable = new JTable();
+    donationTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     scrollPane.setViewportView(donationTable);
     donationTable.setFillsViewportHeight(true);
   }
