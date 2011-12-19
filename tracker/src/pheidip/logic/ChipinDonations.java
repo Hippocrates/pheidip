@@ -65,11 +65,10 @@ public final class ChipinDonations
     return result;
   }
   
-  public static void buildMergeTables(List<ChipinDonation> chipinDonations, List<Donation> databaseDonations, List<Donor> allDonors, List<Donor> donorsToInsert, List<Donation> donationsToInsert, List<Donation> donationsToUpdate)
+  public static List<Donation> updateMergeTable(Map<String, ChipinDonation> chipinDonationMap, List<Donation> databaseDonations)
   {
-    Map<String, Donor> donorTable = generateDonorSet(allDonors);
-    Map<String, ChipinDonation> chipinDonationMap = mapDonations(chipinDonations);
-
+    List<Donation> donationsToUpdate = new ArrayList<Donation>();
+    
     for (Donation donation : databaseDonations)
     {
       ChipinDonation found = chipinDonationMap.remove(donation.getDomainId());
@@ -82,6 +81,13 @@ public final class ChipinDonations
         donationsToUpdate.add(donation);
       }
     }
+    
+    return donationsToUpdate;
+  }
+  
+  public static void buildInsertTables(Map<String, ChipinDonation> chipinDonationMap, List<Donor> allDonors, List<Donor> outDonorsToInsert, List<Donation> outDonationsToInsert)
+  {
+    Map<String, Donor> donorTable = generateDonorSet(allDonors);
     
     for (ChipinDonation chipinDonation : chipinDonationMap.values())
     {
@@ -107,7 +113,7 @@ public final class ChipinDonations
         }
         
         donorTable.put(donor.getEmail(), donor);
-        donorsToInsert.add(donor);
+        outDonorsToInsert.add(donor);
       }
       
       String commentString = chipinDonation.getComment();
@@ -123,7 +129,7 @@ public final class ChipinDonations
       boolean signifigant = chipinDonation.getAmount().compareTo(SIGNIFIGANCE_THRESHOLD) >= 0;
       boolean hasComment = !StringUtils.isEmptyOrNull(commentString);
       
-      donationsToInsert.add(new Donation(IdUtils.generateId(),
+      outDonationsToInsert.add(new Donation(IdUtils.generateId(),
           DonationDomain.CHIPIN, 
           chipinDonation.getChipinId(),
           signifigant && hasComment ? DonationBidState.PENDING : DonationBidState.IGNORED, 

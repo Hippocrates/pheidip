@@ -33,7 +33,7 @@ public interface DonationData {
 	public List<Donation> searchDonations(DonationSearchParams params);
 
   public void insertMultipleDonations(List<Donation> donationsToInsert);
-  public void updateMultiplDonations(List<Donation> donationsToUpdate);
+  public void updateMultipleDonations(List<Donation> donationsToUpdate);
 
   public List<Donation> searchDonationsRange(DonationSearchParams params, int searchOffset,
       int searchSize);

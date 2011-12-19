@@ -244,7 +244,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   }
 
   @Override
-  public void updateMultiplDonations(List<Donation> donationsToUpdate)
+  public void updateMultipleDonations(List<Donation> donationsToUpdate)
   {
     StatelessSession dedicatedSession = this.beginBulkTransaction();
     

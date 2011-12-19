@@ -128,7 +128,7 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     Query q = dedicatedSession.createQuery(queryString + " order by p.name");
 
     if (params.name != null)
-      q.setString("name", params.name);
+      q.setString("name", StringUtils.sqlInnerStringMatch(params.name));
 
     q.setFirstResult(offset);
     q.setMaxResults(size);

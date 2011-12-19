@@ -316,6 +316,9 @@ public class PrizeSearchDialog extends JDialog
     this.okButton.setEnabled(!this.prizeList.isSelectionEmpty());
     
     this.nameField.setEnabled(this.prizeNameCheckBox.isSelected());
+    
+    this.nextButton.setEnabled(this.searcher.hasNext());
+    this.prevButton.setEnabled(this.searcher.hasPrev());
   }
 
   private void runSearch()
