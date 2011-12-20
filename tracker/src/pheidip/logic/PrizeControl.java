@@ -3,6 +3,7 @@ package pheidip.logic;
 import pheidip.db.DonationDataConstraintException;
 import pheidip.db.PrizeData;
 import pheidip.objects.Prize;
+import pheidip.objects.SpeedRun;
 import pheidip.util.IdUtils;
 
 public class PrizeControl
@@ -88,6 +89,26 @@ public class PrizeControl
     {
       this.manager.reportMessage(e.getMessage());
     }
+  }
+  
+  public void setStartGame(SpeedRun startGame)
+  {
+    this.getData().setStartGame(startGame);
+    if (startGame != null)
+    {
+      startGame.getPrizeStartGame().add(this.getData());
+    }
+    this.updateData(this.getData());
+  }
+  
+  public void setEndGame(SpeedRun endGame)
+  {
+    this.getData().setEndGame(endGame);
+    if (endGame != null)
+    {
+      endGame.getPrizeEndGame().add(this.getData());
+    }
+    this.updateData(this.getData());
   }
   
   public PrizeAssign getPrizeAssign()

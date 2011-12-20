@@ -7,6 +7,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import pheidip.db.SpeedRunData;
+import pheidip.objects.Prize;
 import pheidip.objects.SpeedRun;
 import pheidip.objects.SpeedRunSearchParams;
 import pheidip.util.StringUtils;
@@ -46,7 +47,21 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
     SpeedRun s = this.getSpeedRunById(runId);
     
     Session session = this.beginTransaction();
-
+    
+    for (Prize p : s.getPrizeStartGame())
+    {
+      p.setStartGame(null);
+    }
+    
+    s.getPrizeStartGame().clear();
+    
+    for (Prize p : s.getPrizeEndGame())
+    {
+      p.setEndGame(null);
+    }
+    
+    s.getPrizeEndGame().clear();
+    
     session.delete(s);
     
     this.endTransaction();

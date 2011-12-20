@@ -494,8 +494,8 @@ public class PrizePanel extends EntityPanel
     
     if (searcher.getResult() != null)
     {
-      this.control.getData().setStartGame(searcher.getResult());
-      this.saveContent();
+      this.control.setStartGame(searcher.getResult());
+      this.redrawContent();
     }
   }
   
@@ -507,9 +507,22 @@ public class PrizePanel extends EntityPanel
     
     if (searcher.getResult() != null)
     {
-      this.control.getData().setEndGame(searcher.getResult());
-      this.saveContent();
+      this.control.setEndGame(searcher.getResult());
+      this.redrawContent();
     }
+  }
+  
+  
+  private void clearStartGame()
+  {
+    this.control.setStartGame(null);
+    this.redrawContent();
+  }
+  
+  private void clearEndGame()
+  {
+    this.control.setEndGame(null);
+    this.redrawContent();
   }
   
   private void manuallyAssignWinner()
@@ -540,18 +553,6 @@ public class PrizePanel extends EntityPanel
     {
       this.assignPrizeToDonor(dialog.getResult());
     }
-  }
-  
-  private void clearStartGame()
-  {
-    this.control.getData().setStartGame(null);
-    this.saveContent();
-  }
-  
-  private void clearEndGame()
-  {
-    this.control.getData().setEndGame(null);
-    this.saveContent();
   }
   
   private void removeWinner()

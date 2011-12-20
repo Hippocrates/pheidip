@@ -13,6 +13,8 @@ public class SpeedRun
   private String description;
   private int sortKey;
   private Set<Bid> bids = new HashSet<Bid>();
+  private Set<Prize> prizeStartGame = new HashSet<Prize>();
+  private Set<Prize> prizeEndGame = new HashSet<Prize>();
   
   public SpeedRun()
   {
@@ -97,5 +99,25 @@ public class SpeedRun
   public int getSortKey()
   {
     return sortKey;
+  }
+
+  public void setPrizeStartGame(Set<Prize> prizeStartGame)
+  {
+    this.prizeStartGame = prizeStartGame;
+  }
+
+  public Set<Prize> getPrizeStartGame()
+  {
+    return prizeStartGame;
+  }
+
+  public void setPrizeEndGame(Set<Prize> prizeEndGame)
+  {
+    this.prizeEndGame = prizeEndGame;
+  }
+
+  public Set<Prize> getPrizeEndGame()
+  {
+    return prizeEndGame;
   }
 }

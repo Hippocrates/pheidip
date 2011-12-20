@@ -25,5 +25,19 @@
    </key>
    <one-to-many class="pheidip.objects.Bid"/>
   </set>
+  <set cascade="none" inverse="true" lazy="true"
+   name="prizeStartGame" sort="unsorted" table="Prize">
+   <key>
+    <column name="STARTGAME"/>
+   </key>
+   <one-to-many class="pheidip.objects.Prize"/>
+  </set>
+  <set cascade="none" inverse="true" lazy="true"
+   name="prizeEndGame" sort="unsorted" table="Prize">
+   <key>
+    <column name="ENDGAME"/>
+   </key>
+   <one-to-many class="pheidip.objects.Prize"/>
+  </set>
  </class>
 </hibernate-mapping>
