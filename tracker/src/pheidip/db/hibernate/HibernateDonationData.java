@@ -93,7 +93,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   {
     StatelessSession dedicatedSession = this.beginBulkTransaction();
     
-    String queryString = "from Donation d ";
+    String queryString = "from Donation d";
     List<String> whereClause = new ArrayList<String>();
 
     if (lo != null)

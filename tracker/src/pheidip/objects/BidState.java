@@ -1,5 +1,7 @@
 package pheidip.objects;
 
+import pheidip.util.StringUtils;
+
 public enum BidState
 {
   HIDDEN,
@@ -11,5 +13,11 @@ public enum BidState
   public static BidState get(int i)
   {
     return _list[i];
+  }
+  
+  @Override
+  public String toString()
+  {
+    return StringUtils.symbolToNatural(super.toString());
   }
 }

@@ -3,6 +3,7 @@ package pheidip.logic;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +13,6 @@ import pheidip.db.DonationData;
 import pheidip.db.DonorData;
 import pheidip.objects.Donation;
 import pheidip.objects.Donor;
-import pheidip.util.Filter;
-import pheidip.util.FilterFunction;
-import pheidip.util.Pair;
 
 public class PrizeAssign
 {
@@ -29,78 +27,160 @@ public class PrizeAssign
     this.donors = this.manager.getDataAccess().getDonorData();
   }
   
-  public List<Donor> getAllCandidates(final PrizeAssignParams params)
+  public List<PrizeDrawCandidate> getAllCandidatesInRange(Date loRange, Date hiRange)
   {
-    // get all donations inside the time frame
-    List<Donation> donationsInTimeRange = this.donations.getDonationsInTimeRange(params.donatedAfter, params.donatedBefore);
+    List<Donation> donationsInTimeRange = this.donations.getDonationsInTimeRange(loRange, hiRange);
     
-    // filter that list by the donations that match the single donation amount
-    List<Donation> donationsSingleAboveAmount = Filter.filterList(
-        donationsInTimeRange, new FilterFunction<Donation>()
-        {
-          public boolean predicate(Donation x)
-          {
-            return params.singleDonationsAbove == null ? true : x.getAmount().compareTo(params.singleDonationsAbove) >= 0;
-          }
-        });
-    
-    // set all donors to consider, based on whether or not secondard prizing is allowed
-    List<Donor> donorSet = params.excludeIfAlreadyWon ? this.donors.getDonorsWithoutPrizes() : this.donors.getAllDonors();
-    
-    // build a Donor -> List<Donation> dictionary
-    Map<Integer, Pair<Donor,List<Donation> > > donorMap = new HashMap<Integer, Pair<Donor,List<Donation> > >();
-    
-    for (Donor d : donorSet)
+    Map<Integer, List<Donation> > donationMap = new HashMap<Integer, List<Donation> >();
+   
+    for (Donation d : donationsInTimeRange)
     {
-      donorMap.put(d.getId(), new Pair<Donor,List<Donation> >(d, new ArrayList<Donation>()));
-    }
-    
-    for (Donation d : donationsSingleAboveAmount)
-    {
-      Pair<Donor,List<Donation> > pair = donorMap.get(d.getDonor().getId());
-      if (pair != null)
-      {
-        List<Donation> targetList = donorMap.get(d.getDonor().getId()).getSecond();
-        targetList.add(d);
-      }
-    }
-    
-    List<Donor> finalFilter = new ArrayList<Donor>();
-    
-    // get the sum of each donor's contribution over this time-frame
-    // all donors with > 0 donations and with contribution total over the threshold are returned
-    for (Pair<Donor, List<Donation>> it : donorMap.values())
-    {
-      BigDecimal sum = BigDecimal.ZERO;
+      List<Donation> donorList = donationMap.get(d.getDonor().getId());
       
-      if (params.totalDoantionsAbove != null)
+      if (donorList == null)
       {
-        for (Donation d : it.getSecond())
-        {
-          sum = sum.add(d.getAmount());
-        }
+        donorList = new ArrayList<Donation>();
+        donationMap.put(d.getDonor().getId(), donorList);
       }
       
-      if (it.getSecond().size() > 0 && (params.totalDoantionsAbove == null || sum.compareTo(params.totalDoantionsAbove) >= 0))
-      {
-        finalFilter.add(it.getFirst());
-      }
+      donorList.add(d);
     }
     
-    return finalFilter;
+    List<Donor> allDonors = this.donors.getAllDonors();
+    
+    Map<Integer, Donor> donorMap = new HashMap<Integer, Donor>();
+    
+    for (Donor d : allDonors)
+    {
+      donorMap.put(d.getId(), d);
+    }
+    
+    ArrayList<PrizeDrawCandidate> candidates = new ArrayList<PrizeDrawCandidate>();
+    
+    for (List<Donation> donationList : donationMap.values())
+    {
+      candidates.add(new PrizeDrawCandidate(this.donors.getDonorById(donationList.get(0).getDonor().getId()), donationList));
+    }
+    
+    return candidates;
   }
   
-  public Donor pickRandomCandidate(List<Donor> candidates)
+  public Donor pickRandomCandidate(BigDecimal minimumAmount, boolean excludeIfWon, List<PrizeDrawCandidate> candidates)
   {
-    if (candidates.size() > 0)
+    List<Donor> filtered = new ArrayList<Donor>();
+    
+    for (PrizeDrawCandidate c : candidates)
     {
-      // select a random number in the range (using _secure_ random this time)
+      if (c.getMaxDonation().compareTo(minimumAmount) >= 0 && (!excludeIfWon || !c.alreadyHasPrize()))
+      {
+        filtered.add(c.getDonor());
+      }
+    }
+    
+    if (filtered.size() > 0)
+    {
       Random rand = new SecureRandom();
-      return candidates.get(rand.nextInt(candidates.size()));
+      return filtered.get(rand.nextInt(filtered.size()));
     }
     else
     {
-      throw new RuntimeException("Error, no donors found that match the criteria.");
+      return null;
+    }
+  }
+  
+  public Donor pickRandomCandidateWeighted(BigDecimal thresholdAmount, boolean excludeIfWon, List<PrizeDrawCandidate> candidates)
+  {
+    List<Donor> filtered = new ArrayList<Donor>();
+    
+    for (PrizeDrawCandidate c : candidates)
+    {
+      if (!excludeIfWon || !c.alreadyHasPrize())
+      {
+        int iterations = c.getDonationSum().divide(thresholdAmount, BigDecimal.ROUND_FLOOR).intValue();
+        
+        for (int i = 0; i < iterations; ++i)
+        {
+          filtered.add(c.getDonor());
+        }
+      }
+    }
+    
+    if (filtered.size() > 0)
+    {
+      Random rand = new SecureRandom();
+      return filtered.get(rand.nextInt(filtered.size()));
+    }
+    else
+    {
+      return null;
+    }
+  }
+  
+  public Donor pickHighestSingleDonation(BigDecimal minimumAmount, boolean excludeIfWon, List<PrizeDrawCandidate> candidates)
+  {
+    Donor maxDonor = null;
+    BigDecimal currentMax = minimumAmount;
+    
+    for (PrizeDrawCandidate c : candidates)
+    {
+      if (c.getMaxDonation().compareTo(currentMax) >= 0 && (!excludeIfWon || !c.alreadyHasPrize()))
+      {
+        maxDonor = c.getDonor();
+        currentMax = c.getMaxDonation();
+      }
+    }
+    
+    return maxDonor;
+  }
+  
+  public Donor pickHighestSumDonations(BigDecimal minimumAmount, boolean excludeIfWon, List<PrizeDrawCandidate> candidates)
+  {
+    Donor maxDonor = null;
+    BigDecimal currentMax = minimumAmount;
+    
+    for (PrizeDrawCandidate c : candidates)
+    {
+      if (c.getMaxDonation().compareTo(currentMax) >= 0 && (!excludeIfWon || !c.alreadyHasPrize()))
+      {
+        maxDonor = c.getDonor();
+        currentMax = c.getDonationSum();
+      }
+    }
+    
+    return maxDonor;
+  }
+
+  public Donor selectWinner(PrizeAssignParams params)
+  {
+    List<PrizeDrawCandidate> candidates = this.getAllCandidatesInRange(params.donatedAfter, params.donatedBefore);
+    
+    Donor result = null;
+    
+    switch (params.method)
+    {
+    case RANDOM_UNIFORM_DRAW:
+      result = this.pickRandomCandidate(params.targetAmount, params.excludeIfAlreadyWon, candidates);
+      break;
+    case SINGLE_HIGHEST_DONATION:
+      result = this.pickHighestSingleDonation(params.targetAmount, params.excludeIfAlreadyWon, candidates);
+      break;
+    case RANDOM_WEIGHTED_DRAW:
+      result = this.pickRandomCandidateWeighted(params.targetAmount, params.excludeIfAlreadyWon, candidates);
+      break;
+    case HIGHEST_SUM_DONATIONS:
+      result = this.pickHighestSumDonations(params.targetAmount, params.excludeIfAlreadyWon, candidates);
+      break;
+    default:
+      throw new RuntimeException("Error, unknown prize drawing method.");
+    }
+    
+    if (result == null)
+    {
+      throw new RuntimeException("Error, no donors found that match this criteria.");
+    }
+    else
+    {
+      return result;
     }
   }
 }

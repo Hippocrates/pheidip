@@ -19,15 +19,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 
 import pheidip.logic.PrizeAssign;
 import pheidip.logic.PrizeAssignParams;
+import pheidip.logic.PrizeDrawMethod;
 import pheidip.objects.Donor;
 import pheidip.util.FormatUtils;
+import javax.swing.JComboBox;
 
 @SuppressWarnings("serial")
 public class PrizeAssignmentDialog extends JDialog
@@ -50,6 +51,8 @@ public class PrizeAssignmentDialog extends JDialog
   private PrizeAssign assigner;
   private JLabel lblExcludeIfAlready;
   private JCheckBox excludeIfWonCheckBox;
+  private JLabel lblDrawingMethod;
+  private JComboBox drawMethodComboBox;
 
   private void initializeGUI()
   {
@@ -64,6 +67,24 @@ public class PrizeAssignmentDialog extends JDialog
     gbl_contentPanel.columnWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
     gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_contentPanel);
+    {
+      lblDrawingMethod = new JLabel("Drawing Method:");
+      GridBagConstraints gbc_lblDrawingMethod = new GridBagConstraints();
+      gbc_lblDrawingMethod.anchor = GridBagConstraints.EAST;
+      gbc_lblDrawingMethod.insets = new Insets(0, 0, 5, 5);
+      gbc_lblDrawingMethod.gridx = 0;
+      gbc_lblDrawingMethod.gridy = 0;
+      contentPanel.add(lblDrawingMethod, gbc_lblDrawingMethod);
+    }
+    {
+      drawMethodComboBox = new JComboBox(PrizeDrawMethod.values());
+      GridBagConstraints gbc_drawMethodComboBox = new GridBagConstraints();
+      gbc_drawMethodComboBox.insets = new Insets(0, 0, 5, 0);
+      gbc_drawMethodComboBox.fill = GridBagConstraints.HORIZONTAL;
+      gbc_drawMethodComboBox.gridx = 2;
+      gbc_drawMethodComboBox.gridy = 0;
+      contentPanel.add(drawMethodComboBox, gbc_drawMethodComboBox);
+    }
     {
       lblDonatedAfter = new JLabel("Donated After:");
       GridBagConstraints gbc_lblDonatedAfter = new GridBagConstraints();
@@ -267,14 +288,13 @@ public class PrizeAssignmentDialog extends JDialog
   private void runDrawing()
   {
     PrizeAssignParams params = new PrizeAssignParams();
+    params.method = (PrizeDrawMethod) this.drawMethodComboBox.getSelectedItem();
     params.excludeIfAlreadyWon = this.excludeIfWonCheckBox.isSelected();
     params.donatedAfter = this.donatedAfterCheckBox.isSelected() ? (Date) this.donatedAfterTimeField.getValue() : null;
     params.donatedBefore = this.donatedBeforeCheckBox.isSelected() ? (Date) this.donatedBeforeTimeField.getValue() : null;
-    params.singleDonationsAbove = this.minimumDonationCheckBox.isSelected() ? new BigDecimal(this.minimumDonationField.getText()) : null;
+    params.targetAmount = this.minimumDonationCheckBox.isSelected() ? new BigDecimal(this.minimumDonationField.getText()) : null;
     
-    List<Donor> candidates = this.assigner.getAllCandidates(params);
-    
-    this.selectedDonor = this.assigner.pickRandomCandidate(candidates);
+    this.selectedDonor = this.assigner.selectWinner(params);
     
     this.closeDialog();
   }
