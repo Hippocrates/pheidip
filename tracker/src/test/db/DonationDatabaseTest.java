@@ -61,9 +61,9 @@ public abstract class DonationDatabaseTest extends TestCase
     session.save(new SpeedRun(2, "run 2", 2, null));
     session.save(new SpeedRun(3, "yet another run", 3, null));
 
-    session.save(new Prize(1, "a prize", null, null, 1, (Donor)session.load(Donor.class, 2)));
-    session.save(new Prize(2, "another prize", null, null, 2, (Donor)null));
-    session.save(new Prize(3, "one more prize", null, null, 3, (Donor)session.load(Donor.class, 1)));
+    session.save(new Prize(1, "a prize", null, null, 1, null, (Donor)session.load(Donor.class, 2), null, null));
+    session.save(new Prize(2, "another prize", null, null, 2, null, (Donor)null, null, null));
+    session.save(new Prize(3, "one more prize", null, null, 3, null, (Donor)session.load(Donor.class, 1), null, null));
 
     session.save(new Choice(1, "naming something", null, BidState.OPENED, (SpeedRun)session.load(SpeedRun.class, 1)));
     session.save(new Choice(2, "naming something something", null, BidState.OPENED, (SpeedRun)session.load(SpeedRun.class, 1)));

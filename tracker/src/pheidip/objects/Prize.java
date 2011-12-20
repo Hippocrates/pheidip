@@ -1,5 +1,7 @@
 package pheidip.objects;
 
+import java.math.BigDecimal;
+
 import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
 
@@ -11,12 +13,15 @@ public class Prize
   private String description;
   private int sortKey;
   private Donor winner;
+  private BigDecimal mimimumBid = new BigDecimal("5.00");
+  private SpeedRun startGame;
+  private SpeedRun endGame;
   
   public Prize()
   {
   }
   
-  public Prize(int id, String name, String imageURL, String description, int sortKey, Donor winner)
+  public Prize(int id, String name, String imageURL, String description, int sortKey, BigDecimal mimimumBid, Donor winner, SpeedRun startGame, SpeedRun endGame)
   {
     this.setId(id);
     this.setName(name);
@@ -24,6 +29,9 @@ public class Prize
     this.setDescription(description);
     this.setWinner(winner);
     this.setSortKey(sortKey);
+    this.setMinimumBid(mimimumBid);
+    this.setStartGame(startGame);
+    this.setEndGame(endGame);
   }
   
   public int getId()
@@ -106,5 +114,40 @@ public class Prize
   public int getSortKey()
   {
     return sortKey;
+  }
+
+  public void setMinimumBid(BigDecimal minimumBid)
+  {
+    if (minimumBid == null || minimumBid.compareTo(BigDecimal.ZERO) <= 0)
+    {
+      throw new RuntimeException("Error, invalid minimum bid amount.");
+    }
+    
+    this.mimimumBid = minimumBid;
+  }
+
+  public BigDecimal getMinimumBid()
+  {
+    return mimimumBid;
+  }
+
+  public void setStartGame(SpeedRun startGame)
+  {
+    this.startGame = startGame;
+  }
+
+  public SpeedRun getStartGame()
+  {
+    return startGame;
+  }
+
+  public void setEndGame(SpeedRun endGame)
+  {
+    this.endGame = endGame;
+  }
+
+  public SpeedRun getEndGame()
+  {
+    return endGame;
   }
 }

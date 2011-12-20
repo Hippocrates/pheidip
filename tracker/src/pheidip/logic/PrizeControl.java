@@ -21,7 +21,7 @@ public class PrizeControl
   {
     int newId = IdUtils.generateId();
     PrizeData prizes = manager.getDataAccess().getPrizeData();
-    prizes.insertPrize(new Prize(newId, name, null, null, newId, null));
+    prizes.insertPrize(new Prize(newId, name, null, null, newId, null, null, null, null));
     return newId;
   }
   
@@ -98,5 +98,10 @@ public class PrizeControl
   public DonorSearch getDonorSearcher()
   {
     return new DonorSearch(this.manager);
+  }
+  
+  public SpeedRunSearch getSpeedRunSearch()
+  {
+    return new SpeedRunSearch(this.manager);
   }
 }

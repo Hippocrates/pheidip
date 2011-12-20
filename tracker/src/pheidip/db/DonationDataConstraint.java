@@ -47,7 +47,9 @@ public enum DonationDataConstraint
   PrizeNameLowerCase("Prize names must be lowercase."),
   PrizeSortKeyUnique("A prize with that sorting key already exists."),
   PrizePK("A Prize with that ID already exists."),
-  PrizeFKDonor("A Prize is still linked to that Donor.");
+  PrizeFKDonor("A Prize is still linked to that Donor."),
+  PrizeFKSpeedRunStart("A Prize is still linked to this SpeedRun"),
+  PrizeFKSpeedRunEnd("A Prize is still linked to this SpeedRun");
   
   private static DonationDataConstraint[] _list = DonationDataConstraint.values();
   

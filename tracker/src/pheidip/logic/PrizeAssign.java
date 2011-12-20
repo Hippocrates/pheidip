@@ -140,7 +140,7 @@ public class PrizeAssign
     
     for (PrizeDrawCandidate c : candidates)
     {
-      if (c.getMaxDonation().compareTo(currentMax) >= 0 && (!excludeIfWon || !c.alreadyHasPrize()))
+      if (c.getDonationSum().compareTo(currentMax) >= 0 && (!excludeIfWon || !c.alreadyHasPrize()))
       {
         maxDonor = c.getDonor();
         currentMax = c.getDonationSum();

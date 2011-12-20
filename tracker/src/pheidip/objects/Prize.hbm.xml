@@ -19,12 +19,23 @@
    unique="true" unique-key="PrizeSortKeyUnique">
    <column name="sortKey" unique="true"/>
   </property>
+  <property generated="never" lazy="false" name="minimumBid" type="java.math.BigDecimal">
+   <column name="MINIMUMBID"/>
+  </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
   </property>
   <many-to-one class="pheidip.objects.Donor" fetch="join"
    foreign-key="PrizeFKDonor" name="winner">
    <column name="WINNER"/>
+  </many-to-one>
+  <many-to-one class="pheidip.objects.SpeedRun" fetch="join"
+   foreign-key="PrizeFKSpeedRunStart" name="startGame">
+   <column name="STARTGAME"/>
+  </many-to-one>
+  <many-to-one class="pheidip.objects.SpeedRun" fetch="join"
+   foreign-key="PrizeFKSpeedRunEnd" name="endGame">
+   <column name="ENDGAME"/>
   </many-to-one>
  </class>
 </hibernate-mapping>

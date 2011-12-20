@@ -263,7 +263,7 @@ public class PrizeAssignmentDialog extends JDialog
     this.setFocusTraversalPolicy(this.tabOrder);
   }
   
-  public PrizeAssignmentDialog(JFrame owner, PrizeAssign assigner)
+  public PrizeAssignmentDialog(JFrame owner, PrizeAssign assigner, BigDecimal defaultAmount)
   {
     super(owner, true);
     
@@ -272,6 +272,8 @@ public class PrizeAssignmentDialog extends JDialog
     
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.minimumDonationField.setText(defaultAmount.toString());
   }
   
   public Donor getResult()
