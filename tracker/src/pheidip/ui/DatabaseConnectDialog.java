@@ -167,7 +167,10 @@ public class DatabaseConnectDialog extends JDialog
       break;
     }
     
-    this.closeDialog();
+    if (this.databaseManager.isConnected())
+    {
+      this.closeDialog();
+    }
   }
   
   private void createFileConnection()
@@ -177,13 +180,6 @@ public class DatabaseConnectDialog extends JDialog
     String initFilename = panel.getDBFileName();
     
     this.databaseManager.openFileDatabase(new File(initFilename));
-
-    if (!this.databaseManager.isConnected())
-    {
-      JOptionPane.showMessageDialog(this, "Could not create memory connection.", "Failed to connect...", JOptionPane.ERROR_MESSAGE);
-    }
-    
-    this.closeDialog();
   }
 
   private void connectToSever()
@@ -196,13 +192,6 @@ public class DatabaseConnectDialog extends JDialog
           panel.getDBName(),
           panel.getUserName(),
           panel.getPassword());
-    
-    if (!this.databaseManager.isConnected())
-    {
-      JOptionPane.showMessageDialog(this, "Could not connect to database server.", "Failed to connect...", JOptionPane.ERROR_MESSAGE);
-    }
-    
-    this.closeDialog();
   }
   
   private void createMemoryConnection()
@@ -211,19 +200,15 @@ public class DatabaseConnectDialog extends JDialog
     
    this.databaseManager.createMemoryDatabase();
      
-   String initFilename = panel.getInitializeScriptFilename();
-     
-   if (!StringUtils.isEmptyOrNull(initFilename))
+   if (this.databaseManager.isConnected())
    {
-     this.databaseManager.runSQLScript(initFilename);
+     String initFilename = panel.getInitializeScriptFilename();
+       
+     if (!StringUtils.isEmptyOrNull(initFilename))
+     {
+       this.databaseManager.runSQLScript(initFilename);
+     }
    }
-   
-   if (!this.databaseManager.isConnected())
-   {
-     JOptionPane.showMessageDialog(this, "Could not create memory connection.", "Failed to connect...", JOptionPane.ERROR_MESSAGE);
-   }
-   
-   this.closeDialog();
   }
   
   private void cancelButtonClicked()
