@@ -51,8 +51,6 @@ public class JDBCManager
         return "com.mysql.jdbc.Driver";
       case HSQLDB:
         return "org.hsqldb.jdbcDriver";
-      case H2:
-    	return "org.h2.Driver";
       default:
     	return null;
     }
@@ -69,10 +67,7 @@ public class JDBCManager
 		break;
 	  case MYSQL:
 	    location = "//" + server + "/" + dbName;
-	    break;
-	  case H2:
-		location = "tcp://" + server + "/" + dbName;
-		break;
+	  break;
 	  default:
 	    throw new RuntimeException("Error, unsupported database type : " + type.toString());
 	 }
@@ -117,8 +112,7 @@ public class JDBCManager
     
     tables.set(DBType.HSQLDB.ordinal(), generateHSQLDBErrorTables());
     tables.set(DBType.MYSQL.ordinal(), generateMYSQLErrorTables());
-    tables.set(DBType.H2.ordinal(), generateH2ErrorTables());
-    
+
     return tables;
   }
   
@@ -146,14 +140,7 @@ public class JDBCManager
     
     return errorMap;
   }
-  
-  private static Map<Integer,SQLError> generateH2ErrorTables()
-  {
-    Map<Integer,SQLError> errorMap = new TreeMap<Integer,SQLError>();
 
-    return errorMap;
-  }
-  
   public static SQLError getErrorForCode(DBType type, int errorCode)
   {
     Map<Integer,SQLError> table = errorTables.get(type.ordinal());

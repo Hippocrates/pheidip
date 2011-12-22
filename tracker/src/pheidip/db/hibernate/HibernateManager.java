@@ -17,8 +17,6 @@ public class HibernateManager
   {
 	switch (type)
 	{
-	  case H2:
-		return "org.hibernate.dialect.H2Dialect";
 	  case MYSQL:
 		return "org.hibernate.dialect.MySQLDialect";
 	  case HSQLDB:

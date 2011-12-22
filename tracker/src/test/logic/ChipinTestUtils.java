@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Random;
 
 import pheidip.db.DonationData;
-import pheidip.logic.ChipinDonations;
 import pheidip.logic.DonationDatabaseManager;
+import pheidip.logic.chipin.ChipinDonations;
 import pheidip.objects.ChipinDonation;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;

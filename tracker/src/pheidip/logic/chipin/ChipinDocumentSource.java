@@ -1,4 +1,4 @@
-package pheidip.logic;
+package pheidip.logic.chipin;
 
 import org.jsoup.nodes.Document;
 

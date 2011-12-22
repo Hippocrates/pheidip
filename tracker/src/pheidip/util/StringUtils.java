@@ -1,10 +1,24 @@
 package pheidip.util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public final class StringUtils
 {
+  public static String[] heuristicSplit(String toSplit)
+  {
+    final String splitRegex = "(([;,])|(\\s+and\\s+))+";
+    String[] results = toSplit.split(splitRegex);
+    
+    for (int i = 0; i < results.length; ++i)
+    {
+      results[i] = results[i].trim();
+    }
+      
+    return results;
+  }
+  
   public static boolean innerStringMatch(String whole, String part)
   {
     if (whole != null)
@@ -138,6 +152,28 @@ public final class StringUtils
   public static String sqlInnerStringMatch(String s)
   {
     return "%" + emptyIfNull(s).toLowerCase() + "%";
+  }
+  
+  public static String joinLanguageSeperated(List<String> strings)
+  {
+    List<String> subList = new ArrayList<String>(strings);
+    
+    if (subList.size() == 0)
+    {
+      return "";
+    }
+    else if (subList.size() == 1)
+    {
+      return subList.get(0);
+    }
+    else
+    {
+      String last = subList.remove(subList.size() - 1);
+      
+      String first = joinSeperated(subList, ",");
+      
+      return first + ", and " + last;
+    }
   }
   
   public static String joinSeperated(List<String> strings, String seperator)

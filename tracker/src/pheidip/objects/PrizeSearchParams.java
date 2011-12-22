@@ -17,7 +17,7 @@ public class PrizeSearchParams implements FilterFunction<Prize>
   @Override
   public boolean predicate(Prize x)
   {
-    return StringUtils.innerStringMatch(x.getName(), this.name)
+    return (this.name == null || StringUtils.innerStringMatch(x.getName(), this.name))
       && excludeIfWon ? (x.getWinner() == null) : true;
   }
 }

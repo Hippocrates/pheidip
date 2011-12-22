@@ -7,45 +7,30 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-import pheidip.logic.ChipinMergeProcess;
-import pheidip.logic.ChipinMergeProcess.MergeStateCallback;
-import pheidip.logic.ChipinMergeState;
+import pheidip.logic.ExternalProcess;
+import pheidip.logic.chipin.ExternalProcessState;
 
 import java.awt.Font;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Map;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 @SuppressWarnings("serial")
-public class ChipinMergeTab extends TabPanel
+public class ExternalProcessTab extends TabPanel
 {
   private final static int MAXIMUM_PROGRESS = 1000;
-  private static final Map<ChipinMergeState, String> updateProgressStrings = 
-    Collections.unmodifiableMap(new EnumMap<ChipinMergeState, String>(ChipinMergeState.class) {{ 
-        put(ChipinMergeState.IDLE, "No Operation.");
-        put(ChipinMergeState.RETRIEVING, "Retreiving donations from chipin...");
-        put(ChipinMergeState.EXTRACTING, "Reading donations...");
-        put(ChipinMergeState.COMPARING, "Reading current donation set...");
-        put(ChipinMergeState.MERGING, "Merging donations into database...");
-        put(ChipinMergeState.COMPLETED, "Merge operation complete.");
-        put(ChipinMergeState.CANCELLED, "Merge operation cancelled.");
-        put(ChipinMergeState.FAILED, "The merge operation failed.");
-    }});
   
   private JButton cancelButton;
   private JProgressBar loadingProgressBar;
   private JLabel loadingLabel;
-  private ChipinMergeProcess mergeProcess;
-  private ChipinMergeState currentState;
+  private ExternalProcess process;
+  private ExternalProcessState currentState;
   private Thread loadingThread;
 
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{0, 312, 85, 0, 0};
-    gridBagLayout.rowHeights = new int[]{90, 0, 0, 0, 0};
+    gridBagLayout.rowHeights = new int[]{90, 28, 0, 0, 0};
     gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
@@ -71,6 +56,7 @@ public class ChipinMergeTab extends TabPanel
     add(loadingProgressBar, gbc_loadingProgressBar);
     
     cancelButton = new JButton("Cancel");
+    cancelButton.setEnabled(false);
     GridBagConstraints gbc_cancelButton = new GridBagConstraints();
     gbc_cancelButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_cancelButton.insets = new Insets(0, 0, 0, 5);
@@ -85,15 +71,16 @@ public class ChipinMergeTab extends TabPanel
     {
       public void actionPerformed(ActionEvent arg0)
       {
-        ChipinMergeTab.this.confirmCancelOperation();
+        ExternalProcessTab.this.confirmCancelOperation();
       }
     });
     
-    this.mergeProcess.setListener(new MergeStateCallback()
+    this.process.setListener(new ExternalProcess.ProcessStateCallback()
     {
-      public void stateChanged(ChipinMergeState newState, double percentage)
+      @Override
+      public void stateChanged(ExternalProcess updated)
       {
-        ChipinMergeTab.this.onUpdateMergeState(newState, percentage);
+        onUpdateMergeState(updated.getState(), updated.getCompletionState(), updated.getStatusMessage());
       }
     });
   }
@@ -101,17 +88,15 @@ public class ChipinMergeTab extends TabPanel
   /**
    * Create the panel.
    */
-  public ChipinMergeTab(ChipinMergeProcess mergeProcess)
+  public ExternalProcessTab(ExternalProcess process)
   {
-    this.mergeProcess = mergeProcess;
+    this.process = process;
     
-    this.setHeaderText("Chipin Merge");
+    this.setHeaderText(process.getProcessName());
     this.initializeGUI();
     this.initializeGUIEvents();
     
-    this.onUpdateMergeState(ChipinMergeState.IDLE, 0.0);
-    
-    this.loadingThread = new Thread(mergeProcess);
+    this.loadingThread = new Thread(process);
     
     this.loadingThread.start();
   }
@@ -151,17 +136,27 @@ public class ChipinMergeTab extends TabPanel
     }
   }
 
-  private void onUpdateMergeState(ChipinMergeState newState, double percentage)
+  private void onUpdateMergeState(ExternalProcessState newState, double percentage, String message)
   {
     this.currentState = newState;
-    this.loadingLabel.setText(updateProgressStrings.get(newState));
+    this.loadingLabel.setText(message);
     this.loadingProgressBar.setValue((int)(percentage * MAXIMUM_PROGRESS));
     
     if (!this.currentState.isRunningState())
     {
-      this.remove(this.cancelButton);
+      this.cancelButton.setEnabled(false);
       this.repaint();
     }
+    else
+    {
+      this.cancelButton.setEnabled(true);
+      this.repaint();
+    }
+  }
+  
+  public ExternalProcess getProcess()
+  {
+    return this.process;
   }
 
   @Override

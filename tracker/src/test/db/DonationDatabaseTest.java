@@ -2,6 +2,7 @@ package test.db;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.hibernate.Session;
 
@@ -57,9 +58,9 @@ public abstract class DonationDatabaseTest extends TestCase
     session.save(new Donor(5, null, null, "", ""));
     session.save(new Donor(6, null, null, "", ""));
     
-    session.save(new SpeedRun(1, "run 1", 1, null));
-    session.save(new SpeedRun(2, "run 2", 2, null));
-    session.save(new SpeedRun(3, "yet another run", 3, null));
+    session.save(new SpeedRun(1, "run 1", 1, new Date(), new Date(), null));
+    session.save(new SpeedRun(2, "run 2", 2, new Date(), new Date(), null));
+    session.save(new SpeedRun(3, "yet another run", 3, new Date(), new Date(), null));
 
     session.save(new Prize(1, "a prize", null, null, 1, null, (Donor)session.load(Donor.class, 2), null, null));
     session.save(new Prize(2, "another prize", null, null, 2, null, (Donor)null, null, null));

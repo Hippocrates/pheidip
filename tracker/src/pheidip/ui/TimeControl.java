@@ -22,4 +22,21 @@ public class TimeControl extends JSpinner
     this.setEditor(timeEditor);
     this.setValue(defaultDate);
   }
+  
+  public Date getTimeValue()
+  {
+    return (Date) this.getValue();
+  }
+  
+  public void setTimeValue(Date value)
+  {
+    if (value == null)
+    {
+      this.setValue(new Date());
+    }
+    else
+    {
+      this.setValue(value);
+    }
+  }
 }

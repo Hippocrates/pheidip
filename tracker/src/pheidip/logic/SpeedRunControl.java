@@ -59,7 +59,7 @@ public class SpeedRunControl
   public static int createNewSpeedRun(DonationDatabaseManager manager, String name)
   {
     int id = IdUtils.generateId();
-    manager.getDataAccess().getSpeedRuns().insertSpeedRun(new SpeedRun(id, name, id, null));
+    manager.getDataAccess().getSpeedRuns().insertSpeedRun(new SpeedRun(id, name, id, null, null, null));
     return id;
   }
 
