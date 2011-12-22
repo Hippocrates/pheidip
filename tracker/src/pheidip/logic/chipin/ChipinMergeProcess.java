@@ -1,4 +1,4 @@
-package pheidip.logic;
+package pheidip.logic.chipin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,72 +8,50 @@ import org.jsoup.nodes.Document;
 
 import pheidip.db.DonationData;
 import pheidip.db.DonorData;
+import pheidip.logic.AbstractExternalProcess;
+import pheidip.logic.DonationDatabaseManager;
+import pheidip.logic.DonationSearch;
 import pheidip.objects.ChipinDonation;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationSearchParams;
 import pheidip.objects.Donor;
 
-public class ChipinMergeProcess implements Runnable
+public class ChipinMergeProcess extends AbstractExternalProcess
 {
-  public interface MergeStateCallback
-  {
-    void stateChanged(ChipinMergeState newState, double percentage);
-  }
-  
   private DonationDatabaseManager donationDatabase;
   private ChipinDocumentSource documentSource;
-  private ChipinMergeState currentState;
-  private MergeStateCallback listener;
 
   public ChipinMergeProcess(DonationDatabaseManager donationDatabase, ChipinDocumentSource documentSource)
   {
+    this(donationDatabase, documentSource, null);
+  }
+  
+  public ChipinMergeProcess(DonationDatabaseManager donationDatabase, ChipinDocumentSource documentSource, ProcessStateCallback listener)
+  {
+    super(listener);
+    
     this.donationDatabase = donationDatabase;
     this.documentSource = documentSource;
-    
-    this.currentState = ChipinMergeState.IDLE;
-    
-    this.listener = null;
   }
-  
-  public synchronized void setListener(MergeStateCallback listener)
-  {
-    this.listener = listener;
-  }
-  
-  public ChipinMergeState getState()
-  {
-    return this.currentState;
-  }
-  
-  private synchronized void setState(ChipinMergeState newState, double percentage)
-  {
-    this.currentState = newState;
-    
-    if (this.listener != null)
-    {
-      this.listener.stateChanged(this.currentState, percentage);
-    }
-  }
-  
+
+  @Override
   public void run()
   {
     try
     {
-      this.setState(ChipinMergeState.RETRIEVING, 0.1);
+      this.resetState(ExternalProcessState.RUNNING, 0.1, "Retreiving donations from chipin...");
       Thread.sleep(0);
       
       Document html = this.documentSource.provideDocument();
       
-      this.setState(ChipinMergeState.EXTRACTING, 0.2);
+      this.resetState(ExternalProcessState.RUNNING, 0.2, "Reading donations...");
       Thread.sleep(0);
       
       List<ChipinDonation> chipinDonations = ChipinDonations.extractDonations(html);
       
-      this.setState(ChipinMergeState.COMPARING, 0.3);
+      this.resetState(ExternalProcessState.RUNNING, 0.3, "Reading current donation set...");
       Thread.sleep(0);
-      
-      //int current = 0;
       
       DonationData donations = this.donationDatabase.getDataAccess().getDonationData();
       DonorData donors = this.donationDatabase.getDataAccess().getDonorData();
@@ -91,7 +69,7 @@ public class ChipinMergeProcess implements Runnable
       
       List<Donation> databaseDonations = searcher.runSearch(params);
       
-      this.setState(ChipinMergeState.MERGING, 0.4);
+      this.resetState(ExternalProcessState.RUNNING, 0.4, "Merging donations into database...");
       Thread.sleep(0);
       
       double step = (1.0 - 0.4) / chipinDonationMap.size();
@@ -101,7 +79,7 @@ public class ChipinMergeProcess implements Runnable
         donationsToUpdate.addAll(ChipinDonations.updateMergeTable(chipinDonationMap, databaseDonations));
         databaseDonations = searcher.getNext();
 
-        this.setState(ChipinMergeState.MERGING, 1.0 - step*chipinDonationMap.size());
+        this.resetState(ExternalProcessState.RUNNING, 1.0 - step*chipinDonationMap.size(), "Merging donations into database...");
         Thread.sleep(0);
       }
 
@@ -113,16 +91,21 @@ public class ChipinMergeProcess implements Runnable
 
       Thread.sleep(0);
       
-      this.setState(ChipinMergeState.COMPLETED, 1.0);
+      this.resetState(ExternalProcessState.COMPLETED, 1.0, "Merge operation complete.");
     }
     catch (InterruptedException e)
     {
-      this.setState(ChipinMergeState.CANCELLED, 0.0);
+      this.resetState(ExternalProcessState.CANCELLED, 0.0, "Merge operation cancelled.");
     }
     catch (Exception e)
     {
-      this.setState(ChipinMergeState.FAILED, 0.0);
+      this.resetState(ExternalProcessState.FAILED, 0.0, "The merge operation failed.");
     }
   }
-
+  
+  @Override
+  public String getProcessName()
+  {
+    return "Chipin Merge";
+  }
 }

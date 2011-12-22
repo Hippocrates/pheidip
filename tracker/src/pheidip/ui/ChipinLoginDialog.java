@@ -17,7 +17,7 @@ import java.awt.Insets;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 
-import pheidip.logic.ChipinLoginManager;
+import pheidip.logic.chipin.ChipinLoginManager;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -148,7 +148,6 @@ public class ChipinLoginDialog extends JDialog
         JOptionPane.showMessageDialog(ChipinLoginDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       }
     }
-    
   }
   
   private void initializeGUIEvents()

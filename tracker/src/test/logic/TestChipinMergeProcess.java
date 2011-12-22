@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Random;
 
 import junit.framework.TestCase;
-import pheidip.logic.ChipinDonations;
-import pheidip.logic.ChipinFileDocumentSource;
-import pheidip.logic.ChipinLoginManager;
-import pheidip.logic.ChipinMergeProcess;
-import pheidip.logic.ChipinMergeState;
-import pheidip.logic.ChipinTextDocumentSource;
-import pheidip.logic.ChipinWebsiteDocumentSource;
 import pheidip.logic.DonationDatabaseManager;
+import pheidip.logic.chipin.ChipinDonations;
+import pheidip.logic.chipin.ChipinFileDocumentSource;
+import pheidip.logic.chipin.ChipinLoginManager;
+import pheidip.logic.chipin.ChipinMergeProcess;
+import pheidip.logic.chipin.ExternalProcessState;
+import pheidip.logic.chipin.ChipinTextDocumentSource;
+import pheidip.logic.chipin.ChipinWebsiteDocumentSource;
 import pheidip.objects.ChipinDonation;
 import test.db.DBTestConfiguration;
 
@@ -127,7 +127,7 @@ public class TestChipinMergeProcess extends TestCase
       e.printStackTrace();
     }
     
-    assertEquals(ChipinMergeState.CANCELLED, process.getState());
+    assertEquals(ExternalProcessState.CANCELLED, process.getState());
       
     assertFalse(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonations, manager));
   }
@@ -136,7 +136,7 @@ public class TestChipinMergeProcess extends TestCase
   {
     try
     {
-      assertEquals(ChipinMergeState.IDLE, process.getState());
+      assertEquals(ExternalProcessState.IDLE, process.getState());
       
       Thread thread = new Thread(process);
       
@@ -144,14 +144,14 @@ public class TestChipinMergeProcess extends TestCase
       
       Thread.sleep(100);
       
-      assertTrue(ChipinMergeState.IDLE != process.getState());
-      assertTrue(ChipinMergeState.CANCELLED != process.getState());
-      assertTrue(ChipinMergeState.FAILED != process.getState());
+      assertTrue(ExternalProcessState.IDLE != process.getState());
+      assertTrue(ExternalProcessState.CANCELLED != process.getState());
+      assertTrue(ExternalProcessState.FAILED != process.getState());
       
       final long testTimeout = 30000;
       long startTime = System.currentTimeMillis();
       
-      while (process.getState() != ChipinMergeState.COMPLETED)
+      while (process.getState() != ExternalProcessState.COMPLETED)
       {
         if (System.currentTimeMillis() - startTime > testTimeout)
         {

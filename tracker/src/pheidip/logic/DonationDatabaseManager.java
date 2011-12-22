@@ -49,41 +49,20 @@ public class DonationDatabaseManager
 
   public void createMemoryDatabase()
   {
-    try
-    {
-      this.autoCloseConnection();
-      this.dataAccess.createMemoryDatabase();
-    }
-    catch (Exception e)
-    {
-      this.reportMessage(e.getMessage());
-    }
+    this.autoCloseConnection();
+    this.dataAccess.createMemoryDatabase();
   }
   
   public void openFileDatabase(File location)
   {
-    try
-    {
-      this.autoCloseConnection();
-      this.dataAccess.openFileDatabase(location);
-    }
-    catch (Exception e)
-    {
-      this.reportMessage(e.getMessage());
-    }
+    this.autoCloseConnection();
+    this.dataAccess.openFileDatabase(location);
   }
 
   public void connectToServer(DBType type, String serverURL, String dbName, String userName, String password)
   {
-    try
-    {
-      this.autoCloseConnection();
-      this.dataAccess.connectToDatabaseServer(type, serverURL, dbName, userName, password);
-    }
-    catch (Exception e)
-    {
-      this.reportMessage(e.getMessage());
-    }
+    this.autoCloseConnection();
+    this.dataAccess.connectToDatabaseServer(type, serverURL, dbName, userName, password);
   }
   
   public void runSQLScript(final String filename)

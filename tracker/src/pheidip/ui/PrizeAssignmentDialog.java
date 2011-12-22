@@ -263,7 +263,7 @@ public class PrizeAssignmentDialog extends JDialog
     this.setFocusTraversalPolicy(this.tabOrder);
   }
   
-  public PrizeAssignmentDialog(JFrame owner, PrizeAssign assigner, BigDecimal defaultAmount)
+  public PrizeAssignmentDialog(JFrame owner, PrizeAssign assigner, BigDecimal defaultAmount, Date defaultStartTime, Date defaultEndTime)
   {
     super(owner, true);
     
@@ -274,6 +274,18 @@ public class PrizeAssignmentDialog extends JDialog
     this.initializeGUIEvents();
     
     this.minimumDonationField.setText(defaultAmount.toString());
+    
+    if (defaultStartTime != null)
+    {
+      this.donatedAfterTimeField.setTimeValue(defaultStartTime);
+      this.donatedAfterCheckBox.setSelected(true);
+    }
+    
+    if (defaultEndTime != null)
+    {
+      this.donatedBeforeTimeField.setTimeValue(defaultEndTime);
+      this.donatedBeforeCheckBox.setSelected(true);
+    }
   }
   
   public Donor getResult()
@@ -292,8 +304,8 @@ public class PrizeAssignmentDialog extends JDialog
     PrizeAssignParams params = new PrizeAssignParams();
     params.method = (PrizeDrawMethod) this.drawMethodComboBox.getSelectedItem();
     params.excludeIfAlreadyWon = this.excludeIfWonCheckBox.isSelected();
-    params.donatedAfter = this.donatedAfterCheckBox.isSelected() ? (Date) this.donatedAfterTimeField.getValue() : null;
-    params.donatedBefore = this.donatedBeforeCheckBox.isSelected() ? (Date) this.donatedBeforeTimeField.getValue() : null;
+    params.donatedAfter = this.donatedAfterCheckBox.isSelected() ? this.donatedAfterTimeField.getTimeValue() : null;
+    params.donatedBefore = this.donatedBeforeCheckBox.isSelected() ? this.donatedAfterTimeField.getTimeValue() : null;
     params.targetAmount = this.minimumDonationCheckBox.isSelected() ? new BigDecimal(this.minimumDonationField.getText()) : null;
     
     this.selectedDonor = this.assigner.selectWinner(params);

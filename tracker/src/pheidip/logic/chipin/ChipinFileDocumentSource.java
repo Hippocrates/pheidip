@@ -1,4 +1,4 @@
-package pheidip.logic;
+package pheidip.logic.chipin;
 
 import java.io.File;
 import java.io.FileInputStream;

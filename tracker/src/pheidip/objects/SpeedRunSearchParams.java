@@ -1,6 +1,9 @@
 package pheidip.objects;
 
-public class SpeedRunSearchParams
+import pheidip.util.FilterFunction;
+import pheidip.util.StringUtils;
+
+public class SpeedRunSearchParams implements FilterFunction<SpeedRun>
 {
   public SpeedRunSearchParams(String name)
   {
@@ -8,4 +11,12 @@ public class SpeedRunSearchParams
   }
   
   public String name;
+
+  @Override
+  public boolean predicate(SpeedRun x)
+  {
+    return (this.name == null || StringUtils.innerStringMatch(x.getName(), this.name));
+  }
+  
+  
 }

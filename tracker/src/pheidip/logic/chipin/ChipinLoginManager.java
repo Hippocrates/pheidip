@@ -1,4 +1,4 @@
-package pheidip.logic;
+package pheidip.logic.chipin;
 
 import java.io.IOException;
 
@@ -157,6 +157,10 @@ public class ChipinLoginManager
     if (this.reporter != null)
     {
       this.reporter.report(toReport);
+    }
+    else
+    {
+      throw new RuntimeException(toReport);
     }
   }
 }

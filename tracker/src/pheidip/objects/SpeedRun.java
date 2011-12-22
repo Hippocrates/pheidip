@@ -1,5 +1,6 @@
 package pheidip.objects;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,6 +12,8 @@ public class SpeedRun
   private int id;
   private String name;
   private String description;
+  private Date startTime;
+  private Date endTime;
   private int sortKey;
   private Set<Bid> bids = new HashSet<Bid>();
   private Set<Prize> prizeStartGame = new HashSet<Prize>();
@@ -21,11 +24,13 @@ public class SpeedRun
     this.id = IdUtils.generateId();
   }
   
-  public SpeedRun(int id, String name, int sortKey, String description)
+  public SpeedRun(int id, String name, int sortKey, Date startTime, Date endTime, String description)
   {
     this.setId(id);
     this.setName(name);
     this.setDescription(description);
+    this.setStartTime(startTime);
+    this.setEndTime(endTime);
     this.setSortKey(sortKey);
   }
 
@@ -119,5 +124,39 @@ public class SpeedRun
   public Set<Prize> getPrizeEndGame()
   {
     return prizeEndGame;
+  }
+
+  public void setStartTime(Date startTime)
+  {
+    if (startTime == null)
+    {
+      this.startTime = new Date();
+    }
+    else
+    {
+      this.startTime = startTime;
+    }
+  }
+
+  public Date getStartTime()
+  {
+    return startTime;
+  }
+
+  public void setEndTime(Date endTime)
+  {
+    if (endTime == null)
+    {
+      this.endTime = new Date();
+    }
+    else
+    {
+      this.endTime = endTime;
+    }
+  }
+
+  public Date getEndTime()
+  {
+    return endTime;
   }
 }

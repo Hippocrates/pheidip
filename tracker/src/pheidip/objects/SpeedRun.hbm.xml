@@ -18,6 +18,12 @@
   <property generated="never" lazy="false" name="sortKey" type="int" unique-key="SpeedRunSortKeyUnique">
    <column name="sortKey"/>
   </property>
+  <property generated="never" lazy="false" name="startTime" type="java.util.Date">
+   <column name="STARTTIME"/>
+  </property>
+  <property generated="never" lazy="false" name="endTime" type="java.util.Date">
+   <column name="ENDTIME"/>
+  </property>
   <set cascade="all,delete-orphan" inverse="true" lazy="true"
    name="bids" sort="unsorted" table="Bid">
    <key>

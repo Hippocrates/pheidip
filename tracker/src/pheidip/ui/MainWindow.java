@@ -24,11 +24,6 @@ import java.awt.event.WindowListener;
 
 import pheidip.logic.BidSearch;
 import pheidip.logic.ChallengeControl;
-import pheidip.logic.ChipinDocumentSource;
-import pheidip.logic.ChipinFileDocumentSource;
-import pheidip.logic.ChipinMergeProcess;
-import pheidip.logic.ChipinTextDocumentSource;
-import pheidip.logic.ChipinWebsiteDocumentSource;
 import pheidip.logic.ChoiceControl;
 import pheidip.logic.DonationBidTask;
 import pheidip.logic.DonationControl;
@@ -41,6 +36,12 @@ import pheidip.logic.PrizeSearch;
 import pheidip.logic.ProgramInstance;
 import pheidip.logic.SpeedRunControl;
 import pheidip.logic.SpeedRunSearch;
+import pheidip.logic.chipin.ChipinDocumentSource;
+import pheidip.logic.chipin.ChipinFileDocumentSource;
+import pheidip.logic.chipin.ChipinMergeProcess;
+import pheidip.logic.chipin.ChipinTextDocumentSource;
+import pheidip.logic.chipin.ChipinWebsiteDocumentSource;
+import pheidip.logic.gdocs.GoogleRefreshProcess;
 import pheidip.objects.Bid;
 import pheidip.objects.BidType;
 import pheidip.objects.Donation;
@@ -84,6 +85,9 @@ public class MainWindow extends JFrame implements Reporter
   private JMenuItem searchBidButton;
   private JMenuItem createNewPrizeButton;
   private JMenuItem searchPrizeButton;
+  private JMenuItem googleLoginButton;
+  private JMenu googleMenu;
+  private JMenuItem googleRefreshRunsButton;
   
   private void shutdown()
   {
@@ -117,6 +121,9 @@ public class MainWindow extends JFrame implements Reporter
     
     chipinLoginButton = new JMenuItem("Log In To Chipin...");
     fileMenu.add(chipinLoginButton);
+    
+    googleLoginButton = new JMenuItem("Log In To Google...");
+    fileMenu.add(googleLoginButton);
     
     separator = new JSeparator();
     fileMenu.add(separator);
@@ -182,6 +189,13 @@ public class MainWindow extends JFrame implements Reporter
     chipinWebsiteMergeButton.setEnabled(false);
     chipinMenu.add(chipinWebsiteMergeButton);
     
+    googleMenu = new JMenu("Google");
+    googleMenu.setEnabled(false);
+    menuBar.add(googleMenu);
+    
+    googleRefreshRunsButton = new JMenuItem("Refresh Runs From Spreadsheet");
+    googleMenu.add(googleRefreshRunsButton);
+    
     // Initialise message area
     this.messageArea = new JTextField();
     this.messageArea.setEditable(false);
@@ -240,6 +254,21 @@ public class MainWindow extends JFrame implements Reporter
           {
             MainWindow.this.openChipinLogoutDialog();
           }
+        }
+        else if (ev.getSource() == googleLoginButton)
+        {
+          if (!MainWindow.this.instance.getGoogleLogin().isLoggedIn())
+          {
+            MainWindow.this.openGoogleLoginDialog();
+          }
+          else
+          {
+            MainWindow.this.openGoogleLogouDialog();
+          }
+        }
+        else if (ev.getSource() == googleRefreshRunsButton)
+        {
+          MainWindow.this.openGoogleSpreadsheetUpdateTab();
         }
         else if (ev.getSource() == processBidsButton)
         {
@@ -315,6 +344,8 @@ public class MainWindow extends JFrame implements Reporter
     this.readDonationsButton.addActionListener(this.actionHandler);
     this.createNewPrizeButton.addActionListener(this.actionHandler);
     this.searchPrizeButton.addActionListener(this.actionHandler);
+    this.googleLoginButton.addActionListener(this.actionHandler);
+    this.googleRefreshRunsButton.addActionListener(this.actionHandler);
 
     Action deleteAction = new AbstractAction() 
     {
@@ -544,14 +575,76 @@ public class MainWindow extends JFrame implements Reporter
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof ChipinMergeTab)
+      if (target instanceof ExternalProcessTab)
       {
-        this.focusOnTab(i);
-        return;
+        ExternalProcessTab processTab = (ExternalProcessTab) target;
+        if (processTab.getProcess() instanceof ChipinMergeProcess)
+        {
+          this.focusOnTab(i);
+          return;
+        }
       }
     }
     
-    ChipinMergeTab tab = new ChipinMergeTab(new ChipinMergeProcess(this.instance.getDonationDatabase(), documentSource));
+    ExternalProcessTab tab = new ExternalProcessTab(new ChipinMergeProcess(this.instance.getDonationDatabase(), documentSource));
+    
+    this.insertTab(tab);
+  }
+  
+  private void openGoogleLoginDialog()
+  {
+    if (!this.instance.getChipinLogin().isLoggedIn())
+    {
+      GoogleLoginDialog dialog = new GoogleLoginDialog(this, this.instance.getGoogleLogin());
+      dialog.setVisible(true);
+      
+      if (this.instance.getGoogleLogin().isLoggedIn())
+      {
+        this.updateUIState();
+      }
+    }
+    else
+    {
+      throw new RuntimeException("Error, already logged in.");
+    }
+  }
+
+  private void openGoogleLogouDialog()
+  {
+    if (this.instance.getGoogleLogin().isLoggedIn())
+    {
+      int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to log out of google?", "Confirm logout...", JOptionPane.YES_NO_OPTION);
+      
+      if (result == JOptionPane.YES_OPTION)
+      {
+        this.instance.getGoogleLogin().logOut();
+        this.updateUIState();
+      }
+    }
+    else
+    {
+      throw new RuntimeException("Error, not logged in.");
+    }
+  }
+
+  private void openGoogleSpreadsheetUpdateTab()
+  {
+    // prevent opening the same tab twice
+    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    {
+      Component target = this.tabbedPane.getComponentAt(i);
+      if (target instanceof ExternalProcessTab)
+      {
+        ExternalProcessTab processTab = (ExternalProcessTab) target;
+        if (processTab.getProcess() instanceof GoogleRefreshProcess)
+        {
+          this.focusOnTab(i);
+          return;
+        }
+      }
+    }
+    
+    ExternalProcessTab tab = new ExternalProcessTab(new GoogleRefreshProcess(this.instance.getDonationDatabase(), this.instance.getGoogleLogin(), false));
     
     this.insertTab(tab);
   }
@@ -593,6 +686,17 @@ public class MainWindow extends JFrame implements Reporter
     {
       this.chipinLoginButton.setText("Log In To Chipin...");
       this.chipinWebsiteMergeButton.setEnabled(false);
+    }
+    
+    if (this.instance.getGoogleLogin().isLoggedIn())
+    {
+      this.googleLoginButton.setText("Log Out Of Google...");
+      this.googleMenu.setEnabled(true);
+    }
+    else
+    {
+      this.googleLoginButton.setText("Log In To Google...");
+      this.googleMenu.setEnabled(false);
     }
   }
 

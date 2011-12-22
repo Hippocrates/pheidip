@@ -109,4 +109,34 @@ public class TestStringUtils extends TestCase
     assertTrue(amount.compareTo(BigDecimal.TEN.pow(hiNumDigits + 1)) < 0);
     assertTrue(amount.scale() == 2);
   }
+  
+  public void testHeuristicSplit()
+  {
+    String person1 = "Mike89";
+    String person2 = "cygfer";
+    String twoPeople = person1 + " and " + person2;
+    
+    String[] splits = StringUtils.heuristicSplit(twoPeople);
+    
+    assertEquals(2, splits.length);
+    
+    assertEquals(person1, splits[0]);
+    assertEquals(person2, splits[1]);
+    
+    String oneOf4 = "Mike Uyama";
+    String twoOf4 = "Sinister1";
+    String threeOf4 = "Jprophet22";
+    String fourOf4 = "Heidman";
+    
+    String fourPeople = oneOf4 + "; " + twoOf4 + "; " + threeOf4 + "; and " + fourOf4;
+    
+    String[] split4 = StringUtils.heuristicSplit(fourPeople);
+    
+    assertEquals(4, split4.length);
+    
+    assertEquals(oneOf4, split4[0]);
+    assertEquals(twoOf4, split4[1]);
+    assertEquals(threeOf4, split4[2]);
+    assertEquals(fourOf4, split4[3]);
+  }
 }

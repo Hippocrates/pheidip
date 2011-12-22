@@ -1,29 +1,42 @@
 package pheidip.main;
 
-import java.io.IOException;
+import java.util.List;
 
-import org.jsoup.Connection;
-import org.jsoup.Connection.Method;
-import org.jsoup.Connection.Response;
-import org.jsoup.helper.HttpConnection;
+import pheidip.logic.DonationDatabaseManager;
+import pheidip.logic.gdocs.GoogleSpreadSheetLoginManager;
+import pheidip.logic.gdocs.GoogleSpreadSheetReader;
+import pheidip.logic.gdocs.MarathonSpreadsheetEntry;
+import pheidip.objects.SpeedRun;
 
 public class RetreiveGoogleSpreadSheet
 {
   public static void main(String[] args)
   {
-    String url = "https://spreadsheets.google.com/feeds/list/0Alb3Dj0u13H7dG1BTS1mdGVHcXZudUE0SXk5dEk2LXc/1/private/full";
-    Connection loginConnection = HttpConnection.connect(url);
+    DonationDatabaseManager manager = new DonationDatabaseManager();
     
-    loginConnection.method(Method.GET);
+    manager.createMemoryDatabase();
     
-    try
+    GoogleSpreadSheetLoginManager login = new GoogleSpreadSheetLoginManager();
+    
+    login.logIn("sdatracker@gmail.com", "hq3ct0ak", "0Alb3Dj0u13H7dG1BTS1mdGVHcXZudUE0SXk5dEk2LXc");
+    
+    if (login.isLoggedIn())
     {
-      Response result = loginConnection.execute();
-      System.out.println(result.body());
-    } 
-    catch (IOException e)
-    {
-      System.out.println("Failed: " + e.getMessage());
+      List<MarathonSpreadsheetEntry> entries = login.retrieveSpreadSheetEntries();
+      
+      for (MarathonSpreadsheetEntry entry : entries)
+      {
+        System.out.println(entry.getStartTime().toString());
+        System.out.println(entry.getGameName());
+        System.out.println(entry.getRunners().toString());
+        System.out.println(entry.getEstimatedFinish().toString());
+      }
+      
+      GoogleSpreadSheetReader.mergeRuns(manager, entries, true);
     }
+    
+    List<SpeedRun> allRuns = manager.getDataAccess().getSpeedRuns().getAllSpeedRuns();
+    
+    System.out.println(allRuns.toString());
   }
 }

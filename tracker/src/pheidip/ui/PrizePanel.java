@@ -17,6 +17,7 @@ import java.awt.FocusTraversalPolicy;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -546,7 +547,21 @@ public class PrizePanel extends EntityPanel
   {
     BigDecimal targetAmount = new BigDecimal(this.targetAmountField.getText());
     
-    PrizeAssignmentDialog dialog = new PrizeAssignmentDialog(this.owner, this.control.getPrizeAssign(), targetAmount);
+    Prize data = this.control.getData();
+    Date defaultStart = null;
+    Date defaultEnd = null;
+    
+    if (data.getStartGame() != null)
+    {
+      defaultStart = data.getStartGame().getStartTime();
+    }
+    
+    if (data.getEndGame() != null)
+    {
+      defaultEnd = data.getEndGame().getEndTime();
+    }
+    
+    PrizeAssignmentDialog dialog = new PrizeAssignmentDialog(this.owner, this.control.getPrizeAssign(), targetAmount, defaultStart, defaultEnd);
     dialog.setVisible(true);
     
     if (dialog.getResult() != null)
