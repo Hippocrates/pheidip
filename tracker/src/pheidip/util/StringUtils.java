@@ -170,7 +170,7 @@ public final class StringUtils
     {
       String last = subList.remove(subList.size() - 1);
       
-      String first = joinSeperated(subList, ",");
+      String first = joinSeperated(subList, ", ");
       
       return first + ", and " + last;
     }

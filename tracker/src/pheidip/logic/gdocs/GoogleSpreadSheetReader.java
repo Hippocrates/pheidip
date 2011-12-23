@@ -33,6 +33,8 @@ public class GoogleSpreadSheetReader
       {
         SpeedRun newRun = new SpeedRun();
         newRun.setName(entry.getGameName());
+        newRun.setRunners(StringUtils.joinLanguageSeperated(entry.getRunners()));
+        newRun.setDescription(entry.getComments());
         newRun.setSortKey(currentIndex);
         newRun.setStartTime(entry.getStartTime());
         newRun.setEndTime(entry.getEstimatedFinish());
@@ -50,6 +52,7 @@ public class GoogleSpreadSheetReader
       }
       else
       {
+        found.setRunners(StringUtils.joinLanguageSeperated(entry.getRunners()));
         found.setStartTime(entry.getStartTime());
         found.setEndTime(entry.getEstimatedFinish());
         

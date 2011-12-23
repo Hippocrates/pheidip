@@ -113,7 +113,7 @@ public class GoogleSpreadSheetLoginManager
   
   private static MarathonSpreadsheetEntry parseEntry(ListEntry entry) throws ParseException
   {
-    final SimpleDateFormat dateFormatter = new SimpleDateFormat ("yyyy EEE MMM dd KK:mm aa");
+    final SimpleDateFormat dateFormatter = new SimpleDateFormat ("yyyy EEE MMM dd hh:mm aa");
     
     Date startTime = new Date(0);
     String gameName = null;

@@ -102,12 +102,12 @@ public class ChoiceControl
   {
     Choice c = this.refreshData();
     
-    for (ChoiceOption o : c.getOptions())
+    for (ChoiceOption o : getOptions())
     {
       this.deleteOption(o);
     }
 
-    this.bids.deleteChoice(this.refreshData());
+    this.bids.deleteChoice(c);
     this.cachedData = null;
   }
 

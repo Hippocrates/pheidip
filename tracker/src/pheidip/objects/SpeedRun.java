@@ -12,6 +12,7 @@ public class SpeedRun
   private int id;
   private String name;
   private String description;
+  private String runners;
   private Date startTime;
   private Date endTime;
   private int sortKey;
@@ -24,10 +25,11 @@ public class SpeedRun
     this.id = IdUtils.generateId();
   }
   
-  public SpeedRun(int id, String name, int sortKey, Date startTime, Date endTime, String description)
+  public SpeedRun(int id, String name, String runners, int sortKey, Date startTime, Date endTime, String description)
   {
     this.setId(id);
     this.setName(name);
+    this.setRunners(runners);
     this.setDescription(description);
     this.setStartTime(startTime);
     this.setEndTime(endTime);
@@ -158,5 +160,15 @@ public class SpeedRun
   public Date getEndTime()
   {
     return endTime;
+  }
+
+  public void setRunners(String runners)
+  {
+    this.runners = StringUtils.emptyIfNull(runners);
+  }
+
+  public String getRunners()
+  {
+    return runners;
   }
 }

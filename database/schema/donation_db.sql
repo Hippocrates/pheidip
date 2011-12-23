@@ -42,6 +42,7 @@ create table SpeedRun
 (
   ID integer not null, 
   NAME varchar(255),
+  RUNNERS varchar(255),
   DESCRIPTION varchar(255),
   STARTTIME datetime,
   ENDTIME datetime,

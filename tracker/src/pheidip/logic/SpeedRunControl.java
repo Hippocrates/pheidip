@@ -8,6 +8,7 @@ import pheidip.db.BidData;
 import pheidip.db.SpeedRunData;
 import pheidip.objects.Bid;
 import pheidip.objects.BidState;
+import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.SpeedRun;
@@ -59,7 +60,7 @@ public class SpeedRunControl
   public static int createNewSpeedRun(DonationDatabaseManager manager, String name)
   {
     int id = IdUtils.generateId();
-    manager.getDataAccess().getSpeedRuns().insertSpeedRun(new SpeedRun(id, name, id, null, null, null));
+    manager.getDataAccess().getSpeedRuns().insertSpeedRun(new SpeedRun(id, name, "", id, null, null, null));
     return id;
   }
 
@@ -94,6 +95,20 @@ public class SpeedRunControl
 
   public void deleteSpeedRun()
   {
+    for (Bid b : this.getAllBids())
+    {
+      if (b.getType() == BidType.CHALLENGE)
+      {
+        ChallengeControl c = new ChallengeControl(this.donationDatabase, b.getId());
+        c.deleteChallenge();
+      }
+      else
+      {
+        ChoiceControl c = new ChoiceControl(this.donationDatabase, b.getId());
+        c.deleteChoice();
+      }
+    }
+    
     this.speedRuns.deleteSpeedRun(this.speedRunId);
     this.cachedData = null;
   }

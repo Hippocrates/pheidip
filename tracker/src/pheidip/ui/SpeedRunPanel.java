@@ -6,6 +6,7 @@ import pheidip.logic.SpeedRunControl;
 import pheidip.objects.Bid;
 import pheidip.objects.BidType;
 import pheidip.objects.ChoiceOption;
+import pheidip.objects.Prize;
 import pheidip.objects.SpeedRun;
 import pheidip.util.FormatUtils;
 import pheidip.util.Pair;
@@ -27,10 +28,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.List;
+
+import javax.swing.DefaultListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextArea;
 import javax.swing.JFormattedTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.JList;
 
 @SuppressWarnings("serial")
 public class SpeedRunPanel extends EntityPanel
@@ -59,14 +63,20 @@ public class SpeedRunPanel extends EntityPanel
   private TimeControl startTimeField;
   private JLabel lblEndTime;
   private TimeControl endTimeField;
+  private JLabel lblRunners;
+  private JTextField runnersTextField;
+  private JButton openPrizeButton;
+  private JLabel lblPrizesToBe;
+  private JList prizeList;
+  private JScrollPane prizesScrollPane;
 
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{72, 110, 116, 114, 0, 0, 85, 0};
-    gridBagLayout.rowHeights = new int[]{0, 4, 0, 0, 0, 0, 0, 0, 131, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.rowHeights = new int[]{0, 0, 74, 0, 0, 0, 0, 37, 0, 131, 0};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     JLabel nameLabel = new JLabel("Name:");
@@ -95,12 +105,30 @@ public class SpeedRunPanel extends EntityPanel
     gbc_deleteButton.gridy = 0;
     add(deleteButton, gbc_deleteButton);
     
+    lblRunners = new JLabel("Runner(s):");
+    GridBagConstraints gbc_lblRunners = new GridBagConstraints();
+    gbc_lblRunners.anchor = GridBagConstraints.EAST;
+    gbc_lblRunners.insets = new Insets(0, 0, 5, 5);
+    gbc_lblRunners.gridx = 0;
+    gbc_lblRunners.gridy = 1;
+    add(lblRunners, gbc_lblRunners);
+    
+    runnersTextField = new JTextField();
+    GridBagConstraints gbc_runnersTextField = new GridBagConstraints();
+    gbc_runnersTextField.gridwidth = 2;
+    gbc_runnersTextField.insets = new Insets(0, 0, 5, 5);
+    gbc_runnersTextField.fill = GridBagConstraints.HORIZONTAL;
+    gbc_runnersTextField.gridx = 1;
+    gbc_runnersTextField.gridy = 1;
+    add(runnersTextField, gbc_runnersTextField);
+    runnersTextField.setColumns(10);
+    
     lblDescription = new JLabel("Description:");
     GridBagConstraints gbc_lblDescription = new GridBagConstraints();
     gbc_lblDescription.anchor = GridBagConstraints.NORTH;
     gbc_lblDescription.insets = new Insets(0, 0, 5, 5);
     gbc_lblDescription.gridx = 0;
-    gbc_lblDescription.gridy = 1;
+    gbc_lblDescription.gridy = 2;
     add(lblDescription, gbc_lblDescription);
     
     descriptionScrollPane = new JScrollPane();
@@ -110,7 +138,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_descriptionScrollPane.insets = new Insets(0, 0, 5, 5);
     gbc_descriptionScrollPane.fill = GridBagConstraints.BOTH;
     gbc_descriptionScrollPane.gridx = 1;
-    gbc_descriptionScrollPane.gridy = 1;
+    gbc_descriptionScrollPane.gridy = 2;
     add(descriptionScrollPane, gbc_descriptionScrollPane);
     
     descriptionTextArea = new JTextArea();
@@ -123,7 +151,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_lblSortingKey.anchor = GridBagConstraints.EAST;
     gbc_lblSortingKey.insets = new Insets(0, 0, 5, 5);
     gbc_lblSortingKey.gridx = 0;
-    gbc_lblSortingKey.gridy = 2;
+    gbc_lblSortingKey.gridy = 3;
     add(lblSortingKey, gbc_lblSortingKey);
     
     sortKeyField = new JFormattedTextField(FormatUtils.getIntegerFormat());
@@ -132,15 +160,23 @@ public class SpeedRunPanel extends EntityPanel
     gbc_sortKeyField.insets = new Insets(0, 0, 5, 5);
     gbc_sortKeyField.fill = GridBagConstraints.HORIZONTAL;
     gbc_sortKeyField.gridx = 1;
-    gbc_sortKeyField.gridy = 2;
+    gbc_sortKeyField.gridy = 3;
     add(sortKeyField, gbc_sortKeyField);
+    
+    openPrizeButton = new JButton("Open Prize");
+    GridBagConstraints gbc_openPrizeButton = new GridBagConstraints();
+    gbc_openPrizeButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_openPrizeButton.insets = new Insets(0, 0, 5, 0);
+    gbc_openPrizeButton.gridx = 6;
+    gbc_openPrizeButton.gridy = 3;
+    add(openPrizeButton, gbc_openPrizeButton);
     
     lblStartTime = new JLabel("Start Time:");
     GridBagConstraints gbc_lblStartTime = new GridBagConstraints();
     gbc_lblStartTime.anchor = GridBagConstraints.EAST;
     gbc_lblStartTime.insets = new Insets(0, 0, 5, 5);
     gbc_lblStartTime.gridx = 0;
-    gbc_lblStartTime.gridy = 3;
+    gbc_lblStartTime.gridy = 4;
     add(lblStartTime, gbc_lblStartTime);
     
     startTimeField = new TimeControl();
@@ -149,15 +185,36 @@ public class SpeedRunPanel extends EntityPanel
     gbc_startTimeField.insets = new Insets(0, 0, 5, 5);
     gbc_startTimeField.fill = GridBagConstraints.HORIZONTAL;
     gbc_startTimeField.gridx = 1;
-    gbc_startTimeField.gridy = 3;
+    gbc_startTimeField.gridy = 4;
     add(startTimeField, gbc_startTimeField);
+    
+    lblPrizesToBe = new JLabel("Prizes to be drawn:");
+    GridBagConstraints gbc_lblPrizesToBe = new GridBagConstraints();
+    gbc_lblPrizesToBe.anchor = GridBagConstraints.EAST;
+    gbc_lblPrizesToBe.insets = new Insets(0, 0, 5, 5);
+    gbc_lblPrizesToBe.gridx = 4;
+    gbc_lblPrizesToBe.gridy = 4;
+    add(lblPrizesToBe, gbc_lblPrizesToBe);
+    
+    prizesScrollPane = new JScrollPane();
+    GridBagConstraints gbc_prizesScrollPane = new GridBagConstraints();
+    gbc_prizesScrollPane.fill = GridBagConstraints.BOTH;
+    gbc_prizesScrollPane.gridheight = 4;
+    gbc_prizesScrollPane.gridwidth = 2;
+    gbc_prizesScrollPane.insets = new Insets(0, 0, 5, 0);
+    gbc_prizesScrollPane.gridx = 5;
+    gbc_prizesScrollPane.gridy = 4;
+    add(prizesScrollPane, gbc_prizesScrollPane);
+    
+    prizeList = new JList();
+    prizesScrollPane.setViewportView(prizeList);
     
     lblEndTime = new JLabel("End Time:");
     GridBagConstraints gbc_lblEndTime = new GridBagConstraints();
     gbc_lblEndTime.anchor = GridBagConstraints.EAST;
     gbc_lblEndTime.insets = new Insets(0, 0, 5, 5);
     gbc_lblEndTime.gridx = 0;
-    gbc_lblEndTime.gridy = 4;
+    gbc_lblEndTime.gridy = 5;
     add(lblEndTime, gbc_lblEndTime);
     
     endTimeField = new TimeControl();
@@ -166,7 +223,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_endTimeField.insets = new Insets(0, 0, 5, 5);
     gbc_endTimeField.fill = GridBagConstraints.HORIZONTAL;
     gbc_endTimeField.gridx = 1;
-    gbc_endTimeField.gridy = 4;
+    gbc_endTimeField.gridy = 5;
     add(endTimeField, gbc_endTimeField);
     
     saveButton = new JButton("Save");
@@ -174,7 +231,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_saveButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_saveButton.insets = new Insets(0, 0, 5, 5);
     gbc_saveButton.gridx = 1;
-    gbc_saveButton.gridy = 5;
+    gbc_saveButton.gridy = 6;
     add(saveButton, gbc_saveButton);
     
     refreshButton = new JButton("Refresh");
@@ -182,7 +239,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_refreshButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_refreshButton.insets = new Insets(0, 0, 5, 5);
     gbc_refreshButton.gridx = 2;
-    gbc_refreshButton.gridy = 5;
+    gbc_refreshButton.gridy = 6;
     add(refreshButton, gbc_refreshButton);
     
     openBidButton = new JButton("Open Bid");
@@ -190,7 +247,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_openBidButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_openBidButton.insets = new Insets(0, 0, 5, 5);
     gbc_openBidButton.gridx = 2;
-    gbc_openBidButton.gridy = 7;
+    gbc_openBidButton.gridy = 8;
     add(openBidButton, gbc_openBidButton);
     
     newChoiceButton = new JButton("New Choice");
@@ -198,7 +255,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_newChoiceButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_newChoiceButton.insets = new Insets(0, 0, 5, 5);
     gbc_newChoiceButton.gridx = 3;
-    gbc_newChoiceButton.gridy = 7;
+    gbc_newChoiceButton.gridy = 8;
     add(newChoiceButton, gbc_newChoiceButton);
     
     newChallengeButton = new JButton("New Challenge");
@@ -206,7 +263,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_newChallengeButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_newChallengeButton.insets = new Insets(0, 0, 5, 5);
     gbc_newChallengeButton.gridx = 4;
-    gbc_newChallengeButton.gridy = 7;
+    gbc_newChallengeButton.gridy = 8;
     add(newChallengeButton, gbc_newChallengeButton);
     
     bidsScrollPane = new JScrollPane();
@@ -214,7 +271,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_bidsScrollPane.gridwidth = 7;
     gbc_bidsScrollPane.fill = GridBagConstraints.BOTH;
     gbc_bidsScrollPane.gridx = 0;
-    gbc_bidsScrollPane.gridy = 8;
+    gbc_bidsScrollPane.gridy = 9;
     add(bidsScrollPane, gbc_bidsScrollPane);
     
     bidTable = new JTable();
@@ -252,6 +309,10 @@ public class SpeedRunPanel extends EntityPanel
         {
           SpeedRunPanel.this.deleteContent();
         }
+        else if (ev.getSource() == openPrizeButton)
+        {
+          SpeedRunPanel.this.openSelectedPrize();
+        }
       }
       catch(Exception e)
       {
@@ -269,6 +330,13 @@ public class SpeedRunPanel extends EntityPanel
           SpeedRunPanel.this.openSelectedBid();
         }
       }
+      else if (ev.getSource() == prizeList)
+      {
+        if (ev.getClickCount() == 2)
+        {
+          SpeedRunPanel.this.openSelectedPrize();
+        }
+      }
     }
   }
   
@@ -283,6 +351,8 @@ public class SpeedRunPanel extends EntityPanel
     newChallengeButton.addActionListener(this.actionHandler);
     deleteButton.addActionListener(this.actionHandler);
     bidTable.addMouseListener(this.actionHandler);
+    prizeList.addMouseListener(this.actionHandler);
+    this.openPrizeButton.addActionListener(this.actionHandler);
     
     this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(this.descriptionTextArea));
     
@@ -291,6 +361,7 @@ public class SpeedRunPanel extends EntityPanel
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.nameField,
+      this.runnersTextField,
       this.descriptionTextArea,
       this.sortKeyField,
       this.saveButton,
@@ -299,6 +370,8 @@ public class SpeedRunPanel extends EntityPanel
       this.newChoiceButton,
       this.newChallengeButton,
       this.bidTable,
+      this.openPrizeButton,
+      this.prizeList,
     });
     this.setFocusTraversalPolicy(this.tabOrder);
   }
@@ -334,6 +407,21 @@ public class SpeedRunPanel extends EntityPanel
     this.speedRunControl.refreshData();
     this.redrawContent();
   }
+  
+  private Prize getSelectedPrize()
+  {
+    return (Prize) this.prizeList.getSelectedValue();
+  }
+  
+  private void openSelectedPrize()
+  {
+    Prize p = this.getSelectedPrize();
+    
+    if (p != null)
+    {
+      this.owner.openPrizeTab(p.getId());
+    }
+  }
 
   @Override
   public void redrawContent()
@@ -348,10 +436,20 @@ public class SpeedRunPanel extends EntityPanel
     }
     
     this.nameField.setText(data.getName());
+    this.runnersTextField.setText(data.getRunners());
     this.descriptionTextArea.setText(data.getDescription());
     this.sortKeyField.setText("" + data.getSortKey());
     this.startTimeField.setTimeValue(data.getStartTime());
     this.endTimeField.setTimeValue(data.getEndTime());
+    
+    DefaultListModel prizeData = new DefaultListModel();
+    
+    for (Prize p : data.getPrizeEndGame())
+    {
+      prizeData.addElement(p);
+    }
+    
+    this.prizeList.setModel(prizeData);
     
     cachedRelatedBids = this.speedRunControl.getAllBids();
     
@@ -404,6 +502,7 @@ public class SpeedRunPanel extends EntityPanel
   {
     SpeedRun data = this.speedRunControl.getData();
     data.setName(this.nameField.getText());
+    data.setRunners(this.runnersTextField.getText());
     data.setDescription(this.descriptionTextArea.getText());
     data.setSortKey(Integer.parseInt(this.sortKeyField.getText()));
     data.setStartTime(this.startTimeField.getTimeValue());

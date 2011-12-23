@@ -12,6 +12,10 @@
    type="java.lang.String" unique-key="SpeedRunNameUnique">
    <column name="NAME" unique="true"/>
   </property>
+  <property generated="never" lazy="false" name="runners"
+   type="java.lang.String">
+   <column name="RUNNERS"/>
+  </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
   </property>
@@ -31,15 +35,13 @@
    </key>
    <one-to-many class="pheidip.objects.Bid"/>
   </set>
-  <set cascade="none" inverse="true" lazy="true"
-   name="prizeStartGame" sort="unsorted" table="Prize">
+  <set inverse="true" lazy="true" name="prizeStartGame" sort="unsorted" table="Prize">
    <key>
     <column name="STARTGAME"/>
    </key>
    <one-to-many class="pheidip.objects.Prize"/>
   </set>
-  <set cascade="none" inverse="true" lazy="true"
-   name="prizeEndGame" sort="unsorted" table="Prize">
+  <set inverse="true" lazy="true" name="prizeEndGame" sort="unsorted" table="Prize">
    <key>
     <column name="ENDGAME"/>
    </key>

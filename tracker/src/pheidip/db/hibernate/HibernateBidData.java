@@ -71,7 +71,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     Session session = this.beginTransaction();
     
     choice.getSpeedRun().getBids().remove(choice);
-
+    
     session.delete(choice);
     
     this.endTransaction();

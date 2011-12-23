@@ -674,10 +674,11 @@ public class MainWindow extends JFrame implements Reporter
       this.searchMenu.setEnabled(false);
       this.chipinMenu.setEnabled(false);
       this.tasksMenu.setEnabled(false);
+      this.googleMenu.setEnabled(false);
       this.tabbedPane.removeAll();
     }
     
-    if (this.instance.getChipinLogin().isLoggedIn())
+    if (this.instance.getChipinLogin().isLoggedIn() && this.instance.getDonationDatabase().isConnected())
     {
       this.chipinLoginButton.setText("Log Out Of Chipin...");
       this.chipinWebsiteMergeButton.setEnabled(true);
@@ -688,7 +689,7 @@ public class MainWindow extends JFrame implements Reporter
       this.chipinWebsiteMergeButton.setEnabled(false);
     }
     
-    if (this.instance.getGoogleLogin().isLoggedIn())
+    if (this.instance.getGoogleLogin().isLoggedIn() && this.instance.getDonationDatabase().isConnected())
     {
       this.googleLoginButton.setText("Log Out Of Google...");
       this.googleMenu.setEnabled(true);

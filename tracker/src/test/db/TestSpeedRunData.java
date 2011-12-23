@@ -32,7 +32,7 @@ public class TestSpeedRunData extends DonationDatabaseTest
     final int runId = 5;
     final String runName = "another run";
     
-    this.speedRuns.insertSpeedRun(new SpeedRun(runId, runName, runId, new Date(), new Date(), null));
+    this.speedRuns.insertSpeedRun(new SpeedRun(runId, runName, "", runId, new Date(), new Date(), null));
     
     SpeedRun s = this.speedRuns.getSpeedRunById(runId);
     
@@ -62,7 +62,7 @@ public class TestSpeedRunData extends DonationDatabaseTest
     
     assertFalse(newName.equals(s.getName()));
     
-    this.speedRuns.updateSpeedRun(new SpeedRun(runId, newName, runId, new Date(), new Date(), null));
+    this.speedRuns.updateSpeedRun(new SpeedRun(runId, newName, "", runId, new Date(), new Date(), null));
     
     SpeedRun sprime = this.speedRuns.getSpeedRunById(runId);
     
