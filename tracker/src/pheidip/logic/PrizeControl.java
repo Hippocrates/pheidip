@@ -1,5 +1,7 @@
 package pheidip.logic;
 
+import java.math.BigDecimal;
+
 import pheidip.db.DonationDataConstraintException;
 import pheidip.db.PrizeData;
 import pheidip.objects.Prize;
@@ -22,7 +24,7 @@ public class PrizeControl
   {
     int newId = IdUtils.generateId();
     PrizeData prizes = manager.getDataAccess().getPrizeData();
-    prizes.insertPrize(new Prize(newId, name, null, null, newId, null, null, null, null));
+    prizes.insertPrize(new Prize(newId, name, null, null, newId, new BigDecimal("5.00"), null, null, null));
     return newId;
   }
   
