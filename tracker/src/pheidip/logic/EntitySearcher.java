@@ -2,7 +2,9 @@ package pheidip.logic;
 
 import java.util.List;
 
-public abstract class AbstractSearcher<T, P>
+import pheidip.objects.Entity;
+
+public abstract class EntitySearcher<T extends Entity, P>
 {
   public static final int DEFAULT_SEARCH_SIZE = 20;
   
