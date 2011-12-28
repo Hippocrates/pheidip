@@ -53,7 +53,6 @@ public class PrizePanel extends EntityPanel
   private FocusTraversalManager tabOrder;
   private JTextField imageURLField;
   private JLabel lblImageUrl;
-  private Donor winner;
   private JLabel lblSortingKey;
   private JFormattedTextField sortKeyField;
   private JLabel lblTargetAmount;
@@ -564,8 +563,7 @@ public class PrizePanel extends EntityPanel
   
   private void assignPrizeToDonor(Donor d)
   {
-    this.control.getData().setWinner(d);
-    d.getPrizes().add(this.control.getData());
+    this.control.assignPrize(d);
     this.redrawContent();
   }
   
@@ -628,7 +626,7 @@ public class PrizePanel extends EntityPanel
     
     this.setHeaderText("Prize: " + data.toString());
     
-    this.winner = data.getWinner();
+    Donor winner = data.getWinner();
     
     this.nameField.setText(data.getName());
     this.imageURLField.setText(data.getImageURL());
@@ -666,7 +664,6 @@ public class PrizePanel extends EntityPanel
     data.setDescription(this.descriptionTextArea.getText());
     data.setSortKey(Integer.parseInt(this.sortKeyField.getText()));
     data.setMinimumBid(new BigDecimal(this.targetAmountField.getText()));
-    data.setWinner(this.winner);
     data.setDrawMethod((PrizeDrawMethod) this.drawMethodComboBox.getSelectedItem());
     this.control.updateData(data);
     this.refreshContent();

@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -190,7 +192,7 @@ public class PrizeSearchDialog extends JDialog
     }
   }
   
-  class ActionHandler implements ActionListener, ListSelectionListener
+  class ActionHandler implements ActionListener, ListSelectionListener, DocumentListener
   {
     public void actionPerformed(ActionEvent ev)
     {
@@ -239,6 +241,29 @@ public class PrizeSearchDialog extends JDialog
           updateUIState();
       }
     }
+    
+    public void handleDocumentEvent(DocumentEvent ev)
+    {
+      updateUIState();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent ev)
+    {
+      this.handleDocumentEvent(ev);
+    }
+
+    @Override
+    public void insertUpdate(DocumentEvent ev)
+    {
+      this.handleDocumentEvent(ev);
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent ev)
+    {
+      this.handleDocumentEvent(ev);
+    }
   }
   
   private void initializeGUIEvents()
@@ -252,6 +277,7 @@ public class PrizeSearchDialog extends JDialog
     this.createNewButton.addActionListener(this.actionHandler);
     this.nextButton.addActionListener(this.actionHandler);
     this.prevButton.addActionListener(this.actionHandler);
+    this.nameField.getDocument().addDocumentListener(this.actionHandler);
     
     this.prizeNameCheckBox.addActionListener(this.actionHandler);
     
@@ -326,6 +352,8 @@ public class PrizeSearchDialog extends JDialog
     
     this.nextButton.setEnabled(this.searcher.hasNext());
     this.prevButton.setEnabled(this.searcher.hasPrev());
+    
+    this.createNewButton.setEnabled(!StringUtils.isEmptyOrNull(this.nameField.getText()));
   }
 
   private void runSearch()

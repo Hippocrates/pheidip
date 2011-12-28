@@ -14,8 +14,11 @@ import org.jsoup.nodes.Document;
 
 import pheidip.db.DonationData;
 import pheidip.logic.DonationDatabaseManager;
+import pheidip.logic.chipin.ChipinDonation;
+import pheidip.logic.chipin.ChipinDonationSource;
 import pheidip.logic.chipin.ChipinDonations;
-import pheidip.objects.ChipinDonation;
+import pheidip.logic.chipin.ChipinMergeProcess;
+import pheidip.logic.chipin.RawChipinDonationSource;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationDomain;
 
@@ -116,14 +119,22 @@ public class TestChipinDonations extends TestCase
       
       List<ChipinDonation> chipinDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
 
+      ChipinDonationSource s = new RawChipinDonationSource(chipinDonations);
+      
       manager.createMemoryDatabase();
       
-      // logic changed, too lazy to update test
+      ChipinMergeProcess mergeProcess = new ChipinMergeProcess(manager, s);
       
-      assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(chipinDonations, manager));
+      mergeProcess.run();
+      
+      ChipinTestHelper helper = new ChipinTestHelper();
+      
+      helper.checkAllDonationsAreInDatabase(chipinDonations, manager);
     }
     catch (Exception e)
     {
+      System.out.println(e.getMessage());
+      e.printStackTrace();
       fail();
     }
     finally
@@ -148,9 +159,19 @@ public class TestChipinDonations extends TestCase
 
       manager.createMemoryDatabase();
       
-      // logic changed, too lazy to update test
+      ChipinDonationSource s = new RawChipinDonationSource(chipinDonations);
+      
+      manager.createMemoryDatabase();
+      
+      ChipinMergeProcess mergeProcess = new ChipinMergeProcess(manager, s);
+      
+      mergeProcess.run();
+      
+      mergeProcess.run();
+      
+      ChipinTestHelper helper = new ChipinTestHelper();
 
-      assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(chipinDonations, manager));
+      helper.checkAllDonationsAreInDatabase(chipinDonations, manager);
     }
     catch (Exception e)
     {
@@ -179,10 +200,22 @@ public class TestChipinDonations extends TestCase
 
       manager.createMemoryDatabase();
       
-      // logic changed, too lazy to update test
+      ChipinDonationSource sourceA = new RawChipinDonationSource(sourceDonationListA);
+      ChipinDonationSource sourceB = new RawChipinDonationSource(sourceDonationListB);
       
-      assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonationListA, manager));
-      assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonationListB, manager));
+      ChipinMergeProcess mergeProcessA = new ChipinMergeProcess(manager, sourceA);
+      ChipinMergeProcess mergeProcessB = new ChipinMergeProcess(manager, sourceB);
+      
+      mergeProcessA.run();
+      
+      mergeProcessB.run();
+      
+      ChipinTestHelper helper = new ChipinTestHelper();
+      
+      helper.checkAllDonationsAreInDatabase(sourceDonationListA, manager);
+
+      helper.checkAllDonationsAreInDatabase(sourceDonationListB, manager);
+      
     }
     catch (Exception e)
     {
@@ -207,9 +240,13 @@ public class TestChipinDonations extends TestCase
       manager.createMemoryDatabase();
       
       donationList.add(d);
-
-      // logic changed, too lazy to update test
       
+      ChipinDonationSource source = new RawChipinDonationSource(donationList);
+
+      ChipinMergeProcess mergeProcess = new ChipinMergeProcess(manager, source);
+      
+      mergeProcess.run();
+
       DonationData donations = manager.getDataAccess().getDonationData();
       Donation donationBefore = donations.getDonationByDomainId(DonationDomain.CHIPIN, d.getChipinId());
       
@@ -221,10 +258,14 @@ public class TestChipinDonations extends TestCase
 
       donationList.set(0, dPrime);
 
-      // logic changed, too lazy to update test
+      source = new RawChipinDonationSource(donationList);
+
+      mergeProcess = new ChipinMergeProcess(manager, source);
+      
+      mergeProcess.run();
       
       Donation donationAfter = donations.getDonationByDomainId(DonationDomain.CHIPIN, dPrime.getChipinId());
-    
+
       assertEquals(commentText, donationAfter.getComment());
     }
     catch (Exception e)

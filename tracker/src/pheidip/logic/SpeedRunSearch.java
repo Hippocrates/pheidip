@@ -14,7 +14,7 @@ public class SpeedRunSearch extends EntitySearcher<SpeedRun, SpeedRunSearchParam
   public SpeedRunSearch(DonationDatabaseManager manager)
   {
     this.manager = manager;
-    this.speedRuns = this.manager.getDataAccess().getSpeedRuns();
+    this.speedRuns = this.manager.getDataAccess().getSpeedRunData();
   }
   
   public SpeedRun createIfAble(SpeedRunSearchParams params)

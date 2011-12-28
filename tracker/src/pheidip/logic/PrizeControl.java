@@ -3,6 +3,7 @@ package pheidip.logic;
 import java.math.BigDecimal;
 
 import pheidip.db.DonationDataConstraintException;
+import pheidip.db.DonorData;
 import pheidip.db.PrizeData;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
@@ -15,6 +16,7 @@ public class PrizeControl
   private DonationDatabaseManager manager;
   private int prizeId;
   private PrizeData prizes;
+  private DonorData donors;
   private Prize cachedData;
   
   public static int createNewPrize(DonationDatabaseManager manager)
@@ -34,6 +36,7 @@ public class PrizeControl
   {
     this.manager = manager;
     this.prizes = this.manager.getDataAccess().getPrizeData();
+    this.donors = this.manager.getDataAccess().getDonorData();
     this.prizeId = prizeId;
     this.cachedData = null;
   }
@@ -58,12 +61,20 @@ public class PrizeControl
     this.cachedData = this.prizes.getPrizeById(this.prizeId);
     return this.cachedData;
   }
+  
+  public void assignPrize(Donor d)
+  {
+    d = this.donors.getDonorById(d.getId());
+    this.getData().setWinner(d);
+    d.getPrizes().add(this.getData());
+    this.updateData(this.getData());
+  }
 
   public void removePrizeWinner()
   {
     Prize data = this.getData();
     
-    Donor donor = data.getWinner();
+    Donor donor = this.donors.getDonorById(data.getWinner().getId());
     
     if (donor != null)
     {
@@ -71,6 +82,7 @@ public class PrizeControl
     }
     
     this.getData().setWinner(null);
+    this.updateData(this.getData());
   }
   
   public void deletePrize()

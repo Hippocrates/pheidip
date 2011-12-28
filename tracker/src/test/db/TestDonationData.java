@@ -29,13 +29,16 @@ public class TestDonationData extends DonationDatabaseTest
     Donation d = this.donations.getDonationById(id);
 
     assertEquals(id, d.getId());
-    //assertEquals(1, d.getDonorId());
+    assertEquals(1, d.getDonor().getId());
     assertEquals(new BigDecimal("50.40"), d.getAmount());
     assertEquals(DonationDomain.LOCAL, d.getDomain());
     // domain Id should be null for local donations (they don't have 
     // any specific Id)
     assertEquals(null, d.getDomainId());
     assertEquals(DonationBidState.PENDING, d.getBidState());
+    assertEquals(DonationReadState.PENDING, d.getReadState());
+    assertEquals(DonationCommentState.PENDING, d.getCommentState());
+    assertNull(d.getComment());
   }
   
   public void testGetDonationByDomainId()
@@ -44,59 +47,9 @@ public class TestDonationData extends DonationDatabaseTest
     Donation d = this.donations.getDonationByDomainId(DonationDomain.CHIPIN, "1234567890");
     
     assertNotNull(d);
+    assertEquals(7, d.getId());
     assertEquals(domainId, d.getDomainId());
-    //assertEquals(3, d.getDonorId());
-  }
-
-  public void testSetDonationComment()
-  {
-    final int id = 1;
-    Donation d = this.donations.getDonationById(id);
-    
-    assertNull(d.getComment());
-    
-    final String comment = "Some text, :LASDFJFLSDAKHASDGLIHASOIHJASDOUIDFSANLASDFJKHFDSALKJDFAS";
-    
-    d.setComment(comment);
-    this.donations.updateDonation(d);
-    
-    Donation result = this.donations.getDonationById(id);
-    
-    assertEquals(comment, result.getComment());
-  }
-  
-  public void testSetDonationBidState()
-  {
-    final int id = 1;
-    
-    Donation d = this.donations.getDonationById(id);
-    
-    assertEquals(DonationBidState.PENDING, d.getBidState());
-    
-    d.setBidState(DonationBidState.PROCESSED);
-    this.donations.updateDonation(d);
-    
-    d = this.donations.getDonationById(id);
-    
-    assertEquals(DonationBidState.PROCESSED, d.getBidState());
-  }
-  
-  public void testSetDonationAmount()
-  {
-    final int id = 1;
-    
-    Donation d = this.donations.getDonationById(id);
-    
-    assertEquals(new BigDecimal("50.40"), d.getAmount());
-    
-    BigDecimal newAmount = new BigDecimal("5.55");
-    
-    d.setAmount(newAmount);
-    this.donations.updateDonation(d);
-    
-    d = this.donations.getDonationById(id);
-    
-    assertEquals(newAmount, d.getAmount());
+    assertEquals(3, d.getDonor().getId());
   }
   
   public void testDeleteDonation()

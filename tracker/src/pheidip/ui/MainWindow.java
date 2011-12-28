@@ -36,11 +36,11 @@ import pheidip.logic.PrizeSearch;
 import pheidip.logic.ProgramInstance;
 import pheidip.logic.SpeedRunControl;
 import pheidip.logic.SpeedRunSearch;
-import pheidip.logic.chipin.ChipinDocumentSource;
-import pheidip.logic.chipin.ChipinFileDocumentSource;
+import pheidip.logic.chipin.ChipinDonationSource;
+import pheidip.logic.chipin.ChipinFileDonationSource;
 import pheidip.logic.chipin.ChipinMergeProcess;
-import pheidip.logic.chipin.ChipinTextDocumentSource;
-import pheidip.logic.chipin.ChipinWebsiteDocumentSource;
+import pheidip.logic.chipin.ChipinTextDonationSource;
+import pheidip.logic.chipin.ChipinWebsiteDonationSource;
 import pheidip.logic.gdocs.GoogleRefreshProcess;
 import pheidip.objects.Bid;
 import pheidip.objects.BidType;
@@ -508,7 +508,7 @@ public class MainWindow extends JFrame implements Reporter
   {
     if (this.instance.getChipinLogin().isLoggedIn())
     {
-      ChipinDocumentSource source = new ChipinWebsiteDocumentSource(this.instance.getChipinLogin());
+      ChipinDonationSource source = new ChipinWebsiteDonationSource(this.instance.getChipinLogin());
       this.openChipinMergeTab(source);
     }
     else
@@ -524,7 +524,7 @@ public class MainWindow extends JFrame implements Reporter
     
     if (dialog.getResultText() != null)
     {
-      ChipinDocumentSource source = new ChipinTextDocumentSource(dialog.getResultText());
+      ChipinDonationSource source = new ChipinTextDonationSource(dialog.getResultText());
       this.openChipinMergeTab(source);
     }
   }
@@ -537,7 +537,7 @@ public class MainWindow extends JFrame implements Reporter
     
     if (result == JFileChooser.APPROVE_OPTION)
     {
-      ChipinDocumentSource source = new ChipinFileDocumentSource(fileChooser.getSelectedFile());
+      ChipinDonationSource source = new ChipinFileDonationSource(fileChooser.getSelectedFile());
       this.openChipinMergeTab(source);
     }
   }
@@ -578,7 +578,7 @@ public class MainWindow extends JFrame implements Reporter
     }
   }
   
-  private void openChipinMergeTab(ChipinDocumentSource documentSource)
+  private void openChipinMergeTab(ChipinDonationSource documentSource)
   {
     // prevent opening the same tab twice
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)

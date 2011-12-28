@@ -63,7 +63,7 @@ public class GoogleSpreadSheetReader
   
   public static void mergeRuns(DonationDatabaseManager database, List<MarathonSpreadsheetEntry> entries, boolean initializeMode)
   {
-    SpeedRunData speedRuns = database.getDataAccess().getSpeedRuns();
+    SpeedRunData speedRuns = database.getDataAccess().getSpeedRunData();
     
     List<SpeedRun> allRuns = speedRuns.getAllSpeedRuns();
     

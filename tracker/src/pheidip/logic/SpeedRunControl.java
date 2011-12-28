@@ -25,8 +25,8 @@ public class SpeedRunControl
   public SpeedRunControl(DonationDatabaseManager manager, int speedRunId)
   {
     this.donationDatabase = manager;
-    this.speedRuns = this.donationDatabase.getDataAccess().getSpeedRuns();
-    this.bids = this.donationDatabase.getDataAccess().getBids();
+    this.speedRuns = this.donationDatabase.getDataAccess().getSpeedRunData();
+    this.bids = this.donationDatabase.getDataAccess().getBidData();
     this.speedRunId = speedRunId;
     this.cachedData = null;
   }
@@ -60,7 +60,7 @@ public class SpeedRunControl
   public static int createNewSpeedRun(DonationDatabaseManager manager, String name)
   {
     int id = IdUtils.generateId();
-    manager.getDataAccess().getSpeedRuns().insertSpeedRun(new SpeedRun(id, name, "", id, null, null, null));
+    manager.getDataAccess().getSpeedRunData().insertSpeedRun(new SpeedRun(id, name, "", id, null, null, null));
     return id;
   }
 

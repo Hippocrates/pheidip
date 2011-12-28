@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import pheidip.objects.ChipinDonation;
+import pheidip.logic.chipin.ChipinDonation;
 import pheidip.objects.Donor;
 import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;

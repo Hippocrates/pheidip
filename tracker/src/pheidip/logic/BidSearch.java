@@ -23,7 +23,7 @@ public class BidSearch extends EntitySearcher<Bid, BidSearchParams>
   public BidSearch(DonationDatabaseManager manager)
   {
     this.manager = manager;
-    this.bids = this.manager.getDataAccess().getBids();
+    this.bids = this.manager.getDataAccess().getBidData();
   }
   
   public SpeedRunSearch createSpeedRunSearch()

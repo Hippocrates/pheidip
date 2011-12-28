@@ -6,14 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import pheidip.db.DonationData;
-import pheidip.logic.DonationDatabaseManager;
+import pheidip.logic.chipin.ChipinDonation;
 import pheidip.logic.chipin.ChipinDonations;
-import pheidip.objects.ChipinDonation;
-import pheidip.objects.Donation;
-import pheidip.objects.DonationBidState;
-import pheidip.objects.DonationDomain;
-import pheidip.objects.Donor;
 import pheidip.util.StringUtils;
 
 public class ChipinTestUtils
@@ -95,62 +89,5 @@ public class ChipinTestUtils
     builder.append("</table>\n");
     
     return builder.toString();
-  }
-
-  public static boolean checkAllDonationsAreInDatabase(List<ChipinDonation> sourceDonations, DonationDatabaseManager manager)
-  {
-    DonationData donations = manager.getDataAccess().getDonationData();
-
-    // now try to get some of the donations by ID and check that everything checks out
-    // also check that there are no duplicates of donors
-
-    for (ChipinDonation cDonation : sourceDonations)
-    {
-      Donation donation = donations.getDonationByDomainId(DonationDomain.CHIPIN, cDonation.getChipinId());
-      
-      if (donation == null)
-      {
-        return false;
-      }
-      
-      if (!cDonation.getAmount().equals(donation.getAmount()))
-      {
-        return false;
-      }
-      
-      if (!cDonation.getChipinId().equals(donation.getDomainId()))
-      {
-        return false;
-      }
-      
-      if (DonationBidState.PENDING != donation.getBidState())
-      {
-        return false;
-      }
-      
-      Donor donor = donation.getDonor();
-      
-      if (!cDonation.getEmail().equals(donor.getEmail()))
-      {
-        return false;
-      }
-      
-      String[] toks = cDonation.getName().trim().split("\\s+");
-      
-      if (toks.length == 2)
-      {
-        if (!toks[0].equals(donor.getFirstName()))
-        {
-          return false;
-        }
-        
-        if (!toks[1].equals(donor.getLastName()))
-        {
-          return false;
-        }
-      }
-    }
-    
-    return true;
   }
 }

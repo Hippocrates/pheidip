@@ -28,7 +28,7 @@ public class ChoiceControl
     this.donationDatabase = donationDatabase;
     this.choiceId = choiceId;
     this.donations = this.donationDatabase.getDataAccess().getDonationData();
-    this.bids = this.donationDatabase.getDataAccess().getBids();
+    this.bids = this.donationDatabase.getDataAccess().getBidData();
     this.cachedData = null;
   }
   

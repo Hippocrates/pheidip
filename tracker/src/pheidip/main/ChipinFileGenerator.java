@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
 
-import pheidip.objects.ChipinDonation;
+import pheidip.logic.chipin.ChipinDonation;
 import test.logic.ChipinTestUtils;
 
 public class ChipinFileGenerator

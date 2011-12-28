@@ -22,15 +22,13 @@
    type="java.lang.String" unique-key="DonorAliasUnique">
    <column name="ALIAS"/>
   </property>
-  <set cascade="all,delete-orphan" lazy="true" name="donations"
-   sort="unsorted" table="DONATION">
+  <set cascade="all,delete-orphan" lazy="true" name="donations" sort="unsorted" table="DONATION" inverse="true">
    <key>
     <column name="Donor"/>
    </key>
    <one-to-many class="pheidip.objects.Donation"/>
   </set>
-  <set cascade="all" lazy="true" name="prizes"
-   sort="unsorted" table="PRIZE">
+  <set cascade="save-update" lazy="true" name="prizes" sort="unsorted" table="PRIZE" inverse="true">
    <key>
     <column name="Winner"/>
    </key>

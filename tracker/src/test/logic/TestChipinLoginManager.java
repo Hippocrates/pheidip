@@ -5,9 +5,9 @@ import java.util.List;
 import org.jsoup.nodes.Document;
 
 import junit.framework.TestCase;
+import pheidip.logic.chipin.ChipinDonation;
 import pheidip.logic.chipin.ChipinDonations;
 import pheidip.logic.chipin.ChipinLoginManager;
-import pheidip.objects.ChipinDonation;
 
 public class TestChipinLoginManager extends TestCase
 {
