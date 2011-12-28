@@ -46,6 +46,7 @@ import pheidip.objects.Bid;
 import pheidip.objects.BidType;
 import pheidip.objects.Donation;
 import pheidip.objects.Donor;
+import pheidip.objects.Prize;
 import pheidip.objects.SpeedRun;
 import pheidip.util.Reporter;
 
@@ -593,7 +594,7 @@ public class MainWindow extends JFrame implements Reporter
   
   private void openGoogleLoginDialog()
   {
-    if (!this.instance.getChipinLogin().isLoggedIn())
+    if (!this.instance.getGoogleLogin().isLoggedIn())
     {
       GoogleLoginDialog dialog = new GoogleLoginDialog(this, this.instance.getGoogleLogin());
       dialog.setVisible(true);
@@ -707,9 +708,7 @@ public class MainWindow extends JFrame implements Reporter
   
     dialog.setVisible(true);
     
-    Bid result = dialog.getSelectedBid();
-    
-    if (result != null)
+    for (Bid result : dialog.getResults())
     {
       if (result.getType() == BidType.CHALLENGE)
       {
@@ -727,10 +726,8 @@ public class MainWindow extends JFrame implements Reporter
     DonationSearchDialog dialog = new DonationSearchDialog(this, new DonationSearch(this.instance.getDonationDatabase()));
     
     dialog.setVisible(true);
-    
-    Donation result = dialog.getResult();
-    
-    if (result != null)
+
+    for (Donation result : dialog.getResults())
     {
       this.openDonationTab(result.getId());
     }
@@ -742,9 +739,7 @@ public class MainWindow extends JFrame implements Reporter
     
     dialog.setVisible(true);
     
-    Donor result = dialog.getResult();
-    
-    if (result != null)
+    for (Donor result : dialog.getResults())
     {
       this.openDonorTab(result.getId());
     }
@@ -756,9 +751,7 @@ public class MainWindow extends JFrame implements Reporter
     
     dialog.setVisible(true);
     
-    SpeedRun result = dialog.getResult();
-    
-    if (result != null)
+    for (SpeedRun result : dialog.getResults())
     {
       this.openSpeedRunTab(result.getId());
     }
@@ -771,9 +764,9 @@ public class MainWindow extends JFrame implements Reporter
     
     dialog.setVisible(true);
     
-    if (dialog.getSelectedPrize() != null)
+    for (Prize result : dialog.getResults())
     {
-      this.openPrizeTab(dialog.getSelectedPrize().getId());
+      this.openPrizeTab(result.getId());
     }
   }
 

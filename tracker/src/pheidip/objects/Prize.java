@@ -13,6 +13,7 @@ public class Prize
   private String description;
   private int sortKey;
   private Donor winner;
+  private PrizeDrawMethod drawMethod;
   private BigDecimal mimimumBid = new BigDecimal("5.00");
   private SpeedRun startGame;
   private SpeedRun endGame;
@@ -21,7 +22,7 @@ public class Prize
   {
   }
   
-  public Prize(int id, String name, String imageURL, String description, int sortKey, BigDecimal mimimumBid, Donor winner, SpeedRun startGame, SpeedRun endGame)
+  public Prize(int id, String name, String imageURL, String description, int sortKey, PrizeDrawMethod drawMethod, BigDecimal mimimumBid, Donor winner, SpeedRun startGame, SpeedRun endGame)
   {
     this.setId(id);
     this.setName(name);
@@ -29,6 +30,7 @@ public class Prize
     this.setDescription(description);
     this.setWinner(winner);
     this.setSortKey(sortKey);
+    this.setDrawMethod(drawMethod);
     this.setMinimumBid(mimimumBid);
     this.setStartGame(startGame);
     this.setEndGame(endGame);
@@ -114,6 +116,16 @@ public class Prize
   public int getSortKey()
   {
     return sortKey;
+  }
+
+  public void setDrawMethod(PrizeDrawMethod drawMethod)
+  {
+    this.drawMethod = drawMethod;
+  }
+
+  public PrizeDrawMethod getDrawMethod()
+  {
+    return drawMethod;
   }
 
   public void setMinimumBid(BigDecimal minimumBid)

@@ -19,6 +19,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -56,7 +58,7 @@ public class BidSearchDialog extends JDialog
   private JButton browseSpeedRunButton;
   private JCheckBox speedRunCheckBox;
   private SpeedRun currentRun;
-  private Bid result;
+  private List<Bid> results;
   private JLabel lblBidState;
   private JCheckBox bidStateCheckBox;
   private JComboBox bidStateComboBox;
@@ -385,7 +387,7 @@ public class BidSearchDialog extends JDialog
     super(parent, true);
     
     this.searcher = searcher;
-    this.result = null;
+    this.results = new ArrayList<Bid>();
     
     this.initializeGUI();
     this.initializeGUIEvents();
@@ -395,7 +397,12 @@ public class BidSearchDialog extends JDialog
   
   public Bid getResult()
   {
-    return this.result;
+    return this.results == null ? null : this.results.size() > 0 ? this.results.iterator().next() : null;
+  }
+  
+  public List<Bid> getResults()
+  {
+    return Collections.unmodifiableList(this.results);
   }
 
   private void openBrowseDialog()
@@ -430,33 +437,35 @@ public class BidSearchDialog extends JDialog
   
   private void createNewChoice()
   {
-    this.result = this.searcher.createChoiceIfAble(this.currentRun, this.bidField.getText());
+    this.results = new ArrayList<Bid>();
+    this.results.add(this.searcher.createChoiceIfAble(this.currentRun, this.bidField.getText()));
 
     closeDialog();
   }
   
   private void createNewChallenge()
   {
-    this.result = this.searcher.createChallengeIfAble(this.currentRun, this.bidField.getText());
+    this.results = new ArrayList<Bid>();
+    this.results.add(this.searcher.createChallengeIfAble(this.currentRun, this.bidField.getText()));
 
     closeDialog();
   }
-  
-  public Bid getSelectedBid()
-  {
-    return this.result;
-  }
-  
+
   private void returnValue()
   {
-    this.result = (Bid) this.bidList.getSelectedValue();
+    this.results = new ArrayList<Bid>();
     
+    for (int i : this.bidList.getSelectedIndices())
+    {
+      this.results.add((Bid)this.bidList.getModel().getElementAt(i));
+    }
+
     closeDialog();
   }
   
   private void cancelDialog()
   {
-    this.result = null;
+    this.results = new ArrayList<Bid>();
     
     closeDialog();
   }

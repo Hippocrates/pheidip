@@ -25,6 +25,13 @@
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
   </property>
+  <property generated="never" lazy="false" name="drawMethod">
+   <column name="DRAWMETHOD"/>
+   <type name="org.hibernate.type.EnumType">
+    <param name="type">12</param>
+    <param name="enumClass">pheidip.objects.PrizeDrawMethod</param>
+   </type>
+  </property>
   <many-to-one class="pheidip.objects.Donor" fetch="join"
    foreign-key="PrizeFKDonor" name="winner">
    <column name="WINNER"/>

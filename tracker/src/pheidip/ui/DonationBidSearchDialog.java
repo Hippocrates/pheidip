@@ -40,6 +40,7 @@ import pheidip.objects.ChoiceOption;
 import pheidip.objects.SpeedRun;
 import pheidip.util.StringUtils;
 import javax.swing.JComboBox;
+import javax.swing.ListSelectionModel;
 
 @SuppressWarnings("serial")
 public class DonationBidSearchDialog extends JDialog
@@ -130,6 +131,7 @@ public class DonationBidSearchDialog extends JDialog
     contentPanel.add(bidScrollPane, gbc_bidScrollPane);
     
     bidList = new JList();
+    bidList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     bidScrollPane.setViewportView(bidList);
     
     JLabel lblBidName = new JLabel("Bid Name:");
@@ -219,6 +221,7 @@ public class DonationBidSearchDialog extends JDialog
     contentPanel.add(optionScrollPane, gbc_optionScrollPane);
     
     optionList = new JList();
+    optionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     optionList.setEnabled(false);
     optionScrollPane.setViewportView(optionList);
     

@@ -19,6 +19,8 @@ import java.awt.Insets;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JList;
@@ -33,7 +35,7 @@ import javax.swing.JCheckBox;
 public class SpeedRunSearchDialog extends JDialog
 {
   private SpeedRunSearch searcher;
-  private SpeedRun resultRun;
+  private List<SpeedRun> results;
   private JTextField nameField;
   private JLabel nameLabel;
   private JList speedRunList;
@@ -274,7 +276,7 @@ public class SpeedRunSearchDialog extends JDialog
   private void init(SpeedRunSearch searcher)
   {
     this.searcher = searcher;
-    this.resultRun = null;
+    this.results = new ArrayList<SpeedRun>();
     
     this.initializeGUI();
     this.initializeGUIEvents();
@@ -284,27 +286,38 @@ public class SpeedRunSearchDialog extends JDialog
   
   public SpeedRun getResult()
   {
-    return this.resultRun;
+    return this.results == null ? null : this.results.size() > 0 ? this.results.iterator().next() : null;
+  }
+  
+  public List<SpeedRun> getResults()
+  {
+    return Collections.unmodifiableList(this.results);
   }
   
   private void createFromFields()
   {
     SpeedRun s = this.searcher.createIfAble(new SpeedRunSearchParams(this.nameField.getText()));
     
-    this.resultRun = s;
+    this.results = new ArrayList<SpeedRun>();
+    this.results.add(s);
     this.closeDialog();
   }
   
   private void returnSelectedRun()
   {
-    SpeedRun result = (SpeedRun) this.speedRunList.getSelectedValue();
-    if (result == null)
+    this.results = new ArrayList<SpeedRun>();
+    
+    if (this.speedRunList.getSelectedValue() == null)
     {
       JOptionPane.showMessageDialog(this, "No run is selected.", "Error", JOptionPane.OK_OPTION);
     }
     else
     {
-      this.resultRun = result;
+      for (int i : this.speedRunList.getSelectedIndices())
+      {
+        this.results.add((SpeedRun) this.speedRunList.getModel().getElementAt(i));
+      }
+      
       this.closeDialog();
     }
   }

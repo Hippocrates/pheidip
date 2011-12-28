@@ -2,6 +2,8 @@ package pheidip.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -57,7 +59,7 @@ public class DonationSearchDialog extends JDialog
   private JButton browseDonorButton;
   
   private Donor currentDonor = null;
-  private Donation result;
+  private List<Donation> results;
   private JButton okButton;
   private JButton cancelButton;
   private JCheckBox donorCheckBox;
@@ -493,6 +495,7 @@ public class DonationSearchDialog extends JDialog
   {
     super(owner, true);
     this.searcher = searcher;
+    this.results = new ArrayList<Donation>();
 
     this.initializeGUI();
     this.initializeGUIEvents();
@@ -501,26 +504,34 @@ public class DonationSearchDialog extends JDialog
   
   public Donation getResult()
   {
-    return this.result;
+    return this.results == null ? null : this.results.size() > 0 ? this.results.iterator().next() : null;
+  }
+  
+  public List<Donation> getResults()
+  {
+    return Collections.unmodifiableList(this.results);
   }
   
   private void returnValue()
   {
-    this.result = (Donation) this.donationList.getSelectedValue();
-    
-    if (this.result == null)
+    if (this.donationList.getSelectedValue() == null)
     {
       JOptionPane.showMessageDialog(this, "No donation is selected.", "Error", JOptionPane.ERROR_MESSAGE);
     }
     else
     {
+      for (int i : this.donationList.getSelectedIndices())
+      {
+        this.results.add((Donation) this.donationList.getModel().getElementAt(i));
+      }
+      
       this.closeDialog();
     }
   }
   
   private void cancelDialog()
   {
-    this.result = null;
+    this.results = new ArrayList<Donation>();
     this.closeDialog();
   }
   
@@ -529,8 +540,7 @@ public class DonationSearchDialog extends JDialog
     this.setVisible(false);
     this.dispose();
   }
-  
-  
+
   private void updateUIState()
   {
     this.okButton.setEnabled(!this.donationList.isSelectionEmpty());

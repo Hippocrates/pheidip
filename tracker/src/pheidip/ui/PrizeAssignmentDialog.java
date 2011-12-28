@@ -25,8 +25,8 @@ import javax.swing.JFormattedTextField;
 
 import pheidip.logic.PrizeAssign;
 import pheidip.logic.PrizeAssignParams;
-import pheidip.logic.PrizeDrawMethod;
 import pheidip.objects.Donor;
+import pheidip.objects.PrizeDrawMethod;
 import pheidip.util.FormatUtils;
 import javax.swing.JComboBox;
 
@@ -53,6 +53,9 @@ public class PrizeAssignmentDialog extends JDialog
   private JCheckBox excludeIfWonCheckBox;
   private JLabel lblDrawingMethod;
   private JComboBox drawMethodComboBox;
+  private JFormattedTextField maxRaffleSizeField;
+  private JLabel lblMaxRaffleSize;
+  private JCheckBox maxRaffleSizeCheckBox;
 
   private void initializeGUI()
   {
@@ -63,9 +66,9 @@ public class PrizeAssignmentDialog extends JDialog
     getContentPane().add(contentPanel, BorderLayout.CENTER);
     GridBagLayout gbl_contentPanel = new GridBagLayout();
     gbl_contentPanel.columnWidths = new int[]{64, 32, 0, 0};
-    gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
+    gbl_contentPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
     gbl_contentPanel.columnWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
-    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_contentPanel);
     {
       lblDrawingMethod = new JLabel("Drawing Method:");
@@ -86,12 +89,40 @@ public class PrizeAssignmentDialog extends JDialog
       contentPanel.add(drawMethodComboBox, gbc_drawMethodComboBox);
     }
     {
+      lblMaxRaffleSize = new JLabel("Max Raffle Size:");
+      GridBagConstraints gbc_lblMaxRaffleSize = new GridBagConstraints();
+      gbc_lblMaxRaffleSize.anchor = GridBagConstraints.EAST;
+      gbc_lblMaxRaffleSize.insets = new Insets(0, 0, 5, 5);
+      gbc_lblMaxRaffleSize.gridx = 0;
+      gbc_lblMaxRaffleSize.gridy = 1;
+      contentPanel.add(lblMaxRaffleSize, gbc_lblMaxRaffleSize);
+    }
+    {
+      maxRaffleSizeCheckBox = new JCheckBox("");
+      GridBagConstraints gbc_maxRaffleSizeCheckBox = new GridBagConstraints();
+      gbc_maxRaffleSizeCheckBox.insets = new Insets(0, 0, 5, 5);
+      gbc_maxRaffleSizeCheckBox.gridx = 1;
+      gbc_maxRaffleSizeCheckBox.gridy = 1;
+      contentPanel.add(maxRaffleSizeCheckBox, gbc_maxRaffleSizeCheckBox);
+    }
+    {
+      maxRaffleSizeField = new JFormattedTextField(FormatUtils.getIntegerFormat());
+      maxRaffleSizeField.setText("0");
+      maxRaffleSizeField.setHorizontalAlignment(SwingConstants.TRAILING);
+      GridBagConstraints gbc_maxRaffleSizeField = new GridBagConstraints();
+      gbc_maxRaffleSizeField.insets = new Insets(0, 0, 5, 0);
+      gbc_maxRaffleSizeField.fill = GridBagConstraints.HORIZONTAL;
+      gbc_maxRaffleSizeField.gridx = 2;
+      gbc_maxRaffleSizeField.gridy = 1;
+      contentPanel.add(maxRaffleSizeField, gbc_maxRaffleSizeField);
+    }
+    {
       lblDonatedAfter = new JLabel("Donated After:");
       GridBagConstraints gbc_lblDonatedAfter = new GridBagConstraints();
       gbc_lblDonatedAfter.anchor = GridBagConstraints.EAST;
       gbc_lblDonatedAfter.insets = new Insets(0, 0, 5, 5);
       gbc_lblDonatedAfter.gridx = 0;
-      gbc_lblDonatedAfter.gridy = 1;
+      gbc_lblDonatedAfter.gridy = 2;
       contentPanel.add(lblDonatedAfter, gbc_lblDonatedAfter);
     }
     {
@@ -100,7 +131,7 @@ public class PrizeAssignmentDialog extends JDialog
       GridBagConstraints gbc_donatedAfterCheckBox = new GridBagConstraints();
       gbc_donatedAfterCheckBox.insets = new Insets(0, 0, 5, 5);
       gbc_donatedAfterCheckBox.gridx = 1;
-      gbc_donatedAfterCheckBox.gridy = 1;
+      gbc_donatedAfterCheckBox.gridy = 2;
       contentPanel.add(donatedAfterCheckBox, gbc_donatedAfterCheckBox);
     }
     {
@@ -109,7 +140,7 @@ public class PrizeAssignmentDialog extends JDialog
       gbc_donatedAfterTimeField.insets = new Insets(0, 0, 5, 0);
       gbc_donatedAfterTimeField.fill = GridBagConstraints.HORIZONTAL;
       gbc_donatedAfterTimeField.gridx = 2;
-      gbc_donatedAfterTimeField.gridy = 1;
+      gbc_donatedAfterTimeField.gridy = 2;
       contentPanel.add(donatedAfterTimeField, gbc_donatedAfterTimeField);
     }
     {
@@ -118,7 +149,7 @@ public class PrizeAssignmentDialog extends JDialog
       gbc_lblDonatedBefore.anchor = GridBagConstraints.EAST;
       gbc_lblDonatedBefore.insets = new Insets(0, 0, 5, 5);
       gbc_lblDonatedBefore.gridx = 0;
-      gbc_lblDonatedBefore.gridy = 2;
+      gbc_lblDonatedBefore.gridy = 3;
       contentPanel.add(lblDonatedBefore, gbc_lblDonatedBefore);
     }
     {
@@ -127,7 +158,7 @@ public class PrizeAssignmentDialog extends JDialog
       GridBagConstraints gbc_donatedBeforeCheckBox = new GridBagConstraints();
       gbc_donatedBeforeCheckBox.insets = new Insets(0, 0, 5, 5);
       gbc_donatedBeforeCheckBox.gridx = 1;
-      gbc_donatedBeforeCheckBox.gridy = 2;
+      gbc_donatedBeforeCheckBox.gridy = 3;
       contentPanel.add(donatedBeforeCheckBox, gbc_donatedBeforeCheckBox);
     }
     {
@@ -136,7 +167,7 @@ public class PrizeAssignmentDialog extends JDialog
       gbc_donatedBeforeTimeField.insets = new Insets(0, 0, 5, 0);
       gbc_donatedBeforeTimeField.fill = GridBagConstraints.HORIZONTAL;
       gbc_donatedBeforeTimeField.gridx = 2;
-      gbc_donatedBeforeTimeField.gridy = 2;
+      gbc_donatedBeforeTimeField.gridy = 3;
       contentPanel.add(donatedBeforeTimeField, gbc_donatedBeforeTimeField);
     }
     {
@@ -145,7 +176,7 @@ public class PrizeAssignmentDialog extends JDialog
       gbc_lblSingleDonationAbove.anchor = GridBagConstraints.EAST;
       gbc_lblSingleDonationAbove.insets = new Insets(0, 0, 5, 5);
       gbc_lblSingleDonationAbove.gridx = 0;
-      gbc_lblSingleDonationAbove.gridy = 3;
+      gbc_lblSingleDonationAbove.gridy = 4;
       contentPanel.add(lblSingleDonationAbove, gbc_lblSingleDonationAbove);
     }
     {
@@ -154,7 +185,7 @@ public class PrizeAssignmentDialog extends JDialog
       GridBagConstraints gbc_minimumDonationCheckBox = new GridBagConstraints();
       gbc_minimumDonationCheckBox.insets = new Insets(0, 0, 5, 5);
       gbc_minimumDonationCheckBox.gridx = 1;
-      gbc_minimumDonationCheckBox.gridy = 3;
+      gbc_minimumDonationCheckBox.gridy = 4;
       contentPanel.add(minimumDonationCheckBox, gbc_minimumDonationCheckBox);
     }
     {
@@ -165,7 +196,7 @@ public class PrizeAssignmentDialog extends JDialog
       gbc_minimumDonationField.insets = new Insets(0, 0, 5, 0);
       gbc_minimumDonationField.fill = GridBagConstraints.HORIZONTAL;
       gbc_minimumDonationField.gridx = 2;
-      gbc_minimumDonationField.gridy = 3;
+      gbc_minimumDonationField.gridy = 4;
       contentPanel.add(minimumDonationField, gbc_minimumDonationField);
       minimumDonationField.setColumns(10);
     }
@@ -174,7 +205,7 @@ public class PrizeAssignmentDialog extends JDialog
       GridBagConstraints gbc_lblExcludeIfAlready = new GridBagConstraints();
       gbc_lblExcludeIfAlready.insets = new Insets(0, 0, 0, 5);
       gbc_lblExcludeIfAlready.gridx = 0;
-      gbc_lblExcludeIfAlready.gridy = 4;
+      gbc_lblExcludeIfAlready.gridy = 5;
       contentPanel.add(lblExcludeIfAlready, gbc_lblExcludeIfAlready);
     }
     {
@@ -183,7 +214,7 @@ public class PrizeAssignmentDialog extends JDialog
       GridBagConstraints gbc_excludeIfWonCheckBox = new GridBagConstraints();
       gbc_excludeIfWonCheckBox.insets = new Insets(0, 0, 0, 5);
       gbc_excludeIfWonCheckBox.gridx = 1;
-      gbc_excludeIfWonCheckBox.gridy = 4;
+      gbc_excludeIfWonCheckBox.gridy = 5;
       contentPanel.add(excludeIfWonCheckBox, gbc_excludeIfWonCheckBox);
     }
     {
@@ -218,6 +249,19 @@ public class PrizeAssignmentDialog extends JDialog
         {
           cancelDrawing();
         }
+        else if (ev.getSource() == drawMethodComboBox)
+        {
+          if (drawMethodComboBox.getSelectedItem() == PrizeDrawMethod.RANDOM_WEIGHTED_DRAW)
+          {
+            maxRaffleSizeCheckBox.setEnabled(true);
+            maxRaffleSizeField.setEnabled(maxRaffleSizeCheckBox.isSelected());
+          }
+          else
+          {
+            maxRaffleSizeCheckBox.setEnabled(false);
+            maxRaffleSizeField.setEnabled(false);
+          }
+        }
         else if (ev.getSource() == donatedAfterCheckBox)
         {
           donatedAfterTimeField.setEnabled(donatedAfterCheckBox.isSelected());
@@ -229,6 +273,10 @@ public class PrizeAssignmentDialog extends JDialog
         else if (ev.getSource() == minimumDonationCheckBox)
         {
           minimumDonationField.setEnabled(minimumDonationCheckBox.isSelected());
+        }
+        else if (ev.getSource() == maxRaffleSizeCheckBox)
+        {
+          maxRaffleSizeField.setEnabled(maxRaffleSizeCheckBox.isSelected());
         }
       }
       catch(Exception e)
@@ -247,9 +295,14 @@ public class PrizeAssignmentDialog extends JDialog
     this.donatedAfterCheckBox.addActionListener(this.actionHandler);
     this.donatedBeforeCheckBox.addActionListener(this.actionHandler);
     this.minimumDonationCheckBox.addActionListener(this.actionHandler);
+    this.maxRaffleSizeCheckBox.addActionListener(this.actionHandler);
+    this.drawMethodComboBox.addActionListener(this.actionHandler);
 
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
+      this.drawMethodComboBox,
+      this.maxRaffleSizeCheckBox,
+      this.maxRaffleSizeField,
       this.donatedAfterCheckBox,
       this.donatedAfterTimeField,
       this.donatedBeforeCheckBox,
@@ -263,7 +316,7 @@ public class PrizeAssignmentDialog extends JDialog
     this.setFocusTraversalPolicy(this.tabOrder);
   }
   
-  public PrizeAssignmentDialog(JFrame owner, PrizeAssign assigner, BigDecimal defaultAmount, Date defaultStartTime, Date defaultEndTime)
+  public PrizeAssignmentDialog(JFrame owner, PrizeAssign assigner, PrizeDrawMethod defaultMethod, BigDecimal defaultAmount, Date defaultStartTime, Date defaultEndTime)
   {
     super(owner, true);
     
@@ -286,6 +339,11 @@ public class PrizeAssignmentDialog extends JDialog
       this.donatedBeforeTimeField.setTimeValue(defaultEndTime);
       this.donatedBeforeCheckBox.setSelected(true);
     }
+    
+    if (defaultMethod != null)
+    {
+      this.drawMethodComboBox.setSelectedItem(defaultMethod);
+    }
   }
   
   public Donor getResult()
@@ -305,8 +363,17 @@ public class PrizeAssignmentDialog extends JDialog
     params.method = (PrizeDrawMethod) this.drawMethodComboBox.getSelectedItem();
     params.excludeIfAlreadyWon = this.excludeIfWonCheckBox.isSelected();
     params.donatedAfter = this.donatedAfterCheckBox.isSelected() ? this.donatedAfterTimeField.getTimeValue() : null;
-    params.donatedBefore = this.donatedBeforeCheckBox.isSelected() ? this.donatedAfterTimeField.getTimeValue() : null;
+    params.donatedBefore = this.donatedBeforeCheckBox.isSelected() ? this.donatedBeforeTimeField.getTimeValue() : null;
     params.targetAmount = this.minimumDonationCheckBox.isSelected() ? new BigDecimal(this.minimumDonationField.getText()) : null;
+    
+    if (params.method == PrizeDrawMethod.RANDOM_WEIGHTED_DRAW && this.maxRaffleSizeCheckBox.isSelected())
+    {
+      params.maxRaffleTickets = Integer.parseInt(this.maxRaffleSizeField.getText());
+    }
+    else
+    {
+      params.maxRaffleTickets = 0;
+    }
     
     this.selectedDonor = this.assigner.selectWinner(params);
     

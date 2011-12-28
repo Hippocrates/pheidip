@@ -88,7 +88,7 @@ public class PrizeAssign
     }
   }
   
-  public Donor pickRandomCandidateWeighted(BigDecimal thresholdAmount, boolean excludeIfWon, List<PrizeDrawCandidate> candidates)
+  public Donor pickRandomCandidateWeighted(BigDecimal thresholdAmount, boolean excludeIfWon, int maxRaffleTickets, List<PrizeDrawCandidate> candidates)
   {
     List<Donor> filtered = new ArrayList<Donor>();
     
@@ -97,6 +97,11 @@ public class PrizeAssign
       if (!excludeIfWon || !c.alreadyHasPrize())
       {
         int iterations = c.getDonationSum().divide(thresholdAmount, BigDecimal.ROUND_FLOOR).intValue();
+        
+        if (maxRaffleTickets != 0)
+        {
+          iterations = Math.min(iterations, maxRaffleTickets);
+        }
         
         for (int i = 0; i < iterations; ++i)
         {
@@ -165,7 +170,7 @@ public class PrizeAssign
       result = this.pickHighestSingleDonation(params.targetAmount, params.excludeIfAlreadyWon, candidates);
       break;
     case RANDOM_WEIGHTED_DRAW:
-      result = this.pickRandomCandidateWeighted(params.targetAmount, params.excludeIfAlreadyWon, candidates);
+      result = this.pickRandomCandidateWeighted(params.targetAmount, params.excludeIfAlreadyWon, params.maxRaffleTickets, candidates);
       break;
     case HIGHEST_SUM_DONATIONS:
       result = this.pickHighestSumDonations(params.targetAmount, params.excludeIfAlreadyWon, candidates);
