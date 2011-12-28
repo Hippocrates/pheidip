@@ -29,7 +29,7 @@
    </key>
    <one-to-many class="pheidip.objects.Donation"/>
   </set>
-  <set cascade="all,delete-orphan" lazy="true" name="prizes"
+  <set cascade="all" lazy="true" name="prizes"
    sort="unsorted" table="PRIZE">
    <key>
     <column name="Winner"/>

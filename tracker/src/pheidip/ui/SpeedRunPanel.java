@@ -207,6 +207,7 @@ public class SpeedRunPanel extends EntityPanel
     add(prizesScrollPane, gbc_prizesScrollPane);
     
     prizeList = new JList();
+    prizeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     prizesScrollPane.setViewportView(prizeList);
     
     lblEndTime = new JLabel("End Time:");

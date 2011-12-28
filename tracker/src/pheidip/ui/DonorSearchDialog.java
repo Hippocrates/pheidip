@@ -26,6 +26,8 @@ import javax.swing.event.ListSelectionListener;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
@@ -41,7 +43,7 @@ public class DonorSearchDialog extends JDialog
   private JTextField aliasField;
   private JTextField emailField;
   private JList donorList;
-  private Donor resultDonor;
+  private List<Donor> results;
   private JPanel contentPanel;
   private JLabel firstNameLabel;
   private JScrollPane donorScrollPane;
@@ -357,7 +359,7 @@ public class DonorSearchDialog extends JDialog
   private void init(DonorSearch searcher)
   {
     this.searcher = searcher;
-    this.resultDonor = null;
+    this.results = new ArrayList<Donor>();
     
     this.initializeGUI();
     this.initializeGUIEvents();
@@ -367,7 +369,12 @@ public class DonorSearchDialog extends JDialog
   
   public Donor getResult()
   {
-    return this.resultDonor;
+    return this.results == null ? null : this.results.size() > 0 ? this.results.iterator().next() : null;
+  }
+  
+  public List<Donor> getResults()
+  {
+    return Collections.unmodifiableList(this.results);
   }
   
   private void createFromFields()
@@ -378,20 +385,26 @@ public class DonorSearchDialog extends JDialog
         this.emailField.getText(),
         this.aliasField.getText()));
     
-    this.resultDonor = result;
+    this.results = new ArrayList<Donor>();
+    this.results.add(result);
     this.closeDialog();
   }
   
   private void returnSelectedDonor()
   {
-    Donor result = (Donor) this.donorList.getSelectedValue();
-    if (result == null)
+    this.results = new ArrayList<Donor>();
+    
+    if (this.donorList.getSelectedValue() == null)
     {
       JOptionPane.showMessageDialog(this, "No donor is selected.", "Error", JOptionPane.OK_OPTION);
     }
     else
     {
-      this.resultDonor = result;
+      for (int i : this.donorList.getSelectedIndices())
+      {
+        this.results.add((Donor) this.donorList.getModel().getElementAt(i));
+      }
+
       this.closeDialog();
     }
   }

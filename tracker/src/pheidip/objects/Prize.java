@@ -11,6 +11,7 @@ public class Prize extends Entity
   private String description = "";
   private int sortKey = this.getId();
   private Donor winner = null;
+  private PrizeDrawMethod drawMethod = PrizeDrawMethod.RANDOM_UNIFORM_DRAW;
   private BigDecimal mimimumBid = new BigDecimal("5.00");
   private SpeedRun startGame = null;
   private SpeedRun endGame = null;
@@ -19,7 +20,7 @@ public class Prize extends Entity
   {
   }
   
-  public Prize(int id, String name, String imageURL, String description, int sortKey, BigDecimal mimimumBid, Donor winner, SpeedRun startGame, SpeedRun endGame)
+  public Prize(int id, String name, String imageURL, String description, int sortKey, PrizeDrawMethod drawMethod, BigDecimal mimimumBid, Donor winner, SpeedRun startGame, SpeedRun endGame)
   {
     this.setId(id);
     this.setName(name);
@@ -27,6 +28,7 @@ public class Prize extends Entity
     this.setDescription(description);
     this.setWinner(winner);
     this.setSortKey(sortKey);
+    this.setDrawMethod(drawMethod);
     this.setMinimumBid(mimimumBid);
     this.setStartGame(startGame);
     this.setEndGame(endGame);
@@ -96,7 +98,17 @@ public class Prize extends Entity
   {
     return mimimumBid;
   }
-  
+
+  public void setDrawMethod(PrizeDrawMethod drawMethod)
+  {
+    this.drawMethod = drawMethod;
+  }
+
+  public PrizeDrawMethod getDrawMethod()
+  {
+    return drawMethod;
+  }
+
   public void setMinimumBid(BigDecimal minimumBid)
   {
     if (minimumBid == null || minimumBid.compareTo(BigDecimal.ZERO) < 0)

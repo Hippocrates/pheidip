@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 
 import pheidip.db.DonationDataConstraintException;
 import pheidip.db.PrizeData;
+import pheidip.objects.Donor;
 import pheidip.objects.Prize;
+import pheidip.objects.PrizeDrawMethod;
 import pheidip.objects.SpeedRun;
 import pheidip.util.IdUtils;
 
@@ -24,7 +26,7 @@ public class PrizeControl
   {
     int newId = IdUtils.generateId();
     PrizeData prizes = manager.getDataAccess().getPrizeData();
-    prizes.insertPrize(new Prize(newId, name, null, null, newId, new BigDecimal("5.00"), null, null, null));
+    prizes.insertPrize(new Prize(newId, name, null, null, newId, PrizeDrawMethod.RANDOM_UNIFORM_DRAW, new BigDecimal("5.00"), null, null, null));
     return newId;
   }
   
@@ -59,6 +61,15 @@ public class PrizeControl
 
   public void removePrizeWinner()
   {
+    Prize data = this.getData();
+    
+    Donor donor = data.getWinner();
+    
+    if (donor != null)
+    {
+      donor.getPrizes().remove(data);
+    }
+    
     this.getData().setWinner(null);
   }
   

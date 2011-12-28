@@ -25,6 +25,8 @@ import javax.swing.JTextField;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JScrollPane;
@@ -38,7 +40,7 @@ public class PrizeSearchDialog extends JDialog
   private PrizeSearch searcher;
   private JTextField nameField;
   private ActionHandler actionHandler;
-  private Prize selectedPrize;
+  private List<Prize> results;
   private JButton okButton;
   private JButton cancelButton;
   private JList prizeList;
@@ -275,7 +277,7 @@ public class PrizeSearchDialog extends JDialog
     super(parent, true);
     
     this.searcher = searcher;
-    this.selectedPrize = null;
+    this.results = null;
     
     this.initializeGUI();
     this.initializeGUIEvents();
@@ -283,9 +285,14 @@ public class PrizeSearchDialog extends JDialog
     this.updateUIState();
   }
   
-  public Prize getSelectedPrize()
+  public Prize getResult()
   {
-    return this.selectedPrize;
+    return this.results == null ? null : this.results.size() > 0 ? this.results.iterator().next() : null;
+  }
+  
+  public List<Prize> getResults()
+  {
+    return Collections.unmodifiableList(this.results);
   }
 
   private void moveNextResults()
@@ -332,27 +339,33 @@ public class PrizeSearchDialog extends JDialog
   {
     Prize p = this.searcher.createIfAble(this.nameField.getText());
     
-    this.selectedPrize = p;
+    this.results = new ArrayList<Prize>();
+    this.results.add(p);
     this.closeDialog();
   }
   
   private void returnSelectedPrize()
   {
-    this.selectedPrize = (Prize) this.prizeList.getSelectedValue();
+    this.results = new ArrayList<Prize>();
     
-    if (this.selectedPrize == null)
+    if (this.prizeList.getSelectedValue() == null)
     {
       JOptionPane.showMessageDialog(this, "Error, no prize is selected.", "Error", JOptionPane.ERROR_MESSAGE);
     }
     else
     {
+      for (int i : this.prizeList.getSelectedIndices())
+      {
+        this.results.add((Prize) this.prizeList.getModel().getElementAt(i));
+      }
+      
       this.closeDialog();
     }
   }
   
   private void cancelDialog()
   {
-    this.selectedPrize = null;
+    this.results = new ArrayList<Prize>();
     this.closeDialog();
   }
 

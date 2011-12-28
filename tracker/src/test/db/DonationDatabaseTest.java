@@ -21,6 +21,7 @@ import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationReadState;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
+import pheidip.objects.PrizeDrawMethod;
 import pheidip.objects.SpeedRun;
 import junit.framework.TestCase;
 
@@ -49,8 +50,7 @@ public abstract class DonationDatabaseTest extends TestCase
   public void populate()
   {
     Session session = this.dataAccess.getSessionFactory().openSession();
-    
-    
+
     session.save(new Donor(1, "test1@test.com", "smk", "Stephen", "Kiazyk"));
     session.save(new Donor(2, "test2@test.com", "analias", "Stefan", "Ksiazyk"));
     session.save(new Donor(3, "test3@test.com", "demonrushfan6969", "Brooks", "Cracktackle"));
@@ -62,9 +62,9 @@ public abstract class DonationDatabaseTest extends TestCase
     session.save(new SpeedRun(2, "run 2", "", 2, new Date(), new Date(), null));
     session.save(new SpeedRun(3, "yet another run", "", 3, new Date(), new Date(), null));
 
-    session.save(new Prize(1, "a prize", null, null, 1, new BigDecimal("5.00"), (Donor)session.load(Donor.class, 2), null, null));
-    session.save(new Prize(2, "another prize", null, null, 2, new BigDecimal("5.00"), (Donor)null, null, null));
-    session.save(new Prize(3, "one more prize", null, null, 3, new BigDecimal("5.00"), (Donor)session.load(Donor.class, 1), null, null));
+    session.save(new Prize(1, "a prize", null, null, 1, PrizeDrawMethod.RANDOM_UNIFORM_DRAW, new BigDecimal("5.00"), (Donor)session.load(Donor.class, 2), null, null));
+    session.save(new Prize(2, "another prize", null, null, 2, PrizeDrawMethod.RANDOM_UNIFORM_DRAW, new BigDecimal("5.00"), (Donor)null, null, null));
+    session.save(new Prize(3, "one more prize", null, null, 3, PrizeDrawMethod.RANDOM_UNIFORM_DRAW, new BigDecimal("5.00"), (Donor)session.load(Donor.class, 1), null, null));
 
     session.save(new Choice(1, "naming something", null, BidState.OPENED, (SpeedRun)session.load(SpeedRun.class, 1)));
     session.save(new Choice(2, "naming something something", null, BidState.OPENED, (SpeedRun)session.load(SpeedRun.class, 1)));

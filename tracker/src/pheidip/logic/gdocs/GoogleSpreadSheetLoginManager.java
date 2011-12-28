@@ -43,6 +43,7 @@ public class GoogleSpreadSheetLoginManager
     this.loginName = null;
     this.password = null;
     this.spreadSheetId = null;
+    this.service = null;
     this.reporter = reporter;
   }
   
