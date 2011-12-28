@@ -67,15 +67,6 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	{
 	  Session session = this.beginTransaction();
 	  
-<<<<<<< HEAD
-	  for (Prize p : d.getPrizes())
-	  {
-	    p.setWinner(null);
-	  }
-	  
-	  d.getPrizes().clear();
-	  
-=======
 	  // this is neccessary since the prizes aren't cascaded on deletion
     for (Prize p : d.getPrizes())
     {
@@ -83,8 +74,7 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
     }
 
     d.getPrizes().clear();
-    
->>>>>>> master
+
     session.delete(d);
     this.endTransaction();
 	}

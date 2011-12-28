@@ -8,15 +8,9 @@ public interface DonationDataAccess
 
 	public DonationData getDonationData();
 
-<<<<<<< HEAD
-	public BidData getBids();
-
-	public SpeedRunData getSpeedRuns();
-=======
 	public BidData getBidData();
 
 	public SpeedRunData getSpeedRunData();
->>>>>>> master
 
 	public PrizeData getPrizeData();
 

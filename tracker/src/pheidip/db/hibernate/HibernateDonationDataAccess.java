@@ -59,12 +59,8 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 		return this.donations;
 	}
 
-	@Override
-<<<<<<< HEAD
-	public BidData getBids() 
-=======
+  @Override
 	public BidData getBidData() 
->>>>>>> master
 	{
 		if (this.bids == null)
 		{
@@ -75,11 +71,7 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	}
 
 	@Override
-<<<<<<< HEAD
-	public SpeedRunData getSpeedRuns() 
-=======
 	public SpeedRunData getSpeedRunData() 
->>>>>>> master
 	{
 		if (this.speedRuns == null)
 		{
