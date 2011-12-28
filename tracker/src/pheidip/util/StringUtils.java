@@ -198,4 +198,24 @@ public final class StringUtils
     
     return acculm.toString();
   }
+
+  public static String javaToNatural(String java) 
+  {
+    StringBuilder output = new StringBuilder();
+    char[] array = java.toCharArray();
+    
+    output.append(Character.toUpperCase(array[0]));
+    
+    for (int i = 1; i < array.length; ++i)
+    {
+      if (Character.isUpperCase(array[i]))
+      {
+        output.append(' ');
+      }
+      
+      output.append(array[i]);
+    }
+    
+    return output.toString();
+  }
 }

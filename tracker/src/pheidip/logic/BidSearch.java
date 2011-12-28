@@ -15,7 +15,7 @@ import pheidip.objects.ChoiceOptionSearchParams;
 import pheidip.objects.SpeedRun;
 import pheidip.util.Filter;
 
-public class BidSearch extends AbstractSearcher<Bid, BidSearchParams>
+public class BidSearch extends EntitySearcher<Bid, BidSearchParams>
 {
   private DonationDatabaseManager manager;
   private BidData bids;

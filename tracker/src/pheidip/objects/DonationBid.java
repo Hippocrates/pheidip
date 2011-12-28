@@ -2,11 +2,8 @@ package pheidip.objects;
 
 import java.math.BigDecimal;
 
-import pheidip.util.IdUtils;
-
-public abstract class DonationBid
+public abstract class DonationBid extends Entity
 {
-  private int id = IdUtils.generateId();
   private BigDecimal amount;
   private Donation donation;
   
@@ -22,25 +19,17 @@ public abstract class DonationBid
   }
   
   public abstract BidType getType();
-  
-  public int getId()
-  {
-    return this.id;
-  }
-  
-  public void setId(int id)
-  {
-    this.id = id;
-  }
-  
-  public void setDonation(Donation donation)
-  {
-    this.donation = donation;
-  }
 
   public Donation getDonation()
   {
     return donation;
+  }
+
+  public void setDonation(Donation donation)
+  {
+    Donation oldDonation = this.donation;
+    this.donation = donation;
+    this.firePropertyChange("donation", oldDonation, this.donation);
   }
 
   public BigDecimal getAmount()
@@ -55,6 +44,8 @@ public abstract class DonationBid
       throw new RuntimeException("Bid amount must be greater than zero.");
     }
     
+    BigDecimal oldAmount = this.amount;
     this.amount = amount;
+    this.firePropertyChange("amount", oldAmount, this.amount);
   }
 }

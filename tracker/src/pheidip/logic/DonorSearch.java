@@ -6,7 +6,7 @@ import pheidip.db.DonorData;
 import pheidip.objects.Donor;
 import pheidip.objects.DonorSearchParams;
 
-public class DonorSearch extends AbstractSearcher<Donor, DonorSearchParams>
+public class DonorSearch extends EntitySearcher<Donor, DonorSearchParams>
 {
   public static final int DEFAULT_SEARCH_SIZE = 20;
   

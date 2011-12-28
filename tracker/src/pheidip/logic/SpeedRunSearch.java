@@ -6,7 +6,7 @@ import pheidip.db.SpeedRunData;
 import pheidip.objects.SpeedRun;
 import pheidip.objects.SpeedRunSearchParams;
 
-public class SpeedRunSearch extends AbstractSearcher<SpeedRun, SpeedRunSearchParams>
+public class SpeedRunSearch extends EntitySearcher<SpeedRun, SpeedRunSearchParams>
 {
   private DonationDatabaseManager manager;
   private SpeedRunData speedRuns;

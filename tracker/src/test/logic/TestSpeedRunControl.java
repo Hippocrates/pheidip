@@ -1,11 +1,11 @@
 package test.logic;
 
-import java.awt.Choice;
 import java.util.List;
 
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.logic.SpeedRunControl;
 import pheidip.objects.Bid;
+import pheidip.objects.Choice;
 import pheidip.objects.SpeedRun;
 import test.db.DBTestConfiguration;
 import junit.framework.TestCase;
@@ -52,7 +52,7 @@ public class TestSpeedRunControl extends TestCase
     
     for (Bid b : bids)
     {
-      if (b.getClass() == Choice.class)
+      if (b instanceof Choice)
       {
         assertEquals("naming something", b.getName());
       }

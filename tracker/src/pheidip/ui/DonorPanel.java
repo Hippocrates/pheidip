@@ -281,6 +281,7 @@ public class DonorPanel extends EntityPanel
       }
       catch (Exception e)
       {
+        e.printStackTrace();
         owner.report(e);
       }
     }

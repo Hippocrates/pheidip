@@ -4,22 +4,19 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
-import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
 
-public class Donor
+public class Donor extends Entity
 {
-  private int id;
-  private String email;
-  private String firstName;
-  private String lastName;
-  private String alias;
+  private String email = "#" + this.getId();
+  private String firstName = "";
+  private String lastName = "";
+  private String alias = null;
   private Set<Donation> donations = new HashSet<Donation>();
   private Set<Prize> prizes = new HashSet<Prize>();
 
   public Donor()
   {
-    this.id = IdUtils.generateId();
   }
   
   public Donor(int id, String email, String alias, String firstName, String lastName)
@@ -38,7 +35,9 @@ public class Donor
   
   public void setAlias(String alias)
   {
+    String oldAlias = alias;
     this.alias = StringUtils.canonicalize(alias);
+    this.firePropertyChange("alias", oldAlias, this.alias);
   }
 
   public String getFirstName()
@@ -48,7 +47,9 @@ public class Donor
   
   public void setFirstName(String firstName)
   {
+    String oldFirstName = firstName;
     this.firstName = StringUtils.emptyIfNull(firstName);
+    this.firePropertyChange("firstName", oldFirstName, this.firstName);
   }
 
   public String getLastName()
@@ -58,7 +59,9 @@ public class Donor
 
   public void setLastName(String lastName)
   {
+    String oldLastName = lastName;
     this.lastName = StringUtils.emptyIfNull(lastName);
+    this.firePropertyChange("lastName", oldLastName, this.lastName);
   }
 
   public String getEmail()
@@ -68,19 +71,11 @@ public class Donor
 
   public void setEmail(String email)
   {
+    String oldEmail = this.email;
     this.email = StringUtils.isEmptyOrNull(email) ? "#" + this.getId() : email.toLowerCase();
+    this.firePropertyChange("email", oldEmail, this.email);
   }
 
-  public int getId()
-  {
-    return id;
-  }
-  
-  public void setId(int id)
-  {
-    this.id = id;
-  }
-  
   public void setPrizes(Set<Prize> prizes)
   {
     this.prizes = prizes;
@@ -100,11 +95,7 @@ public class Donor
   {
     this.donations = donations;
   }
-  
-  public int hashCode()
-  {
-    return this.getId();
-  }
+
   
   public boolean equals(Object other)
   {

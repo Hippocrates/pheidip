@@ -6,14 +6,12 @@ import java.util.Set;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
 
-public class Donation 
+public class Donation extends Entity
 {
 	private Date timeReceived;
 	private BigDecimal amount;
-	private int id;
 	private String comment;
 	private DonationDomain domain;
   private String domainId;
@@ -25,7 +23,6 @@ public class Donation
 
   public Donation()
   {
-    this.id = IdUtils.generateId();
   }
 	
 	public Donation(int id, DonationDomain domain, String domainId, DonationBidState bidState, DonationReadState readState, DonationCommentState commentState, BigDecimal amount, Date timeReceived, Donor donor, String comment)
@@ -49,7 +46,9 @@ public class Donation
 	
 	public void setTimeReceived(Date timeReceived)
   {
+	  Date oldTimeReceived = this.timeReceived;
     this.timeReceived = timeReceived;
+    this.firePropertyChange("timeReceived", oldTimeReceived, this.timeReceived);
   }
 
   public BigDecimal getAmount()
@@ -59,22 +58,14 @@ public class Donation
 	
   public void setAmount(BigDecimal amount)
   {
-    if (amount.compareTo(BigDecimal.ZERO) < 0)
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0)
     {
-      throw new RuntimeException("Negative donation amount invalid.");
+      throw new RuntimeException("Donation amount invalid.");
     }
 
+    BigDecimal oldAmount = amount;
     this.amount = amount;
-  }
-
-  public int getId()
-	{
-	  return this.id;
-	}
-	
-  public void setId(int id)
-  {
-    this.id = id;
+    this.firePropertyChange("amount", oldAmount, this.amount);
   }
 
   public String getComment()
@@ -84,7 +75,9 @@ public class Donation
 	
   public void setComment(String comment)
   {
-    this.comment = comment;
+    String oldComment = this.comment;
+    this.comment = StringUtils.emptyIfNull(comment);
+    this.firePropertyChange("comment", oldComment, this.comment);
   }
 
   public DonationDomain getDomain()
@@ -94,7 +87,9 @@ public class Donation
 
   public void setDomain(DonationDomain domain)
   {
+    DonationDomain oldDomain = this.domain;
     this.domain = domain;
+    this.firePropertyChange("domain", oldDomain, this.domain);
   }
 
   public String getDomainId()
@@ -104,7 +99,9 @@ public class Donation
 
   public void setDomainId(String domainId)
   {
+    String oldDomainId = this.domainId;
     this.domainId = domainId;
+    this.firePropertyChange("domainId", oldDomainId, this.domainId);
   }
 
   public DonationBidState getBidState()
@@ -114,22 +111,21 @@ public class Donation
   
   public void setBidState(DonationBidState bidState)
   {
+    DonationBidState oldBidState = this.bidState;
     this.bidState = bidState;
+    this.firePropertyChange("bidState", oldBidState, this.bidState);
   }
 
   public DonationReadState getReadState()
   {
     return this.readState;
   }
-  
-  public void setCommentState(DonationCommentState commentState)
-  {
-    this.commentState = commentState;
-  }
 
   public void setReadState(DonationReadState readState)
   {
+    DonationReadState oldReadState = this.readState;
     this.readState = readState;
+    this.firePropertyChange("readState", oldReadState, this.readState);
   }
 
   public DonationCommentState getCommentState()
@@ -137,6 +133,35 @@ public class Donation
     return this.commentState;
   }
   
+  public void setCommentState(DonationCommentState commentState)
+  {
+    DonationCommentState oldCommentState = this.commentState;
+    this.commentState = commentState;
+    this.firePropertyChange("commentState", oldCommentState, this.commentState);
+  }
+
+  public Set<DonationBid> getBids()
+  {
+    return bids;
+  }
+  
+  public void setBids(Set<DonationBid> bids)
+  {
+    this.bids = bids;
+  }
+
+  public Donor getDonor()
+  {
+    return donor;
+  }
+  
+  public void setDonor(Donor donor)
+  {
+    Donor oldDonor = this.donor;
+    this.donor = donor;
+    this.firePropertyChange("donor", oldDonor, this.donor);
+  }
+
   public String getDomainString()
   {
     return StringUtils.symbolToNatural(this.getDomain().toString()) + ":" + (this.getDomainId() == null ? "" + this.getId() : this.getDomainId());
@@ -145,11 +170,6 @@ public class Donation
   public String toString()
   {
     return this.getDomain().toString() + " : $" + this.getAmount().toString() + " : " + this.getTimeReceived().toString();
-  }
-  
-  public int hashCode()
-  {
-    return this.getId();
   }
   
   public boolean equals(Object other)
@@ -162,25 +182,5 @@ public class Donation
     {
       return false;
     }
-  }
-
-  public void setBids(Set<DonationBid> bids)
-  {
-    this.bids = bids;
-  }
-
-  public void setDonor(Donor donor)
-  {
-    this.donor = donor;
-  }
-
-  public Donor getDonor()
-  {
-    return donor;
-  }
-
-  public Set<DonationBid> getBids()
-  {
-    return bids;
   }
 }

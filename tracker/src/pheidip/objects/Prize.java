@@ -2,20 +2,18 @@ package pheidip.objects;
 
 import java.math.BigDecimal;
 
-import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
 
-public class Prize
+public class Prize extends Entity
 {
-  private int id = IdUtils.generateId();
-  private String name;
-  private String imageURL;
-  private String description;
-  private int sortKey;
-  private Donor winner;
+  private String name = "Prize#" + this.getId();
+  private String imageURL = null;
+  private String description = "";
+  private int sortKey = this.getId();
+  private Donor winner = null;
   private BigDecimal mimimumBid = new BigDecimal("5.00");
-  private SpeedRun startGame;
-  private SpeedRun endGame;
+  private SpeedRun startGame = null;
+  private SpeedRun endGame = null;
   
   public Prize()
   {
@@ -33,16 +31,6 @@ public class Prize
     this.setStartGame(startGame);
     this.setEndGame(endGame);
   }
-  
-  public int getId()
-  {
-    return this.id;
-  }
-  
-  public void setId(int id)
-  {
-    this.id = id;
-  }
 
   public String getName()
   {
@@ -51,7 +39,9 @@ public class Prize
   
   public void setName(String name)
   {
-    this.name = StringUtils.isEmptyOrNull(name) ? "#" + this.getId() : name.toLowerCase();
+    String oldName = this.name;
+    this.name = StringUtils.isEmptyOrNull(name) ? "Prize#" + this.getId() : name.toLowerCase();
+    this.firePropertyChange("name", oldName, this.name);
   }
 
   public String getImageURL()
@@ -61,7 +51,9 @@ public class Prize
 
   public void setImageURL(String imageURL)
   {
+    String oldImageURL = this.imageURL;
     this.imageURL = StringUtils.nullIfEmpty(imageURL);
+    this.firePropertyChange("imageURL", oldImageURL, this.imageURL);
   }
 
   public String getDescription()
@@ -71,17 +63,79 @@ public class Prize
   
   public void setDescription(String description)
   {
+    String oldDescription = this.description;
     this.description = StringUtils.emptyIfNull(description);
+    this.firePropertyChange("description", oldDescription, this.description);
   }
 
-  public String toString()
+  public Donor getWinner()
   {
-    return this.getName() == null ? "Prize#" + this.getId() : this.getName();
+    return winner;
+  }
+
+  public void setWinner(Donor winner)
+  {
+    Donor oldWinner = this.winner;
+    this.winner = winner;
+    this.firePropertyChange("winner", oldWinner, this.winner);
+  }
+
+  public int getSortKey()
+  {
+    return sortKey;
+  }
+
+  public void setSortKey(int sortKey)
+  {
+    int oldSortKey = this.sortKey;
+    this.sortKey = sortKey;
+    this.firePropertyChange("sortKey", oldSortKey, this.sortKey);
+  }
+
+  public BigDecimal getMinimumBid()
+  {
+    return mimimumBid;
   }
   
-  public int hashCode()
+  public void setMinimumBid(BigDecimal minimumBid)
   {
-    return this.getId();
+    if (minimumBid == null || minimumBid.compareTo(BigDecimal.ZERO) < 0)
+    {
+      throw new RuntimeException("Error, invalid minimum bid amount.");
+    }
+    
+    BigDecimal oldMinimumBid = this.mimimumBid;
+    this.mimimumBid = minimumBid;
+    this.firePropertyChange("minimumBid", oldMinimumBid, this.mimimumBid);
+  }
+
+  public SpeedRun getStartGame()
+  {
+    return startGame;
+  }
+
+  public void setStartGame(SpeedRun startGame)
+  {
+    SpeedRun oldStartGame = this.startGame;
+    this.startGame = startGame;
+    this.firePropertyChange("startGame", oldStartGame, this.startGame);
+  }
+
+  public SpeedRun getEndGame()
+  {
+    return endGame;
+  }
+
+  public void setEndGame(SpeedRun endGame)
+  {
+    SpeedRun oldEndGame = this.endGame;
+    this.endGame = endGame;
+    this.firePropertyChange("endGame", oldEndGame, this.endGame);
+  }
+  
+  public String toString()
+  {
+    return this.getName();
   }
   
   public boolean equals(Object other)
@@ -94,60 +148,5 @@ public class Prize
     {
       return false;
     }
-  }
-
-  public void setWinner(Donor winner)
-  {
-    this.winner = winner;
-  }
-
-  public Donor getWinner()
-  {
-    return winner;
-  }
-
-  public void setSortKey(int sortKey)
-  {
-    this.sortKey = sortKey;
-  }
-
-  public int getSortKey()
-  {
-    return sortKey;
-  }
-
-  public void setMinimumBid(BigDecimal minimumBid)
-  {
-    if (minimumBid == null || minimumBid.compareTo(BigDecimal.ZERO) <= 0)
-    {
-      throw new RuntimeException("Error, invalid minimum bid amount.");
-    }
-    
-    this.mimimumBid = minimumBid;
-  }
-
-  public BigDecimal getMinimumBid()
-  {
-    return mimimumBid;
-  }
-
-  public void setStartGame(SpeedRun startGame)
-  {
-    this.startGame = startGame;
-  }
-
-  public SpeedRun getStartGame()
-  {
-    return startGame;
-  }
-
-  public void setEndGame(SpeedRun endGame)
-  {
-    this.endGame = endGame;
-  }
-
-  public SpeedRun getEndGame()
-  {
-    return endGame;
   }
 }

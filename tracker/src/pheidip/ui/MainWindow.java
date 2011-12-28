@@ -44,8 +44,12 @@ import pheidip.logic.chipin.ChipinWebsiteDocumentSource;
 import pheidip.logic.gdocs.GoogleRefreshProcess;
 import pheidip.objects.Bid;
 import pheidip.objects.BidType;
+import pheidip.objects.Challenge;
+import pheidip.objects.Choice;
 import pheidip.objects.Donation;
 import pheidip.objects.Donor;
+import pheidip.objects.Entity;
+import pheidip.objects.Prize;
 import pheidip.objects.SpeedRun;
 import pheidip.util.Reporter;
 
@@ -303,7 +307,7 @@ public class MainWindow extends JFrame implements Reporter
         }
         else if (ev.getSource() == searchPrizeButton)
         {
-          MainWindow.this.openPrizeSearchDialog();
+          MainWindow.this.openSearchPrizeDialog();
         }
       }
       catch(Exception e)
@@ -420,6 +424,11 @@ public class MainWindow extends JFrame implements Reporter
     this.initializeGUIEvents();
     
     this.updateUIState();
+  }
+  
+  public ProgramInstance getInstance()
+  {
+    return this.instance;
   }
   
   private void deleteCurrentEntity()
@@ -700,6 +709,30 @@ public class MainWindow extends JFrame implements Reporter
       this.googleMenu.setEnabled(false);
     }
   }
+  
+  protected void createSearchDialog(Class<?> entityClass)
+  {
+    if (SpeedRun.class.isAssignableFrom(entityClass))
+    {
+      this.openSearchSpeedRunDialog();
+    }
+    else if (Bid.class.isAssignableFrom(entityClass))
+    {
+      this.openSearchBidDialog();
+    }
+    else if (Donor.class.isAssignableFrom(entityClass))
+    {
+      this.openSearchDonorDialog();
+    }
+    else if (Donation.class.isAssignableFrom(entityClass))
+    {
+      this.openSearchDonationDialog();
+    }
+    else if (Prize.class.isAssignableFrom(entityClass))
+    {
+      this.openSearchPrizeDialog();
+    }
+  }
 
   private void openSearchBidDialog()
   {
@@ -764,7 +797,7 @@ public class MainWindow extends JFrame implements Reporter
     }
   }
   
-  private void openPrizeSearchDialog()
+  private void openSearchPrizeDialog()
   {
     PrizeSearch searcher = new PrizeSearch(this.instance.getDonationDatabase());
     PrizeSearchDialog dialog = new PrizeSearchDialog(this, searcher);
@@ -813,6 +846,38 @@ public class MainWindow extends JFrame implements Reporter
     DonationTaskPanel panel = new DonationTaskPanel(this, task);
     
     this.insertTab(panel);
+  }
+
+  protected void openEntityTab(Entity entity)
+  {
+    if (entity instanceof SpeedRun)
+    {
+      this.openSpeedRunTab(entity.getId());
+    }
+    else if (entity instanceof Donor)
+    {
+      this.openDonorTab(entity.getId());
+    }
+    else if (entity instanceof Donation)
+    {
+      this.openDonationTab(entity.getId());
+    }
+    else if (entity instanceof Choice)
+    {
+      this.openChoiceTab(entity.getId());
+    }
+    else if (entity instanceof Challenge)
+    {
+      this.openChallengeTab(entity.getId());
+    }
+    else if (entity instanceof Prize)
+    {
+      this.openPrizeTab(entity.getId());
+    }
+    else
+    {
+      throw new RuntimeException("Error, cannot open a tab for entity of type : " + entity.getClass().getName());
+    }
   }
 
   protected void openSpeedRunTab(int speedRunId)

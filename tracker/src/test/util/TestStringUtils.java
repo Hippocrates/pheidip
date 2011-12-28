@@ -17,6 +17,15 @@ public class TestStringUtils extends TestCase
     assertEquals("A Symbol String", natural);
   }
   
+  public void testJavaToNatural()
+  {
+	  String java = "aVariableName"; // i.e. inner caps, first lowered (though it'll accept C# style inner caps too)
+	    
+	  String natural = StringUtils.javaToNatural(java);
+	    
+	  assertEquals("A Variable Name", natural);
+  }
+  
   public void testIsEmptyOrNull()
   {
     assertTrue(StringUtils.isEmptyOrNull(""));

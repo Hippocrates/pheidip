@@ -1,6 +1,7 @@
 package pheidip.ui;
 
 import pheidip.logic.DonationControl;
+import pheidip.logic.ProgramInstance;
 import pheidip.objects.Donation;
 import pheidip.objects.Donor;
 import pheidip.objects.DonationBidState;
@@ -40,8 +41,6 @@ public class DonationPanel extends EntityPanel
   private JLabel domainIdLabel;
   private JLabel amountLabel;
   private JLabel donorLabel;
-  private JTextField donorField;
-  private JButton openDonorButton;
   private JLabel timeLabel;
   private JTextField timeField;
   private JLabel commentLabel;
@@ -56,17 +55,19 @@ public class DonationPanel extends EntityPanel
   private JComboBox bidStateComboBox;
   private JComboBox readStateComboBox;
   private JComboBox commentStateComboBox;
-  private JLabel lblNewLabel;
-  private JLabel lblNewLabel_1;
-  private JLabel lblNewLabel_2;
+  private JLabel bidStateLabel;
+  private JLabel readStateLabel;
+  private JLabel commentStateLabel;
+  private EntitySelector<Donor> donorSelector;
+  private ProgramInstance instance;
   
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{37, 63, 105, 58, 48, 63};
-    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0};
-    gridBagLayout.columnWeights = new double[]{1.0, 1.0, 0.0, 0.0, 0.0, 0.0};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.columnWidths = new int[]{99, 93, 105, 105, 58, 48, 63};
+    gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 23, 58, 31, 0, 0};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
     amountLabel = new JLabel("Amount:");
@@ -80,7 +81,7 @@ public class DonationPanel extends EntityPanel
     amountField = new JFormattedTextField(FormatUtils.getMoneyFormat());
     amountField.setHorizontalAlignment(SwingConstants.TRAILING);
     GridBagConstraints gbc_amountField = new GridBagConstraints();
-    gbc_amountField.gridwidth = 2;
+    gbc_amountField.gridwidth = 3;
     gbc_amountField.insets = new Insets(0, 0, 5, 5);
     gbc_amountField.fill = GridBagConstraints.HORIZONTAL;
     gbc_amountField.gridx = 1;
@@ -88,17 +89,10 @@ public class DonationPanel extends EntityPanel
     add(amountField, gbc_amountField);
     amountField.setColumns(10);
     
-    commentLabel = new JLabel("Comment:");
-    GridBagConstraints gbc_commentLabel = new GridBagConstraints();
-    gbc_commentLabel.insets = new Insets(0, 0, 5, 5);
-    gbc_commentLabel.gridx = 3;
-    gbc_commentLabel.gridy = 0;
-    add(commentLabel, gbc_commentLabel);
-    
     deleteButton = new JButton("Delete Donation");
     GridBagConstraints gbc_deleteButton = new GridBagConstraints();
     gbc_deleteButton.insets = new Insets(0, 0, 5, 0);
-    gbc_deleteButton.gridx = 5;
+    gbc_deleteButton.gridx = 6;
     gbc_deleteButton.gridy = 0;
     add(deleteButton, gbc_deleteButton);
     
@@ -113,7 +107,7 @@ public class DonationPanel extends EntityPanel
     domainIdField = new JTextField();
     domainIdField.setEditable(false);
     GridBagConstraints gbc_domainIdField = new GridBagConstraints();
-    gbc_domainIdField.gridwidth = 2;
+    gbc_domainIdField.gridwidth = 3;
     gbc_domainIdField.insets = new Insets(0, 0, 5, 5);
     gbc_domainIdField.fill = GridBagConstraints.HORIZONTAL;
     gbc_domainIdField.gridx = 1;
@@ -121,15 +115,22 @@ public class DonationPanel extends EntityPanel
     add(domainIdField, gbc_domainIdField);
     domainIdField.setColumns(10);
     
+    commentLabel = new JLabel("Comment:");
+    GridBagConstraints gbc_commentLabel = new GridBagConstraints();
+    gbc_commentLabel.insets = new Insets(0, 0, 5, 5);
+    gbc_commentLabel.gridx = 4;
+    gbc_commentLabel.gridy = 1;
+    add(commentLabel, gbc_commentLabel);
+    
     commentScrollPane = new JScrollPane();
     commentScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
     gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
-    gbc_scrollPane_1.gridheight = 10;
+    gbc_scrollPane_1.gridheight = 7;
     gbc_scrollPane_1.gridwidth = 3;
     gbc_scrollPane_1.insets = new Insets(0, 0, 5, 0);
-    gbc_scrollPane_1.gridx = 3;
-    gbc_scrollPane_1.gridy = 1;
+    gbc_scrollPane_1.gridx = 4;
+    gbc_scrollPane_1.gridy = 2;
     add(commentScrollPane, gbc_scrollPane_1);
     
     commentTextArea = new JTextArea();
@@ -148,7 +149,7 @@ public class DonationPanel extends EntityPanel
     timeField = new JTextField();
     timeField.setEditable(false);
     GridBagConstraints gbc_timeField = new GridBagConstraints();
-    gbc_timeField.gridwidth = 2;
+    gbc_timeField.gridwidth = 3;
     gbc_timeField.insets = new Insets(0, 0, 5, 5);
     gbc_timeField.fill = GridBagConstraints.HORIZONTAL;
     gbc_timeField.gridx = 1;
@@ -163,75 +164,65 @@ public class DonationPanel extends EntityPanel
     gbc_donorLabel.gridx = 0;
     gbc_donorLabel.gridy = 3;
     add(donorLabel, gbc_donorLabel);
-    
-    donorField = new JTextField();
-    donorField.setEditable(false);
-    GridBagConstraints gbc_donorField = new GridBagConstraints();
-    gbc_donorField.gridwidth = 2;
-    gbc_donorField.insets = new Insets(0, 0, 5, 5);
-    gbc_donorField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_donorField.gridx = 1;
-    gbc_donorField.gridy = 3;
-    add(donorField, gbc_donorField);
-    donorField.setColumns(10);
         
-        openDonorButton = new JButton("Open Donor");
-        GridBagConstraints gbc_openDonorButton = new GridBagConstraints();
-        gbc_openDonorButton.fill = GridBagConstraints.HORIZONTAL;
-        gbc_openDonorButton.insets = new Insets(0, 0, 5, 5);
-        gbc_openDonorButton.gridx = 1;
-        gbc_openDonorButton.gridy = 4;
-        add(openDonorButton, gbc_openDonorButton);
+        donorSelector = new EntitySelector<Donor>(this.owner, this.instance, true, false, true, Donor.class);
+        GridBagConstraints gbc_donorSelector = new GridBagConstraints();
+        gbc_donorSelector.gridwidth = 3;
+        gbc_donorSelector.insets = new Insets(0, 0, 5, 5);
+        gbc_donorSelector.fill = GridBagConstraints.BOTH;
+        gbc_donorSelector.gridx = 1;
+        gbc_donorSelector.gridy = 3;
+        add(donorSelector, gbc_donorSelector);
         
-        lblNewLabel = new JLabel("Bid State:");
-        GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-        gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
-        gbc_lblNewLabel.anchor = GridBagConstraints.EAST;
-        gbc_lblNewLabel.gridx = 0;
-        gbc_lblNewLabel.gridy = 5;
-        add(lblNewLabel, gbc_lblNewLabel);
+        bidStateLabel = new JLabel("Bid State:");
+        GridBagConstraints gbc_bidStateLabel = new GridBagConstraints();
+        gbc_bidStateLabel.insets = new Insets(0, 0, 5, 5);
+        gbc_bidStateLabel.anchor = GridBagConstraints.EAST;
+        gbc_bidStateLabel.gridx = 0;
+        gbc_bidStateLabel.gridy = 4;
+        add(bidStateLabel, gbc_bidStateLabel);
         
         bidStateComboBox = new JComboBox(DonationBidState.values());
         GridBagConstraints gbc_bidStateComboBox = new GridBagConstraints();
-        gbc_bidStateComboBox.gridwidth = 2;
+        gbc_bidStateComboBox.gridwidth = 3;
         gbc_bidStateComboBox.insets = new Insets(0, 0, 5, 5);
         gbc_bidStateComboBox.fill = GridBagConstraints.HORIZONTAL;
         gbc_bidStateComboBox.gridx = 1;
-        gbc_bidStateComboBox.gridy = 5;
+        gbc_bidStateComboBox.gridy = 4;
         add(bidStateComboBox, gbc_bidStateComboBox);
         
-        lblNewLabel_1 = new JLabel("Read State:");
-        GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
-        gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
-        gbc_lblNewLabel_1.anchor = GridBagConstraints.EAST;
-        gbc_lblNewLabel_1.gridx = 0;
-        gbc_lblNewLabel_1.gridy = 6;
-        add(lblNewLabel_1, gbc_lblNewLabel_1);
+        readStateLabel = new JLabel("Read State:");
+        GridBagConstraints gbc_readStateLabel = new GridBagConstraints();
+        gbc_readStateLabel.insets = new Insets(0, 0, 5, 5);
+        gbc_readStateLabel.anchor = GridBagConstraints.EAST;
+        gbc_readStateLabel.gridx = 0;
+        gbc_readStateLabel.gridy = 5;
+        add(readStateLabel, gbc_readStateLabel);
         
         readStateComboBox = new JComboBox(DonationReadState.values());
         GridBagConstraints gbc_readStateComboBox = new GridBagConstraints();
-        gbc_readStateComboBox.gridwidth = 2;
+        gbc_readStateComboBox.gridwidth = 3;
         gbc_readStateComboBox.insets = new Insets(0, 0, 5, 5);
         gbc_readStateComboBox.fill = GridBagConstraints.HORIZONTAL;
         gbc_readStateComboBox.gridx = 1;
-        gbc_readStateComboBox.gridy = 6;
+        gbc_readStateComboBox.gridy = 5;
         add(readStateComboBox, gbc_readStateComboBox);
         
-        lblNewLabel_2 = new JLabel("Comment Approval:");
-        GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
-        gbc_lblNewLabel_2.insets = new Insets(0, 0, 5, 5);
-        gbc_lblNewLabel_2.anchor = GridBagConstraints.EAST;
-        gbc_lblNewLabel_2.gridx = 0;
-        gbc_lblNewLabel_2.gridy = 7;
-        add(lblNewLabel_2, gbc_lblNewLabel_2);
+        commentStateLabel = new JLabel("Comment Approval:");
+        GridBagConstraints gbc_commentStateLabel = new GridBagConstraints();
+        gbc_commentStateLabel.insets = new Insets(0, 0, 5, 5);
+        gbc_commentStateLabel.anchor = GridBagConstraints.EAST;
+        gbc_commentStateLabel.gridx = 0;
+        gbc_commentStateLabel.gridy = 6;
+        add(commentStateLabel, gbc_commentStateLabel);
         
         commentStateComboBox = new JComboBox(DonationCommentState.values());
         GridBagConstraints gbc_commentStateComboBox = new GridBagConstraints();
-        gbc_commentStateComboBox.gridwidth = 2;
+        gbc_commentStateComboBox.gridwidth = 3;
         gbc_commentStateComboBox.insets = new Insets(0, 0, 5, 5);
         gbc_commentStateComboBox.fill = GridBagConstraints.HORIZONTAL;
         gbc_commentStateComboBox.gridx = 1;
-        gbc_commentStateComboBox.gridy = 7;
+        gbc_commentStateComboBox.gridy = 6;
         add(commentStateComboBox, gbc_commentStateComboBox);
     
         refreshButton = new JButton("Refresh");
@@ -239,7 +230,7 @@ public class DonationPanel extends EntityPanel
         gbc_refreshButton.fill = GridBagConstraints.HORIZONTAL;
         gbc_refreshButton.insets = new Insets(0, 0, 5, 5);
         gbc_refreshButton.gridx = 1;
-        gbc_refreshButton.gridy = 9;
+        gbc_refreshButton.gridy = 7;
         add(refreshButton, gbc_refreshButton);
     
     saveButton = new JButton("Save");
@@ -247,15 +238,16 @@ public class DonationPanel extends EntityPanel
     gbc_saveButton.fill = GridBagConstraints.HORIZONTAL;
     gbc_saveButton.insets = new Insets(0, 0, 5, 5);
     gbc_saveButton.gridx = 2;
-    gbc_saveButton.gridy = 9;
+    gbc_saveButton.gridy = 7;
     add(saveButton, gbc_saveButton);
     
     donationBidsPanel = new DonationBidsPanel(this.owner, this.donationControl);
     GridBagConstraints gbc_donationBidsPanel = new GridBagConstraints();
-    gbc_donationBidsPanel.gridwidth = 6;
-    gbc_donationBidsPanel.fill = GridBagConstraints.BOTH;
+    gbc_donationBidsPanel.anchor = GridBagConstraints.EAST;
+    gbc_donationBidsPanel.gridwidth = 7;
+    gbc_donationBidsPanel.fill = GridBagConstraints.VERTICAL;
     gbc_donationBidsPanel.gridx = 0;
-    gbc_donationBidsPanel.gridy = 11;
+    gbc_donationBidsPanel.gridy = 10;
     add(donationBidsPanel, gbc_donationBidsPanel);
   }
   
@@ -266,11 +258,7 @@ public class DonationPanel extends EntityPanel
     {
       try
       {
-        if (event.getSource() == openDonorButton)
-        {
-          DonationPanel.this.openDonor();
-        }
-        else if (event.getSource() == refreshButton)
+        if (event.getSource() == refreshButton)
         {
           DonationPanel.this.refreshContent();
         }
@@ -298,8 +286,6 @@ public class DonationPanel extends EntityPanel
   private void initializeGUIEvents()
   {
     this.actionHandler = new ActionHandler();
-    
-    this.openDonorButton.addActionListener(this.actionHandler);
     this.refreshButton.addActionListener(this.actionHandler);
     this.saveButton.addActionListener(this.actionHandler);
     this.deleteButton.addActionListener(this.actionHandler);
@@ -308,7 +294,7 @@ public class DonationPanel extends EntityPanel
     
     List<Component> tabArray = new ArrayList<Component>();
     tabArray.add(this.amountField);
-    tabArray.add(this.openDonorButton);
+    tabArray.add(this.donorSelector);
     tabArray.add(this.bidStateComboBox);
     tabArray.add(this.readStateComboBox);
     tabArray.add(this.commentStateComboBox);
@@ -340,8 +326,9 @@ public class DonationPanel extends EntityPanel
   public DonationPanel(MainWindow owner, DonationControl control)
   {    
     this.owner = owner;
+    this.instance = owner.getInstance();
     this.donationControl = control;
-    
+
     this.initializeGUI();
     this.initializeGUIEvents();
   }
@@ -384,9 +371,7 @@ public class DonationPanel extends EntityPanel
         this.owner.removeTab(this);
         return;
       }
-      
-      Donor donor = result.getDonor();
-      
+
       this.amountField.setText(result.getAmount().toString());
       this.timeField.setText(result.getTimeReceived().toString());
       
@@ -405,7 +390,7 @@ public class DonationPanel extends EntityPanel
       }
       
       this.domainIdField.setText(result.getDomainString());
-      this.donorField.setText(donor.toString());
+      this.donorSelector.setEntity(result.getDonor());
       this.commentTextArea.setText(result.getComment());
       this.bidStateComboBox.setEnabled(true);
       this.bidStateComboBox.setSelectedItem(result.getBidState());
@@ -426,7 +411,7 @@ public class DonationPanel extends EntityPanel
       this.commentTextArea.setText("");
       
       this.domainIdField.setText("");
-      this.donorField.setText("");
+      this.donorSelector.setEntity(null);
       this.bidStateComboBox.setEnabled(false);
       this.readStateComboBox.setEnabled(false);
       this.commentStateComboBox.setEnabled(false);
@@ -451,11 +436,5 @@ public class DonationPanel extends EntityPanel
     this.donationControl.updateData(d);
     
     this.redrawContent();
-  }
-
-  private void openDonor()
-  {
-    Donor donor = this.donationControl.getDonationDonor();
-    this.owner.openDonorTab(donor.getId());
   }
 }

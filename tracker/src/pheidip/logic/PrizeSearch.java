@@ -6,7 +6,7 @@ import pheidip.db.PrizeData;
 import pheidip.objects.Prize;
 import pheidip.objects.PrizeSearchParams;
 
-public class PrizeSearch extends AbstractSearcher<Prize, PrizeSearchParams>
+public class PrizeSearch extends EntitySearcher<Prize, PrizeSearchParams>
 {
   private DonationDatabaseManager manager;
   private PrizeData prizes;

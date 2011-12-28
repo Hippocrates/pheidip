@@ -1,4 +1,4 @@
-package pheidip.model;
+package pheidip.model; 
 
 public interface ConverterMethod
 {
