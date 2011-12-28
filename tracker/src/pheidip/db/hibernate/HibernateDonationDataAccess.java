@@ -60,7 +60,7 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	}
 
 	@Override
-	public BidData getBids() 
+	public BidData getBidData() 
 	{
 		if (this.bids == null)
 		{
@@ -71,7 +71,7 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	}
 
 	@Override
-	public SpeedRunData getSpeedRuns() 
+	public SpeedRunData getSpeedRunData() 
 	{
 		if (this.speedRuns == null)
 		{

@@ -13,6 +13,7 @@ public class AllDBTests
     suite.addTestSuite(TestSpeedRunData.class);
     suite.addTestSuite(TestBidData.class);
     suite.addTestSuite(TestJDBCManager.class);
+    suite.addTestSuite(TestPrizeData.class);
     suite.addTestSuite(TestDonationData.class);
     suite.addTestSuite(TestDonorData.class);
     suite.addTestSuite(TestDonationDataErrorParser.class);

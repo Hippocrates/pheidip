@@ -5,17 +5,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
-public class ChipinFileDocumentSource implements ChipinDocumentSource
+public class ChipinFileDonationSource implements ChipinDonationSource
 {
   
   private InputStream inputFile;
   private Runnable fileCloseDelegate;
 
-  public ChipinFileDocumentSource(File targetFile)
+  public ChipinFileDonationSource(File targetFile)
   {
     try
     {
@@ -32,7 +32,7 @@ public class ChipinFileDocumentSource implements ChipinDocumentSource
       {
         try
         {
-          ChipinFileDocumentSource.this.inputFile.close();
+          ChipinFileDonationSource.this.inputFile.close();
         } 
         catch (IOException e)
         {
@@ -42,17 +42,17 @@ public class ChipinFileDocumentSource implements ChipinDocumentSource
     };
   }
   
-  public ChipinFileDocumentSource(InputStream inputFile, Runnable fileCloseDelegate)
+  public ChipinFileDonationSource(InputStream inputFile, Runnable fileCloseDelegate)
   {
     this.inputFile = inputFile;
     this.fileCloseDelegate = fileCloseDelegate;
   }
   
-  public Document provideDocument()
+  public List<ChipinDonation> provideChipinDonations()
   {
     try
     {
-      return Jsoup.parse(this.inputFile, null, "www.chipin.com");
+      return ChipinDonations.extractDonations(Jsoup.parse(this.inputFile, null, "www.chipin.com"));
     } 
     catch (IOException e)
     {

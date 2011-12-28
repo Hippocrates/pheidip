@@ -6,14 +6,14 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 import pheidip.logic.DonationDatabaseManager;
+import pheidip.logic.chipin.ChipinDonation;
 import pheidip.logic.chipin.ChipinDonations;
-import pheidip.logic.chipin.ChipinFileDocumentSource;
+import pheidip.logic.chipin.ChipinFileDonationSource;
 import pheidip.logic.chipin.ChipinLoginManager;
 import pheidip.logic.chipin.ChipinMergeProcess;
 import pheidip.logic.chipin.ExternalProcessState;
-import pheidip.logic.chipin.ChipinTextDocumentSource;
-import pheidip.logic.chipin.ChipinWebsiteDocumentSource;
-import pheidip.objects.ChipinDonation;
+import pheidip.logic.chipin.ChipinTextDonationSource;
+import pheidip.logic.chipin.ChipinWebsiteDonationSource;
 import test.db.DBTestConfiguration;
 
 public class TestChipinMergeProcess extends TestCase
@@ -41,9 +41,11 @@ public class TestChipinMergeProcess extends TestCase
     List<ChipinDonation> sourceDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
     String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations);
 
-    testRunMergeOn(new ChipinMergeProcess(this.manager, new ChipinTextDocumentSource(randomDonations)));
-  
-    assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonations, manager));
+    testRunMergeOn(new ChipinMergeProcess(this.manager, new ChipinTextDonationSource(randomDonations)));
+
+    ChipinTestHelper helper = new ChipinTestHelper();
+    
+    helper.checkAllDonationsAreInDatabase(sourceDonations, manager);
   }
   
   public void testRunFileMerge()
@@ -57,13 +59,15 @@ public class TestChipinMergeProcess extends TestCase
 
     ByteArrayInputStream stream = new ByteArrayInputStream(randomDonations.getBytes());
     
-    testRunMergeOn(new ChipinMergeProcess(this.manager, new ChipinFileDocumentSource(stream, new Runnable()
+    testRunMergeOn(new ChipinMergeProcess(this.manager, new ChipinFileDonationSource(stream, new Runnable()
     {
       public void run()
       {
       }})));
     
-    assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonations, manager));
+ChipinTestHelper helper = new ChipinTestHelper();
+    
+    helper.checkAllDonationsAreInDatabase(sourceDonations, manager);
   }
   
   public void testRunWebsiteMerge()
@@ -79,10 +83,11 @@ public class TestChipinMergeProcess extends TestCase
       
       List<ChipinDonation> sourceDonations = ChipinDonations.extractDonations(chipinLogin.getChipinPage());
       
-      testRunMergeOn(new ChipinMergeProcess(this.manager, new ChipinWebsiteDocumentSource(chipinLogin)));
+      testRunMergeOn(new ChipinMergeProcess(this.manager, new ChipinWebsiteDonationSource(chipinLogin)));
       
-      assertTrue(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonations, manager));
-    
+      ChipinTestHelper helper = new ChipinTestHelper();
+      
+      helper.checkAllDonationsAreInDatabase(sourceDonations, manager);
     }
     else
     {
@@ -99,7 +104,7 @@ public class TestChipinMergeProcess extends TestCase
     List<ChipinDonation> sourceDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
     String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations);
 
-    ChipinMergeProcess process = new ChipinMergeProcess(this.manager, new ChipinTextDocumentSource(randomDonations));
+    ChipinMergeProcess process = new ChipinMergeProcess(this.manager, new ChipinTextDonationSource(randomDonations));
       
     Thread thread = new Thread(process);
       
@@ -111,7 +116,6 @@ public class TestChipinMergeProcess extends TestCase
     } 
     catch (InterruptedException e)
     {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
       
@@ -123,13 +127,12 @@ public class TestChipinMergeProcess extends TestCase
     } 
     catch (InterruptedException e)
     {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     
     assertEquals(ExternalProcessState.CANCELLED, process.getState());
-      
-    assertFalse(ChipinTestUtils.checkAllDonationsAreInDatabase(sourceDonations, manager));
+
+    assertEquals(0, this.manager.getDataAccess().getDonationData().getAllDonations().size());
   }
   
   private void testRunMergeOn(ChipinMergeProcess process)

@@ -60,7 +60,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   {
     Session session = this.beginTransaction();
 
-    session.update(choice);
+    session.merge(choice);
     
     this.endTransaction();
   }

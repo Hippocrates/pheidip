@@ -9,7 +9,6 @@ import java.util.Map;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import pheidip.objects.ChipinDonation;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationCommentState;
@@ -141,7 +140,7 @@ public final class ChipinDonations
     }
   }
 
-  private static Map<String, Donor> generateDonorSet(List<Donor> all)
+  public static Map<String, Donor> generateDonorSet(List<Donor> all)
   {
     Map<String, Donor> table = new HashMap<String, Donor>();
 

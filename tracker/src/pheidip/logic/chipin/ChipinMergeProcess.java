@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.jsoup.nodes.Document;
-
 import pheidip.db.DonationData;
 import pheidip.db.DonorData;
 import pheidip.logic.AbstractExternalProcess;
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.logic.DonationSearch;
-import pheidip.objects.ChipinDonation;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationSearchParams;
@@ -20,19 +17,19 @@ import pheidip.objects.Donor;
 public class ChipinMergeProcess extends AbstractExternalProcess
 {
   private DonationDatabaseManager donationDatabase;
-  private ChipinDocumentSource documentSource;
+  private ChipinDonationSource donationSource;
 
-  public ChipinMergeProcess(DonationDatabaseManager donationDatabase, ChipinDocumentSource documentSource)
+  public ChipinMergeProcess(DonationDatabaseManager donationDatabase, ChipinDonationSource documentSource)
   {
     this(donationDatabase, documentSource, null);
   }
   
-  public ChipinMergeProcess(DonationDatabaseManager donationDatabase, ChipinDocumentSource documentSource, ProcessStateCallback listener)
+  public ChipinMergeProcess(DonationDatabaseManager donationDatabase, ChipinDonationSource documentSource, ProcessStateCallback listener)
   {
     super(listener);
     
     this.donationDatabase = donationDatabase;
-    this.documentSource = documentSource;
+    this.donationSource = documentSource;
   }
 
   @Override
@@ -43,12 +40,7 @@ public class ChipinMergeProcess extends AbstractExternalProcess
       this.resetState(ExternalProcessState.RUNNING, 0.1, "Retreiving donations from chipin...");
       Thread.sleep(0);
       
-      Document html = this.documentSource.provideDocument();
-      
-      this.resetState(ExternalProcessState.RUNNING, 0.2, "Reading donations...");
-      Thread.sleep(0);
-      
-      List<ChipinDonation> chipinDonations = ChipinDonations.extractDonations(html);
+      List<ChipinDonation> chipinDonations = this.donationSource.provideChipinDonations();
       
       this.resetState(ExternalProcessState.RUNNING, 0.3, "Reading current donation set...");
       Thread.sleep(0);
@@ -85,6 +77,7 @@ public class ChipinMergeProcess extends AbstractExternalProcess
 
       ChipinDonations.buildInsertTables(chipinDonationMap, allDonors, donorsToInsert, donationsToInsert);
 
+      donations.updateMultipleDonations(donationsToUpdate);
 
       donors.insertMultipleDonors(donorsToInsert);
       donations.insertMultipleDonations(donationsToInsert);

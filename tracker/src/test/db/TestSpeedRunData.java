@@ -1,5 +1,6 @@
 package test.db;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -14,17 +15,23 @@ public class TestSpeedRunData extends DonationDatabaseTest
   public void setUp()
   {
     super.setUp();
-    this.speedRuns = this.getDataAccess().getSpeedRuns();
+    this.speedRuns = this.getDataAccess().getSpeedRunData();
   }
   
   public void testGetSpeedRunById()
   {
-    final int runId = 1;
+    final int runId = 3;
     SpeedRun s = this.speedRuns.getSpeedRunById(runId);
     
     assertNotNull(s);
     assertEquals(runId, s.getId());
-    assertEquals("run 1", s.getName());
+    assertEquals("yet another run", s.getName());
+    assertEquals(runId, s.getSortKey());
+    
+    assertEquals(2, s.getBids().size());
+    
+    assertEquals(0, s.getPrizeStartGame().size());
+    assertEquals(1, s.getPrizeEndGame().size());
   }
   
   public void testInsertSpeedRun()
@@ -32,14 +39,22 @@ public class TestSpeedRunData extends DonationDatabaseTest
     final int runId = 5;
     final String runName = "another run";
     
-    this.speedRuns.insertSpeedRun(new SpeedRun(runId, runName, "", runId, new Date(), new Date(), null));
+    Calendar c = Calendar.getInstance();
+    
+    c.set(2007,11,15,03,11,00);
+    Date startTime = c.getTime();
+    c.set(2007,11,15,05,19,24);
+    Date endTime = c.getTime();
+    this.speedRuns.insertSpeedRun(new SpeedRun(runId, runName, "", runId, startTime, endTime, ""));
     
     SpeedRun s = this.speedRuns.getSpeedRunById(runId);
     
     assertNotNull(s);
     assertEquals(runId, s.getId());
     assertEquals(runName, s.getName());
-    assertEquals(null, s.getDescription());
+    assertEquals("", s.getDescription());
+    assertEquals(startTime, s.getStartTime());
+    assertEquals(endTime, s.getEndTime());
   }
   
   public void testDeleteSpeedRun()

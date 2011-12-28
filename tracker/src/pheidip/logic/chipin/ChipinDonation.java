@@ -1,4 +1,4 @@
-package pheidip.objects;
+package pheidip.logic.chipin;
 
 import java.math.BigDecimal;
 import java.util.Date;

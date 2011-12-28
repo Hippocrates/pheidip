@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.List;
 
 import pheidip.db.DonorData;
+import pheidip.db.PrizeData;
 import pheidip.objects.Donor;
+import pheidip.objects.Prize;
 
 public class TestDonorData extends DonationDatabaseTest
 {
@@ -24,6 +26,11 @@ public class TestDonorData extends DonationDatabaseTest
     assertEquals(1, result.getId());
     assertEquals("test1@test.com", result.getEmail());
     assertEquals("smk", result.getAlias());
+    
+    assertEquals(2, result.getDonations().size());
+    
+    assertEquals(1, result.getPrizes().size());
+    
     assertNull(donors.getDonorById(0));
   }
   
@@ -37,18 +44,43 @@ public class TestDonorData extends DonationDatabaseTest
   
   public void testCreateDonor()
   {
-    Donor template = new Donor((int) new Date().getTime(), "some.email@test.com", null, "first", "last");
+    Donor template = new Donor((int) new Date().getTime(), "some.email@test.com", "analiasthathasntbeenusedyet", "first", "last");
     
     this.donors.createDonor(template);
     
-    Donor result = this.donors.getDonorById(template.getId());
-    
-    this.compareDonors(template, result);
+    Donor copycat1 = new Donor(template.getId(), "another-email@test.com", null, "first", "last");
     
     try
     {
-      this.donors.createDonor(template);
+      this.donors.createDonor(copycat1);
+
       fail("Did not refuse creation of duplicate donor.");
+    }
+    catch (Exception e)
+    {
+      // pass
+    }
+    
+    Donor copycat2 = new Donor(template.getId() + 1, template.getEmail(), null, "first", "last");
+    
+    try
+    {
+      this.donors.createDonor(copycat2);
+
+      fail("Did not refuse creation of duplicate email donor.");
+    }
+    catch (Exception e)
+    {
+      // pass
+    }
+    
+    Donor copycat3 = new Donor(template.getId() + 1, null, template.getAlias(), "first", "last");
+    
+    try
+    {
+      this.donors.createDonor(copycat3);
+
+      fail("Did not refuse creation of duplicate alias donor.");
     }
     catch (Exception e)
     {
@@ -87,16 +119,23 @@ public class TestDonorData extends DonationDatabaseTest
   
   public void testDeleteDonor()
   {
-    // can't delete one of them due to fk constraint, try again
     Donor d = donors.getDonorById(5);
     this.donors.deleteDonor(d);
       
     assertNull(donors.getDonorById(5));
-      
+ 
     try
     {
-      this.donors.deleteDonor(d);
-      fail("Did not throw on non-present donor.");
+      Donor d2 = donors.getDonorById(2);
+      this.donors.deleteDonor(d2);
+      
+      // check the the association nulls, and is not obliterated completely on delete,
+      // since prizes exist as stand-alone entities
+      PrizeData prizes = this.getDataAccess().getPrizeData();
+      
+      Prize p = prizes.getPrizeById(1);
+      
+      assertNotNull(p);
     }
     catch(Exception e)
     {

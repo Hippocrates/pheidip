@@ -23,7 +23,7 @@ public class ChallengeControl
     this.donationDatabase = donationDatabase;
     this.challengeId = challengeId;
     this.donations = this.donationDatabase.getDataAccess().getDonationData();
-    this.bids = this.donationDatabase.getDataAccess().getBids();
+    this.bids = this.donationDatabase.getDataAccess().getBidData();
     this.cachedData = null;
   }
 

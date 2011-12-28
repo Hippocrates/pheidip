@@ -8,9 +8,9 @@ public interface DonationDataAccess
 
 	public DonationData getDonationData();
 
-	public BidData getBids();
+	public BidData getBidData();
 
-	public SpeedRunData getSpeedRuns();
+	public SpeedRunData getSpeedRunData();
 
 	public PrizeData getPrizeData();
 

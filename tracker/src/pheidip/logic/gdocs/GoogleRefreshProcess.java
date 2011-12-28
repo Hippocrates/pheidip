@@ -46,7 +46,7 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
         this.resetState(ExternalProcessState.RUNNING, 0.3, "Reading current database state");
         Thread.sleep(0);
         
-        SpeedRunData speedRuns = database.getDataAccess().getSpeedRuns();
+        SpeedRunData speedRuns = database.getDataAccess().getSpeedRunData();
         
         List<SpeedRun> allRuns = speedRuns.getAllSpeedRuns();
         Map<String, SpeedRun> mappedRuns = GoogleSpreadSheetReader.nameMapRuns(allRuns);
