@@ -70,7 +70,10 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   {
     Session session = this.beginTransaction();
     
-    choice.getSpeedRun().getBids().remove(choice);
+    if (choice.getSpeedRun() != null)
+    {
+      choice.getSpeedRun().getBids().remove(choice);
+    }
     
     session.delete(choice);
     
@@ -110,7 +113,11 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   public void deleteChoiceOption(ChoiceOption option)
   {
     Session session = this.beginTransaction();
-    option.getChoice().getOptions().remove(option);
+    
+    if (option.getChoice() != null)
+    {
+      option.getChoice().getOptions().remove(option);
+    }
 
     session.delete(option);
     
@@ -175,7 +182,6 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     
     q.setInteger("id", challengeId);
     
-    //@SuppressWarnings("unchecked")
     @SuppressWarnings("rawtypes")
     List listing = q.list();
     
@@ -189,7 +195,10 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   {
     Session session = this.beginTransaction();
 
-    challenge.getSpeedRun().getBids().remove(challenge);
+    if (challenge.getSpeedRun() != null)
+    {
+      challenge.getSpeedRun().getBids().remove(challenge);
+    }
   
     session.delete(challenge);
       

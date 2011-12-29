@@ -76,7 +76,7 @@ public class Donation extends Entity
   public void setComment(String comment)
   {
     String oldComment = this.comment;
-    this.comment = StringUtils.emptyIfNull(comment);
+    this.comment = StringUtils.nullIfEmpty(comment);
     this.firePropertyChange("comment", oldComment, this.comment);
   }
 

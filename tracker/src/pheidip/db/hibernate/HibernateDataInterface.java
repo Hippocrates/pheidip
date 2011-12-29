@@ -57,14 +57,21 @@ abstract public class HibernateDataInterface
 
 	public Session beginTransaction()
 	{
-	  if (this.manager.getSession().getTransaction().isActive())
+	  try
 	  {
-	    this.manager.getSession().getTransaction().rollback();
+  	  if (this.manager.getSession().getTransaction().isActive())
+  	  {
+  	    this.manager.getSession().getTransaction().rollback();
+  	  }
+  	  
+  	  this.manager.getSession().beginTransaction();
+  	  
+  	  return this.manager.getSession();
 	  }
-	  
-	  this.manager.getSession().beginTransaction();
-	  
-	  return this.manager.getSession();
+	  catch(Exception e)
+	  {
+	    throw new RuntimeException(e);
+	  }
 	}
 	
 	public void endTransaction()
