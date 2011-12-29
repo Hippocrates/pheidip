@@ -520,7 +520,7 @@ public class PrizePanel extends EntityPanel
     if (searcher.getResult() != null)
     {
       this.control.setStartGame(searcher.getResult());
-      this.redrawContent();
+      this.startGameField.setText(searcher.getResult().getName());
     }
   }
   
@@ -533,7 +533,7 @@ public class PrizePanel extends EntityPanel
     if (searcher.getResult() != null)
     {
       this.control.setEndGame(searcher.getResult());
-      this.redrawContent();
+      this.endGameField.setText(searcher.getResult().getName());
     }
   }
   
@@ -541,13 +541,13 @@ public class PrizePanel extends EntityPanel
   private void clearStartGame()
   {
     this.control.setStartGame(null);
-    this.redrawContent();
+    this.startGameField.setText("");
   }
   
   private void clearEndGame()
   {
     this.control.setEndGame(null);
-    this.redrawContent();
+    this.endGameField.setText("");
   }
   
   private void manuallyAssignWinner()
@@ -564,7 +564,7 @@ public class PrizePanel extends EntityPanel
   private void assignPrizeToDonor(Donor d)
   {
     this.control.assignPrize(d);
-    this.redrawContent();
+    this.yesWinner();
   }
   
   private void assignWinner()
@@ -602,7 +602,7 @@ public class PrizePanel extends EntityPanel
     if (response == JOptionPane.YES_OPTION)
     {
       this.control.removePrizeWinner();
-      this.refreshContent();
+      this.noWinner();
     }
   }
   
@@ -610,7 +610,25 @@ public class PrizePanel extends EntityPanel
   {
     return this.control.getPrizeId();
   }
-
+  
+  private void yesWinner()
+  {
+    Donor winner = this.control.getData().getWinner();
+    this.winnerField.setText(winner.toString());
+    this.assignWinnerButton.setEnabled(false);
+    this.removeWinnerButton.setEnabled(true);
+    this.openDonorButton.setEnabled(true);
+    this.manualAssignButton.setEnabled(false);
+  }
+  
+  private void noWinner()
+  {
+    this.winnerField.setText("");
+    this.assignWinnerButton.setEnabled(true);
+    this.removeWinnerButton.setEnabled(false);
+    this.openDonorButton.setEnabled(false);
+    this.manualAssignButton.setEnabled(true);
+  }
 
   @Override
   public void refreshContent()
@@ -624,10 +642,14 @@ public class PrizePanel extends EntityPanel
   {
     Prize data = this.control.getData();
     
+    if (data == null)
+    {
+      this.owner.removeTab(this);
+      throw new RuntimeException("Error, this prize no longer exists.");
+    }
+    
     this.setHeaderText("Prize: " + data.toString());
-    
-    Donor winner = data.getWinner();
-    
+
     this.nameField.setText(data.getName());
     this.imageURLField.setText(data.getImageURL());
     this.descriptionTextArea.setText(data.getDescription());
@@ -637,21 +659,13 @@ public class PrizePanel extends EntityPanel
     this.endGameField.setText(data.getEndGame() != null ? data.getEndGame().toString() : "");
     this.drawMethodComboBox.setSelectedItem(data.getDrawMethod());
     
-    if (winner != null)
+    if (data.getWinner() != null)
     {
-      this.winnerField.setText(winner.toString());
-      this.assignWinnerButton.setEnabled(false);
-      this.removeWinnerButton.setEnabled(true);
-      this.openDonorButton.setEnabled(true);
-      this.manualAssignButton.setEnabled(false);
+      this.yesWinner();
     }
     else
     {
-      this.winnerField.setText("");
-      this.assignWinnerButton.setEnabled(true);
-      this.removeWinnerButton.setEnabled(false);
-      this.openDonorButton.setEnabled(false);
-      this.manualAssignButton.setEnabled(true);
+      this.noWinner();
     }
   }
 

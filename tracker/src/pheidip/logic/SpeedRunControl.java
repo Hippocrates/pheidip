@@ -4,11 +4,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import pheidip.db.BidData;
 import pheidip.db.SpeedRunData;
 import pheidip.objects.Bid;
 import pheidip.objects.BidState;
-import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.SpeedRun;
@@ -18,7 +16,6 @@ public class SpeedRunControl
 {
   private DonationDatabaseManager donationDatabase;
   private SpeedRunData speedRuns;
-  private BidData bids;
   private int speedRunId;
   private SpeedRun cachedData;
   
@@ -26,7 +23,6 @@ public class SpeedRunControl
   {
     this.donationDatabase = manager;
     this.speedRuns = this.donationDatabase.getDataAccess().getSpeedRunData();
-    this.bids = this.donationDatabase.getDataAccess().getBidData();
     this.speedRunId = speedRunId;
     this.cachedData = null;
   }
@@ -76,7 +72,7 @@ public class SpeedRunControl
     Challenge inserted = new Challenge(id, result, BigDecimal.ZERO.setScale(2), null, BidState.HIDDEN, this.getData());
     this.getData().getBids().add(inserted);
     
-    this.bids.insertChallenge(inserted);
+    this.updateData(this.getData());
     
     return id;
   }
@@ -86,30 +82,18 @@ public class SpeedRunControl
     int id = IdUtils.generateId();
     
     Choice inserted = new Choice(id, defaultName, null, BidState.OPENED, this.getData());
-    
-    this.bids.insertChoice(inserted);
     this.getData().getBids().add(inserted);
     
+    this.updateData(this.getData());
+
     return id;
   }
 
   public void deleteSpeedRun()
   {
-    for (Bid b : this.getAllBids())
-    {
-      if (b.getType() == BidType.CHALLENGE)
-      {
-        ChallengeControl c = new ChallengeControl(this.donationDatabase, b.getId());
-        c.deleteChallenge();
-      }
-      else
-      {
-        ChoiceControl c = new ChoiceControl(this.donationDatabase, b.getId());
-        c.deleteChoice();
-      }
-    }
-    
-    this.speedRuns.deleteSpeedRun(this.speedRunId);
+    this.refreshData();
+
+    this.speedRuns.deleteSpeedRun(this.cachedData);
     this.cachedData = null;
   }
   

@@ -431,9 +431,8 @@ public class SpeedRunPanel extends EntityPanel
     
     if (data == null)
     {
-      JOptionPane.showMessageDialog(this, "Error, this run no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
       this.owner.removeTab(this);
-      return;
+      throw new RuntimeException("Error, this run no longer exists");
     }
     
     this.nameField.setText(data.getName());

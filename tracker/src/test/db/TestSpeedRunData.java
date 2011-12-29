@@ -63,7 +63,7 @@ public class TestSpeedRunData extends DonationDatabaseTest
     
     assertNotNull(this.speedRuns.getSpeedRunById(runId));
 
-    this.speedRuns.deleteSpeedRun(runId);
+    this.speedRuns.deleteSpeedRun(this.speedRuns.getSpeedRunById(runId));
     
     assertNull(this.speedRuns.getSpeedRunById(runId));
   }
