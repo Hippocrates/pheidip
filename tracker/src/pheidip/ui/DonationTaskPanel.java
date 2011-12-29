@@ -8,6 +8,8 @@ import javax.swing.JScrollPane;
 import java.awt.GridBagConstraints;
 import javax.swing.JList;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -242,8 +244,16 @@ public class DonationTaskPanel extends EntityPanel
   {
     if (this.control != null)
     {
-      Donation data = this.control.refreshData();
-      this.nextButton.setEnabled(!this.task.isTaskCleared(data));
+      Donation data = this.control.getData();
+      if (data == null)
+      {
+        JOptionPane.showMessageDialog(this, "This donation no longer exists", "Error", JOptionPane.OK_OPTION);
+        this.control = null;
+      }
+      else
+      {
+        this.nextButton.setEnabled(!this.task.isTaskCleared(data));
+      }
     }
     else
     {      
@@ -251,6 +261,7 @@ public class DonationTaskPanel extends EntityPanel
     }
     
     this.donationPanel.setDonationControl(this.control);
+    this.donationPanel.disableDeletion();
     this.donationPanel.redrawContent();
   }
 
