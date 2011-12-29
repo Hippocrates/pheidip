@@ -112,7 +112,7 @@ ChipinTestHelper helper = new ChipinTestHelper();
       
     try
     {
-      Thread.sleep(20);
+      Thread.sleep(10);
     } 
     catch (InterruptedException e)
     {
@@ -145,7 +145,7 @@ ChipinTestHelper helper = new ChipinTestHelper();
       
       thread.start();
       
-      Thread.sleep(100);
+      Thread.sleep(200);
       
       assertTrue(ExternalProcessState.IDLE != process.getState());
       assertTrue(ExternalProcessState.CANCELLED != process.getState());

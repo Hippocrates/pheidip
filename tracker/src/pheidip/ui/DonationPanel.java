@@ -324,6 +324,11 @@ public class DonationPanel extends EntityPanel
     this.setFocusTraversalPolicyProvider(true);
     this.setFocusCycleRoot(true);
   }
+  
+  protected void disableDeletion()
+  {
+    this.deleteButton.setEnabled(false);
+  }
 
   @Override
   public void deleteContent()
@@ -349,6 +354,7 @@ public class DonationPanel extends EntityPanel
   public void setDonationControl(DonationControl control)
   {
     this.donationControl = control;
+    this.donationBidsPanel.setControl(control);
     this.redrawContent();
   }
   
@@ -366,7 +372,10 @@ public class DonationPanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    this.donationControl.refreshData();
+    if (this.donationControl != null)
+    {
+      this.donationControl.refreshData();
+    }
     this.redrawContent();
   }
   
@@ -413,7 +422,11 @@ public class DonationPanel extends EntityPanel
       this.readStateComboBox.setSelectedItem(result.getReadState());
       this.commentStateComboBox.setEnabled(true);
       this.commentStateComboBox.setSelectedItem(result.getCommentState());
-
+      
+      this.openDonorButton.setEnabled(true);
+      this.refreshButton.setEnabled(true);
+      this.saveButton.setEnabled(true);
+      
       this.donationBidsPanel.refreshContent();
 
       this.setHeaderText(result.getDomainString());
@@ -424,6 +437,9 @@ public class DonationPanel extends EntityPanel
       this.amountField.setText("");
       this.commentTextArea.setEnabled(false);
       this.commentTextArea.setText("");
+      this.openDonorButton.setEnabled(false);
+      this.refreshButton.setEnabled(false);
+      this.saveButton.setEnabled(false);
       
       this.domainIdField.setText("");
       this.donorField.setText("");
@@ -431,6 +447,7 @@ public class DonationPanel extends EntityPanel
       this.readStateComboBox.setEnabled(false);
       this.commentStateComboBox.setEnabled(false);
       this.donationBidsPanel.refreshContent();
+      this.deleteButton.setEnabled(false);
     }
   }
   

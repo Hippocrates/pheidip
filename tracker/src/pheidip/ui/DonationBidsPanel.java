@@ -243,6 +243,7 @@ public class DonationBidsPanel extends JPanel
       this.attachBidButton.setEnabled(true);
       this.changeAmountButton.setEnabled(true);
       this.deleteBidButton.setEnabled(true);
+      this.openBidButton.setEnabled(true);
       CustomTableModel tableData = new CustomTableModel(
           new String[]{"Bid", "Amount"}, 0);
       
@@ -263,6 +264,7 @@ public class DonationBidsPanel extends JPanel
     else
     {
       this.attachBidButton.setEnabled(false);
+      this.openBidButton.setEnabled(false);
       this.changeAmountButton.setEnabled(false);
       this.deleteBidButton.setEnabled(false);
       this.bidTable.setModel(new CustomTableModel(
