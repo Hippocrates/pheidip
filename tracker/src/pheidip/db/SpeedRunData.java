@@ -11,7 +11,7 @@ public interface SpeedRunData {
 
 	public void insertSpeedRun(SpeedRun speedRun);
 
-	public void deleteSpeedRun(int runId);
+	public void deleteSpeedRun(SpeedRun speedRun);
 
 	public void updateSpeedRun(SpeedRun run);
 

@@ -14,6 +14,7 @@ import pheidip.logic.chipin.ChipinMergeProcess;
 import pheidip.logic.chipin.ExternalProcessState;
 import pheidip.logic.chipin.ChipinTextDonationSource;
 import pheidip.logic.chipin.ChipinWebsiteDonationSource;
+import pheidip.logic.chipin.RawChipinDonationSource;
 import test.db.DBTestConfiguration;
 
 public class TestChipinMergeProcess extends TestCase
@@ -102,9 +103,8 @@ ChipinTestHelper helper = new ChipinTestHelper();
     Random rand = new Random();
 
     List<ChipinDonation> sourceDonations = ChipinTestUtils.generateRandomDonations(numDonors, numDonations, rand);
-    String randomDonations = ChipinTestUtils.generateChipinHTMLTable(sourceDonations);
 
-    ChipinMergeProcess process = new ChipinMergeProcess(this.manager, new ChipinTextDonationSource(randomDonations));
+    ChipinMergeProcess process = new ChipinMergeProcess(this.manager, new RawChipinDonationSource(sourceDonations));
       
     Thread thread = new Thread(process);
       
@@ -112,7 +112,7 @@ ChipinTestHelper helper = new ChipinTestHelper();
       
     try
     {
-      Thread.sleep(10);
+      Thread.sleep(20);
     } 
     catch (InterruptedException e)
     {
@@ -132,7 +132,7 @@ ChipinTestHelper helper = new ChipinTestHelper();
     
     assertEquals(ExternalProcessState.CANCELLED, process.getState());
 
-    assertEquals(0, this.manager.getDataAccess().getDonationData().getAllDonations().size());
+    assertTrue(this.manager.getDataAccess().getDonationData().getAllDonations().size() < sourceDonations.size());
   }
   
   private void testRunMergeOn(ChipinMergeProcess process)

@@ -79,6 +79,6 @@ public class TestDonationControl extends TestCase
     
     control.deleteDonation();
     
-    assertNull(control.getData());
+    assertNull(control.refreshData());
   }
 }

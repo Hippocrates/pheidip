@@ -77,6 +77,14 @@ public class HibernateManager
     cfg.setProperty("hibernate.connection.password", password);
     cfg.setProperty("hibernate.dialect", getDialect(type));
 
+    cfg.setProperty("hibernate.connection.provider_class", "org.hibernate.connection.C3P0ConnectionProvider");
+    cfg.setProperty("c3p0.acquire_increment", "1");
+    cfg.setProperty("c3p0.idle_test_period", "50");
+    cfg.setProperty("c3p0.max_size", "200");
+    cfg.setProperty("c3p0.max_statements", "10");
+    cfg.setProperty("c3p0.min_size", "10");
+    cfg.setProperty("c3p0.timeout", "100");
+
     SessionFactory result = cfg.buildSessionFactory();
     Session session = null;
     

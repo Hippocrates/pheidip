@@ -42,27 +42,25 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
   }
 
   @Override
-  public void deleteSpeedRun(int runId)
+  public void deleteSpeedRun(SpeedRun speedRun)
   {
-    SpeedRun s = this.getSpeedRunById(runId);
-    
     Session session = this.beginTransaction();
     
-    for (Prize p : s.getPrizeStartGame())
+    for (Prize p : speedRun.getPrizeStartGame())
     {
       p.setStartGame(null);
     }
     
-    s.getPrizeStartGame().clear();
+    speedRun.getPrizeStartGame().clear();
     
-    for (Prize p : s.getPrizeEndGame())
+    for (Prize p : speedRun.getPrizeEndGame())
     {
       p.setEndGame(null);
     }
     
-    s.getPrizeEndGame().clear();
+    speedRun.getPrizeEndGame().clear();
     
-    session.delete(s);
+    session.delete(speedRun);
     
     this.endTransaction();
   }

@@ -37,9 +37,8 @@ public class TestDonorControl extends TestCase
     
     assertNotNull(result);
     assertNull(result.getAlias());
-    assertNull(result.getEmail());
-    assertNull(result.getFirstName());
-    assertNull(result.getLastName());
+    assertEquals("", result.getFirstName());
+    assertEquals("", result.getLastName());
     
     List<Donation> donations = control.getDonorDonations();
     
@@ -103,7 +102,7 @@ public class TestDonorControl extends TestCase
     
     control.deleteDonor();
     
-    assertNull(control.getData());
+    assertNull(control.refreshData());
   }
   
   public void testCreateNewDonation()
