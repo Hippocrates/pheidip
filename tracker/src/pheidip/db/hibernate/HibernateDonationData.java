@@ -42,7 +42,11 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   {
     Session session = this.beginTransaction();
     
-    d.getDonor().getDonations().remove(d);
+    if (d.getDonor() != null)
+    {
+      d.getDonor().getDonations().remove(d);
+    }
+    
     session.delete(d);
 
     this.endTransaction();

@@ -95,6 +95,16 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   {
     Session session = this.beginTransaction();
     
+    if (prize.getStartGame() != null)
+    {
+      prize.getStartGame().getPrizeStartGame().remove(prize);
+    }
+    
+    if (prize.getEndGame() != null)
+    {
+      prize.getEndGame().getPrizeEndGame().remove(prize);
+    }
+    
     session.delete(prize);
     
     this.endTransaction();
