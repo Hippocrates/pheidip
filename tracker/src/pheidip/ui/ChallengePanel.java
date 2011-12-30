@@ -306,6 +306,7 @@ public class ChallengePanel extends EntityPanel
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.nameField,
+      this.openRunButton,
       this.amountField,
       this.bidStateComboBox,
       this.descriptionTextArea,

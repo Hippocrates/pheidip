@@ -268,6 +268,10 @@ public class ChoicePanel extends EntityPanel
         {
           openAssociatedRun();
         }
+        else if (ev.getSource() == openDonationButton)
+        {
+          openSelectedBid();
+        }
       }
       catch(Exception e)
       {
@@ -322,6 +326,7 @@ public class ChoicePanel extends EntityPanel
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
         this.nameField,
+        this.openRunButton,
         this.stateComboBox,
         this.descriptionTextArea,
         this.saveButton,

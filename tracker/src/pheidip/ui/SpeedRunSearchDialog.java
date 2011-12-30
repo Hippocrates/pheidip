@@ -244,6 +244,7 @@ public class SpeedRunSearchDialog extends JDialog
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
+      this.nameFieldCheckBox,
       this.nameField,
       this.searchButton,
       this.speedRunList,

@@ -162,6 +162,7 @@ public class DonationBidsPanel extends JPanel
     {
       this.attachBidButton,
       this.changeAmountButton,
+      this.openBidButton,
       this.deleteBidButton,
       this.bidTable,
     };
