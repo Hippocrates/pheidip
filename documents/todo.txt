@@ -7,9 +7,6 @@ Tracker App TODO:
 - UPGRADE: Better Searching
   - Possily allow searches to be performed on a tab, such that you can run a search multiple times without having to re-type it
   - Allow multi-select in the list boxes to open multiple tabs: should be easy to do
-  
-- UPGRADE: Store prize drawing method as a field in the prize itself
-  - allow the entire drawing process to be completely automated
 
 - UPGRADE: Better donation task view
   - Right now, its fairly inflexible.
@@ -22,15 +19,13 @@ Tracker App TODO:
     - In the other direction, we could make searching queries persistent tabs instead, and then just open the tabs independently
       -> it should still be possible to search via dialog too...
 
-- UPGRADE: Make the bid searching dialog better
-  - It's pretty bad as it is now
-  - Priority: High
-  - Difficulty: Medium-High
-
 - Upgrade/Bug: string lowercasing avoiding
   - Either figure out how to set up Mysql case-insensitive collating, or do the double string set-up
   - Priority: Low
   - Difficulty: Medium-High
-
-/ Bug: creating a new prize displays an 'invalid bid amount error'
-  - The prize minimum bid was being set to null, which was throwing the error, simple fix
+  
+~ UPGRADE: Make the bid searching dialog better
+  - It's a little better, but it could still probably be better.
+  - The forthcomming upgrades might make this a little easier to make better
+  - Priority: High
+  - Difficulty: Medium-High
