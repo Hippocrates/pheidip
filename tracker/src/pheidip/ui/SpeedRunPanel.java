@@ -365,6 +365,8 @@ public class SpeedRunPanel extends EntityPanel
       this.runnersTextField,
       this.descriptionTextArea,
       this.sortKeyField,
+      this.startTimeField,
+      this.endTimeField,
       this.saveButton,
       this.refreshButton,
       this.openBidButton,

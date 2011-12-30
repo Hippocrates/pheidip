@@ -285,8 +285,10 @@ public class PrizeSearchDialog extends JDialog
     
     this.traversalManager = new FocusTraversalManager(new Component[]
     {
+      this.prizeNameCheckBox,
       this.nameField,
-      this.prizeList,
+      this.excludeIfWonCheckBox,
+      this.searchButton,
       this.createNewButton,
       this.prizeList,
       this.prevButton,
@@ -303,7 +305,7 @@ public class PrizeSearchDialog extends JDialog
     super(parent, true);
     
     this.searcher = searcher;
-    this.results = null;
+    this.results = new ArrayList<Prize>();
     
     this.initializeGUI();
     this.initializeGUIEvents();
@@ -359,7 +361,7 @@ public class PrizeSearchDialog extends JDialog
   private void runSearch()
   {
     PrizeSearchParams params = new PrizeSearchParams(this.prizeNameCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.nameField.getText()) : null, this.excludeIfWonCheckBox.isSelected());
-    
+    this.results = new ArrayList<Prize>();
     this.fillList(this.searcher.runSearch(params));
   }
   

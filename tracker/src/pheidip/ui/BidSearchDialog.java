@@ -341,6 +341,8 @@ public class BidSearchDialog extends JDialog
       this.browseSpeedRunButton,
       this.bidCheckBox,
       this.bidField,
+      this.bidStateCheckBox,
+      this.bidStateComboBox,
       this.newChoiceButton,
       this.newChallengeButton,
       this.bidList,

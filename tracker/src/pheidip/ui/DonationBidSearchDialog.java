@@ -411,6 +411,8 @@ public class DonationBidSearchDialog extends JDialog
       this.browseSpeedRunButton,
       this.bidCheckBox,
       this.bidField,
+      this.bidStateCheckBox,
+      this.bidStateComboBox,
       this.optionField,
       this.optionList,
       this.newOptionButton,
