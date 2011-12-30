@@ -325,9 +325,13 @@ public class DonorSearchDialog extends JDialog
     
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
+      this.firstNameCheckBox,
       this.firstNameField,
+      this.lastNameCheckBox,
       this.lastNameField,
+      this.aliasCheckBox,
       this.aliasField,
+      this.emailCheckBox,
       this.emailField,
       this.searchButton,
       this.createNewButton,
