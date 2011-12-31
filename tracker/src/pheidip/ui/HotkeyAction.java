@@ -11,7 +11,8 @@ public enum HotkeyAction
   CLOSE(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
   SAVE(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())),
   REFRESH(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())),
-  CHIPIN_MERGE(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+  CHIPIN_MERGE(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())),
+  GOOGLE_REFRESH(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
   
   HotkeyAction(KeyStroke key)
   {
