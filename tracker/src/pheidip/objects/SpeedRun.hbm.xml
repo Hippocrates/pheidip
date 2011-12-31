@@ -19,7 +19,7 @@
   <property generated="never" lazy="false" name="description" type="java.lang.String">
    <column name="DESCRIPTION"/>
   </property>
-  <property generated="never" lazy="false" name="sortKey" type="int" unique-key="SpeedRunSortKeyUnique">
+  <property generated="never" lazy="false" name="sortKey" type="int">
    <column name="sortKey"/>
   </property>
   <property generated="never" lazy="false" name="startTime" type="java.util.Date">

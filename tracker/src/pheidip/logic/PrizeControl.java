@@ -118,7 +118,13 @@ public class PrizeControl
   
   public void setStartGame(SpeedRun startGame)
   {
+    if (this.getData().getStartGame() != null)
+    {
+      this.getData().getStartGame().getPrizeStartGame().remove(this.getData());
+    }
+    
     this.getData().setStartGame(startGame);
+    
     if (startGame != null)
     {
       startGame.getPrizeStartGame().add(this.getData());
@@ -128,7 +134,13 @@ public class PrizeControl
   
   public void setEndGame(SpeedRun endGame)
   {
+    if (this.getData().getEndGame() != null)
+    {
+      this.getData().getEndGame().getPrizeEndGame().remove(this.getData());
+    }
+    
     this.getData().setEndGame(endGame);
+    
     if (endGame != null)
     {
       endGame.getPrizeEndGame().add(this.getData());

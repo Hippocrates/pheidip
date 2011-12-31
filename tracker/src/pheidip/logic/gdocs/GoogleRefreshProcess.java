@@ -1,5 +1,8 @@
 package pheidip.logic.gdocs;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -7,20 +10,18 @@ import pheidip.db.SpeedRunData;
 import pheidip.logic.AbstractExternalProcess;
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.logic.chipin.ExternalProcessState;
+import pheidip.objects.Prize;
 import pheidip.objects.SpeedRun;
+import pheidip.util.StringUtils;
 
 public class GoogleRefreshProcess extends AbstractExternalProcess
 {
   private DonationDatabaseManager database;
   private GoogleSpreadSheetLoginManager loginManager;
   
-  private boolean intializationMode = false;
-
-  public GoogleRefreshProcess(DonationDatabaseManager database, GoogleSpreadSheetLoginManager loginManager, boolean intializationMode)
+  public GoogleRefreshProcess(DonationDatabaseManager database, GoogleSpreadSheetLoginManager loginManager)
   {
     this(database, loginManager, null);
-    
-    this.intializationMode = intializationMode;
   }
   
   public GoogleRefreshProcess(DonationDatabaseManager database, GoogleSpreadSheetLoginManager loginManager, ProcessStateCallback listener)
@@ -51,20 +52,107 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
         List<SpeedRun> allRuns = speedRuns.getAllSpeedRuns();
         Map<String, SpeedRun> mappedRuns = GoogleSpreadSheetReader.nameMapRuns(allRuns);
         
-        double processIncrement = (1.0 - 0.4) / entries.size();
+        double processIncrement = (1.0 - 0.4) / (entries.size() * 2 + allRuns.size());
         double processPercentage = 0.4;
         
         int currentIndex = 0;
+        int currentPrizeIndex = 0;
         
+        List<SpeedRun> runsToInsert = new ArrayList<SpeedRun>();
+        List<SpeedRun> runsToUpdate = new ArrayList<SpeedRun>();
+
         for (MarathonSpreadsheetEntry entry : entries)
         {
           this.resetState(ExternalProcessState.RUNNING, processPercentage, "Pushing run information");
           Thread.sleep(0);
           
-          GoogleSpreadSheetReader.mergeRun(speedRuns, entry, mappedRuns, currentIndex, intializationMode);
-          
+          if (!StringUtils.innerStringMatch(entry.getGameName(), "setup") && !entry.getGameName().equalsIgnoreCase("end"))
+          {
+            SpeedRun found = mappedRuns.remove(entry.getGameName().toLowerCase());
+            
+            if (found == null)
+            {
+              SpeedRun newRun = new SpeedRun();
+              newRun.setName(entry.getGameName());
+              newRun.setRunners(StringUtils.joinLanguageSeperated(entry.getRunners()));
+              newRun.setDescription(entry.getComments());
+              newRun.setSortKey(currentIndex);
+              newRun.setStartTime(entry.getStartTime());
+              newRun.setEndTime(entry.getEstimatedFinish());
+              
+              String description = StringUtils.joinLanguageSeperated(entry.getRunners());
+              
+              if (!StringUtils.isEmptyOrNull(entry.getComments()))
+              {
+                description += (StringUtils.isEmptyOrNull(description) ? "" : " - ") + entry.getComments();
+              }
+              
+              newRun.setDescription(description);
+                
+              runsToInsert.add(newRun);
+            }
+            else
+            {
+              found.setSortKey(currentIndex);
+              found.setRunners(StringUtils.joinLanguageSeperated(entry.getRunners()));
+              found.setStartTime(entry.getStartTime());
+              found.setEndTime(entry.getEstimatedFinish());
+              
+              List<Prize> prizes = new ArrayList<Prize>(found.getPrizeEndGame());
+              
+              Collections.sort(prizes, new Comparator<Prize>()
+              {
+                @Override
+                public int compare(Prize arg0, Prize arg1)
+                {
+                  return arg0.getSortKey() - arg1.getSortKey();
+                }
+              });
+              
+              for (Prize p : prizes)
+              {
+                p.setSortKey(currentPrizeIndex);
+                ++currentPrizeIndex;
+              }
+                
+              runsToUpdate.add(found);
+            }
+          }
+
           processPercentage += processIncrement;
           ++currentIndex;
+        }
+        
+        currentIndex += 1000;
+        currentPrizeIndex += 1000;
+        
+        for (SpeedRun s : mappedRuns.values())
+        {
+          s.setSortKey(currentIndex);
+          ++currentIndex;
+          
+          for (Prize p : s.getPrizeEndGame())
+          {
+            p.setSortKey(currentPrizeIndex);
+            ++currentPrizeIndex;
+          }
+          runsToUpdate.add(s);
+        }
+        
+        for (SpeedRun s : runsToInsert)
+        {
+          speedRuns.insertSpeedRun(s);
+          this.resetState(ExternalProcessState.RUNNING, processPercentage, "Pushing run information");
+          Thread.sleep(0);
+          processPercentage += processIncrement;
+        }
+        
+        for (SpeedRun s : runsToUpdate)
+        {
+          speedRuns.updateSpeedRun(s);
+          this.resetState(ExternalProcessState.RUNNING, processPercentage, "Pushing run information");
+          Thread.sleep(0);
+          processPercentage += processIncrement;
         }
         
         this.resetState(ExternalProcessState.COMPLETED, 1.0, "All runs updated");
