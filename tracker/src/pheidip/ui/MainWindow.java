@@ -393,12 +393,28 @@ public class MainWindow extends JFrame implements Reporter
         }
       }
     };
+    
+    Action googleRefreshAction = new AbstractAction()
+    {
+      public void actionPerformed(ActionEvent e) 
+      {
+        try
+        {
+          MainWindow.this.openGoogleSpreadsheetUpdateTab();
+        }
+        catch(Exception error)
+        {
+          MainWindow.this.report(error);
+        }
+      }
+    };
 
     this.tabbedPane.getActionMap().put(HotkeyAction.DELETE.toString(), deleteAction);
     this.tabbedPane.getActionMap().put(HotkeyAction.CLOSE.toString(), closeAction);
     this.tabbedPane.getActionMap().put(HotkeyAction.SAVE.toString(), saveAction);
     this.tabbedPane.getActionMap().put(HotkeyAction.REFRESH.toString(), refreshAction);
     this.tabbedPane.getActionMap().put(HotkeyAction.CHIPIN_MERGE.toString(), chipinWebsiteMergeAction);
+    this.tabbedPane.getActionMap().put(HotkeyAction.GOOGLE_REFRESH.toString(), googleRefreshAction);
     
     InputMap[] inputMaps = new InputMap[] {
       this.tabbedPane.getInputMap(JComponent.WHEN_FOCUSED),
@@ -506,39 +522,60 @@ public class MainWindow extends JFrame implements Reporter
   
   protected void runChipinWebsiteMerge()
   {
-    if (this.instance.getChipinLogin().isLoggedIn())
+    if (this.instance.getDonationDatabase().isConnected())
     {
-      ChipinDonationSource source = new ChipinWebsiteDonationSource(this.instance.getChipinLogin());
-      this.openChipinMergeTab(source);
+      if (this.instance.getChipinLogin().isLoggedIn())
+      {
+        ChipinDonationSource source = new ChipinWebsiteDonationSource(this.instance.getChipinLogin());
+        this.openChipinMergeTab(source);
+      }
+      else
+      {
+        throw new RuntimeException("Cannot merge: not logged in to www.chipin.com.");
+      }
     }
     else
     {
-      throw new RuntimeException("Cannot merge: not logged in to www.chipin.com.");
+      throw new RuntimeException("Cannot merge: not connected to any database.");
     }
   }
  
   private void openChipinTextMergeDialog()
   {
-    ChipinTextMergeDialog dialog = new ChipinTextMergeDialog(this);
-    dialog.setVisible(true);
-    
-    if (dialog.getResultText() != null)
+    if (this.instance.getDonationDatabase().isConnected())
     {
-      ChipinDonationSource source = new ChipinTextDonationSource(dialog.getResultText());
-      this.openChipinMergeTab(source);
+      ChipinTextMergeDialog dialog = new ChipinTextMergeDialog(this);
+      dialog.setVisible(true);
+      
+      if (dialog.getResultText() != null)
+      {
+        ChipinDonationSource source = new ChipinTextDonationSource(dialog.getResultText());
+        this.openChipinMergeTab(source);
+      }
+    }
+    else
+    {
+      throw new RuntimeException("Cannot merge: not connected to any database.");
     }
   }
 
   protected void openChipinFileMergeDialog()
   {
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.addChoosableFileFilter(new ListFileFilter(new String[]{"html","htm","xml"}));
-    int result = fileChooser.showOpenDialog(this);
-    
-    if (result == JFileChooser.APPROVE_OPTION)
+    if (this.instance.getDonationDatabase().isConnected())
     {
-      ChipinDonationSource source = new ChipinFileDonationSource(fileChooser.getSelectedFile());
-      this.openChipinMergeTab(source);
+      JFileChooser fileChooser = new JFileChooser();
+      fileChooser.addChoosableFileFilter(new ListFileFilter(new String[]{"html","htm","xml"}));
+      int result = fileChooser.showOpenDialog(this);
+      
+      if (result == JFileChooser.APPROVE_OPTION)
+      {
+        ChipinDonationSource source = new ChipinFileDonationSource(fileChooser.getSelectedFile());
+        this.openChipinMergeTab(source);
+      }
+    }
+    else
+    {
+      throw new RuntimeException("Cannot merge: not connected to any database.");
     }
   }
  
@@ -638,24 +675,38 @@ public class MainWindow extends JFrame implements Reporter
 
   private void openGoogleSpreadsheetUpdateTab()
   {
-    // prevent opening the same tab twice
-    for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
+    if (this.instance.getDonationDatabase().isConnected())
     {
-      Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof ExternalProcessTab)
+      if (this.instance.getGoogleLogin().isLoggedIn())
       {
-        ExternalProcessTab processTab = (ExternalProcessTab) target;
-        if (processTab.getProcess() instanceof GoogleRefreshProcess)
+        // prevent opening the same tab twice
+        for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
         {
-          this.focusOnTab(i);
-          return;
+          Component target = this.tabbedPane.getComponentAt(i);
+          if (target instanceof ExternalProcessTab)
+          {
+            ExternalProcessTab processTab = (ExternalProcessTab) target;
+            if (processTab.getProcess() instanceof GoogleRefreshProcess)
+            {
+              this.focusOnTab(i);
+              return;
+            }
+          }
         }
+        
+        ExternalProcessTab tab = new ExternalProcessTab(new GoogleRefreshProcess(this.instance.getDonationDatabase(), this.instance.getGoogleLogin(), false));
+        
+        this.insertTab(tab);
+      }
+      else
+      {
+        throw new RuntimeException("Cannot get data from google: not logged into google.");
       }
     }
-    
-    ExternalProcessTab tab = new ExternalProcessTab(new GoogleRefreshProcess(this.instance.getDonationDatabase(), this.instance.getGoogleLogin(), false));
-    
-    this.insertTab(tab);
+    else
+    {
+      throw new RuntimeException("Cannot get data from google: not connected to a database.");
+    }
   }
   
   private void openConnectDialog()
