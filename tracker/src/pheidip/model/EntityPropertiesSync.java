@@ -3,36 +3,8 @@ package pheidip.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-class SyncrhonizationEntry
-{
-  private ObjectProperty source;
-  private ObjectProperty destination;
-  private ConverterMethod converter;
-  
-  public SyncrhonizationEntry(ObjectProperty source, ObjectProperty destination, ConverterMethod converter)
-  {
-    this.source = source;
-    this.destination = destination;
-    this.converter = converter;
-  }
-  
-  public ObjectProperty getDestination()
-  {
-    return this.destination;
-  }
-  
-  public ObjectProperty getSource()
-  {
-    return this.source;
-  }
-  
-  public void synchronize()
-  {
-    this.destination.setValue(this.converter.convert(this.source.getValue()));
-  }
-}
 
 public class EntityPropertiesSync implements PropertyChangeListener
 {
@@ -72,18 +44,19 @@ public class EntityPropertiesSync implements PropertyChangeListener
   
   public void removeSync(ObjectProperty source, ObjectProperty destination)
   {
-    boolean alreadyFound = false;
-    for (SyncrhonizationEntry entry : this.synchedProperties)
+    SyncrhonizationEntry found = null;
+    for (SyncrhonizationEntry entry : Collections.unmodifiableList(this.synchedProperties))
     {
       if (entry.getSource().equals(source) && entry.getDestination().equals(destination))
       {
-        if (alreadyFound)
+        if (found != null)
         {
           System.out.println("Error, multiple entries");
         }
         else
         {
-          alreadyFound = true;
+          found = entry;
+          break;
         }
         
         PropertyReflectSupport.removePropertyChangeListener(source.getTarget(), source.getProperty(), this);
@@ -100,7 +73,7 @@ public class EntityPropertiesSync implements PropertyChangeListener
   
   public void removeObject(Object target)
   {
-    for (SyncrhonizationEntry entry : this.synchedProperties)
+    for (SyncrhonizationEntry entry : Collections.unmodifiableList(this.synchedProperties))
     {
       if (entry.getSource().getTarget() == target || entry.getDestination().getTarget() == target)
       {

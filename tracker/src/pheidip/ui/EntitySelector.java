@@ -3,6 +3,8 @@ package pheidip.ui;
 import javax.swing.JPanel;
 
 import pheidip.logic.ProgramInstance;
+import pheidip.model.AggregateBooleanProperty;
+import pheidip.model.BooleanInverseConverterMethod;
 import pheidip.model.EntityPropertiesSync;
 import pheidip.model.NullToBooleanConverterMethod;
 import pheidip.model.ObjectProperty;
@@ -36,6 +38,10 @@ public class EntitySelector<T extends Entity> extends JPanel implements ActionLi
   private JTextField entityField;
   private Class<T> entityClass;
   private FocusTraversalManager tabOrder;
+  private AggregateBooleanProperty openable;
+  private AggregateBooleanProperty clearable;
+  private AggregateBooleanProperty nullable;
+  private AggregateBooleanProperty settable;
 
   private void initializeGUI()
   {
@@ -56,38 +62,29 @@ public class EntitySelector<T extends Entity> extends JPanel implements ActionLi
     add(entityField, gbc_textField);
     entityField.setColumns(10);
     
-    if (this.navigationAllowed)
-    {
-      openButton = new JButton("Open");
-      GridBagConstraints gbc_openButton = new GridBagConstraints();
-      gbc_openButton.insets = new Insets(0, 0, 0, 5);
-      gbc_openButton.gridx = 1;
-      gbc_openButton.gridy = 0;
-      gbc_openButton.fill = GridBagConstraints.HORIZONTAL;
-      add(openButton, gbc_openButton);
-    }
-    
-    if (this.nullSelectionAllowed && !this.readOnly)
-    {
-      clearSelectionButton = new JButton("Clear");
-      GridBagConstraints gbc_clearSelectionButton = new GridBagConstraints();
-      gbc_clearSelectionButton.fill = GridBagConstraints.HORIZONTAL;
-      gbc_clearSelectionButton.insets = new Insets(0, 0, 0, 5);
-      gbc_clearSelectionButton.gridx = 2;
-      gbc_clearSelectionButton.gridy = 0;
-      add(clearSelectionButton, gbc_clearSelectionButton);
-    }
-    
-    if (!this.readOnly)
-    {
-      setSelectionButton = new JButton("Set...");
-      GridBagConstraints gbc_setSelectionButton = new GridBagConstraints();
-      gbc_setSelectionButton.fill = GridBagConstraints.HORIZONTAL;
-      gbc_setSelectionButton.insets = new Insets(0, 0, 0, 5);
-      gbc_setSelectionButton.gridx = 3;
-      gbc_setSelectionButton.gridy = 0;
-      add(setSelectionButton, gbc_setSelectionButton);
-    }
+    openButton = new JButton("Open");
+    GridBagConstraints gbc_openButton = new GridBagConstraints();
+    gbc_openButton.insets = new Insets(0, 0, 0, 5);
+    gbc_openButton.gridx = 1;
+    gbc_openButton.gridy = 0;
+    gbc_openButton.fill = GridBagConstraints.HORIZONTAL;
+    add(openButton, gbc_openButton);
+
+    clearSelectionButton = new JButton("Clear");
+    GridBagConstraints gbc_clearSelectionButton = new GridBagConstraints();
+    gbc_clearSelectionButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_clearSelectionButton.insets = new Insets(0, 0, 0, 5);
+    gbc_clearSelectionButton.gridx = 2;
+    gbc_clearSelectionButton.gridy = 0;
+    add(clearSelectionButton, gbc_clearSelectionButton);
+
+    setSelectionButton = new JButton("Set...");
+    GridBagConstraints gbc_setSelectionButton = new GridBagConstraints();
+    gbc_setSelectionButton.fill = GridBagConstraints.HORIZONTAL;
+    gbc_setSelectionButton.insets = new Insets(0, 0, 0, 5);
+    gbc_setSelectionButton.gridx = 3;
+    gbc_setSelectionButton.gridy = 0;
+    add(setSelectionButton, gbc_setSelectionButton);
   }
 
   @Override
@@ -118,50 +115,56 @@ public class EntitySelector<T extends Entity> extends JPanel implements ActionLi
   {
     List<Component> tabArray = new ArrayList<Component>();
     
-    if (this.navigationAllowed)
-    {
-      this.openButton.addActionListener(this);
-      tabArray.add(this.openButton);
-      sync.synchronizeProperties(new ObjectProperty(this, "entity"), new ObjectProperty(this.openButton, "enabled"), NullToBooleanConverterMethod.getInstance());
-    }
+    this.openable = new AggregateBooleanProperty();
+    this.openable.addSource(new ObjectProperty(this, "entity"), NullToBooleanConverterMethod.getInstance());
+    this.openable.addSource(new ObjectProperty(this, "enabled"));
+    this.openable.addSource(new ObjectProperty(this, "navigationAllowed"));
     
-    if (!this.readOnly && this.nullSelectionAllowed)
-    {
-      this.clearSelectionButton.addActionListener(this);
-      tabArray.add(this.clearSelectionButton);
-      sync.synchronizeProperties(new ObjectProperty(this, "entity"), new ObjectProperty(this.clearSelectionButton, "enabled"), NullToBooleanConverterMethod.getInstance());
-    }
+    this.openButton.addActionListener(this);
+    tabArray.add(this.openButton);
     
-    if (!this.readOnly)
-    {
-      this.setSelectionButton.addActionListener(this);
-      tabArray.add(this.setSelectionButton);
-      sync.synchronizeProperties(new ObjectProperty(this, "entity"), new ObjectProperty(this.setSelectionButton, "enabled"), NullToBooleanConverterMethod.getInstance());
-    }
+    sync.synchronizeProperties(new ObjectProperty(this.openable, "value"), new ObjectProperty(this.openButton, "enabled"));
+    sync.synchronizeProperties(new ObjectProperty(this, "navigationAllowed"), new ObjectProperty(this.openButton, "visible"));
 
+    this.clearable = new AggregateBooleanProperty();
+    this.clearable.addSource(new ObjectProperty(this, "entity"), NullToBooleanConverterMethod.getInstance());
+    this.clearable.addSource(new ObjectProperty(this, "enabled"));
+    this.clearable.addSource(new ObjectProperty(this, "readOnly"), BooleanInverseConverterMethod.getInstance());
+    
+    this.nullable = new AggregateBooleanProperty();
+    this.nullable.addSource(new ObjectProperty(this, "readOnly"), BooleanInverseConverterMethod.getInstance());
+    this.nullable.addSource(new ObjectProperty(this, "nullSelectionAllowed"));
+    
+    this.clearSelectionButton.addActionListener(this);
+    tabArray.add(this.clearSelectionButton);
+    
+    sync.synchronizeProperties(new ObjectProperty(this.clearable, "value"), new ObjectProperty(this.clearSelectionButton, "enabled"));
+    sync.synchronizeProperties(new ObjectProperty(this.nullable, "value"), new ObjectProperty(this.clearSelectionButton, "visible"));
+    
+    this.settable = new AggregateBooleanProperty();
+    this.settable.addSource(new ObjectProperty(this, "enabled"));
+    this.settable.addSource(new ObjectProperty(this, "readOnly"), BooleanInverseConverterMethod.getInstance());
+    
+    this.setSelectionButton.addActionListener(this);
+    tabArray.add(this.setSelectionButton);
+    sync.synchronizeProperties(new ObjectProperty(this.settable, "value"), new ObjectProperty(this.setSelectionButton, "enabled"));
+    sync.synchronizeProperties(new ObjectProperty(this, "readOnly"), new ObjectProperty(this.setSelectionButton, "visible"), BooleanInverseConverterMethod.getInstance());
+    
     this.tabOrder = new FocusTraversalManager(tabArray.toArray(new Component[tabArray.size()]));
     this.setFocusTraversalPolicy(this.tabOrder);
     this.setFocusTraversalPolicyProvider(true);
     this.setFocusCycleRoot(false);
   }
-  
-  /**
-   * @wbp.parser.constructor
-   */
-  public EntitySelector(MainWindow owner, ProgramInstance instance, boolean navigationAllowed, boolean nullSelectionAllowed, boolean readOnly, Class<T> entityClass)
-  {
-    this(owner, instance, navigationAllowed, nullSelectionAllowed, readOnly, entityClass, null);
-  }
-  
-  public EntitySelector(MainWindow owner, ProgramInstance instance, boolean navigationAllowed, boolean nullSelectionAllowed, boolean readOnly, Class<T> entityClass, T defaultValue)
+
+  public EntitySelector(MainWindow owner, ProgramInstance instance, Class<T> entityClass)
   {
     this.sync = new EntityPropertiesSync();
     this.owner = owner;
-    this.entity = defaultValue;
+    this.entity = null;
     this.entityClass = entityClass;
-    this.navigationAllowed = navigationAllowed;
-    this.nullSelectionAllowed = nullSelectionAllowed;
-    this.readOnly = readOnly;
+    this.navigationAllowed = false;
+    this.nullSelectionAllowed = false;
+    this.readOnly = false;
     
     this.initializeGUI();
     this.initializeGUIEvents();
@@ -178,5 +181,41 @@ public class EntitySelector<T extends Entity> extends JPanel implements ActionLi
     this.entityField.setText(entity == null ? "" : entity.toString());
     this.entity = entity;
     this.firePropertyChange("entity", oldValue, this.entity);
+  }
+  
+  public boolean isNavigationAllowed()
+  {
+    return this.navigationAllowed;
+  }
+  
+  public void setNavigationAllowed(boolean value)
+  {
+    boolean oldValue = this.navigationAllowed;
+    this.navigationAllowed = value;
+    this.firePropertyChange("navigationAllowed", oldValue, this.navigationAllowed);
+  }
+  
+  public boolean isNullSelectionAllowed()
+  {
+    return this.nullSelectionAllowed;
+  }
+  
+  public void setNullSelectionAllowed(boolean value)
+  {
+    boolean oldValue = this.nullSelectionAllowed;
+    this.nullSelectionAllowed = value;
+    this.firePropertyChange("nullSelectionAllowed", oldValue, this.nullSelectionAllowed);
+  }
+  
+  public boolean isReadOnly()
+  {
+    return this.readOnly;
+  }
+  
+  public void setReadOnly(boolean value)
+  {
+    boolean oldValue = this.readOnly;
+    this.readOnly = value;
+    this.firePropertyChange("readOnly", oldValue, this.readOnly);
   }
 }

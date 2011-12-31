@@ -165,7 +165,10 @@ public class DonationPanel extends EntityPanel
     gbc_donorLabel.gridy = 3;
     add(donorLabel, gbc_donorLabel);
         
-        donorSelector = new EntitySelector<Donor>(this.owner, this.instance, true, false, true, Donor.class);
+        donorSelector = new EntitySelector<Donor>(this.owner, this.instance, Donor.class);
+        donorSelector.setNavigationAllowed(true);
+        donorSelector.setNullSelectionAllowed(false);
+        donorSelector.setReadOnly(false);
         GridBagConstraints gbc_donorSelector = new GridBagConstraints();
         gbc_donorSelector.gridwidth = 3;
         gbc_donorSelector.insets = new Insets(0, 0, 5, 5);
@@ -407,8 +410,6 @@ public class DonationPanel extends EntityPanel
       this.readStateComboBox.setSelectedItem(result.getReadState());
       this.commentStateComboBox.setEnabled(true);
       this.commentStateComboBox.setSelectedItem(result.getCommentState());
-      
-      this.openDonorButton.setEnabled(true);
       this.refreshButton.setEnabled(true);
       this.saveButton.setEnabled(true);
       
@@ -422,7 +423,6 @@ public class DonationPanel extends EntityPanel
       this.amountField.setText("");
       this.commentTextArea.setEnabled(false);
       this.commentTextArea.setText("");
-      this.openDonorButton.setEnabled(false);
       this.refreshButton.setEnabled(false);
       this.saveButton.setEnabled(false);
       

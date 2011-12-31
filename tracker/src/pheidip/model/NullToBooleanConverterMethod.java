@@ -14,5 +14,4 @@ public class NullToBooleanConverterMethod implements ConverterMethod
   {
     return source != null;
   }
-
 }
