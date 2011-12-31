@@ -371,8 +371,8 @@ public class BidSearchDialog extends JDialog
     
     this.okButton.setEnabled(!this.bidList.isSelectionEmpty());
     
-    this.nextButton.setEnabled(this.searcher.hasNext());
-    this.prevButton.setEnabled(this.searcher.hasPrev());
+    this.nextButton.setEnabled(this.searcher.getHasNext());
+    this.prevButton.setEnabled(this.searcher.getHasPrevious());
     
     this.speedRunField.setEnabled(this.speedRunCheckBox.isSelected());
     this.browseSpeedRunButton.setEnabled(this.speedRunCheckBox.isSelected());
@@ -429,12 +429,12 @@ public class BidSearchDialog extends JDialog
   
   private void moveNextResults()
   {
-    this.fillList(this.searcher.getNext());
+    this.fillList(this.searcher.moveNext());
   }
   
   private void movePrevResults()
   {
-    this.fillList(this.searcher.getPrev());
+    this.fillList(this.searcher.movePrevious());
   }
   
   private void createNewChoice()

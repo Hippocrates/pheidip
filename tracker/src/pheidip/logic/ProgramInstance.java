@@ -72,6 +72,26 @@ public class ProgramInstance
     return new PrizeControl(this.donationDatabase, prizeId);
   }
   
+  public DonorSearch createDonorSearch()
+  {
+    return new DonorSearch(this.donationDatabase);
+  }
+  
+  public DonationSearch createDonationSearch()
+  {
+    return new DonationSearch(this.donationDatabase);
+  }
+  
+  public BidSearch createBidSearch()
+  {
+    return new BidSearch(this.donationDatabase);
+  }
+  
+  public SpeedRunSearch createSpeedRunSearch()
+  {
+    return new SpeedRunSearch(this.donationDatabase);
+  }
+  
   public void shutdownProgram()
   {
     this.googleLogin.logOut();

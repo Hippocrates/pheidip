@@ -325,12 +325,12 @@ public class PrizeSearchDialog extends JDialog
 
   private void moveNextResults()
   {
-    this.fillList(this.searcher.getNext());
+    this.fillList(this.searcher.moveNext());
   }
   
   private void movePrevResults()
   {
-    this.fillList(this.searcher.getPrev());
+    this.fillList(this.searcher.movePrevious());
   }
   
   private void fillList(List<Prize> filtered)
@@ -352,8 +352,8 @@ public class PrizeSearchDialog extends JDialog
     
     this.nameField.setEnabled(this.prizeNameCheckBox.isSelected());
     
-    this.nextButton.setEnabled(this.searcher.hasNext());
-    this.prevButton.setEnabled(this.searcher.hasPrev());
+    this.nextButton.setEnabled(this.searcher.getHasNext());
+    this.prevButton.setEnabled(this.searcher.getHasPrevious());
     
     this.createNewButton.setEnabled(!StringUtils.isEmptyOrNull(this.nameField.getText()));
   }

@@ -436,8 +436,8 @@ public class DonorSearchDialog extends JDialog
   {
     this.okButton.setEnabled(!this.donorList.isSelectionEmpty());
     
-    this.nextButton.setEnabled(this.searcher.hasNext());
-    this.prevButton.setEnabled(this.searcher.hasPrev());
+    this.nextButton.setEnabled(this.searcher.getHasNext());
+    this.prevButton.setEnabled(this.searcher.getHasPrevious());
     
     this.firstNameField.setEnabled(this.firstNameCheckBox.isSelected());
     this.lastNameField.setEnabled(this.lastNameCheckBox.isSelected());
@@ -447,12 +447,12 @@ public class DonorSearchDialog extends JDialog
   
   private void moveNextResults()
   {
-    this.fillList(this.searcher.getNext());
+    this.fillList(this.searcher.moveNext());
   }
   
   private void movePrevResults()
   {
-    this.fillList(this.searcher.getPrev());
+    this.fillList(this.searcher.movePrevious());
   }
 
   private void runSearch()

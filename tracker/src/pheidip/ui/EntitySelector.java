@@ -150,7 +150,7 @@ public class EntitySelector<T extends Entity> extends JPanel implements ActionLi
     sync.synchronizeProperties(new ObjectProperty(this.settable, "value"), new ObjectProperty(this.setSelectionButton, "enabled"));
     sync.synchronizeProperties(new ObjectProperty(this, "readOnly"), new ObjectProperty(this.setSelectionButton, "visible"), BooleanInverseConverterMethod.getInstance());
     
-    this.tabOrder = new FocusTraversalManager(tabArray.toArray(new Component[tabArray.size()]));
+    this.tabOrder = new FocusTraversalManager(tabArray);
     this.setFocusTraversalPolicy(this.tabOrder);
     this.setFocusTraversalPolicyProvider(true);
     this.setFocusCycleRoot(false);

@@ -69,7 +69,7 @@ public class ChipinMergeProcess extends AbstractExternalProcess
       while (databaseDonations.size() > 0)
       {
         donationsToUpdate.addAll(ChipinDonations.updateMergeTable(chipinDonationMap, databaseDonations));
-        databaseDonations = searcher.getNext();
+        databaseDonations = searcher.moveNext();
 
         this.resetState(ExternalProcessState.RUNNING, 1.0 - step*chipinDonationMap.size(), "Merging donations into database...");
         Thread.sleep(0);
