@@ -16,7 +16,7 @@
    <column name="IMAGEURL"/>
   </property>
   <property generated="never" lazy="false" name="sortKey" type="int"
-   unique="true" unique-key="PrizeSortKeyUnique">
+   unique="true">
    <column name="sortKey" unique="true"/>
   </property>
   <property generated="never" lazy="false" name="minimumBid" type="java.math.BigDecimal">

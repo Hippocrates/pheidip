@@ -694,7 +694,7 @@ public class MainWindow extends JFrame implements Reporter
           }
         }
         
-        ExternalProcessTab tab = new ExternalProcessTab(new GoogleRefreshProcess(this.instance.getDonationDatabase(), this.instance.getGoogleLogin(), false));
+        ExternalProcessTab tab = new ExternalProcessTab(new GoogleRefreshProcess(this.instance.getDonationDatabase(), this.instance.getGoogleLogin()));
         
         this.insertTab(tab);
       }
