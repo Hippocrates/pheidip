@@ -333,11 +333,19 @@ public class PrizeAssignmentDialog extends JDialog
       this.donatedAfterTimeField.setTimeValue(defaultStartTime);
       this.donatedAfterCheckBox.setSelected(true);
     }
+    else
+    {
+      this.donatedAfterCheckBox.setSelected(false);
+    }
     
     if (defaultEndTime != null)
     {
       this.donatedBeforeTimeField.setTimeValue(defaultEndTime);
       this.donatedBeforeCheckBox.setSelected(true);
+    }
+    else
+    {
+      this.donatedAfterCheckBox.setSelected(false);
     }
     
     if (defaultMethod != null)
