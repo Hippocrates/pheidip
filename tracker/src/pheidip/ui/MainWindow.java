@@ -16,6 +16,7 @@ import javax.swing.JMenuBar;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -101,6 +102,8 @@ public class MainWindow extends JFrame implements Reporter
   
   private void initializeGUI()
   {
+    this.setIconImage(Toolkit.getDefaultToolkit().getImage("sdaicon.png"));
+    
     // Initialise window
     this.setTitle("Donation Tracking Program");
     this.setSize(new Dimension(640, 480));

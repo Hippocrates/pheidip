@@ -55,7 +55,7 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
         double processIncrement = (1.0 - 0.4) / (entries.size() * 2 + allRuns.size());
         double processPercentage = 0.4;
         
-        int currentIndex = 0;
+        int currentRunIndex = 0;
         int currentPrizeIndex = 0;
         
         List<SpeedRun> runsToInsert = new ArrayList<SpeedRun>();
@@ -76,7 +76,7 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
               newRun.setName(entry.getGameName());
               newRun.setRunners(StringUtils.joinLanguageSeperated(entry.getRunners()));
               newRun.setDescription(entry.getComments());
-              newRun.setSortKey(currentIndex);
+              newRun.setSortKey(currentRunIndex * 100);
               newRun.setStartTime(entry.getStartTime());
               newRun.setEndTime(entry.getEstimatedFinish());
               
@@ -93,7 +93,7 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
             }
             else
             {
-              found.setSortKey(currentIndex);
+              found.setSortKey(currentRunIndex);
               found.setRunners(StringUtils.joinLanguageSeperated(entry.getRunners()));
               found.setStartTime(entry.getStartTime());
               found.setEndTime(entry.getEstimatedFinish());
@@ -111,7 +111,7 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
               
               for (Prize p : prizes)
               {
-                p.setSortKey(currentPrizeIndex);
+                p.setSortKey(currentPrizeIndex * 100);
                 ++currentPrizeIndex;
               }
                 
@@ -120,20 +120,20 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
           }
 
           processPercentage += processIncrement;
-          ++currentIndex;
+          ++currentRunIndex;
         }
         
-        currentIndex += 1000;
+        currentRunIndex += 1000;
         currentPrizeIndex += 1000;
         
         for (SpeedRun s : mappedRuns.values())
         {
-          s.setSortKey(currentIndex);
-          ++currentIndex;
+          s.setSortKey(currentRunIndex * 100);
+          ++currentRunIndex;
           
           for (Prize p : s.getPrizeEndGame())
           {
-            p.setSortKey(currentPrizeIndex);
+            p.setSortKey(currentPrizeIndex * 100);
             ++currentPrizeIndex;
           }
           runsToUpdate.add(s);
