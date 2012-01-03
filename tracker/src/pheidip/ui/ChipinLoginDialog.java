@@ -126,6 +126,8 @@ public class ChipinLoginDialog extends JDialog
         chipinIdField.setColumns(10);
       }
     }
+    
+    this.pack();
   }
   
   private class ActionHandler implements ActionListener
