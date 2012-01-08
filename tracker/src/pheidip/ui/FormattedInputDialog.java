@@ -33,6 +33,12 @@ public class FormattedInputDialog extends JDialog
     
     textField = new JFormattedTextField(formatter);
     getContentPane().add(textField, BorderLayout.CENTER);
+    textField.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) 
+        {
+          okSelected();
+        }
+      });
     
     JPanel panel = new JPanel();
     getContentPane().add(panel, BorderLayout.SOUTH);

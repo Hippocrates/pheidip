@@ -95,6 +95,8 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   {
     Session session = this.beginTransaction();
     
+    prize = (Prize) session.merge(prize);
+    
     if (prize.getStartGame() != null)
     {
       prize.getStartGame().getPrizeStartGame().remove(prize);

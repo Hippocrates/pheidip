@@ -160,7 +160,11 @@ public class HibernateDonationDataAccess implements DonationDataAccess
 	public void resetSession()
 	{
 	  //this.session.flush();
-	  this.session.close();
+      if (this.session.isOpen())
+      {
+    	  this.session.close();
+      }
+      
 	  this.session = this.sessionFactory.openSession();
 	}
 }

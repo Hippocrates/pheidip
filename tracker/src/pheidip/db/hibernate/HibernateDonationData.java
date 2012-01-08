@@ -10,8 +10,10 @@ import org.hibernate.StatelessSession;
 
 import pheidip.db.DonationData;
 import pheidip.objects.BidType;
+import pheidip.objects.Challenge;
 import pheidip.objects.ChallengeBid;
 import pheidip.objects.ChoiceBid;
+import pheidip.objects.ChoiceOption;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBid;
 import pheidip.objects.DonationDomain;
@@ -29,9 +31,9 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   public Donation getDonationById(int id)
   {
     Session session = this.beginTransaction();
-
-    Donation d = (Donation) session.get(Donation.class, id);
-
+    
+    Donation d = (Donation) session.load(Donation.class, id);
+ 
     this.endTransaction();
     
     return d;
@@ -42,11 +44,8 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   {
     Session session = this.beginTransaction();
     
-    if (d.getDonor() != null)
-    {
-      d.getDonor().getDonations().remove(d);
-    }
-    
+    d = (Donation) session.merge(d);
+
     session.delete(d);
 
     this.endTransaction();
@@ -63,7 +62,8 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   @Override
   public void updateDonation(Donation updated)
   {
-    Session session = this.beginTransaction();    
+    Session session = this.beginTransaction();
+    
     session.merge(updated);
     this.endTransaction();
   }
@@ -251,16 +251,14 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   public void updateMultipleDonations(List<Donation> donationsToUpdate)
   {
     // Super hacky, I'll need to figure out a way around this...
-    Session session = this.beginTransaction();
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
     
     for (Donation donation : donationsToUpdate)
     {
-      session.evict(donation);
-      session.merge(donation);
+      dedicatedSession.update(donation);
     }
     
-    //this.endBulkTransaction(dedicatedSession);
-    session.getTransaction().commit();
+    this.endBulkTransaction(dedicatedSession);
   }
 
   @Override
@@ -284,16 +282,22 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   {
     Session session = this.beginTransaction();
     
+    remove = (DonationBid) session.merge(remove);
+    
     if (remove.getType() == BidType.CHOICE)
     {
-      ((ChoiceBid)remove).getOption().getBids().remove((ChoiceBid)remove);
+      ChoiceOption bid = (ChoiceOption) session.merge(((ChoiceBid)remove).getOption());
+      bid.getBids().remove((ChoiceBid)remove);
     }
     else if (remove.getType() == BidType.CHALLENGE)
     {
-      ((ChallengeBid)remove).getChallenge().getBids().remove((ChallengeBid)remove);
+      Challenge bid = (Challenge) session.merge(((ChallengeBid)remove).getChallenge());
+      bid.getBids().remove((ChallengeBid)remove);
     }
     
-    remove.getDonation().getBids().remove(remove);
+    Donation d = (Donation) session.merge(remove.getDonation());
+    
+    d.getBids().remove(remove);
     
     session.delete(remove);
     this.endTransaction();

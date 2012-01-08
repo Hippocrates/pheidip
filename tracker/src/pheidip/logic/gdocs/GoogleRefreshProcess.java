@@ -147,6 +147,8 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
           processPercentage += processIncrement;
         }
         
+        speedRuns.multiUpdateSpeedRuns(runsToUpdate);
+        /*
         for (SpeedRun s : runsToUpdate)
         {
           speedRuns.updateSpeedRun(s);
@@ -154,6 +156,7 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
           Thread.sleep(0);
           processPercentage += processIncrement;
         }
+        */
         
         this.resetState(ExternalProcessState.COMPLETED, 1.0, "All runs updated");
         Thread.sleep(0);

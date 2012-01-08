@@ -31,16 +31,16 @@ public class DonationReadTask implements DonationTask
   public void clearTask(Donation d)
   {
     DonationControl control = getControl(d);
-    if (d.getReadState() == DonationReadState.PENDING)
+    if (control.getData().getReadState() == DonationReadState.PENDING)
     {
-      d.setReadState(DonationReadState.READ);
+      control.getData().setReadState(DonationReadState.READ);
     }
     
-    if (d.getCommentState() == DonationCommentState.PENDING && !StringUtils.isEmptyOrNull(d.getComment()))
+    if (control.getData().getCommentState() == DonationCommentState.PENDING && !StringUtils.isEmptyOrNull(control.getData().getComment()))
     {
-      d.setCommentState(DonationCommentState.APPROVED);
+      control.getData().setCommentState(DonationCommentState.APPROVED);
     }
-    control.updateData(d);
+    control.updateData(control.getData());
   }
 
   @Override

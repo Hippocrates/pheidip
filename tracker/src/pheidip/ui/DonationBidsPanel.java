@@ -124,6 +124,7 @@ public class DonationBidsPanel extends JPanel
       catch (Exception e)
       {
         owner.report(e);
+        e.printStackTrace();
       }
     }
     

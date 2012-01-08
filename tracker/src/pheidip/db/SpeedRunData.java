@@ -21,4 +21,6 @@ public interface SpeedRunData {
 
   public List<SpeedRun> searchSpeedRunsRange(SpeedRunSearchParams params, int offset,
       int size);
+
+void multiUpdateSpeedRuns(List<SpeedRun> toUpdate);
 }

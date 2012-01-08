@@ -12,8 +12,7 @@ public class PrizeDrawCandidate
   List<Donation> donationList;
   private BigDecimal donationSum;
   private BigDecimal maxDonation;
-  private boolean alreadyWon;
-  
+
   public PrizeDrawCandidate(Donor donor, List<Donation> donationList)
   {
     this.donor = donor;
@@ -31,8 +30,6 @@ public class PrizeDrawCandidate
       
       this.donationSum = this.donationSum.add(d.getAmount());
     }
-    
-    this.alreadyWon = this.donor.getPrizes().size() > 0;
   }
   
   public Donor getDonor()
@@ -48,10 +45,5 @@ public class PrizeDrawCandidate
   public BigDecimal getDonationSum()
   {
     return this.donationSum;
-  }
-  
-  public boolean alreadyHasPrize()
-  {
-    return this.alreadyWon;
   }
 }
