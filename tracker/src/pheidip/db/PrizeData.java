@@ -22,4 +22,6 @@ public interface PrizeData {
 	public List<Prize> searchPrizes(PrizeSearchParams params);
 
   public List<Prize> searchPrizesRange(PrizeSearchParams params, int offset, int size);
+
+  public void multiUpdatePrizes(List<Prize> prizesToUpdate);
 }

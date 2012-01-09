@@ -153,4 +153,17 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     return listing;
   }
 
+	@Override
+	public void multiUpdatePrizes(List<Prize> prizesToUpdate) 
+	{
+		StatelessSession dedicatedSession = this.beginBulkTransaction();
+		
+		for (Prize p : prizesToUpdate)
+		{
+			dedicatedSession.update(p);
+		}
+		
+		this.endBulkTransaction(dedicatedSession);
+	}
+
 }

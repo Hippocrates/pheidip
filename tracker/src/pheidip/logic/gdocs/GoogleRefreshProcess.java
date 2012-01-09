@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import pheidip.db.PrizeData;
 import pheidip.db.SpeedRunData;
 import pheidip.logic.AbstractExternalProcess;
 import pheidip.logic.DonationDatabaseManager;
@@ -48,11 +49,12 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
         Thread.sleep(0);
         
         SpeedRunData speedRuns = database.getDataAccess().getSpeedRunData();
+        PrizeData prizes = database.getDataAccess().getPrizeData();
         
         List<SpeedRun> allRuns = speedRuns.getAllSpeedRuns();
         Map<String, SpeedRun> mappedRuns = GoogleSpreadSheetReader.nameMapRuns(allRuns);
         
-        double processIncrement = (1.0 - 0.4) / (entries.size() * 2 + allRuns.size());
+        double processIncrement = (0.8 - 0.4) / (entries.size() * 2 + allRuns.size());
         double processPercentage = 0.4;
         
         int currentRunIndex = 0;
@@ -60,6 +62,8 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
         
         List<SpeedRun> runsToInsert = new ArrayList<SpeedRun>();
         List<SpeedRun> runsToUpdate = new ArrayList<SpeedRun>();
+        
+        List<Prize> prizesToUpdate = new ArrayList<Prize>();
 
         for (MarathonSpreadsheetEntry entry : entries)
         {
@@ -98,9 +102,9 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
               found.setStartTime(entry.getStartTime());
               found.setEndTime(entry.getEstimatedFinish());
               
-              List<Prize> prizes = new ArrayList<Prize>(found.getPrizeEndGame());
+              List<Prize> runPrizes = new ArrayList<Prize>(found.getPrizeEndGame());
               
-              Collections.sort(prizes, new Comparator<Prize>()
+              Collections.sort(runPrizes, new Comparator<Prize>()
               {
                 @Override
                 public int compare(Prize arg0, Prize arg1)
@@ -109,10 +113,11 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
                 }
               });
               
-              for (Prize p : prizes)
+              for (Prize p : runPrizes)
               {
                 p.setSortKey(currentPrizeIndex * 100);
                 ++currentPrizeIndex;
+                prizesToUpdate.add(p);
               }
                 
               runsToUpdate.add(found);
@@ -148,17 +153,14 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
         }
         
         speedRuns.multiUpdateSpeedRuns(runsToUpdate);
-        /*
-        for (SpeedRun s : runsToUpdate)
-        {
-          speedRuns.updateSpeedRun(s);
-          this.resetState(ExternalProcessState.RUNNING, processPercentage, "Pushing run information");
-          Thread.sleep(0);
-          processPercentage += processIncrement;
-        }
-        */
+
+        this.resetState(ExternalProcessState.RUNNING, 0.8, "Pushing prize information");
+        
+        
+        prizes.multiUpdatePrizes(prizesToUpdate);
         
         this.resetState(ExternalProcessState.COMPLETED, 1.0, "All runs updated");
+        
         Thread.sleep(0);
       }
       else
