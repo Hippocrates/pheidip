@@ -131,7 +131,7 @@ public class DonationControl
       throw new RuntimeException("Total of all bids cannot exceed donation amount.");
     }
     
-    this.updateData(data);
+    //this.updateData(data);
     
     return created;
   }
@@ -155,7 +155,7 @@ public class DonationControl
       throw new RuntimeException("Total of all bids cannot exceed donation amount.");
     }
     
-    this.updateData(data);
+    //this.updateData(data);
     
     return created;
   }
@@ -209,13 +209,13 @@ public class DonationControl
 
   public void deleteDonation()
   {
-    List<DonationBid> attachedBids = getAttachedBids();
+    /*List<DonationBid> attachedBids = getAttachedBids();
     
     for (DonationBid b : attachedBids)
     {
       this.removeBid(b);
     }
-    
+    */
     this.cachedData = null;
     this.donations.deleteDonation(this.getData());
   }

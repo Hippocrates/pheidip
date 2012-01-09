@@ -29,11 +29,11 @@ public class DonationBidTask implements DonationTask
   public void clearTask(Donation d)
   {
     DonationControl control = this.getControl(d);
-    if (d.getBidState() == DonationBidState.PENDING)
+    if (control.getData().getBidState() == DonationBidState.PENDING)
     {
-      d.setBidState(DonationBidState.PROCESSED);
+      control.getData().setBidState(DonationBidState.PROCESSED);
     }
-    control.updateData(d);
+    control.updateData(control.getData());
   }
   
   public boolean isTaskCleared(Donation d)

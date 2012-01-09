@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
 
 import java.awt.Component;
+import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -399,11 +400,16 @@ public class DonorPanel extends EntityPanel
     
     this.totalDonatedField.setText(this.donorControl.getTotalDonated().toString());
     
-    Prize prizeWon = this.donorControl.getPrizeWon();
+    List<Prize> allPrizes = new ArrayList<Prize>(data.getPrizes());
     
-    if (prizeWon != null)
+    if (allPrizes.size() > 0)
     {
-      this.prizeField.setText(prizeWon.getName());
+      List<String> strings = new ArrayList<String>();
+      for (Prize p : allPrizes)
+      {
+    	  strings.add(p.toString());
+      }
+      this.prizeField.setText(StringUtils.joinSeperated(strings, ","));
       this.openPrizeButton.setEnabled(true);
     }
     else

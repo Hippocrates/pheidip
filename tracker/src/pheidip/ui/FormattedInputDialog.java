@@ -25,6 +25,7 @@ public class FormattedInputDialog extends JDialog
   {
     this.setTitle(title);
     this.setSize(224,95);
+    this.setResizable(true);
     getContentPane().setLayout(new BorderLayout(0, 0));
     
     JLabel messageLabel = new JLabel(message);
@@ -32,6 +33,12 @@ public class FormattedInputDialog extends JDialog
     
     textField = new JFormattedTextField(formatter);
     getContentPane().add(textField, BorderLayout.CENTER);
+    textField.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent arg0) 
+        {
+          okSelected();
+        }
+      });
     
     JPanel panel = new JPanel();
     getContentPane().add(panel, BorderLayout.SOUTH);
@@ -57,6 +64,8 @@ public class FormattedInputDialog extends JDialog
     panel.add(cancelButton);
     
     this.getRootPane().setDefaultButton(this.okButton);
+    
+    this.pack();
   }
   
   /**

@@ -249,6 +249,8 @@ public class DonorSearchDialog extends JDialog
     gbc_cancelButton.gridx = 5;
     gbc_cancelButton.gridy = 8;
     contentPanel.add(cancelButton, gbc_cancelButton);
+    
+    this.pack();
   }
   
   private class ActionHandler implements ActionListener, ListSelectionListener

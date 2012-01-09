@@ -233,6 +233,8 @@ public class PrizeAssignmentDialog extends JDialog
         buttonPane.add(cancelButton);
       }
     }
+    
+    this.pack();
   }
   
   class ActionHandler implements ActionListener

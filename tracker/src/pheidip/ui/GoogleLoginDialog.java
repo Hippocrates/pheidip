@@ -119,6 +119,8 @@ public class GoogleLoginDialog extends JDialog
         buttonPane.add(cancelButton);
       }
     }
+    
+    this.pack();
   }
   
   private class ActionHandler implements ActionListener

@@ -86,7 +86,7 @@ public class DonationSearchDialog extends JDialog
   
   private void initializeGUI()
   {
-    setBounds(100, 100, 583, 327);
+    //setBounds(100, 100, 583, 327);
     getContentPane().setLayout(new BorderLayout(0, 0));
     JPanel panel = new JPanel();
     panel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -361,6 +361,7 @@ public class DonationSearchDialog extends JDialog
     gbc_cancelButton.gridy = 11;
     panel.add(cancelButton, gbc_cancelButton);
     
+    this.pack();
   }
   
   private class ActionHandler implements ActionListener, ChangeListener, ListSelectionListener

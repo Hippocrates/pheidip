@@ -114,7 +114,9 @@ public class GoogleSpreadSheetLoginManager
   
   private static MarathonSpreadsheetEntry parseEntry(ListEntry entry) throws ParseException
   {
-    final SimpleDateFormat dateFormatter = new SimpleDateFormat ("yyyy EEE MMM dd hh:mm aa");
+    final SimpleDateFormat dateFormatter = new SimpleDateFormat ("MM/dd/yyyy hh:mm:ss");
+    final SimpleDateFormat secondFormatter = new SimpleDateFormat("MM/dd/yyyy");
+    dateFormatter.setLenient(true);
     
     Date startTime = new Date(0);
     String gameName = null;
@@ -129,7 +131,14 @@ public class GoogleSpreadSheetLoginManager
       final String value = entry.getCustomElements().getValue(tag);
       if (tag.equalsIgnoreCase(DATE_FIELD_TAG))
       {
-        startTime = dateFormatter.parse("2012 " + value);
+    	try
+    	{
+          startTime = dateFormatter.parse(value);
+    	}
+    	catch (ParseException e)
+    	{
+          startTime = secondFormatter.parse(value);
+    	}
       }
       else if (tag.equalsIgnoreCase(GAME_FIELD_TAG))
       {

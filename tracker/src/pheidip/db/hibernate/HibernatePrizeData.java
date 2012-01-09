@@ -95,6 +95,8 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   {
     Session session = this.beginTransaction();
     
+    prize = (Prize) session.merge(prize);
+    
     if (prize.getStartGame() != null)
     {
       prize.getStartGame().getPrizeStartGame().remove(prize);
@@ -150,5 +152,18 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
     
     return listing;
   }
+
+	@Override
+	public void multiUpdatePrizes(List<Prize> prizesToUpdate) 
+	{
+		StatelessSession dedicatedSession = this.beginBulkTransaction();
+		
+		for (Prize p : prizesToUpdate)
+		{
+			dedicatedSession.update(p);
+		}
+		
+		this.endBulkTransaction(dedicatedSession);
+	}
 
 }

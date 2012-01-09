@@ -389,16 +389,15 @@ public class DonationPanel extends EntityPanel
       
       this.amountField.setEnabled(true);
       this.commentTextArea.setEnabled(true);
+      this.commentTextArea.setEditable(true);
       
       if (this.donationControl.allowUpdateData())
       {
         this.amountField.setEditable(true);
-        this.commentTextArea.setEditable(true);
       }
       else
       {
         this.amountField.setEditable(false);
-        this.commentTextArea.setEditable(false);
       }
       
       this.domainIdField.setText(result.getDomainString());
@@ -443,9 +442,9 @@ public class DonationPanel extends EntityPanel
     if (this.donationControl.allowUpdateData())
     {
       d.setAmount(new BigDecimal(this.amountField.getText()));
-      d.setComment(this.commentTextArea.getText());
     }
     
+    d.setComment(this.commentTextArea.getText());
     d.setCommentState((DonationCommentState)this.commentStateComboBox.getSelectedItem());
     d.setReadState((DonationReadState)this.readStateComboBox.getSelectedItem());
     d.setBidState((DonationBidState)this.bidStateComboBox.getSelectedItem());

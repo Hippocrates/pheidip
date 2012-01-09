@@ -190,6 +190,8 @@ public class PrizeSearchDialog extends JDialog
       contentPanel.add(cancelButton, gbc_cancelButton);
       cancelButton.setActionCommand("Cancel");
     }
+    
+    this.pack();
   }
   
   class ActionHandler implements ActionListener, ListSelectionListener, DocumentListener

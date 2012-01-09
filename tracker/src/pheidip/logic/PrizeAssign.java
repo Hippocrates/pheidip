@@ -3,6 +3,8 @@ package pheidip.logic;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,33 +61,47 @@ public class PrizeAssign
     
     for (List<Donation> donationList : donationMap.values())
     {
-      candidates.add(new PrizeDrawCandidate(this.donors.getDonorById(donationList.get(0).getDonor().getId()), donationList));
+      candidates.add(new PrizeDrawCandidate(donorMap.get(donationList.get(0).getDonor().getId()), donationList));
     }
     
     return candidates;
   }
   
+  public Donor selectFromFilteredList(List<Donor> filtered, boolean excludeIfWon)
+  {
+	    while (filtered.size() > 0)
+	    {
+	      Random rand = new SecureRandom();
+	      int location = rand.nextInt(filtered.size());
+	      Donor result = this.donors.getDonorById(filtered.get(location).getId());
+	      
+	      if (result.getPrizes().size() > 0 && excludeIfWon)
+	      {
+	    	  filtered.remove(location);
+	    	  continue;
+	      }
+	      else
+	      {
+	    	  return result;
+	      }
+	    }
+
+	    return null;
+  }
+  
   public Donor pickRandomCandidate(BigDecimal minimumAmount, boolean excludeIfWon, List<PrizeDrawCandidate> candidates)
   {
     List<Donor> filtered = new ArrayList<Donor>();
-    
+
     for (PrizeDrawCandidate c : candidates)
     {
-      if (c.getMaxDonation().compareTo(minimumAmount) >= 0 && (!excludeIfWon || !c.alreadyHasPrize()))
+      if (c.getMaxDonation().compareTo(minimumAmount) >= 0)
       {
         filtered.add(c.getDonor());
       }
     }
     
-    if (filtered.size() > 0)
-    {
-      Random rand = new SecureRandom();
-      return filtered.get(rand.nextInt(filtered.size()));
-    }
-    else
-    {
-      return null;
-    }
+    return this.selectFromFilteredList(filtered, excludeIfWon);
   }
   
   public Donor pickRandomCandidateWeighted(BigDecimal thresholdAmount, boolean excludeIfWon, int maxRaffleTickets, List<PrizeDrawCandidate> candidates)
@@ -94,8 +110,6 @@ public class PrizeAssign
     
     for (PrizeDrawCandidate c : candidates)
     {
-      if (!excludeIfWon || !c.alreadyHasPrize())
-      {
         int iterations = c.getDonationSum().divide(thresholdAmount, BigDecimal.ROUND_FLOOR).intValue();
         
         if (maxRaffleTickets != 0)
@@ -107,52 +121,59 @@ public class PrizeAssign
         {
           filtered.add(c.getDonor());
         }
-      }
     }
     
-    if (filtered.size() > 0)
-    {
-      Random rand = new SecureRandom();
-      return filtered.get(rand.nextInt(filtered.size()));
-    }
-    else
-    {
-      return null;
-    }
+    return this.selectFromFilteredList(filtered, excludeIfWon);
   }
   
   public Donor pickHighestSingleDonation(BigDecimal minimumAmount, boolean excludeIfWon, List<PrizeDrawCandidate> candidates)
   {
-    Donor maxDonor = null;
-    BigDecimal currentMax = minimumAmount;
-    
-    for (PrizeDrawCandidate c : candidates)
-    {
-      if (c.getMaxDonation().compareTo(currentMax) >= 0 && (!excludeIfWon || !c.alreadyHasPrize()))
-      {
-        maxDonor = c.getDonor();
-        currentMax = c.getMaxDonation();
-      }
-    }
-    
-    return maxDonor;
+	  Collections.sort(candidates, new Comparator<PrizeDrawCandidate>()
+			    {
+					@Override
+					public int compare(PrizeDrawCandidate o1, PrizeDrawCandidate o2) 
+					{
+						return o1.getMaxDonation().compareTo(o2.getMaxDonation());
+					}
+			    	
+			    });
+			    
+			    for (int i = candidates.size() - 1; i >= 0; --i)
+			    {
+				    Donor result = this.donors.getDonorById(candidates.get(i).getDonor().getId());
+				      
+				    if (!(result.getPrizes().size() > 0 && excludeIfWon))
+				    {
+				      return result;
+				    }
+			    }
+			    
+			    return null;
   }
   
   public Donor pickHighestSumDonations(BigDecimal minimumAmount, boolean excludeIfWon, List<PrizeDrawCandidate> candidates)
   {
-    Donor maxDonor = null;
-    BigDecimal currentMax = minimumAmount;
-    
-    for (PrizeDrawCandidate c : candidates)
+    Collections.sort(candidates, new Comparator<PrizeDrawCandidate>()
     {
-      if (c.getDonationSum().compareTo(currentMax) >= 0 && (!excludeIfWon || !c.alreadyHasPrize()))
-      {
-        maxDonor = c.getDonor();
-        currentMax = c.getDonationSum();
-      }
+		@Override
+		public int compare(PrizeDrawCandidate o1, PrizeDrawCandidate o2) 
+		{
+			return o1.getDonationSum().compareTo(o2.getDonationSum());
+		}
+    	
+    });
+    
+    for (int i = candidates.size() - 1; i >= 0; --i)
+    {
+	    Donor result = this.donors.getDonorById(candidates.get(i).getDonor().getId());
+	      
+	    if (!(result.getPrizes().size() > 0 && excludeIfWon))
+	    {
+	      return result;
+	    }
     }
     
-    return maxDonor;
+    return null;
   }
 
   public Donor selectWinner(PrizeAssignParams params)

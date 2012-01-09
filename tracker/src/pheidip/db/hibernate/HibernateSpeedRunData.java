@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 
 import pheidip.db.SpeedRunData;
 import pheidip.objects.Prize;
@@ -46,6 +47,8 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
   {
     Session session = this.beginTransaction();
     
+    speedRun = (SpeedRun) session.merge(speedRun);
+    
     for (Prize p : speedRun.getPrizeStartGame())
     {
       p.setStartGame(null);
@@ -73,6 +76,19 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
     session.merge(run);
     
     this.endTransaction();
+  }
+  
+  @Override
+  public void multiUpdateSpeedRuns(List<SpeedRun> toUpdate)
+  {
+	  StatelessSession session = this.beginBulkTransaction();
+	  
+	  for (SpeedRun s : toUpdate)
+	  {
+		  session.update(s);
+	  }
+	  
+	  this.endBulkTransaction(session);
   }
 
   @Override
