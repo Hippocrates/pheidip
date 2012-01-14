@@ -1,7 +1,7 @@
 package pheidip.main;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +30,7 @@ public final class PrizeFormPrinter
     if (db.isConnected())
     {
         StringBuffer fileData = new StringBuffer(1000);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader reader = new BufferedReader(new FileReader("prizeformat.txt"));
         char[] buf = new char[1024];
         int numRead=0;
         while((numRead=reader.read(buf)) != -1)

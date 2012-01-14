@@ -74,11 +74,11 @@ abstract public class HibernateDataInterface
 	    throw new RuntimeException(e);
 	  }
 	  
-          this.manager.resetSession();
+          //this.manager.resetSession();
 	  
-	  this.manager.getSession().beginTransaction();
+	  //this.manager.getSession().beginTransaction();
 	  
-	  return this.manager.getSession();
+	  //return this.manager.getSession();
 	}
 	
 	public void endTransaction()
