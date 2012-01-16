@@ -1,6 +1,5 @@
 package pheidip.db.hibernate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -9,9 +8,8 @@ import org.hibernate.StatelessSession;
 
 import pheidip.db.DonorData;
 import pheidip.objects.Donor;
-import pheidip.objects.DonorSearchParams;
 import pheidip.objects.Prize;
-import pheidip.util.StringUtils;
+import pheidip.objects.SearchEntity;
 
 public class HibernateDonorData extends HibernateDataInterface implements DonorData 
 {
@@ -110,50 +108,22 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	
 
   @Override
-  public List<Donor> searchDonors(DonorSearchParams params)
+  public List<Donor> searchDonors(SearchEntity<Donor> params)
   {
     return this.searchDonorsRange(params, 0, Integer.MAX_VALUE);
   }
 	
 	@Override
-  public List<Donor> searchDonorsRange(DonorSearchParams params, int offset, int size)
+  public List<Donor> searchDonorsRange(SearchEntity<Donor> params, int offset, int size)
   {
-    String queryString = "from Donor d";
-    List<String> whereClause = new ArrayList<String>();
-    
-    if (params.firstName != null)
-      whereClause.add("lower(d.firstName) like :firstName");
-    
-    if (params.lastName != null)
-      whereClause.add("lower(d.lastName) like :lastName");
-    
-    if (params.email != null)
-      whereClause.add("lower(d.email) like :email");
-    
-    if (params.alias != null)
-      whereClause.add("lower(d.alias) like :alias");
-    
-    if (whereClause.size() > 0)
-    {
-      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
-    }
+    String queryString = SQLMethods.makeHQLSearchQueryString(params, "Donor");
     
     StatelessSession dedicatedSession = this.beginBulkTransaction();
-    
-    Query q = dedicatedSession.createQuery(queryString + " order by d.alias, d.email, d.firstName, d.lastName");
 
-    if (params.firstName != null)
-      q.setString("firstName", StringUtils.sqlInnerStringMatch(params.firstName));
-    
-    if (params.lastName != null)
-      q.setString("lastName", StringUtils.sqlInnerStringMatch(params.lastName));
-    
-    if (params.email != null)
-      q.setString("email", StringUtils.sqlInnerStringMatch(params.email));
-    
-    if (params.alias != null)
-      q.setString("alias", StringUtils.sqlInnerStringMatch(params.alias));
-    
+    Query q = dedicatedSession.createQuery(queryString);
+
+    SQLMethods.applyParametersToQuery(q, params);
+
     q.setFirstResult(offset);
     q.setMaxResults(size + 1);
     

@@ -45,7 +45,7 @@ public class DonationBidTask implements DonationTask
   public List<Donation> refreshTaskList()
   {
     DonationSearchParams params = new DonationSearchParams();
-    params.targetBidState = DonationBidState.PENDING;
+    params.setTargetBidState(DonationBidState.PENDING);
     
     return this.donations.searchDonations(params);
   }

@@ -30,14 +30,14 @@ public class TestSpeedRunSearch extends TestCase
   
   public void testSearchSpeedRunsNoParam()
   {
-    List<SpeedRun> runs = this.searcher.runSearch(new SpeedRunSearchParams(null));
+    List<SpeedRun> runs = this.searcher.runSearch(new SpeedRunSearchParams(null, null, null, null, null, null));
     
     assertEquals(3, runs.size());
   }
   
   public void testSearchSpeedRunsName()
   {
-    List<SpeedRun> runs = this.searcher.runSearch(new SpeedRunSearchParams("yet"));
+    List<SpeedRun> runs = this.searcher.runSearch(new SpeedRunSearchParams("yet", null, null, null, null, null));
     
     assertEquals(1, runs.size());
     

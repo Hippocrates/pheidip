@@ -5,8 +5,9 @@ import java.util.List;
 import pheidip.db.DonorData;
 import pheidip.objects.Donor;
 import pheidip.objects.DonorSearchParams;
+import pheidip.objects.SearchEntity;
 
-public class DonorSearch extends EntitySearcher<Donor, DonorSearchParams>
+public class DonorSearch extends EntitySearcher<Donor>
 {
   public static final int DEFAULT_SEARCH_SIZE = 20;
   
@@ -21,12 +22,12 @@ public class DonorSearch extends EntitySearcher<Donor, DonorSearchParams>
   
   public Donor createIfAble(DonorSearchParams params)
   {
-    int createdDonor = DonorControl.createNewDonor(this.donationDatabase, params.email, params.alias, params.firstName, params.lastName);
+    int createdDonor = DonorControl.createNewDonor(this.donationDatabase, params.getEmail(), params.getAlias(), params.getFirstName(), params.getLastName());
     return this.donors.getDonorById(createdDonor);
   }
  
   @Override
-  public List<Donor> implRunSearch(DonorSearchParams params, int searchOffset, int searchSize)
+  public List<Donor> implRunSearch(SearchEntity<Donor> params, int searchOffset, int searchSize)
   {
     return this.donors.searchDonorsRange(params, searchOffset, searchSize);
   }

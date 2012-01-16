@@ -362,7 +362,7 @@ public class PrizeSearchDialog extends JDialog
 
   private void runSearch()
   {
-    PrizeSearchParams params = new PrizeSearchParams(this.prizeNameCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.nameField.getText()) : null, this.excludeIfWonCheckBox.isSelected());
+    PrizeSearchParams params = new PrizeSearchParams(this.prizeNameCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.nameField.getText()) : null, null, this.excludeIfWonCheckBox.isSelected());
     this.results = new ArrayList<Prize>();
     this.fillList(this.searcher.runSearch(params));
   }

@@ -19,7 +19,9 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
@@ -661,9 +663,14 @@ public class DonationBidSearchDialog extends JDialog
   {
     SpeedRun target = this.speedRunCheckBox.isSelected() ? this.currentRun : null;
     String name = this.bidCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.bidField.getText()) : null;
-    BidState state = this.bidStateCheckBox.isSelected() ? (BidState)this.bidStateComboBox.getSelectedItem() : null;
+    Set<BidState> states = new HashSet<BidState>();
     
-    BidSearchParams params = new BidSearchParams(name, target, state);
+    if (this.bidStateCheckBox.isSelected())
+    {
+      states.add((BidState)this.bidStateComboBox.getSelectedItem());
+    }
+    
+    BidSearchParams params = new BidSearchParams(name, "", target, states);
     
     this.fillList(this.searcher.runSearch(params));
   }

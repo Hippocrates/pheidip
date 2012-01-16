@@ -585,14 +585,14 @@ public class DonationSearchDialog extends JDialog
   {
     DonationSearchParams params = new DonationSearchParams();
     
-    params.donor = this.donorCheckBox.isSelected() ? this.currentDonor : null;
-    params.loTime = this.donatedAfterCheckBox.isSelected() ? (Date)this.donatedAfterField.getValue() : null;
-    params.hiTime = this.donatedBeforeCheckBox.isSelected() ? (Date)this.donatedBeforeField.getValue() : null;
-    params.loAmount = this.amountAboveCheckBox.isSelected() ? FormatUtils.getNumberOrNull(this.amountAboveField.getText()) : null;
-    params.hiAmount = this.amountBelowCheckBox.isSelected() ? FormatUtils.getNumberOrNull(this.amountBelowField.getText()) : null;
-    params.targetBidState = this.bidStateCheckBox.isSelected() ? (DonationBidState)this.bidStateComboBox.getSelectedItem() : null;
-    params.targetReadState = this.readStateCheckBox.isSelected() ? (DonationReadState)this.readStateComboBox.getSelectedItem() : null;
-    params.targetCommentState = this.commentStateCheckBox.isSelected() ? (DonationCommentState)this.commentStateComboBox.getSelectedItem() : null;
+    params.setDonor(this.donorCheckBox.isSelected() ? this.currentDonor : null);
+    params.setLoTime(this.donatedAfterCheckBox.isSelected() ? (Date)this.donatedAfterField.getValue() : null);
+    params.setHiTime(this.donatedBeforeCheckBox.isSelected() ? (Date)this.donatedBeforeField.getValue() : null);
+    params.setLoAmount(this.amountAboveCheckBox.isSelected() ? FormatUtils.getNumberOrNull(this.amountAboveField.getText()) : null);
+    params.setHiAmount(this.amountBelowCheckBox.isSelected() ? FormatUtils.getNumberOrNull(this.amountBelowField.getText()) : null);
+    params.setTargetBidState(this.bidStateCheckBox.isSelected() ? (DonationBidState)this.bidStateComboBox.getSelectedItem() : null);
+    params.setTargetReadState(this.readStateCheckBox.isSelected() ? (DonationReadState)this.readStateComboBox.getSelectedItem() : null);
+    params.setTargetCommentState(this.commentStateCheckBox.isSelected() ? (DonationCommentState)this.commentStateComboBox.getSelectedItem() : null);
     
     this.fillList(this.searcher.runSearch(params));
   }

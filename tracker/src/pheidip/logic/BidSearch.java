@@ -6,16 +6,16 @@ import java.util.List;
 
 import pheidip.db.BidData;
 import pheidip.objects.Bid;
-import pheidip.objects.BidSearchParams;
 import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 import pheidip.objects.ChoiceOptionSearchParams;
+import pheidip.objects.SearchEntity;
 import pheidip.objects.SpeedRun;
 import pheidip.util.Filter;
 
-public class BidSearch extends EntitySearcher<Bid, BidSearchParams>
+public class BidSearch extends EntitySearcher<Bid>
 {
   private DonationDatabaseManager manager;
   private BidData bids;
@@ -72,13 +72,8 @@ public class BidSearch extends EntitySearcher<Bid, BidSearchParams>
     return toAdd;
   }
 
-  public List<Bid> filterBids(BidSearchParams params)
-  {
-    return Filter.filterList(new ArrayList<Bid>(params.owner.getBids()), params);
-  }
-
   @Override
-  protected List<Bid> implRunSearch(BidSearchParams params, int searchOffset, int searchSize)
+  protected List<Bid> implRunSearch(SearchEntity<Bid> params, int searchOffset, int searchSize)
   {
     return this.bids.searchBidsRange(params, searchOffset, searchSize);
   }

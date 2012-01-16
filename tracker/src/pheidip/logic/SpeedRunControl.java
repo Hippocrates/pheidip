@@ -2,6 +2,7 @@ package pheidip.logic;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import pheidip.db.SpeedRunData;
@@ -56,7 +57,7 @@ public class SpeedRunControl
   public static int createNewSpeedRun(DonationDatabaseManager manager, String name)
   {
     int id = IdUtils.generateId();
-    manager.getDataAccess().getSpeedRunData().insertSpeedRun(new SpeedRun(id, name, "", id, null, null, null));
+    manager.getDataAccess().getSpeedRunData().insertSpeedRun(new SpeedRun(id, name, "", id, new Date(), new Date(), ""));
     return id;
   }
 

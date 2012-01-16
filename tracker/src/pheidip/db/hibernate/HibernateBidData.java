@@ -1,19 +1,18 @@
 package pheidip.db.hibernate;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 
 import pheidip.db.BidData;
 import pheidip.objects.Bid;
-import pheidip.objects.BidSearchParams;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
-import pheidip.util.StringUtils;
+import pheidip.objects.SearchEntity;
 
 public class HibernateBidData extends HibernateDataInterface implements BidData
 {
@@ -210,43 +209,21 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   }
 
   @Override
-  public List<Bid> searchBids(BidSearchParams params)
+  public List<Bid> searchBids(SearchEntity<Bid> params)
   {
     return this.searchBidsRange(params, 0, Integer.MAX_VALUE);
   }
     
   @Override
-  public List<Bid> searchBidsRange(BidSearchParams params, int offset, int size)
+  public List<Bid> searchBidsRange(SearchEntity<Bid> params, int offset, int size)
   {
-    String queryString = "from Bid b";
-    List<String> whereClause = new ArrayList<String>();
+    String queryString = SQLMethods.makeHQLSearchQueryString(params, "Bid", "name");
     
-    if (params.name != null)
-      whereClause.add("lower(b.name) like :name");
-    
-    if (params.owner != null)
-      whereClause.add("b.speedRun = :owner");
-    
-    if (params.state != null)
-      whereClause.add("lower(b.bidState) = :state");
-    
-    if (whereClause.size() > 0)
-    {
-      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
-    }
-    
-    Session session = this.beginTransaction();
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
 
-    Query q = session.createQuery(queryString + " order by b.name");
+    Query q = dedicatedSession.createQuery(queryString);
 
-    if (params.name != null)
-      q.setString("name", StringUtils.sqlInnerStringMatch(params.name));
-    
-    if (params.owner != null)
-      q.setParameter("owner", params.owner);
-    
-    if (params.state != null)
-      q.setParameter("state", params.state);
+    SQLMethods.applyParametersToQuery(q, params);
 
     q.setFirstResult(offset);
     q.setMaxResults(size);
@@ -254,7 +231,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
     @SuppressWarnings("unchecked")
     List<Bid> listing = q.list();
     
-    this.endTransaction();
+    this.endBulkTransaction(dedicatedSession);
 
     return listing;
   }

@@ -4,9 +4,9 @@ import java.util.List;
 
 import pheidip.db.PrizeData;
 import pheidip.objects.Prize;
-import pheidip.objects.PrizeSearchParams;
+import pheidip.objects.SearchEntity;
 
-public class PrizeSearch extends EntitySearcher<Prize, PrizeSearchParams>
+public class PrizeSearch extends EntitySearcher<Prize>
 {
   private DonationDatabaseManager manager;
   private PrizeData prizes;
@@ -24,7 +24,7 @@ public class PrizeSearch extends EntitySearcher<Prize, PrizeSearchParams>
   }
 
   @Override
-  protected List<Prize> implRunSearch(PrizeSearchParams params,
+  protected List<Prize> implRunSearch(SearchEntity<Prize> params,
       int searchOffset, int searchSize)
   {
     return this.prizes.searchPrizesRange(params, searchOffset, searchSize);

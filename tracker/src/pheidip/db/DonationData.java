@@ -6,7 +6,7 @@ import java.util.List;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBid;
 import pheidip.objects.DonationDomain;
-import pheidip.objects.DonationSearchParams;
+import pheidip.objects.SearchEntity;
 
 public interface DonationData {
 
@@ -30,11 +30,11 @@ public interface DonationData {
 
 	public List<Donation> getAllDonations();
 
-	public List<Donation> searchDonations(DonationSearchParams params);
+	public List<Donation> searchDonations(SearchEntity<Donation> params);
 
   public void insertMultipleDonations(List<Donation> donationsToInsert);
   public void updateMultipleDonations(List<Donation> donationsToUpdate);
 
-  public List<Donation> searchDonationsRange(DonationSearchParams params, int searchOffset,
+  public List<Donation> searchDonationsRange(SearchEntity<Donation> params, int searchOffset,
       int searchSize);
 }

@@ -47,7 +47,7 @@ public class DonationReadTask implements DonationTask
   public List<Donation> refreshTaskList()
   {
     DonationSearchParams params = new DonationSearchParams();
-    params.targetReadState = DonationReadState.PENDING;
+    params.setTargetReadState(DonationReadState.PENDING);
     
     return this.donations.searchDonations(params);
   }

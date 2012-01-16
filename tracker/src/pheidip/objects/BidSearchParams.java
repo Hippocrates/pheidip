@@ -1,27 +1,88 @@
 package pheidip.objects;
 
-import pheidip.util.FilterFunction;
-import pheidip.util.StringUtils;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-public class BidSearchParams implements FilterFunction<Bid>
+import pheidip.model.ComparisonOperator;
+import pheidip.model.EntitySpecification;
+import pheidip.model.SearchProperty;
+import pheidip.model.SearchSpecification;
+
+public class BidSearchParams implements SearchEntity<Bid>
 {
-  public String name;
-  public SpeedRun owner;
-  public BidState state;
+  private static SearchSpecification specification;
+  
+  private String name;
+  private String description;
+  private SpeedRun owner;
+  private Set<BidState> states;
 
-  public BidSearchParams(String name, SpeedRun owner, BidState state)
+  public BidSearchParams(String name, String description, SpeedRun owner, Set<BidState> states)
+  {
+    this.setName(name);
+    this.setDescription(description);
+    this.setOwner(owner);
+    this.setStates(states);
+  }
+
+  public void setName(String name)
   {
     this.name = name;
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setOwner(SpeedRun owner)
+  {
     this.owner = owner;
-    this.state = state;
+  }
+
+  public SpeedRun getOwner()
+  {
+    return owner;
+  }
+
+  public void setStates(Set<BidState> states)
+  {
+    this.states = new HashSet<BidState>(states);
+  }
+
+  public Set<BidState> getStates()
+  {
+    return Collections.unmodifiableSet(states);
+  }
+
+  public void setDescription(String description)
+  {
+    this.description = description;
+  }
+
+  public String getDescription()
+  {
+    return description;
   }
 
   @Override
-  public boolean predicate(Bid x)
+  public SearchSpecification getSearchSpecification()
   {
-    return
-      (StringUtils.nullIfEmpty(this.name) == null || StringUtils.innerStringMatch(x.getName(), this.name)) &&
-      (this.owner == null || this.owner.equals(x.getSpeedRun())) &&
-      (this.state == null || this.state == x.getBidState());
+    if (specification == null)
+    {
+      EntitySpecification selfSpec = EntityMethods.getSpecification(this.getClass());
+      EntitySpecification targetSpec = EntityMethods.getSpecification(Bid.class);
+
+      specification = new SearchSpecification(
+          new SearchProperty(selfSpec.getProperty("name"), targetSpec.getProperty("name"), ComparisonOperator.INNERMATCH),
+          new SearchProperty(selfSpec.getProperty("description"), targetSpec.getProperty("description"), ComparisonOperator.INNERMATCH),
+          new SearchProperty(selfSpec.getProperty("owner"), targetSpec.getProperty("speedRun"), ComparisonOperator.EQUALS),
+          new SearchProperty(selfSpec.getProperty("states"), targetSpec.getProperty("bidState"), ComparisonOperator.IN));
+    }
+    
+    return specification;
   }
+  
+  
 }

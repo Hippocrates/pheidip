@@ -2,8 +2,8 @@ package pheidip.db;
 
 import java.util.List;
 
+import pheidip.objects.SearchEntity;
 import pheidip.objects.SpeedRun;
-import pheidip.objects.SpeedRunSearchParams;
 
 public interface SpeedRunData {
 
@@ -17,9 +17,9 @@ public interface SpeedRunData {
 
 	public List<SpeedRun> getAllSpeedRuns();
 
-	public List<SpeedRun> searchSpeedRuns(SpeedRunSearchParams params);
+	public List<SpeedRun> searchSpeedRuns(SearchEntity<SpeedRun> params);
 
-  public List<SpeedRun> searchSpeedRunsRange(SpeedRunSearchParams params, int offset,
+  public List<SpeedRun> searchSpeedRunsRange(SearchEntity<SpeedRun> params, int offset,
       int size);
 
 void multiUpdateSpeedRuns(List<SpeedRun> toUpdate);

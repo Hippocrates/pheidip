@@ -3,10 +3,11 @@ package pheidip.logic;
 import java.util.List;
 
 import pheidip.db.SpeedRunData;
+import pheidip.objects.SearchEntity;
 import pheidip.objects.SpeedRun;
 import pheidip.objects.SpeedRunSearchParams;
 
-public class SpeedRunSearch extends EntitySearcher<SpeedRun, SpeedRunSearchParams>
+public class SpeedRunSearch extends EntitySearcher<SpeedRun>
 {
   private DonationDatabaseManager manager;
   private SpeedRunData speedRuns;
@@ -19,13 +20,13 @@ public class SpeedRunSearch extends EntitySearcher<SpeedRun, SpeedRunSearchParam
   
   public SpeedRun createIfAble(SpeedRunSearchParams params)
   {
-    int id = SpeedRunControl.createNewSpeedRun(this.manager, params.name);
+    int id = SpeedRunControl.createNewSpeedRun(this.manager, params.getName());
     return this.speedRuns.getSpeedRunById(id);
   }
 
   @Override
   protected List<SpeedRun> implRunSearch(
-      SpeedRunSearchParams params, int searchOffset, int searchSize)
+      SearchEntity<SpeedRun> params, int searchOffset, int searchSize)
   {
     return this.speedRuns.searchSpeedRunsRange(params, searchOffset, searchSize);
   }

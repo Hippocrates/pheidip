@@ -48,7 +48,7 @@ public class ChipinMergeProcess extends AbstractExternalProcess
       DonationData donations = this.donationDatabase.getDataAccess().getDonationData();
       DonorData donors = this.donationDatabase.getDataAccess().getDonorData();
       DonationSearchParams params = new DonationSearchParams();
-      params.domain = DonationDomain.CHIPIN;
+      params.setDomain(DonationDomain.CHIPIN);
 
       List<Donor> allDonors = donors.getAllDonors();
       List<Donation> donationsToInsert = new ArrayList<Donation>();

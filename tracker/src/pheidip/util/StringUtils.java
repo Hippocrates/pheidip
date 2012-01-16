@@ -1,6 +1,7 @@
 package pheidip.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -217,5 +218,10 @@ public final class StringUtils
     }
     
     return output.toString();
+  }
+
+  public static String joinSeperated(String[] orderingProperties, String seperator)
+  {
+    return joinSeperated(Arrays.asList(orderingProperties), seperator);
   }
 }

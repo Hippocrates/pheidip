@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import pheidip.logic.EntitySearcher;
 import pheidip.objects.Entity;
+import pheidip.objects.SearchEntity;
 
 import java.awt.Component;
 import java.awt.GridBagLayout;
@@ -24,10 +25,10 @@ import java.awt.Insets;
 import javax.swing.ListSelectionModel;
 
 @SuppressWarnings("serial")
-public class EntitySearchList<T extends Entity, P> extends JPanel
+public class EntitySearchList<T extends Entity> extends JPanel
 {
-  private P searchParams;
-  private EntitySearcher<T,P> searcher;
+  private SearchEntity<T> searchParams;
+  private EntitySearcher<T> searcher;
   private List<T> cachedList;
   private JList resultsList;
   private JButton previousButton;
@@ -121,7 +122,7 @@ public class EntitySearchList<T extends Entity, P> extends JPanel
     this.setFocusTraversalPolicy(new FocusTraversalManager(tabOrder));
   }
   
-  public EntitySearchList(EntitySearcher<T,P> searcher)
+  public EntitySearchList(EntitySearcher<T> searcher)
   {
     this.searcher = searcher;
     this.cachedList = new ArrayList<T>();
@@ -142,14 +143,14 @@ public class EntitySearchList<T extends Entity, P> extends JPanel
     return this.cachedList;
   }
   
-  public P getSearchParams()
+  public SearchEntity<T> getSearchParams()
   {
     return this.searchParams;
   }
   
-  public void setSearchParams(P searchParams)
+  public void setSearchParams(SearchEntity<T> searchParams)
   {
-    P oldValue = this.searchParams;
+    SearchEntity<T> oldValue = this.searchParams;
     this.searchParams = searchParams;
     this.runSearch();
     this.firePropertyChange("searchParams", oldValue, this.searchParams);

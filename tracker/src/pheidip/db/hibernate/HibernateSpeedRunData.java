@@ -1,6 +1,5 @@
 package pheidip.db.hibernate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -9,9 +8,8 @@ import org.hibernate.StatelessSession;
 
 import pheidip.db.SpeedRunData;
 import pheidip.objects.Prize;
+import pheidip.objects.SearchEntity;
 import pheidip.objects.SpeedRun;
-import pheidip.objects.SpeedRunSearchParams;
-import pheidip.util.StringUtils;
 
 public class HibernateSpeedRunData extends HibernateDataInterface implements SpeedRunData
 {
@@ -107,32 +105,22 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
   }
 
   @Override
-  public List<SpeedRun> searchSpeedRuns(SpeedRunSearchParams params)
+  public List<SpeedRun> searchSpeedRuns(SearchEntity<SpeedRun> params)
   {
     return this.searchSpeedRunsRange(params, 0, Integer.MAX_VALUE);
   }
   
   @Override
-  public List<SpeedRun> searchSpeedRunsRange(SpeedRunSearchParams params, int offset, int size)
+  public List<SpeedRun> searchSpeedRunsRange(SearchEntity<SpeedRun> params, int offset, int size)
   {
-    String queryString = "from SpeedRun s";
-    List<String> whereClause = new ArrayList<String>();
+    String queryString = SQLMethods.makeHQLSearchQueryString(params, "SpeedRun", "name");
     
-    if (params.name != null)
-      whereClause.add("lower(s.name) like :name");
+    StatelessSession dedicatedSession = this.beginBulkTransaction();
 
-    if (whereClause.size() > 0)
-    {
-      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
-    }
-    
-    Session session = this.beginTransaction();
-    
-    Query q = session.createQuery(queryString + " order by s.name");
+    Query q = dedicatedSession.createQuery(queryString);
 
-    if (params.name != null)
-      q.setString("name", StringUtils.sqlInnerStringMatch(params.name));
-    
+    SQLMethods.applyParametersToQuery(q, params);
+
     q.setFirstResult(offset);
     q.setMaxResults(size);
     

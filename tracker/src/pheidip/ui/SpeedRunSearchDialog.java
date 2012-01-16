@@ -299,7 +299,7 @@ public class SpeedRunSearchDialog extends JDialog
   
   private void createFromFields()
   {
-    SpeedRun s = this.searcher.createIfAble(new SpeedRunSearchParams(this.nameField.getText()));
+    SpeedRun s = this.searcher.createIfAble(new SpeedRunSearchParams(this.nameField.getText(), null, null, null, null, null));
     
     this.results = new ArrayList<SpeedRun>();
     this.results.add(s);
@@ -370,7 +370,7 @@ public class SpeedRunSearchDialog extends JDialog
 
   private void runSearch()
   {
-    SpeedRunSearchParams params = new SpeedRunSearchParams(this.nameFieldCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.nameField.getText()) : null);
+    SpeedRunSearchParams params = new SpeedRunSearchParams(this.nameFieldCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.nameField.getText()) : null, null, null, null, null, null);
     
     this.fillList(this.searcher.runSearch(params));
   }

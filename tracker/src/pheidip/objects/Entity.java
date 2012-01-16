@@ -3,12 +3,18 @@ package pheidip.objects;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import pheidip.model.EntitySpecification;
 import pheidip.util.IdUtils;
 
 public abstract class Entity
 {
   private int id = IdUtils.generateId();
   private PropertyChangeSupport propertyChangeManager = new PropertyChangeSupport(this);
+  
+  public EntitySpecification getSpecification()
+  {
+    return EntityMethods.getSpecification(this.getClass());
+  }
   
   public int getId()
   {

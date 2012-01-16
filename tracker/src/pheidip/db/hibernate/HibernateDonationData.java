@@ -17,7 +17,7 @@ import pheidip.objects.ChoiceOption;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBid;
 import pheidip.objects.DonationDomain;
-import pheidip.objects.DonationSearchParams;
+import pheidip.objects.SearchEntity;
 import pheidip.util.StringUtils;
 
 public class HibernateDonationData extends HibernateDataInterface implements DonationData
@@ -143,80 +143,16 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   }
 
   @Override
-  public List<Donation> searchDonationsRange(DonationSearchParams params, int offset, int size)
+  public List<Donation> searchDonationsRange(SearchEntity<Donation> params, int offset, int size)
   {
-    String queryString = "from Donation d inner join fetch d.donor";
-    List<String> whereClause = new ArrayList<String>();
+    String queryString = SQLMethods.makeHQLSearchQueryString(params, "Donation", "timeReceived");
     
-    if (params.donor != null)
-      whereClause.add("d.donor = :donor");
-    
-    if (params.domain != null)
-      whereClause.add("d.domain = :domain");
-    
-    if (params.domainId != null)
-      whereClause.add("d.domainId like :domainId");
-    
-    if (params.loTime != null)
-      whereClause.add("d.timeReceived >= :loTime");
-    
-    if (params.hiTime != null)
-      whereClause.add("d.timeReceived <= :hiTime");
-    
-    if (params.loAmount != null)
-      whereClause.add("d.amount >= :loAmount");
-    
-    if (params.hiAmount != null)
-      whereClause.add("d.amount <= :hiAmount");
-    
-    if (params.targetBidState != null)
-      whereClause.add("d.bidState = :bidState");
-    
-    if (params.targetReadState != null)
-      whereClause.add("d.readState = :readState");
-    
-    if (params.targetCommentState != null)
-      whereClause.add("d.commentState = :commentState");
-    
-    if (whereClause.size() > 0)
-    {
-      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
-    }
-
     StatelessSession dedicatedSession = this.beginBulkTransaction();
-    
-    Query q = dedicatedSession.createQuery(queryString + " order by d.timeReceived");
-    
-    if (params.donor != null)
-      q.setParameter("donor", params.donor);
-    
-    if (params.domain != null)
-      q.setParameter("domain", params.domain);
-    
-    if (params.domainId != null)
-      q.setString("domainId", params.domainId);
-    
-    if (params.loTime != null)
-      q.setTimestamp("loTime", params.loTime);
-    
-    if (params.hiTime != null)
-      q.setTimestamp("hiTime", params.hiTime);
 
-    if (params.loAmount != null)
-      q.setBigDecimal("loAmount", params.loAmount);
-    
-    if (params.hiAmount != null)
-      q.setBigDecimal("hiAmount", params.hiAmount);
-    
-    if (params.targetBidState != null)
-      q.setParameter("bidState", params.targetBidState);
-    
-    if (params.targetReadState != null)
-      q.setParameter("readState", params.targetReadState);
-    
-    if (params.targetCommentState != null)
-      q.setParameter("commentState", params.targetCommentState);
-    
+    Query q = dedicatedSession.createQuery(queryString);
+
+    SQLMethods.applyParametersToQuery(q, params);
+
     q.setFirstResult(offset);
     q.setMaxResults(size);
     
@@ -229,7 +165,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   }
   
   @Override
-  public List<Donation> searchDonations(DonationSearchParams params)
+  public List<Donation> searchDonations(SearchEntity<Donation> params)
   {
     return this.searchDonationsRange(params, 0, Integer.MAX_VALUE);
   }

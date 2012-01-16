@@ -1,6 +1,5 @@
 package pheidip.db.hibernate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -8,9 +7,8 @@ import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 
 import pheidip.db.PrizeData;
+import pheidip.objects.SearchEntity;
 import pheidip.objects.Prize;
-import pheidip.objects.PrizeSearchParams;
-import pheidip.util.StringUtils;
 
 public class HibernatePrizeData extends HibernateDataInterface implements PrizeData
 {
@@ -113,34 +111,21 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   }
 
   @Override
-  public List<Prize> searchPrizes(PrizeSearchParams params)
+  public List<Prize> searchPrizes(SearchEntity<Prize> params)
   {
     return this.searchPrizesRange(params, 0, Integer.MAX_VALUE);
   }
   
   @Override
-  public List<Prize> searchPrizesRange(PrizeSearchParams params, int offset, int size)
+  public List<Prize> searchPrizesRange(SearchEntity<Prize> params, int offset, int size)
   {
-    String queryString = "from Prize p";
-    List<String> whereClause = new ArrayList<String>();
-    
-    if (params.name != null)
-      whereClause.add("lower(p.name) like :name");
-    
-    if (params.excludeIfWon)
-      whereClause.add("p.winner is null");
-    
-    if (whereClause.size() > 0)
-    {
-      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
-    }
+    String queryString = SQLMethods.makeHQLSearchQueryString(params, "Prize", "name");
     
     StatelessSession dedicatedSession = this.beginBulkTransaction();
-    
-    Query q = dedicatedSession.createQuery(queryString + " order by p.name");
 
-    if (params.name != null)
-      q.setString("name", StringUtils.sqlInnerStringMatch(params.name));
+    Query q = dedicatedSession.createQuery(queryString);
+
+    SQLMethods.applyParametersToQuery(q, params);
 
     q.setFirstResult(offset);
     q.setMaxResults(size);

@@ -15,7 +15,7 @@ public class FocusTraversalManager extends FocusTraversalPolicy
 {
   List<Component> components;
   
-  public FocusTraversalManager(Component[] components)
+  public FocusTraversalManager(Component... components)
   {
     this(Arrays.asList(components));
   }
