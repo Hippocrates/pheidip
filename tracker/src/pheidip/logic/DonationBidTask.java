@@ -1,5 +1,7 @@
 package pheidip.logic;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import pheidip.db.DonationData;
@@ -45,7 +47,7 @@ public class DonationBidTask implements DonationTask
   public List<Donation> refreshTaskList()
   {
     DonationSearchParams params = new DonationSearchParams();
-    params.setTargetBidState(DonationBidState.PENDING);
+    params.setTargetBidState(new HashSet<DonationBidState>(Arrays.asList(DonationBidState.PENDING)));
     
     return this.donations.searchDonations(params);
   }

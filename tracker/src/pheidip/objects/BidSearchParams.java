@@ -9,7 +9,7 @@ import pheidip.model.EntitySpecification;
 import pheidip.model.SearchProperty;
 import pheidip.model.SearchSpecification;
 
-public class BidSearchParams implements SearchEntity<Bid>
+public class BidSearchParams extends SearchParameters<Bid>
 {
   private static SearchSpecification specification;
   
@@ -24,6 +24,10 @@ public class BidSearchParams implements SearchEntity<Bid>
     this.setDescription(description);
     this.setOwner(owner);
     this.setStates(states);
+  }
+
+  public BidSearchParams()
+  {
   }
 
   public void setName(String name)

@@ -1,6 +1,8 @@
 package pheidip.logic.chipin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +50,7 @@ public class ChipinMergeProcess extends AbstractExternalProcess
       DonationData donations = this.donationDatabase.getDataAccess().getDonationData();
       DonorData donors = this.donationDatabase.getDataAccess().getDonorData();
       DonationSearchParams params = new DonationSearchParams();
-      params.setDomain(DonationDomain.CHIPIN);
+      params.setDomain(new HashSet<DonationDomain>(Arrays.asList(DonationDomain.CHIPIN)));
 
       List<Donor> allDonors = donors.getAllDonors();
       List<Donation> donationsToInsert = new ArrayList<Donation>();

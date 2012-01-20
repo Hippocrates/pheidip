@@ -2,6 +2,9 @@ package pheidip.model;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Collection;
 
 public class EntityProperty
 {
@@ -41,6 +44,31 @@ public class EntityProperty
   public Class<?> getStorageType()
   {
     return this.storageType;
+  }
+  
+  public boolean isCollectionType()
+  {
+    return Collection.class.isAssignableFrom(this.getStorageType());
+  }
+  
+  public Class<?> getCollectionType()
+  {
+    if (this.isCollectionType())
+    {
+      Type rawType = this.getReadMethod().getGenericReturnType();
+      
+      if (rawType instanceof ParameterizedType)
+      {
+        Type result = ((ParameterizedType)rawType).getActualTypeArguments()[0];
+        
+        if (result instanceof Class)
+        {
+          return (Class<?>)result;
+        }
+      }
+    }
+
+    return null;
   }
 
   public boolean isReadOnly()

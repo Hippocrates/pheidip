@@ -36,7 +36,6 @@ import pheidip.logic.PrizeControl;
 import pheidip.logic.PrizeSearch;
 import pheidip.logic.ProgramInstance;
 import pheidip.logic.SpeedRunControl;
-import pheidip.logic.SpeedRunSearch;
 import pheidip.logic.chipin.ChipinDonationSource;
 import pheidip.logic.chipin.ChipinFileDonationSource;
 import pheidip.logic.chipin.ChipinMergeProcess;
@@ -44,14 +43,19 @@ import pheidip.logic.chipin.ChipinTextDonationSource;
 import pheidip.logic.chipin.ChipinWebsiteDonationSource;
 import pheidip.logic.gdocs.GoogleRefreshProcess;
 import pheidip.objects.Bid;
+import pheidip.objects.BidSearchParams;
 import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationSearchParams;
 import pheidip.objects.Donor;
+import pheidip.objects.DonorSearchParams;
 import pheidip.objects.Entity;
 import pheidip.objects.Prize;
+import pheidip.objects.PrizeSearchParams;
 import pheidip.objects.SpeedRun;
+import pheidip.objects.SpeedRunSearchParams;
 import pheidip.util.Reporter;
 
 import javax.swing.JSeparator;
@@ -790,7 +794,8 @@ public class MainWindow extends JFrame implements Reporter
 
   private void openSearchBidDialog()
   {
-    BidSearchDialog dialog = new BidSearchDialog(this, new BidSearch(this.instance.getDonationDatabase()));
+    @SuppressWarnings("unchecked")
+    EntitySearchDialog<Bid> dialog = (EntitySearchDialog<Bid>) UIGenerator.createEntitySearchDialog(Bid.class, this.instance, true);
   
     dialog.setVisible(true);
     
@@ -809,8 +814,9 @@ public class MainWindow extends JFrame implements Reporter
 
   private void openSearchDonationDialog()
   {
-    DonationSearchDialog dialog = new DonationSearchDialog(this, new DonationSearch(this.instance.getDonationDatabase()));
-    
+    @SuppressWarnings("unchecked")
+    EntitySearchDialog<Donation> dialog = (EntitySearchDialog<Donation>) UIGenerator.createEntitySearchDialog(Donation.class, this.instance, true);
+
     dialog.setVisible(true);
 
     for (Donation result : dialog.getResults())
@@ -821,7 +827,8 @@ public class MainWindow extends JFrame implements Reporter
   
   private void openSearchDonorDialog()
   {
-    DonorSearchDialog dialog = new DonorSearchDialog(this, new DonorSearch(this.instance.getDonationDatabase()));
+    @SuppressWarnings("unchecked")
+    EntitySearchDialog<Donor> dialog = (EntitySearchDialog<Donor>) UIGenerator.createEntitySearchDialog(Donor.class, this.instance, true);
     
     dialog.setVisible(true);
     
@@ -833,7 +840,8 @@ public class MainWindow extends JFrame implements Reporter
   
   private void openSearchSpeedRunDialog()
   {
-    SpeedRunSearchDialog dialog = new SpeedRunSearchDialog(this, new SpeedRunSearch(this.instance.getDonationDatabase()));
+    @SuppressWarnings("unchecked")
+    EntitySearchDialog<SpeedRun> dialog = (EntitySearchDialog<SpeedRun>) UIGenerator.createEntitySearchDialog(SpeedRun.class, this.instance, true);
     
     dialog.setVisible(true);
     
@@ -845,8 +853,8 @@ public class MainWindow extends JFrame implements Reporter
   
   private void openSearchPrizeDialog()
   {
-    PrizeSearch searcher = new PrizeSearch(this.instance.getDonationDatabase());
-    PrizeSearchDialog dialog = new PrizeSearchDialog(this, searcher);
+    @SuppressWarnings("unchecked")
+    EntitySearchDialog<Prize> dialog = (EntitySearchDialog<Prize>) UIGenerator.createEntitySearchDialog(Prize.class, this.instance, true);
     
     dialog.setVisible(true);
     

@@ -42,6 +42,7 @@ public class EntitySelector<T extends Entity> extends JPanel implements ActionLi
   private AggregateBooleanProperty clearable;
   private AggregateBooleanProperty nullable;
   private AggregateBooleanProperty settable;
+  private ProgramInstance instance;
 
   private void initializeGUI()
   {
@@ -98,7 +99,14 @@ public class EntitySelector<T extends Entity> extends JPanel implements ActionLi
       }
       else if (ev.getSource() == this.setSelectionButton)
       {
-        this.owner.createSearchDialog(entityClass);
+        @SuppressWarnings("unchecked")
+        EntitySearchDialog<T> searcher = (EntitySearchDialog<T>) UIGenerator.createEntitySearchDialog(entityClass, instance, false);
+        searcher.setVisible(true);
+        
+        if (searcher.getResult() != null)
+        {
+          this.setEntity(searcher.getResult());
+        }
       }
       else if (ev.getSource() == this.clearSelectionButton)
       {
@@ -107,7 +115,7 @@ public class EntitySelector<T extends Entity> extends JPanel implements ActionLi
     }
     catch(Exception e)
     {
-      this.owner.report(e);
+      UIConfiguration.reportError(e);
     }
   }
   
@@ -155,11 +163,22 @@ public class EntitySelector<T extends Entity> extends JPanel implements ActionLi
     this.setFocusTraversalPolicyProvider(true);
     this.setFocusCycleRoot(false);
   }
-
-  public EntitySelector(MainWindow owner, ProgramInstance instance, Class<T> entityClass)
+  
+  public EntitySelector(ProgramInstance instance, Class<T> entityClass)
+  {
+    this(null, instance, entityClass);
+  }
+  
+  public EntitySelector(MainWindow owner, Class<T> entityClass)
+  {
+    this(owner, owner.getInstance(), entityClass);
+  }
+  
+  private EntitySelector(MainWindow owner, ProgramInstance instance, Class<T> entityClass)
   {
     this.sync = new EntityPropertiesSync();
     this.owner = owner;
+    this.instance = instance;
     this.entity = null;
     this.entityClass = entityClass;
     this.navigationAllowed = false;
@@ -185,13 +204,13 @@ public class EntitySelector<T extends Entity> extends JPanel implements ActionLi
   
   public boolean isNavigationAllowed()
   {
-    return this.navigationAllowed;
+    return this.navigationAllowed && this.owner != null;
   }
   
   public void setNavigationAllowed(boolean value)
   {
     boolean oldValue = this.navigationAllowed;
-    this.navigationAllowed = value;
+    this.navigationAllowed = value && this.owner != null;
     this.firePropertyChange("navigationAllowed", oldValue, this.navigationAllowed);
   }
   

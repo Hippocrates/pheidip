@@ -3,7 +3,7 @@ package pheidip.logic;
 import java.util.List;
 
 import pheidip.objects.Entity;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 
 public abstract class EntitySearcher<T extends Entity>
 {
@@ -11,11 +11,11 @@ public abstract class EntitySearcher<T extends Entity>
   
   private int searchOffset;
   private int searchSize;
-  private SearchEntity<T> searchParams;
+  private SearchParameters<T> searchParams;
 
   private boolean hasMore;
   
-  final public List<T> runSearch(SearchEntity<T> params)
+  final public List<T> runSearch(SearchParameters<T> params)
   {
     this.searchOffset = 0;
     this.searchSize = DEFAULT_SEARCH_SIZE;
@@ -45,7 +45,7 @@ public abstract class EntitySearcher<T extends Entity>
     return result;
   }
   
-  abstract protected List<T> implRunSearch(SearchEntity<T> params, int searchOffset, int searchSize);
+  abstract protected List<T> implRunSearch(SearchParameters<T> params, int searchOffset, int searchSize);
   
   final public boolean getHasPrevious()
   {

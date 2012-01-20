@@ -9,17 +9,17 @@ import org.hibernate.Query;
 import pheidip.model.ComparisonOperator;
 import pheidip.model.SearchProperty;
 import pheidip.objects.Entity;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 import pheidip.util.StringUtils;
 
 public final class SQLMethods
 {
-  public static <T extends Entity> String makeHQLSearchQueryString(SearchEntity<T> searchParams, String tableName, String... orderingProperties)
+  public static <T extends Entity> String makeHQLSearchQueryString(SearchParameters<T> searchParams, String tableName, String... orderingProperties)
   {
     return makeHQLSearchQueryString(new HQLAliasProvider(), searchParams, tableName, orderingProperties);
   }
   
-  public static <T extends Entity> String makeHQLSearchQueryString(HQLAliasProvider aliasProvider, SearchEntity<T> searchParams, String tableName, String... orderingProperties)
+  public static <T extends Entity> String makeHQLSearchQueryString(HQLAliasProvider aliasProvider, SearchParameters<T> searchParams, String tableName, String... orderingProperties)
   {
     String entityAlias = aliasProvider.generateNewAlias();
     
@@ -54,7 +54,7 @@ public final class SQLMethods
   }
   
   @SuppressWarnings("rawtypes")
-  public static <T extends Entity> List<String> buildWherePredicates(String entityAlias, SearchEntity<T> searchParams)
+  public static <T extends Entity> List<String> buildWherePredicates(String entityAlias, SearchParameters<T> searchParams)
   {
     List<String> predicates = new ArrayList<String>();
     
@@ -97,7 +97,7 @@ public final class SQLMethods
     }
   }
   
-  public static <T extends Entity> void applyParametersToQuery(Query q, SearchEntity<T> searchParams)
+  public static <T extends Entity> void applyParametersToQuery(Query q, SearchParameters<T> searchParams)
   {
     for (SearchProperty searchParam : searchParams.getSearchSpecification().getProperties())
     {
@@ -106,7 +106,7 @@ public final class SQLMethods
   }
   
   @SuppressWarnings("rawtypes")
-  public static <T extends Entity> void applyParameterToQuery(Query q, SearchProperty searchParam, SearchEntity<T> searchParams)
+  public static <T extends Entity> void applyParameterToQuery(Query q, SearchProperty searchParam, SearchParameters<T> searchParams)
   {
     final String searchName = searchParam.getSearchProperty().getName();
     final Object searchObject = searchParam.getSearchProperty().getProperty(searchParams);

@@ -1,5 +1,7 @@
 package pheidip.logic;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import pheidip.db.DonationData;
@@ -47,14 +49,14 @@ public class DonationReadTask implements DonationTask
   public List<Donation> refreshTaskList()
   {
     DonationSearchParams params = new DonationSearchParams();
-    params.setTargetReadState(DonationReadState.PENDING);
+    params.setTargetReadState(new HashSet<DonationReadState>(Arrays.asList(DonationReadState.PENDING)));
     
     return this.donations.searchDonations(params);
   }
   
   public boolean isTaskCleared(Donation d)
   {
-    return d.getReadState() != DonationReadState.PENDING || (d.getCommentState() != DonationCommentState.PENDING && !StringUtils.isEmptyOrNull(d.getComment()));
+    return d.getReadState() != DonationReadState.PENDING;
   }
 
   @Override

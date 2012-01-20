@@ -37,7 +37,7 @@ public class SetSelector<E> extends JPanel
     {
       this.boxes[i] = new JCheckBox(this.options.get(i).toString());
       this.add(this.boxes[i]);
-      this.boxes[i].setSelected(true);
+      this.boxes[i].setSelected(false);
     }
   }
   
@@ -62,6 +62,7 @@ public class SetSelector<E> extends JPanel
             {
               selections.remove(options.get(i));
             }
+            
             SetSelector.this.firePropertyChange("selections", oldSet, getSelections());
           }
         }
@@ -76,7 +77,7 @@ public class SetSelector<E> extends JPanel
   private void initializeGUIEvents()
   {
     this.actionHandler = new ActionHandler();
-    
+
     List<Component> tabOrder = new ArrayList<Component>();
     
     for (JCheckBox box : this.boxes)
@@ -92,8 +93,8 @@ public class SetSelector<E> extends JPanel
   {
     this.options = Collections.unmodifiableList(options);
     
-    // default all options to selected
-    this.selections = new HashSet<E>(this.options);
+    // default no options to selected
+    this.selections = new HashSet<E>();
     
     this.initializeGUI();
     this.initializeGUIEvents();
@@ -106,6 +107,14 @@ public class SetSelector<E> extends JPanel
   
   public Set<E> getSelections()
   {
-    return Collections.unmodifiableSet(this.selections);
+    // treat 'nothing selected' the same as 'all selected'
+    if (this.selections.isEmpty())
+    {
+      return Collections.unmodifiableSet(new HashSet<E>(this.options));
+    }
+    else
+    {
+      return Collections.unmodifiableSet(this.selections);
+    }
   }
 }

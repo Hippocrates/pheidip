@@ -5,7 +5,7 @@ import java.util.List;
 import pheidip.db.DonorData;
 import pheidip.objects.Donor;
 import pheidip.objects.DonorSearchParams;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 
 public class DonorSearch extends EntitySearcher<Donor>
 {
@@ -27,7 +27,7 @@ public class DonorSearch extends EntitySearcher<Donor>
   }
  
   @Override
-  public List<Donor> implRunSearch(SearchEntity<Donor> params, int searchOffset, int searchSize)
+  public List<Donor> implRunSearch(SearchParameters<Donor> params, int searchOffset, int searchSize)
   {
     return this.donors.searchDonorsRange(params, searchOffset, searchSize);
   }

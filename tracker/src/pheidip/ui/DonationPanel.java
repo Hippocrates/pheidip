@@ -165,7 +165,7 @@ public class DonationPanel extends EntityPanel
     gbc_donorLabel.gridy = 3;
     add(donorLabel, gbc_donorLabel);
         
-        donorSelector = new EntitySelector<Donor>(this.owner, this.instance, Donor.class);
+        donorSelector = new EntitySelector<Donor>(this.owner, Donor.class);
         donorSelector.setNavigationAllowed(true);
         donorSelector.setNullSelectionAllowed(false);
         donorSelector.setReadOnly(false);

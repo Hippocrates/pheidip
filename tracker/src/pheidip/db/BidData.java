@@ -7,7 +7,7 @@ import pheidip.objects.Bid;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 
 public interface BidData {
 
@@ -41,7 +41,7 @@ public interface BidData {
 
 	public void deleteChallenge(Challenge challenge);
 
-	public List<Bid> searchBids(SearchEntity<Bid> params);
+	public List<Bid> searchBids(SearchParameters<Bid> params);
 
-  public List<Bid> searchBidsRange(SearchEntity<Bid> params, int offset, int size);
+  public List<Bid> searchBidsRange(SearchParameters<Bid> params, int offset, int size);
 }

@@ -1,11 +1,15 @@
 package pheidip.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -13,52 +17,155 @@ import pheidip.model.EntityPropertiesSync;
 import pheidip.model.NullToBooleanConverterMethod;
 import pheidip.model.ObjectProperty;
 import pheidip.objects.Entity;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import pheidip.logic.EntitySearcher;
+import pheidip.logic.ProgramInstance;
+
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import pheidip.objects.SearchParameters;
 
 @SuppressWarnings("serial")
 public class EntitySearchDialog<T extends Entity> extends JDialog
 {
   private JPanel contentPanel;
   private EntityPropertiesSync sync;
-  private EntitySearchPanel<T> internalPanel;
   private JButton okButton;
   private JButton cancelButton;
-
+  private EntitySearchList<T> listPanel;
+  private SearchParametersPanel<T> parametersPanel;
+  private SearchParameters<T> parameters;
+  private JButton searchButton;
+  private EntitySearcher<T> searcher;
+  private boolean allowMultiSelect;
+  private List<T> results;
+  private ActionHandler actionHandler;
+  private ProgramInstance instance;
+  
   private void intitializeGUI()
   {
     this.contentPanel = new JPanel();
-    setBounds(100, 100, 450, 300);
+    setBounds(100, 100, 450, 369);
     getContentPane().setLayout(new BorderLayout());
-    contentPanel.setLayout(new FlowLayout());
     contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-    this.contentPanel.add(this.internalPanel);
     getContentPane().add(contentPanel, BorderLayout.CENTER);
+    GridBagLayout gbl_contentPanel = new GridBagLayout();
+    gbl_contentPanel.columnWidths = new int[]{258, 133, 0};
+    gbl_contentPanel.rowHeights = new int[]{198, 0, 0, 0};
+    gbl_contentPanel.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+    gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
+    contentPanel.setLayout(gbl_contentPanel);
+    {
+      parametersPanel = new SearchParametersPanel<T>((SearchParameters<T>) this.parameters, this.instance);
+      GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+      gbc_panel_1.insets = new Insets(0, 0, 5, 5);
+      gbc_panel_1.fill = GridBagConstraints.BOTH;
+      gbc_panel_1.gridx = 0;
+      gbc_panel_1.gridy = 0;
+      contentPanel.add(parametersPanel, gbc_panel_1);
+    }
+    {
+      listPanel = new EntitySearchList<T>(this.searcher);
+      listPanel.setMultiSelectAllowed(this.allowMultiSelect);
+      GridBagConstraints gbc_panel = new GridBagConstraints();
+      gbc_panel.insets = new Insets(0, 0, 5, 0);
+      gbc_panel.gridheight = 3;
+      gbc_panel.fill = GridBagConstraints.BOTH;
+      gbc_panel.gridx = 1;
+      gbc_panel.gridy = 0;
+      contentPanel.add(listPanel, gbc_panel);
+    }
+    {
+      searchButton = new JButton("Search");
+      GridBagConstraints gbc_searchButton = new GridBagConstraints();
+      gbc_searchButton.anchor = GridBagConstraints.EAST;
+      gbc_searchButton.insets = new Insets(0, 0, 5, 5);
+      gbc_searchButton.gridx = 0;
+      gbc_searchButton.gridy = 1;
+      contentPanel.add(searchButton, gbc_searchButton);
+    }
     {
       JPanel buttonPane = new JPanel();
       buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
       getContentPane().add(buttonPane, BorderLayout.SOUTH);
       {
         okButton = new JButton("OK");
-        okButton.setActionCommand("OK");
         buttonPane.add(okButton);
         getRootPane().setDefaultButton(okButton);
       }
       {
         cancelButton = new JButton("Cancel");
-        cancelButton.setActionCommand("Cancel");
         buttonPane.add(cancelButton);
       }
     }
   }
   
-  private void initializeGUIEvents()
+  private class ActionHandler implements ActionListener
   {
-    this.sync.synchronizeProperties(new ObjectProperty(this.internalPanel, "result"), new ObjectProperty(this.okButton, "enabled"), NullToBooleanConverterMethod.getInstance());
+    @Override
+    public void actionPerformed(ActionEvent ev)
+    {
+      try
+      {
+        if (ev.getSource() == okButton)
+        {
+          okSelected();
+        }
+        else if (ev.getSource() == cancelButton)
+        {
+          cancelSelected();
+        }
+        else if (ev.getSource() == searchButton)
+        {
+          runSearch();
+        }
+      }
+      catch(Exception e)
+      {
+        UIConfiguration.reportError(e);
+      }
+    }
+    
   }
   
-  public EntitySearchDialog(EntitySearchPanel<T> internalPanel)
+  private void initializeGUIEvents()
   {
+    this.actionHandler = new ActionHandler();
+    
+    this.okButton.addActionListener(this.actionHandler);
+    this.cancelButton.addActionListener(this.actionHandler);
+    this.searchButton.addActionListener(this.actionHandler);
+    
+    this.sync.synchronizeProperties(new ObjectProperty(this.listPanel, "result"), new ObjectProperty(this.okButton, "enabled"), NullToBooleanConverterMethod.getInstance());
+  
+    this.getRootPane().setDefaultButton(this.searchButton);
+    
+    List<Component> tabOrder = new ArrayList<Component>();
+    
+    tabOrder.add(this.parametersPanel);
+    tabOrder.add(this.searchButton);
+    tabOrder.add(this.listPanel);
+    tabOrder.add(this.okButton);
+    tabOrder.add(this.cancelButton);
+    
+    this.setFocusTraversalPolicy(new FocusTraversalManager(tabOrder));
+    this.setFocusTraversalPolicyProvider(true);
+  }
+  
+  @SuppressWarnings("unchecked")
+  public EntitySearchDialog(ProgramInstance instance, Class<T> clazz, boolean allowMultiSelect)
+  {
+    super((JFrame)null, true);
+    
+    this.instance = instance;
     this.sync = new EntityPropertiesSync();
-    this.internalPanel = internalPanel;
+    this.parameters = (SearchParameters<T>) this.instance.createSearchParameters(clazz);
+    this.searcher = (EntitySearcher<T>) this.instance.createEntitySearcher(clazz);
+    this.allowMultiSelect = allowMultiSelect;
+    this.results = Collections.unmodifiableList(new ArrayList<T>());
     
     this.intitializeGUI();
     this.initializeGUIEvents();
@@ -66,11 +173,28 @@ public class EntitySearchDialog<T extends Entity> extends JDialog
 
   public T getResult()
   {
-    return this.internalPanel.getResult();
+    return this.getResults().size() > 0 ? this.getResults().get(0) : null;
   }
   
   public List<T> getResults()
   {
-    return this.internalPanel.getResults();
+    return this.results;
+  }
+  
+  private void cancelSelected()
+  {
+    this.results = Collections.unmodifiableList(new ArrayList<T>());
+    this.setVisible(false);
+  }
+  
+  private void okSelected()
+  {
+    this.results = this.listPanel.getResults();
+    this.setVisible(false);
+  }
+  
+  private void runSearch()
+  {
+    this.listPanel.setSearchParams(this.parametersPanel.getParameters());
   }
 }

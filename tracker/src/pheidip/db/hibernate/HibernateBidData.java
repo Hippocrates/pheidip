@@ -12,7 +12,7 @@ import pheidip.objects.Bid;
 import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 
 public class HibernateBidData extends HibernateDataInterface implements BidData
 {
@@ -209,13 +209,13 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   }
 
   @Override
-  public List<Bid> searchBids(SearchEntity<Bid> params)
+  public List<Bid> searchBids(SearchParameters<Bid> params)
   {
     return this.searchBidsRange(params, 0, Integer.MAX_VALUE);
   }
     
   @Override
-  public List<Bid> searchBidsRange(SearchEntity<Bid> params, int offset, int size)
+  public List<Bid> searchBidsRange(SearchParameters<Bid> params, int offset, int size)
   {
     String queryString = SQLMethods.makeHQLSearchQueryString(params, "Bid", "name");
     

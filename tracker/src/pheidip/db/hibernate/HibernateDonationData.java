@@ -17,7 +17,7 @@ import pheidip.objects.ChoiceOption;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBid;
 import pheidip.objects.DonationDomain;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 import pheidip.util.StringUtils;
 
 public class HibernateDonationData extends HibernateDataInterface implements DonationData
@@ -143,7 +143,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   }
 
   @Override
-  public List<Donation> searchDonationsRange(SearchEntity<Donation> params, int offset, int size)
+  public List<Donation> searchDonationsRange(SearchParameters<Donation> params, int offset, int size)
   {
     String queryString = SQLMethods.makeHQLSearchQueryString(params, "Donation", "timeReceived");
     
@@ -165,7 +165,7 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   }
   
   @Override
-  public List<Donation> searchDonations(SearchEntity<Donation> params)
+  public List<Donation> searchDonations(SearchParameters<Donation> params)
   {
     return this.searchDonationsRange(params, 0, Integer.MAX_VALUE);
   }

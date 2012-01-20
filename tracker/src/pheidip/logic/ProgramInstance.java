@@ -2,6 +2,17 @@ package pheidip.logic;
 
 import pheidip.logic.chipin.ChipinLoginManager;
 import pheidip.logic.gdocs.GoogleSpreadSheetLoginManager;
+import pheidip.objects.Bid;
+import pheidip.objects.BidSearchParams;
+import pheidip.objects.Donation;
+import pheidip.objects.DonationSearchParams;
+import pheidip.objects.Donor;
+import pheidip.objects.DonorSearchParams;
+import pheidip.objects.Prize;
+import pheidip.objects.PrizeSearchParams;
+import pheidip.objects.SearchParameters;
+import pheidip.objects.SpeedRun;
+import pheidip.objects.SpeedRunSearchParams;
 import pheidip.util.Reporter;
 
 public class ProgramInstance
@@ -90,6 +101,67 @@ public class ProgramInstance
   public SpeedRunSearch createSpeedRunSearch()
   {
     return new SpeedRunSearch(this.donationDatabase);
+  }
+  
+  public PrizeSearch createPrizeSearch()
+  {
+    return new PrizeSearch(this.donationDatabase);
+  }
+  
+  public EntitySearcher<?> createEntitySearcher(Class<?> clazz)
+  {
+    if (clazz == Donor.class)
+    {
+      return this.createDonorSearch();
+    }
+    else if (clazz == Donation.class)
+    {
+      return this.createDonationSearch();
+    }
+    else if (clazz == Bid.class)
+    {
+      return this.createBidSearch();
+    }
+    else if (clazz == Prize.class)
+    {
+      return this.createPrizeSearch();
+    }
+    else if (clazz == SpeedRun.class)
+    {
+      return this.createSpeedRunSearch();
+    }
+    else
+    {
+      return null;
+    }
+  }
+  
+  public SearchParameters<?> createSearchParameters(Class<?> clazz)
+  {
+    if (clazz == Donor.class)
+    {
+      return new DonorSearchParams();
+    }
+    else if (clazz == Donation.class)
+    {
+      return new DonationSearchParams();
+    }
+    else if (clazz == Bid.class)
+    {
+      return new BidSearchParams();
+    }
+    else if (clazz == Prize.class)
+    {
+      return new PrizeSearchParams();
+    }
+    else if (clazz == SpeedRun.class)
+    {
+      return new SpeedRunSearchParams();
+    }
+    else
+    {
+      return null;
+    }
   }
   
   public void shutdownProgram()

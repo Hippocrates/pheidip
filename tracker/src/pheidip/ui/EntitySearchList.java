@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 
 import pheidip.logic.EntitySearcher;
 import pheidip.objects.Entity;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 
 import java.awt.Component;
 import java.awt.GridBagLayout;
@@ -22,12 +22,15 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.ListSelectionModel;
 
 @SuppressWarnings("serial")
 public class EntitySearchList<T extends Entity> extends JPanel
 {
-  private SearchEntity<T> searchParams;
+  private SearchParameters<T> searchParams;
   private EntitySearcher<T> searcher;
   private List<T> cachedList;
   private JList resultsList;
@@ -55,6 +58,7 @@ public class EntitySearchList<T extends Entity> extends JPanel
     add(scrollPane, gbc_scrollPane);
     
     resultsList = new JList();
+    resultsList.setEnabled(false);
     resultsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     scrollPane.setViewportView(resultsList);
     
@@ -74,7 +78,7 @@ public class EntitySearchList<T extends Entity> extends JPanel
     add(nextButton, gbc_nextButton);
   }
   
-  private class ActionHandler implements ListSelectionListener
+  private class ActionHandler implements ListSelectionListener, ActionListener
   {
     @SuppressWarnings("unchecked")
     @Override
@@ -104,12 +108,35 @@ public class EntitySearchList<T extends Entity> extends JPanel
         JOptionPane.showMessageDialog(EntitySearchList.this, "Error: " + e.getMessage(), "Error", JOptionPane.YES_OPTION);
       }
     }
+
+    @Override
+    public void actionPerformed(ActionEvent ev)
+    {
+      try
+      {
+        if (ev.getSource() == nextButton)
+        {
+          navigateToNext();
+        }
+        else if (ev.getSource() == previousButton)
+        {
+          navigateToPrevious();
+        }
+      }
+      catch(Exception e)
+      {
+        UIConfiguration.reportError(e);
+      }
+    }
     
   }
   
   private void initializeGUIEvents()
   {
     this.actionHandler = new ActionHandler();
+    
+    this.nextButton.addActionListener(this.actionHandler);
+    this.previousButton.addActionListener(this.actionHandler);
     
     this.resultsList.addListSelectionListener(this.actionHandler);
     
@@ -120,6 +147,7 @@ public class EntitySearchList<T extends Entity> extends JPanel
     tabOrder.add(this.nextButton);
     
     this.setFocusTraversalPolicy(new FocusTraversalManager(tabOrder));
+    this.setFocusTraversalPolicyProvider(true);
   }
   
   public EntitySearchList(EntitySearcher<T> searcher)
@@ -143,14 +171,14 @@ public class EntitySearchList<T extends Entity> extends JPanel
     return this.cachedList;
   }
   
-  public SearchEntity<T> getSearchParams()
+  public SearchParameters<T> getSearchParams()
   {
     return this.searchParams;
   }
   
-  public void setSearchParams(SearchEntity<T> searchParams)
+  public void setSearchParams(SearchParameters<T> searchParams)
   {
-    SearchEntity<T> oldValue = this.searchParams;
+    SearchParameters<T> oldValue = this.searchParams;
     this.searchParams = searchParams;
     this.runSearch();
     this.firePropertyChange("searchParams", oldValue, this.searchParams);
@@ -186,8 +214,27 @@ public class EntitySearchList<T extends Entity> extends JPanel
     }
     
     this.resultsList.setModel(listData);
+    if (this.resultsList.getModel().getSize() > 0)
+    {
+      this.resultsList.setEnabled(true);
+      this.resultsList.setSelectedIndex(0);
+    }
+    else
+    {
+      this.resultsList.setEnabled(false);
+    }
     
     this.nextButton.setEnabled(this.isEnabled() && this.searcher.getHasNext());
     this.previousButton.setEnabled(this.isEnabled() && this.searcher.getHasPrevious());
+  }
+  
+  private void navigateToNext()
+  {
+    this.setSearchListContents(this.searcher.moveNext());
+  }
+  
+  private void navigateToPrevious()
+  {
+    this.setSearchListContents(this.searcher.movePrevious());
   }
 }

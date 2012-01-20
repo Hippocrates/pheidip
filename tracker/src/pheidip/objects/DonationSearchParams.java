@@ -1,26 +1,29 @@
 package pheidip.objects;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import pheidip.model.ComparisonOperator;
 import pheidip.model.EntitySpecification;
 import pheidip.model.SearchProperty;
 import pheidip.model.SearchSpecification;
 
-public class DonationSearchParams implements SearchEntity<Donation>
+public class DonationSearchParams extends SearchParameters<Donation>
 {
   private static SearchSpecification specification;
   
   private Donor donor;
-  private DonationDomain domain;
+  private Set<DonationDomain> domain;
   private Date loTime;
   private Date hiTime;
   private BigDecimal loAmount;
   private BigDecimal hiAmount;
-  private DonationBidState targetBidState;
-  private DonationReadState targetReadState;
-  private DonationCommentState targetCommentState;
+  private Set<DonationBidState> targetBidState;
+  private Set<DonationReadState> targetReadState;
+  private Set<DonationCommentState> targetCommentState;
   
   @Override
   public SearchSpecification getSearchSpecification()
@@ -32,14 +35,14 @@ public class DonationSearchParams implements SearchEntity<Donation>
 
       specification = new SearchSpecification(
           new SearchProperty(selfSpec.getProperty("donor"), targetSpec.getProperty("donor"), ComparisonOperator.EQUALS),
-          new SearchProperty(selfSpec.getProperty("domain"), targetSpec.getProperty("domain"), ComparisonOperator.EQUALS),
+          new SearchProperty(selfSpec.getProperty("domain"), targetSpec.getProperty("domain"), ComparisonOperator.IN),
           new SearchProperty(selfSpec.getProperty("loTime"), targetSpec.getProperty("timeReceived"), ComparisonOperator.GEQUALS),
           new SearchProperty(selfSpec.getProperty("hiTime"), targetSpec.getProperty("timeReceived"), ComparisonOperator.LEQUALS),
           new SearchProperty(selfSpec.getProperty("loAmount"), targetSpec.getProperty("amount"), ComparisonOperator.GEQUALS),
           new SearchProperty(selfSpec.getProperty("hiAmount"), targetSpec.getProperty("amount"), ComparisonOperator.LEQUALS),
-          new SearchProperty(selfSpec.getProperty("targetBidState"), targetSpec.getProperty("bidState"), ComparisonOperator.EQUALS),
-          new SearchProperty(selfSpec.getProperty("targetReadState"), targetSpec.getProperty("readState"), ComparisonOperator.EQUALS),
-          new SearchProperty(selfSpec.getProperty("targetCommentState"), targetSpec.getProperty("commentState"), ComparisonOperator.EQUALS));
+          new SearchProperty(selfSpec.getProperty("targetBidState"), targetSpec.getProperty("bidState"), ComparisonOperator.IN),
+          new SearchProperty(selfSpec.getProperty("targetReadState"), targetSpec.getProperty("readState"), ComparisonOperator.IN),
+          new SearchProperty(selfSpec.getProperty("targetCommentState"), targetSpec.getProperty("commentState"), ComparisonOperator.IN));
     }
     
     return specification;
@@ -55,12 +58,12 @@ public class DonationSearchParams implements SearchEntity<Donation>
     return donor;
   }
 
-  public void setDomain(DonationDomain domain)
+  public void setDomain(Set<DonationDomain> domain)
   {
-    this.domain = domain;
+    this.domain = Collections.unmodifiableSet(new HashSet<DonationDomain>(domain));
   }
 
-  public DonationDomain getDomain()
+  public Set<DonationDomain> getDomain()
   {
     return domain;
   }
@@ -105,32 +108,32 @@ public class DonationSearchParams implements SearchEntity<Donation>
     return hiAmount;
   }
 
-  public void setTargetBidState(DonationBidState targetBidState)
+  public void setTargetBidState(Set<DonationBidState> targetBidState)
   {
-    this.targetBidState = targetBidState;
+    this.targetBidState = Collections.unmodifiableSet(new HashSet<DonationBidState>(targetBidState));
   }
 
-  public DonationBidState getTargetBidState()
+  public Set<DonationBidState> getTargetBidState()
   {
     return targetBidState;
   }
 
-  public void setTargetReadState(DonationReadState targetReadState)
+  public void setTargetReadState(Set<DonationReadState> targetReadState)
   {
-    this.targetReadState = targetReadState;
+    this.targetReadState = Collections.unmodifiableSet(new HashSet<DonationReadState>(targetReadState));
   }
 
-  public DonationReadState getTargetReadState()
+  public Set<DonationReadState> getTargetReadState()
   {
     return targetReadState;
   }
 
-  public void setTargetCommentState(DonationCommentState targetCommentState)
+  public void setTargetCommentState(Set<DonationCommentState> targetCommentState)
   {
-    this.targetCommentState = targetCommentState;
+    this.targetCommentState = Collections.unmodifiableSet(new HashSet<DonationCommentState>(targetCommentState));
   }
 
-  public DonationCommentState getTargetCommentState()
+  public Set<DonationCommentState> getTargetCommentState()
   {
     return targetCommentState;
   }

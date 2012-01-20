@@ -8,7 +8,7 @@ import org.hibernate.StatelessSession;
 
 import pheidip.db.SpeedRunData;
 import pheidip.objects.Prize;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 import pheidip.objects.SpeedRun;
 
 public class HibernateSpeedRunData extends HibernateDataInterface implements SpeedRunData
@@ -105,13 +105,13 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
   }
 
   @Override
-  public List<SpeedRun> searchSpeedRuns(SearchEntity<SpeedRun> params)
+  public List<SpeedRun> searchSpeedRuns(SearchParameters<SpeedRun> params)
   {
     return this.searchSpeedRunsRange(params, 0, Integer.MAX_VALUE);
   }
   
   @Override
-  public List<SpeedRun> searchSpeedRunsRange(SearchEntity<SpeedRun> params, int offset, int size)
+  public List<SpeedRun> searchSpeedRunsRange(SearchParameters<SpeedRun> params, int offset, int size)
   {
     String queryString = SQLMethods.makeHQLSearchQueryString(params, "SpeedRun", "name");
     
@@ -127,7 +127,7 @@ public class HibernateSpeedRunData extends HibernateDataInterface implements Spe
     @SuppressWarnings("unchecked")
     List<SpeedRun> listing = q.list();
     
-    this.endTransaction();
+    this.endBulkTransaction(dedicatedSession);
 
     return listing;
   }

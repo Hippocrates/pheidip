@@ -1,5 +1,6 @@
 package pheidip.ui;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -39,5 +40,15 @@ public class UIConfiguration
     {
       System.out.println(e.getMessage());
     }
+	}
+	
+	public static void reportError(Exception e)
+	{
+	  reportError(e.getMessage());
+	}
+	
+	public static void reportError(String message)
+	{
+	  JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 }

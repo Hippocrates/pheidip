@@ -3,7 +3,7 @@ package pheidip.db;
 import java.util.List;
 
 import pheidip.objects.Prize;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 
 public interface PrizeData {
 
@@ -19,9 +19,9 @@ public interface PrizeData {
 
 	public void deletePrize(Prize prize);
 
-	public List<Prize> searchPrizes(SearchEntity<Prize> params);
+	public List<Prize> searchPrizes(SearchParameters<Prize> params);
 
-  public List<Prize> searchPrizesRange(SearchEntity<Prize> params, int offset, int size);
+  public List<Prize> searchPrizesRange(SearchParameters<Prize> params, int offset, int size);
 
   public void multiUpdatePrizes(List<Prize> prizesToUpdate);
 }

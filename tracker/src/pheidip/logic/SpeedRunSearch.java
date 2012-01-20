@@ -3,7 +3,7 @@ package pheidip.logic;
 import java.util.List;
 
 import pheidip.db.SpeedRunData;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 import pheidip.objects.SpeedRun;
 import pheidip.objects.SpeedRunSearchParams;
 
@@ -26,7 +26,7 @@ public class SpeedRunSearch extends EntitySearcher<SpeedRun>
 
   @Override
   protected List<SpeedRun> implRunSearch(
-      SearchEntity<SpeedRun> params, int searchOffset, int searchSize)
+      SearchParameters<SpeedRun> params, int searchOffset, int searchSize)
   {
     return this.speedRuns.searchSpeedRunsRange(params, searchOffset, searchSize);
   }

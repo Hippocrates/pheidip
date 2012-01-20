@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 
+// TODO: make it possible to set this editor as nullable, since that would be useful
 @SuppressWarnings("serial")
 public class TimeControl extends JSpinner
 {

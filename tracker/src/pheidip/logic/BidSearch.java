@@ -11,7 +11,7 @@ import pheidip.objects.Challenge;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 import pheidip.objects.ChoiceOptionSearchParams;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 import pheidip.objects.SpeedRun;
 import pheidip.util.Filter;
 
@@ -73,7 +73,7 @@ public class BidSearch extends EntitySearcher<Bid>
   }
 
   @Override
-  protected List<Bid> implRunSearch(SearchEntity<Bid> params, int searchOffset, int searchSize)
+  protected List<Bid> implRunSearch(SearchParameters<Bid> params, int searchOffset, int searchSize)
   {
     return this.bids.searchBidsRange(params, searchOffset, searchSize);
   }

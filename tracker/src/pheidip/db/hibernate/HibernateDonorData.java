@@ -9,7 +9,7 @@ import org.hibernate.StatelessSession;
 import pheidip.db.DonorData;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 
 public class HibernateDonorData extends HibernateDataInterface implements DonorData 
 {
@@ -108,13 +108,13 @@ public class HibernateDonorData extends HibernateDataInterface implements DonorD
 	
 
   @Override
-  public List<Donor> searchDonors(SearchEntity<Donor> params)
+  public List<Donor> searchDonors(SearchParameters<Donor> params)
   {
     return this.searchDonorsRange(params, 0, Integer.MAX_VALUE);
   }
 	
 	@Override
-  public List<Donor> searchDonorsRange(SearchEntity<Donor> params, int offset, int size)
+  public List<Donor> searchDonorsRange(SearchParameters<Donor> params, int offset, int size)
   {
     String queryString = SQLMethods.makeHQLSearchQueryString(params, "Donor");
     

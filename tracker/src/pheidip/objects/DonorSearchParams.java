@@ -6,7 +6,7 @@ import pheidip.model.SearchProperty;
 import pheidip.model.SearchSpecification;
 import pheidip.util.StringUtils;
 
-public class DonorSearchParams implements SearchEntity<Donor>
+public class DonorSearchParams extends SearchParameters<Donor>
 {
   private static SearchSpecification specification;
   

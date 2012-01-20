@@ -7,7 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 
 import pheidip.db.PrizeData;
-import pheidip.objects.SearchEntity;
+import pheidip.objects.SearchParameters;
 import pheidip.objects.Prize;
 
 public class HibernatePrizeData extends HibernateDataInterface implements PrizeData
@@ -111,13 +111,13 @@ public class HibernatePrizeData extends HibernateDataInterface implements PrizeD
   }
 
   @Override
-  public List<Prize> searchPrizes(SearchEntity<Prize> params)
+  public List<Prize> searchPrizes(SearchParameters<Prize> params)
   {
     return this.searchPrizesRange(params, 0, Integer.MAX_VALUE);
   }
   
   @Override
-  public List<Prize> searchPrizesRange(SearchEntity<Prize> params, int offset, int size)
+  public List<Prize> searchPrizesRange(SearchParameters<Prize> params, int offset, int size)
   {
     String queryString = SQLMethods.makeHQLSearchQueryString(params, "Prize", "name");
     
