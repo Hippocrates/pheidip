@@ -9,7 +9,7 @@ import pheidip.model.SearchSpecification;
 
 public class SpeedRunSearchParams extends SearchParameters<SpeedRun>
 {
-  private static SearchSpecification specification;
+  private static SearchSpecification<SpeedRun> specification;
   
   private String name;
   private String description;
@@ -93,20 +93,21 @@ public class SpeedRunSearchParams extends SearchParameters<SpeedRun>
   }
 
   @Override
-  public SearchSpecification getSearchSpecification()
+  public SearchSpecification<SpeedRun> getSearchSpecification()
   {
     if (specification == null)
     {
       EntitySpecification selfSpec = EntityMethods.getSpecification(this.getClass());
       EntitySpecification targetSpec = EntityMethods.getSpecification(SpeedRun.class);
 
-      specification = new SearchSpecification(
-          new SearchProperty(selfSpec.getProperty("name"), targetSpec.getProperty("name"), ComparisonOperator.INNERMATCH),
+      specification = new SearchSpecification<SpeedRun>(
+          new SearchProperty[]{ new SearchProperty(selfSpec.getProperty("name"), targetSpec.getProperty("name"), ComparisonOperator.INNERMATCH),
           new SearchProperty(selfSpec.getProperty("description"), targetSpec.getProperty("description"), ComparisonOperator.INNERMATCH),
           new SearchProperty(selfSpec.getProperty("startTimeAfter"), targetSpec.getProperty("startTime"), ComparisonOperator.GEQUALS),
           new SearchProperty(selfSpec.getProperty("startTimeBefore"), targetSpec.getProperty("startTime"), ComparisonOperator.LEQUALS),
           new SearchProperty(selfSpec.getProperty("endTimeAfter"), targetSpec.getProperty("endTime"), ComparisonOperator.GEQUALS),
-          new SearchProperty(selfSpec.getProperty("endTimeBefore"), targetSpec.getProperty("endTime"), ComparisonOperator.LEQUALS));
+          new SearchProperty(selfSpec.getProperty("endTimeBefore"), targetSpec.getProperty("endTime"), ComparisonOperator.LEQUALS) },
+          new Class<?>[]{ SpeedRun.class });
     }
     
     return specification;

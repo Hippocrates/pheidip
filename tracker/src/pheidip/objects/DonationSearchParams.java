@@ -13,7 +13,7 @@ import pheidip.model.SearchSpecification;
 
 public class DonationSearchParams extends SearchParameters<Donation>
 {
-  private static SearchSpecification specification;
+  private static SearchSpecification<Donation> specification;
   
   private Donor donor;
   private Set<DonationDomain> domain;
@@ -26,15 +26,15 @@ public class DonationSearchParams extends SearchParameters<Donation>
   private Set<DonationCommentState> targetCommentState;
   
   @Override
-  public SearchSpecification getSearchSpecification()
+  public SearchSpecification<Donation> getSearchSpecification()
   {
     if (specification == null)
     {
       EntitySpecification selfSpec = EntityMethods.getSpecification(this.getClass());
       EntitySpecification targetSpec = EntityMethods.getSpecification(Donation.class);
 
-      specification = new SearchSpecification(
-          new SearchProperty(selfSpec.getProperty("donor"), targetSpec.getProperty("donor"), ComparisonOperator.EQUALS),
+      specification = new SearchSpecification<Donation>(
+          new SearchProperty[]{ new SearchProperty(selfSpec.getProperty("donor"), targetSpec.getProperty("donor"), ComparisonOperator.EQUALS),
           new SearchProperty(selfSpec.getProperty("domain"), targetSpec.getProperty("domain"), ComparisonOperator.IN),
           new SearchProperty(selfSpec.getProperty("loTime"), targetSpec.getProperty("timeReceived"), ComparisonOperator.GEQUALS),
           new SearchProperty(selfSpec.getProperty("hiTime"), targetSpec.getProperty("timeReceived"), ComparisonOperator.LEQUALS),
@@ -42,7 +42,8 @@ public class DonationSearchParams extends SearchParameters<Donation>
           new SearchProperty(selfSpec.getProperty("hiAmount"), targetSpec.getProperty("amount"), ComparisonOperator.LEQUALS),
           new SearchProperty(selfSpec.getProperty("targetBidState"), targetSpec.getProperty("bidState"), ComparisonOperator.IN),
           new SearchProperty(selfSpec.getProperty("targetReadState"), targetSpec.getProperty("readState"), ComparisonOperator.IN),
-          new SearchProperty(selfSpec.getProperty("targetCommentState"), targetSpec.getProperty("commentState"), ComparisonOperator.IN));
+          new SearchProperty(selfSpec.getProperty("targetCommentState"), targetSpec.getProperty("commentState"), ComparisonOperator.IN) },
+          new Class<?>[]{});
     }
     
     return specification;

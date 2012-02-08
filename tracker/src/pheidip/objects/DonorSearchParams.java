@@ -8,7 +8,7 @@ import pheidip.util.StringUtils;
 
 public class DonorSearchParams extends SearchParameters<Donor>
 {
-  private static SearchSpecification specification;
+  private static SearchSpecification<Donor> specification;
   
   public DonorSearchParams(String firstName, String lastName, String email, String alias)
   {
@@ -28,18 +28,19 @@ public class DonorSearchParams extends SearchParameters<Donor>
   private String alias;
   
   @Override
-  public SearchSpecification getSearchSpecification()
+  public SearchSpecification<Donor> getSearchSpecification()
   {
     if (specification == null)
     {
       EntitySpecification selfSpec = EntityMethods.getSpecification(this.getClass());
       EntitySpecification targetSpec = EntityMethods.getSpecification(Donor.class);
 
-      specification = new SearchSpecification(
-          new SearchProperty(selfSpec.getProperty("firstName"), targetSpec.getProperty("firstName"), ComparisonOperator.INNERMATCH),
+      specification = new SearchSpecification<Donor>(
+          new SearchProperty[]{ new SearchProperty(selfSpec.getProperty("firstName"), targetSpec.getProperty("firstName"), ComparisonOperator.INNERMATCH),
           new SearchProperty(selfSpec.getProperty("lastName"), targetSpec.getProperty("lastName"), ComparisonOperator.INNERMATCH),
           new SearchProperty(selfSpec.getProperty("email"), targetSpec.getProperty("email"), ComparisonOperator.INNERMATCH),
-          new SearchProperty(selfSpec.getProperty("alias"), targetSpec.getProperty("alias"), ComparisonOperator.INNERMATCH));
+          new SearchProperty(selfSpec.getProperty("alias"), targetSpec.getProperty("alias"), ComparisonOperator.INNERMATCH) },
+          new Class<?>[]{ Donor.class });
     }
     
     return specification;

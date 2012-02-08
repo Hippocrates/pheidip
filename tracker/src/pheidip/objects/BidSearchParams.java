@@ -11,7 +11,7 @@ import pheidip.model.SearchSpecification;
 
 public class BidSearchParams extends SearchParameters<Bid>
 {
-  private static SearchSpecification specification;
+  private static SearchSpecification<Bid> specification;
   
   private String name;
   private String description;
@@ -71,18 +71,19 @@ public class BidSearchParams extends SearchParameters<Bid>
   }
 
   @Override
-  public SearchSpecification getSearchSpecification()
+  public SearchSpecification<Bid> getSearchSpecification()
   {
     if (specification == null)
     {
       EntitySpecification selfSpec = EntityMethods.getSpecification(this.getClass());
       EntitySpecification targetSpec = EntityMethods.getSpecification(Bid.class);
 
-      specification = new SearchSpecification(
-          new SearchProperty(selfSpec.getProperty("name"), targetSpec.getProperty("name"), ComparisonOperator.INNERMATCH),
+      specification = new SearchSpecification<Bid>(
+          new SearchProperty[]{ new SearchProperty(selfSpec.getProperty("name"), targetSpec.getProperty("name"), ComparisonOperator.INNERMATCH),
           new SearchProperty(selfSpec.getProperty("description"), targetSpec.getProperty("description"), ComparisonOperator.INNERMATCH),
           new SearchProperty(selfSpec.getProperty("owner"), targetSpec.getProperty("speedRun"), ComparisonOperator.EQUALS),
-          new SearchProperty(selfSpec.getProperty("states"), targetSpec.getProperty("bidState"), ComparisonOperator.IN));
+          new SearchProperty(selfSpec.getProperty("states"), targetSpec.getProperty("bidState"), ComparisonOperator.IN) },
+          new Class<?>[]{ Choice.class, Challenge.class });
     }
     
     return specification;

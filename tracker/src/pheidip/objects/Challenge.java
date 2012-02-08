@@ -48,7 +48,7 @@ public class Challenge extends Bid
   
   public String toString()
   {
-    return "Challenge: " + this.getName();
+    return "Challenge : " + this.getSpeedRun().getName() + " : " + this.getName();
   }
   
   public boolean equals(Object other)

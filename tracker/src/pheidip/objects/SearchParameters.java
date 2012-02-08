@@ -36,15 +36,16 @@ public abstract class SearchParameters<T extends Entity>
     this.propertyChangeManager.firePropertyChange(propertyName, oldValue, newValue);
   }
   
-  public abstract SearchSpecification getSearchSpecification();
+  public abstract SearchSpecification<T> getSearchSpecification();
   
-  public T createInstanceFromParameters(Class<T> clazz)
+  @SuppressWarnings("unchecked")
+  public T createInstanceFromParameters(Class<?> clazz)
   {
     T result = null;
     
     try
     {
-      result = clazz.newInstance();
+      result = (T)clazz.newInstance();
 
       for (SearchProperty property : this.getSearchSpecification().getProperties())
       {

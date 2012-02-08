@@ -29,7 +29,7 @@ public class SearchParametersPanel<T extends Entity> extends JPanel
 
   private void initializeGUI()
   {
-    SearchSpecification spec = this.searchParams.getSearchSpecification();
+    SearchSpecification<T> spec = this.searchParams.getSearchSpecification();
     
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = null;
@@ -70,7 +70,7 @@ public class SearchParametersPanel<T extends Entity> extends JPanel
   
   private void initializeGUIEvents()
   {
-    SearchSpecification spec = this.searchParams.getSearchSpecification();
+    SearchSpecification<T> spec = this.searchParams.getSearchSpecification();
     List<SearchProperty> searchProperties = spec.getProperties();
     
     for (int i = 0; i < this.components.size(); ++i)

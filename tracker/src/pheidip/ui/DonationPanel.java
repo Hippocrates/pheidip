@@ -1,7 +1,6 @@
 package pheidip.ui;
 
 import pheidip.logic.DonationControl;
-import pheidip.logic.ProgramInstance;
 import pheidip.objects.Donation;
 import pheidip.objects.Donor;
 import pheidip.objects.DonationBidState;
@@ -59,8 +58,7 @@ public class DonationPanel extends EntityPanel
   private JLabel readStateLabel;
   private JLabel commentStateLabel;
   private EntitySelector<Donor> donorSelector;
-  private ProgramInstance instance;
-  
+
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
@@ -334,7 +332,6 @@ public class DonationPanel extends EntityPanel
   public DonationPanel(MainWindow owner, DonationControl control)
   {    
     this.owner = owner;
-    this.instance = owner.getInstance();
     this.donationControl = control;
 
     this.initializeGUI();

@@ -218,7 +218,7 @@ public class HibernateBidData extends HibernateDataInterface implements BidData
   public List<Bid> searchBidsRange(SearchParameters<Bid> params, int offset, int size)
   {
     String queryString = SQLMethods.makeHQLSearchQueryString(params, "Bid", "name");
-    
+
     StatelessSession dedicatedSession = this.beginBulkTransaction();
 
     Query q = dedicatedSession.createQuery(queryString);

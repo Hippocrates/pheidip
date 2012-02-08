@@ -7,7 +7,7 @@ import pheidip.model.SearchSpecification;
 
 public class PrizeSearchParams extends SearchParameters<Prize>
 {
-  private static SearchSpecification specification;
+  private static SearchSpecification<Prize> specification;
   
   private String name;
   private String description;
@@ -23,16 +23,17 @@ public class PrizeSearchParams extends SearchParameters<Prize>
   }
 
   @Override
-  public SearchSpecification getSearchSpecification()
+  public SearchSpecification<Prize> getSearchSpecification()
   {
     if (specification == null)
     {
       EntitySpecification selfSpec = EntityMethods.getSpecification(this.getClass());
       EntitySpecification targetSpec = EntityMethods.getSpecification(Prize.class);
 
-      specification = new SearchSpecification(
-          new SearchProperty(selfSpec.getProperty("name"), targetSpec.getProperty("name"), ComparisonOperator.INNERMATCH),
-          new SearchProperty(selfSpec.getProperty("description"), targetSpec.getProperty("description"), ComparisonOperator.INNERMATCH));
+      specification = new SearchSpecification<Prize>(
+          new SearchProperty[]{ new SearchProperty(selfSpec.getProperty("name"), targetSpec.getProperty("name"), ComparisonOperator.INNERMATCH),
+          new SearchProperty(selfSpec.getProperty("description"), targetSpec.getProperty("description"), ComparisonOperator.INNERMATCH) },
+          new Class<?>[]{ Prize.class });
     }
     
     return specification;
@@ -48,7 +49,7 @@ public class PrizeSearchParams extends SearchParameters<Prize>
     return name;
   }
 
-  private void setDescription(String description)
+  public void setDescription(String description)
   {
     this.description = description;
   }

@@ -38,7 +38,7 @@ public class Choice extends Bid
 
   public String toString()
   {
-    return "Choice : " + this.getName();
+    return "Choice : " + this.getSpeedRun().getName() + " : " + this.getName();
   }
 
   public boolean equals(Object other)

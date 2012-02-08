@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import pheidip.logic.PrizeControl;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
-import pheidip.objects.SpeedRun;
 import pheidip.objects.PrizeDrawMethod;
 import pheidip.util.FormatUtils;
 
@@ -390,30 +389,6 @@ public class PrizePanel extends EntityPanel
         {
           manuallyAssignWinner();
         }
-        else if (ev.getSource() == openStartGameButton)
-        {
-          openStartGame();
-        }
-        else if (ev.getSource() == openEndGameButton)
-        {
-          openEndGame();
-        }
-        else if (ev.getSource() == setStartGameButton)
-        {
-          setStartGame();
-        }
-        else if (ev.getSource() == setEndGameButton)
-        {
-          setEndGame();
-        }
-        else if (ev.getSource() == clearStartGameButton)
-        {
-          clearStartGame();
-        }
-        else if (ev.getSource() == clearEndGameButton)
-        {
-          clearEndGame();
-        }
       }
       catch (Exception e)
       {
@@ -490,69 +465,10 @@ public class PrizePanel extends EntityPanel
       this.owner.openDonorTab(winner.getId());
     }
   }
-  
-  private void openStartGame()
-  {
-    SpeedRun startGame = this.control.getData().getStartGame();
-    
-    if (startGame != null)
-    {
-      this.owner.openSpeedRunTab(startGame.getId());
-    }
-  }
-  
-  private void openEndGame()
-  {
-    SpeedRun endGame = this.control.getData().getEndGame();
-    
-    if (endGame != null)
-    {
-      this.owner.openSpeedRunTab(endGame.getId());
-    }
-  }
-  
-  private void setStartGame()
-  {
-    SpeedRunSearchDialog searcher = new SpeedRunSearchDialog(this.owner, this.control.getSpeedRunSearch());
-    
-    searcher.setVisible(true);
-    
-    if (searcher.getResult() != null)
-    {
-      this.control.setStartGame(searcher.getResult());
-      this.startGameField.setText(searcher.getResult().getName());
-    }
-  }
-  
-  private void setEndGame()
-  {
-    SpeedRunSearchDialog searcher = new SpeedRunSearchDialog(this.owner, this.control.getSpeedRunSearch());
-    
-    searcher.setVisible(true);
-    
-    if (searcher.getResult() != null)
-    {
-      this.control.setEndGame(searcher.getResult());
-      this.endGameField.setText(searcher.getResult().getName());
-    }
-  }
-  
-  
-  private void clearStartGame()
-  {
-    this.control.setStartGame(null);
-    this.startGameField.setText("");
-  }
-  
-  private void clearEndGame()
-  {
-    this.control.setEndGame(null);
-    this.endGameField.setText("");
-  }
-  
+
   private void manuallyAssignWinner()
   {
-    DonorSearchDialog dialog = new DonorSearchDialog(this.owner, this.control.getDonorSearcher());
+    EntitySearchDialog<Donor> dialog = new EntitySearchDialog<Donor>(this.owner.getInstance(), Donor.class, false);
     dialog.setVisible(true);
     
     if (dialog.getResult() != null)

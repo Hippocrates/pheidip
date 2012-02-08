@@ -74,7 +74,7 @@ abstract public class HibernateDataInterface
 	    throw new RuntimeException(e);
 	  }
 	  
-          //this.manager.resetSession();
+    //this.manager.resetSession();
 	  
 	  //this.manager.getSession().beginTransaction();
 	  

@@ -1,6 +1,5 @@
 package pheidip.db.hibernate;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,8 +16,8 @@ import pheidip.objects.ChoiceOption;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBid;
 import pheidip.objects.DonationDomain;
+import pheidip.objects.DonationSearchParams;
 import pheidip.objects.SearchParameters;
-import pheidip.util.StringUtils;
 
 public class HibernateDonationData extends HibernateDataInterface implements DonationData
 {
@@ -31,6 +30,10 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   public Donation getDonationById(int id)
   {
     Session session = this.beginTransaction();
+
+    Donation dummy = new Donation();
+    dummy.setId(id);
+    session.evict(dummy);
     
     Donation d = (Donation) session.load(Donation.class, id);
  
@@ -95,36 +98,12 @@ public class HibernateDonationData extends HibernateDataInterface implements Don
   @Override
   public List<Donation> getDonationsInTimeRange(Date lo, Date hi)
   {
-    StatelessSession dedicatedSession = this.beginBulkTransaction();
+    DonationSearchParams params = new DonationSearchParams();
     
-    String queryString = "from Donation d";
-    List<String> whereClause = new ArrayList<String>();
-
-    if (lo != null)
-      whereClause.add("d.timeReceived >= :lotime");
+    params.setLoTime(lo);
+    params.setHiTime(hi);
     
-    if (hi != null)
-      whereClause.add("d.timeReceived <= :hitime");
-    
-    if (whereClause.size() > 0)
-    {
-      queryString += " where " + StringUtils.joinSeperated(whereClause, " AND ");
-    }
-    
-    Query q = dedicatedSession.createQuery(queryString);
-    
-    if (lo != null)
-      q.setTimestamp("lotime", lo);
-    
-    if (hi != null)
-      q.setTimestamp("hitime", hi);
-
-    @SuppressWarnings("unchecked")
-    List<Donation> listing = q.list();
-    
-    this.endBulkTransaction(dedicatedSession);
-    
-    return listing;
+    return this.searchDonations(params);
   }
 
   @Override
