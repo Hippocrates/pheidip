@@ -8,7 +8,6 @@ import javax.swing.JScrollPane;
 import java.awt.GridBagConstraints;
 import javax.swing.JList;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -20,7 +19,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import pheidip.logic.DonationControl;
 import pheidip.objects.Donation;
 
 @SuppressWarnings("serial")
@@ -28,7 +26,6 @@ public class DonationTaskPanel extends EntityPanel
 {
   private MainWindow owner;
   private DonationTask task;
-  private DonationControl control;
   private JScrollPane donationScrollPane;
   private JList donationList;
   private FocusTraversalManager tabOrder;
@@ -170,19 +167,7 @@ public class DonationTaskPanel extends EntityPanel
   {
     Donation d = getSelectedDonation();
     
-    if (d != null)
-    {
-      if (this.control == null || this.control.getDonationId() != d.getId())
-      {
-        this.control = this.task.getControl(d);
-      }
-    }
-    else
-    {
-      this.control = null;
-    }
-    
-    refreshDonationView();
+    refreshDonationView(d);
   }
   
   public DonationTaskPanel(MainWindow owner, DonationTask task)
@@ -240,27 +225,18 @@ public class DonationTaskPanel extends EntityPanel
     this.openDonation();
   }
 
-  private void refreshDonationView()
+  private void refreshDonationView(Donation donation)
   {
-    if (this.control != null)
+    if (donation != null)
     {
-      Donation data = this.control.getData();
-      if (data == null)
-      {
-        JOptionPane.showMessageDialog(this, "This donation no longer exists", "Error", JOptionPane.OK_OPTION);
-        this.control = null;
-      }
-      else
-      {
-        this.nextButton.setEnabled(!this.task.isTaskCleared(data));
-      }
+      this.nextButton.setEnabled(!this.task.isTaskCleared(donation));
     }
     else
     {      
       this.nextButton.setEnabled(false);
     }
     
-    this.donationPanel.setDonationControl(this.control);
+    this.donationPanel.setDonation(donation);
     this.donationPanel.disableDeletion();
     this.donationPanel.redrawContent();
   }
@@ -268,19 +244,13 @@ public class DonationTaskPanel extends EntityPanel
   @Override
   public void saveContent()
   {
-    if (this.control != null)
-    { 
-      this.donationPanel.saveContent();
-    }
+    this.donationPanel.saveContent();
   }
 
   @Override
   public void deleteContent()
   {
-    if (this.control != null)
-    {
-      this.donationPanel.deleteContent();
-    }
+    this.donationPanel.deleteContent();
   }
   
   public String getTaskName()

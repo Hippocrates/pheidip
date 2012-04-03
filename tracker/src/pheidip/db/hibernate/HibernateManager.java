@@ -15,15 +15,15 @@ public class HibernateManager
 
   private static String getDialect(DBType type)
   {
-	switch (type)
-	{
-	  case MYSQL:
-		return "org.hibernate.dialect.MySQLDialect";
-	  case HSQLDB:
-	  return "org.hibernate.dialect.HSQLDialect";
-	  default:
-		return null;
-	}
+  	switch (type)
+  	{
+  	  case MYSQL:
+  		return "org.hibernate.dialect.MySQLDialect";
+  	  case HSQLDB:
+  	  return "org.hibernate.dialect.HSQLDialect";
+  	  default:
+  		return null;
+  	}
   }
 	
   @SuppressWarnings("deprecation")

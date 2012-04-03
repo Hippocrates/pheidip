@@ -4,8 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import pheidip.db.SpeedRunData;
+import meta.MetaEntity;
+import meta.reflect.MetaEntityReflector;
+
+import pheidip.db.DataAccess;
 import pheidip.logic.DonationDatabaseManager;
+import pheidip.logic.EntitySearchInstance;
+import pheidip.logic.ProgramInstance;
 import pheidip.objects.SpeedRun;
 import pheidip.util.StringUtils;
 
@@ -23,10 +28,12 @@ public class GoogleSpreadSheetReader
     return mappedRuns;
   }
   
-  public static void mergeRun(SpeedRunData speedRuns, MarathonSpreadsheetEntry entry, Map<String, SpeedRun> mappedRuns, int currentIndex, boolean initializeMode)
+  public static void mergeRun(DataAccess database, MarathonSpreadsheetEntry entry, Map<String, SpeedRun> mappedRuns, int currentIndex, boolean initializeMode)
   {
     if (!StringUtils.innerStringMatch(entry.getGameName(), "setup") && !entry.getGameName().equalsIgnoreCase("end"))
     {
+      MetaEntity speedRunEntity = MetaEntityReflector.getMetaEntity(SpeedRun.class);
+      
       SpeedRun found = mappedRuns.get(entry.getGameName().toLowerCase());
       
       if (found == null)
@@ -48,7 +55,7 @@ public class GoogleSpreadSheetReader
         
         newRun.setDescription(description);
           
-        speedRuns.insertSpeedRun(newRun);
+        database.saveInstance(speedRunEntity, newRun);
       }
       else
       {
@@ -56,16 +63,17 @@ public class GoogleSpreadSheetReader
         found.setStartTime(entry.getStartTime());
         found.setEndTime(entry.getEstimatedFinish());
         
-        speedRuns.updateSpeedRun(found);
+        database.updateInstance(speedRunEntity, found);
       }
     }
   }
   
-  public static void mergeRuns(DonationDatabaseManager database, List<MarathonSpreadsheetEntry> entries, boolean initializeMode)
+  public static void mergeRuns(ProgramInstance instance, List<MarathonSpreadsheetEntry> entries, boolean initializeMode)
   {
-    SpeedRunData speedRuns = database.getDataAccess().getSpeedRunData();
-    
-    List<SpeedRun> allRuns = speedRuns.getAllSpeedRuns();
+    EntitySearchInstance<SpeedRun> searcher = instance.getEntitySearch(SpeedRun.class).createSearchInstance();
+    searcher.setPageSize(Integer.MAX_VALUE);
+    searcher.runSearch();
+    List<SpeedRun> allRuns = searcher.getResults();
     
     Map<String, SpeedRun> mappedRuns = nameMapRuns(allRuns);
     
@@ -73,7 +81,7 @@ public class GoogleSpreadSheetReader
     
     for (MarathonSpreadsheetEntry entry : entries)
     {
-      mergeRun(speedRuns, entry, mappedRuns, currentIndex, initializeMode);
+      mergeRun(instance.getDataAccess(), entry, mappedRuns, currentIndex, initializeMode);
       
       ++currentIndex;
     }

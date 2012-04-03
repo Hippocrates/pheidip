@@ -11,27 +11,40 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import pheidip.db.DonationData;
-import pheidip.db.DonorData;
+import meta.MetaEntity;
+import meta.reflect.MetaEntityReflector;
+import meta.search.MetaSearchUtils;
+
+import pheidip.model.PropertyReflectSupport;
 import pheidip.objects.Donation;
 import pheidip.objects.Donor;
 
 public class PrizeAssign
 {
-  private DonationDatabaseManager manager;
-  private DonationData donations;
-  private DonorData donors;
+  private MetaEntity donorEntity;
+  private ProgramInstance instance;
+  private EntitySearch<Donation> donationSearch;
+  private EntitySearch<Donor> donorSearch;
 
-  public PrizeAssign(DonationDatabaseManager manager)
+  public PrizeAssign(ProgramInstance instance)
   {
-    this.manager = manager;
-    this.donations = this.manager.getDataAccess().getDonationData();
-    this.donors = this.manager.getDataAccess().getDonorData();
+    this.instance = instance;
+    this.donationSearch = this.instance.getEntitySearch(Donation.class);
+    this.donorSearch = this.instance.getEntitySearch(Donor.class);
+    
+    this.donorEntity = MetaEntityReflector.getMetaEntity(Donor.class);
   }
   
   public List<PrizeDrawCandidate> getAllCandidatesInRange(Date loRange, Date hiRange)
   {
-    List<Donation> donationsInTimeRange = this.donations.getDonationsInTimeRange(loRange, hiRange);
+    EntitySearchInstance<Donation> searchInstance = donationSearch.createSearchInstance();
+    
+    PropertyReflectSupport.setProperty(searchInstance.getSearchParams(), MetaSearchUtils.getLowerRangeName("timeReceived"), loRange);
+    PropertyReflectSupport.setProperty(searchInstance.getSearchParams(), MetaSearchUtils.getUpperRangeName("timeReceived"), hiRange);
+    searchInstance.setPageSize(Integer.MAX_VALUE);
+    searchInstance.runSearch();
+    
+    List<Donation> donationsInTimeRange = searchInstance.getResults();
     
     Map<Integer, List<Donation> > donationMap = new HashMap<Integer, List<Donation> >();
    
@@ -48,7 +61,10 @@ public class PrizeAssign
       donorList.add(d);
     }
     
-    List<Donor> allDonors = this.donors.getAllDonors();
+    EntitySearchInstance<Donor> donorSearchInstance = this.donorSearch.createSearchInstance();
+    donorSearchInstance.setPageSize(Integer.MAX_VALUE);
+    donorSearchInstance.runSearch();
+    List<Donor> allDonors = donorSearchInstance.getResults();
     
     Map<Integer, Donor> donorMap = new HashMap<Integer, Donor>();
     
@@ -73,7 +89,7 @@ public class PrizeAssign
 	    {
 	      Random rand = new SecureRandom();
 	      int location = rand.nextInt(filtered.size());
-	      Donor result = this.donors.getDonorById(filtered.get(location).getId());
+	      Donor result = this.instance.getDataAccess().loadInstance(this.donorEntity, filtered.get(location).getId());
 	      
 	      if (result.getPrizes().size() > 0 && excludeIfWon)
 	      {
@@ -140,7 +156,7 @@ public class PrizeAssign
 			    
 			    for (int i = candidates.size() - 1; i >= 0; --i)
 			    {
-				    Donor result = this.donors.getDonorById(candidates.get(i).getDonor().getId());
+				    Donor result = this.instance.getDataAccess().loadInstance(this.donorEntity, candidates.get(i).getDonor().getId());
 				      
 				    if (!(result.getPrizes().size() > 0 && excludeIfWon))
 				    {
@@ -165,7 +181,7 @@ public class PrizeAssign
     
     for (int i = candidates.size() - 1; i >= 0; --i)
     {
-	    Donor result = this.donors.getDonorById(candidates.get(i).getDonor().getId());
+	    Donor result = this.instance.getDataAccess().loadInstance(this.donorEntity, candidates.get(i).getDonor().getId());
 	      
 	    if (!(result.getPrizes().size() > 0 && excludeIfWon))
 	    {

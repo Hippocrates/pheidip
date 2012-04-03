@@ -3,32 +3,32 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:49:18 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
- <class name="pheidip.objects.Donor" table="Donor">
+ <class name="pheidip.objects.Donor" table="Donor" lazy="false">
   <id name="id" type="int">
    <column name="ID"/>
    <generator class="assigned"/>
   </id>
   <property generated="never" lazy="false" name="email"
    type="java.lang.String" unique-key="DonorEmailUnique">
-   <column name="EMAIL"/>
+   <column name="EMAIL" not-null="true"/>
   </property>
-  <property generated="never" lazy="false" name="firstName" type="java.lang.String">
-   <column name="FIRSTNAME"/>
+  <property generated="never" lazy="false" name="firstName" type="java.lang.String" not-null="true">
+   <column name="FIRSTNAME" not-null="true"/>
   </property>
-  <property generated="never" lazy="false" name="lastName" type="java.lang.String">
-   <column name="LASTNAME"/>
+  <property generated="never" lazy="false" name="lastName" type="java.lang.String" not-null="true">
+   <column name="LASTNAME" not-null="true"/>
   </property>
   <property generated="never" lazy="false" name="alias"
    type="java.lang.String" unique-key="DonorAliasUnique">
    <column name="ALIAS"/>
   </property>
-  <set cascade="all,delete-orphan" lazy="true" name="donations" sort="unsorted" table="DONATION" inverse="true">
+  <set cascade="all,delete-orphan" fetch="join" lazy="true" name="donations" sort="unsorted" table="DONATION" inverse="true">
    <key>
     <column name="Donor"/>
    </key>
    <one-to-many class="pheidip.objects.Donation"/>
   </set>
-  <set cascade="save-update" lazy="true" name="prizes" sort="unsorted" table="PRIZE" inverse="true">
+  <set cascade="save-update" fetch="join" lazy="true" name="prizes" sort="unsorted" table="PRIZE">
    <key>
     <column name="Winner"/>
    </key>

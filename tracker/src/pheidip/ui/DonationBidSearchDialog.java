@@ -19,9 +19,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
@@ -31,9 +30,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
 
-import pheidip.logic.BidSearch;
+import pheidip.logic.EntitySearchInstance;
+import pheidip.logic.ProgramInstance;
+import pheidip.model.PropertyReflectSupport;
 import pheidip.objects.Bid;
-import pheidip.objects.BidSearchParams;
 import pheidip.objects.BidState;
 import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
@@ -48,7 +48,7 @@ import javax.swing.ListSelectionModel;
 public class DonationBidSearchDialog extends JDialog
 {
   private final JPanel contentPanel = new JPanel();
-  private BidSearch searcher;
+  private EntitySearchInstance<Bid> searcher;
   private JTextField speedRunField;
   private JTextField bidField;
   private ActionHandler actionHandler;
@@ -75,6 +75,7 @@ public class DonationBidSearchDialog extends JDialog
   private JComboBox bidStateComboBox;
   private JButton nextButton;
   private JButton prevButton;
+  private ProgramInstance instance;
 
   private void initializeGUI()
   {
@@ -483,8 +484,8 @@ public class DonationBidSearchDialog extends JDialog
       }
     }
     
-    this.nextButton.setEnabled(this.searcher.getHasNext());
-    this.prevButton.setEnabled(this.searcher.getHasPrevious());
+    this.nextButton.setEnabled(this.searcher.isNextPageAvailable());
+    this.prevButton.setEnabled(this.searcher.isPreviousPageAvailable());
     
     this.speedRunField.setEnabled(this.speedRunCheckBox.isSelected());
     this.browseSpeedRunButton.setEnabled(this.speedRunCheckBox.isSelected());
@@ -496,11 +497,12 @@ public class DonationBidSearchDialog extends JDialog
   /**
    * Create the dialog.
    */
-  public DonationBidSearchDialog(JFrame parent, BidSearch searcher)
+  public DonationBidSearchDialog(JFrame parent, ProgramInstance instance)
   {
     super(parent, true);
     
-    this.searcher = searcher;
+    this.instance = instance;
+    this.searcher = this.instance.getEntitySearch(Bid.class).createSearchInstance();
     this.challengeResult = null;
     this.choiceOptionResult = null;
     
@@ -512,7 +514,7 @@ public class DonationBidSearchDialog extends JDialog
   
   private void openBrowseDialog()
   {
-    SpeedRunSearchDialog dialog = new SpeedRunSearchDialog(this, this.searcher.createSpeedRunSearch());
+    EntitySearchDialog<SpeedRun> dialog = new EntitySearchDialog<SpeedRun>(this.instance, SpeedRun.class, false);
     
     dialog.setVisible(true);
     
@@ -541,7 +543,9 @@ public class DonationBidSearchDialog extends JDialog
         throw new RuntimeException("Error, no choice is selected.");
       }
       
-      this.choiceOptionResult = this.searcher.createOptionIfAble(currentChoice, this.optionField.getText());
+      this.choiceOptionResult = new ChoiceOption();
+      this.choiceOptionResult.setName(this.optionField.getText());
+      this.choiceOptionResult.setChoice(currentChoice);
     }
     else
     {
@@ -553,7 +557,9 @@ public class DonationBidSearchDialog extends JDialog
   
   private void createNewChallenge()
   {
-    this.challengeResult = this.searcher.createChallengeIfAble(this.currentRun, this.bidField.getText());
+    this.challengeResult = new Challenge();
+    this.challengeResult.setName(this.bidField.getText());
+    this.challengeResult.setSpeedRun(this.currentRun);
 
     closeDialog();
   }
@@ -567,7 +573,7 @@ public class DonationBidSearchDialog extends JDialog
   {
     Bid c = this.getCurrentBid();
     
-    if (c != null && c.getType() == BidType.CHOICE)
+    if (c != null && c.bidType() == BidType.CHOICE)
     {
       return (Choice) c;
     }
@@ -611,7 +617,7 @@ public class DonationBidSearchDialog extends JDialog
     {
       throw new RuntimeException("Error, no bid selected.");
     }
-    else if (result.getType() == BidType.CHALLENGE)
+    else if (result.bidType() == BidType.CHALLENGE)
     {
       this.challengeResult = (Challenge) result;
     }
@@ -638,12 +644,14 @@ public class DonationBidSearchDialog extends JDialog
   
   private void moveNextResults()
   {
-    this.fillList(this.searcher.moveNext());
+    this.searcher.nextPage();
+    this.fillList(this.searcher.getResults());
   }
   
   private void movePrevResults()
   {
-    this.fillList(this.searcher.movePrevious());
+    this.searcher.previousPage();
+    this.fillList(this.searcher.getResults());
   }
   
   private void fillList(List<Bid> filtered)
@@ -663,16 +671,22 @@ public class DonationBidSearchDialog extends JDialog
   {
     SpeedRun target = this.speedRunCheckBox.isSelected() ? this.currentRun : null;
     String name = this.bidCheckBox.isSelected() ? StringUtils.nullIfEmpty(this.bidField.getText()) : null;
-    Set<BidState> states = new HashSet<BidState>();
+    EnumSet<BidState> states = EnumSet.noneOf(BidState.class);
     
     if (this.bidStateCheckBox.isSelected())
     {
       states.add((BidState)this.bidStateComboBox.getSelectedItem());
     }
     
-    BidSearchParams params = new BidSearchParams(name, "", target, states);
+    Object params = this.searcher.getSearchParams();
     
-    this.fillList(this.searcher.runSearch(params));
+    //PropertyReflectSupport.setProperty(params, "speedRun", target);
+    PropertyReflectSupport.setProperty(params, "name", name);
+    PropertyReflectSupport.setProperty(params, "bidState", states);
+    
+    this.searcher.runSearch();
+    
+    this.fillList(this.searcher.getResults());
   }
   
   private void closeDialog()

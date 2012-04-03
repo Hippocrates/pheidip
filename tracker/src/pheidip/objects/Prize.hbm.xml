@@ -3,30 +3,30 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:55:43 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
- <class name="pheidip.objects.Prize" table="Prize">
+ <class name="pheidip.objects.Prize" table="Prize" lazy="false">
   <id name="id" type="int">
    <column name="ID"/>
    <generator class="assigned"/>
   </id>
   <property generated="never" lazy="false" name="name"
    type="java.lang.String" unique-key="PrizeNameUnique">
-   <column name="NAME"/>
+   <column name="NAME" not-null="true"/>
   </property>
   <property generated="never" lazy="false" name="imageURL" type="java.lang.String">
    <column name="IMAGEURL"/>
   </property>
   <property generated="never" lazy="false" name="sortKey" type="int"
-   unique="true">
+   unique="true" not-null="true">
    <column name="sortKey" unique="true"/>
   </property>
   <property generated="never" lazy="false" name="minimumBid" type="java.math.BigDecimal">
-   <column name="MINIMUMBID"/>
+   <column name="MINIMUMBID" not-null="true"/>
   </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
-   <column name="DESCRIPTION"/>
+   <column name="DESCRIPTION" not-null="true"/>
   </property>
   <property generated="never" lazy="false" name="drawMethod">
-   <column name="DRAWMETHOD"/>
+   <column name="DRAWMETHOD" not-null="true"/>
    <type name="org.hibernate.type.EnumType">
     <param name="type">12</param>
     <param name="enumClass">pheidip.objects.PrizeDrawMethod</param>

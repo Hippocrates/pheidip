@@ -1,6 +1,6 @@
 package pheidip.ui;
 
-import pheidip.logic.ChallengeControl;
+import pheidip.logic.EntityControlInstance;
 import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
 import pheidip.objects.ChallengeBid;
@@ -34,7 +34,7 @@ import javax.swing.ListSelectionModel;
 public class ChallengePanel extends EntityPanel
 {
   private MainWindow owner;
-  private ChallengeControl challengeControl;
+  private EntityControlInstance<Challenge> challengeControl;
   private JTextField nameField;
   private JFormattedTextField amountField;
   private JButton saveButton;
@@ -58,7 +58,7 @@ public class ChallengePanel extends EntityPanel
   private JTable bidsTable;
   private JButton openDonationButton;
   
-  private int[] donationTableIds;
+  private ListTableModel<ChallengeBid> bidsTableData;
   
   private void initializeGUI()
   {
@@ -322,7 +322,7 @@ public class ChallengePanel extends EntityPanel
       
     if (selectedRow != -1)
     {
-      this.owner.openDonationTab(this.donationTableIds[selectedRow]);
+      this.owner.openDonationTab(this.bidsTableData.getRow(selectedRow).getDonation());
     }
   }
 
@@ -336,13 +336,15 @@ public class ChallengePanel extends EntityPanel
     return this.tabOrder;
   }
 
-  public ChallengePanel(MainWindow owner, ChallengeControl challengeControl)
+  public ChallengePanel(MainWindow owner, Challenge challenge)
   {
     this.owner = owner;
-    this.challengeControl = challengeControl;
+    this.challengeControl = new EntityControlInstance<Challenge>(owner.getInstance().getEntityControl(Challenge.class), challenge);
     
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.refreshContent();
   }
   
   @Override
@@ -355,64 +357,52 @@ public class ChallengePanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    this.challengeControl.refreshData();
+    if (this.challengeControl.isPersistent())
+    {
+      this.challengeControl.refreshInstance();
+    }
+    
     this.redrawContent();
   }
   
   @Override
   public void redrawContent()
   {
-    Challenge data = this.challengeControl.getData();
-    
-    if (data == null)
+    if (!this.challengeControl.isValid())
     {
       JOptionPane.showMessageDialog(this, "Error, this challenge no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
       this.owner.removeTab(this);
       return;
     }
     
+    Challenge data = this.challengeControl.getInstance();
+    
     this.nameField.setText(data.getName());
     this.runField.setText(data.getSpeedRun().getName());
     this.amountField.setText(data.getGoalAmount().toString());
     this.descriptionTextArea.setText(data.getDescription());
-    this.totalAmountField.setText(this.challengeControl.getTotalCollected().toString());
+    this.totalAmountField.setText(data.getTotalCollected().toString());
     this.bidStateComboBox.setSelectedItem(data.getBidState());
     
-    this.donationTableIds = new int[data.getBids().size()];
+    this.bidsTableData = new ListTableModel<ChallengeBid>(ChallengeBid.class,
+      "amount",
+      "donorName");
     
-    CustomTableModel tableData = new CustomTableModel(new String[]
-    {
-      "Amount Bid",
-      "Donor",
-    },0);
-    
-    int current = 0;
-    
-    for (ChallengeBid b : data.getBids())
-    {
-      this.donationTableIds[current] = b.getDonation().getId();
-      ++current;
-      
-      tableData.addRow(new Object[]
-      {
-        b.getAmount(),
-        b.getDonation().getDonor().toString(),
-      });
-    }
-    
-    this.bidsTable.setModel(tableData);
+    this.bidsTableData.setCollection(data.getBids());
+
+    this.bidsTable.setModel(this.bidsTableData);
     
     this.setHeaderText(data.toString());
   }
   
   private void openAssociatedRun()
   {
-    this.owner.openSpeedRunTab(this.challengeControl.getData().getSpeedRun().getId());
+    this.owner.openSpeedRunTab(this.challengeControl.getInstance().getSpeedRun());
   }
 
   public int getChallengeId()
   {
-    return this.challengeControl.getChallengeId();
+    return this.challengeControl.getId();
   }
 
   public void deleteContent()
@@ -421,18 +411,18 @@ public class ChallengePanel extends EntityPanel
     
     if (result == JOptionPane.YES_OPTION)
     {
-      this.challengeControl.deleteChallenge();
+      this.challengeControl.deleteInstance();
       this.owner.removeTab(this);
     }
   }
 
   public void saveContent()
   {
-    Challenge data = this.challengeControl.getData();
+    Challenge data = this.challengeControl.getInstance();
     data.setName(this.nameField.getText());
     data.setGoalAmount(new BigDecimal(this.amountField.getText()));
     data.setDescription(this.descriptionTextArea.getText());
     data.setBidState((BidState)this.bidStateComboBox.getSelectedItem());
-    this.challengeControl.updateData(data);
+    this.challengeControl.saveInstance();
   }
 }

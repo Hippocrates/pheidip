@@ -3,46 +3,46 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:49:18 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
- <class name="pheidip.objects.Donation" table="Donation">
+ <class name="pheidip.objects.Donation" table="Donation" lazy="false">
   <id name="id" type="int">
    <column name="ID"/>
    <generator class="assigned"/>
   </id>
   <property generated="never" lazy="false" name="timeReceived" type="java.util.Date">
-   <column name="TIMERECEIVED"/>
+   <column name="TIMERECEIVED" not-null="true"/>
   </property>
   <property generated="never" lazy="false" name="amount" type="java.math.BigDecimal">
-   <column name="AMOUNT"/>
+   <column name="AMOUNT" not-null="true"/>
   </property>
   <property generated="never" lazy="false" length="4096" name="comment" type="java.lang.String">
    <column length="4096" name="COMMENT"/>
   </property>
-  <property generated="never" lazy="false" name="domain">
-   <column name="DOMAIN"/>
+  <property generated="never" lazy="false" name="domain" unique-key="DomainIDKey">
+   <column name="DOMAIN" not-null="true"/>
    <type name="org.hibernate.type.EnumType">
     <param name="type">12</param>
     <param name="enumClass">pheidip.objects.DonationDomain</param>
    </type>
   </property>
-  <property generated="never" lazy="false" name="domainId" type="java.lang.String">
-   <column name="DOMAINID"/>
+  <property generated="never" lazy="false" name="domainId" type="java.lang.String" unique-key="DomainIDKey">
+   <column name="DOMAINID" not-null="true"/>
   </property>
   <property generated="never" lazy="false" name="bidState">
-   <column name="BIDSTATE"/>
+   <column name="BIDSTATE" not-null="true"/>
    <type name="org.hibernate.type.EnumType">
     <param name="type">12</param>
     <param name="enumClass">pheidip.objects.DonationBidState</param>
    </type>
   </property>
   <property generated="never" lazy="false" name="readState">
-   <column name="READSTATE"/>
+   <column name="READSTATE" not-null="true"/>
    <type name="org.hibernate.type.EnumType">
     <param name="type">12</param>
     <param name="enumClass">pheidip.objects.DonationReadState</param>
    </type>
   </property>
   <property generated="never" lazy="false" name="commentState">
-   <column name="COMMENTSTATE"/>
+   <column name="COMMENTSTATE" not-null="true"/>
    <type name="org.hibernate.type.EnumType">
     <param name="type">12</param>
     <param name="enumClass">pheidip.objects.DonationCommentState</param>
@@ -57,7 +57,7 @@
   </set>
   <many-to-one class="pheidip.objects.Donor" fetch="join"
    foreign-key="DonationFKDonor" name="donor">
-   <column name="DONOR"/>
+   <column name="DONOR" not-null="true"/>
   </many-to-one>
  </class>
 </hibernate-mapping>

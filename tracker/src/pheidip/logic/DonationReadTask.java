@@ -1,57 +1,52 @@
 package pheidip.logic;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
 
-import pheidip.db.DonationData;
+import pheidip.model.PropertyReflectSupport;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationCommentState;
 import pheidip.objects.DonationReadState;
-import pheidip.objects.DonationSearchParams;
 import pheidip.util.StringUtils;
 
 public class DonationReadTask implements DonationTask
 {
   public static String TASK_NAME = "Read Task";
-  private DonationDatabaseManager manager;
-  private DonationData donations;
-  
-  public DonationReadTask(DonationDatabaseManager manager)
-  {
-    this.manager = manager;
-    this.donations = this.manager.getDataAccess().getDonationData();
-  }
-  
-  @Override
-  public DonationControl getControl(Donation d)
-  {
-    return new DonationControl(this.manager, d.getId());
-  }
 
+  private EntityControl<Donation> control;
+  private EntitySearch<Donation> search;
+  private EntitySearchInstance<Donation> searchInstance;
+  
+  public DonationReadTask(EntityControl<Donation> control, EntitySearch<Donation> search)
+  {
+    this.control = control;
+    this.search = search;
+    this.searchInstance = this.search.createSearchInstance();
+    this.searchInstance.setPageSize(Integer.MAX_VALUE);
+    PropertyReflectSupport.setProperty(this.searchInstance.getSearchParams(), "bidState", EnumSet.of(DonationReadState.PENDING));
+  }
+  
   @Override
   public void clearTask(Donation d)
   {
-    DonationControl control = getControl(d);
-    if (control.getData().getReadState() == DonationReadState.PENDING)
+    if (d.getReadState() == DonationReadState.PENDING)
     {
-      control.getData().setReadState(DonationReadState.READ);
+      d.setReadState(DonationReadState.READ);
     }
     
-    if (control.getData().getCommentState() == DonationCommentState.PENDING && !StringUtils.isEmptyOrNull(control.getData().getComment()))
+    if (d.getCommentState() == DonationCommentState.PENDING && !StringUtils.isEmptyOrNull(d.getComment()))
     {
-      control.getData().setCommentState(DonationCommentState.APPROVED);
+      d.setCommentState(DonationCommentState.APPROVED);
     }
-    control.updateData(control.getData());
+
+    this.control.save(d);
   }
 
   @Override
   public List<Donation> refreshTaskList()
   {
-    DonationSearchParams params = new DonationSearchParams();
-    params.setTargetReadState(new HashSet<DonationReadState>(Arrays.asList(DonationReadState.PENDING)));
-    
-    return this.donations.searchDonations(params);
+    this.searchInstance.runSearch();
+    return this.searchInstance.getResults();
   }
   
   public boolean isTaskCleared(Donation d)

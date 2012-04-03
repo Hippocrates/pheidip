@@ -3,20 +3,20 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:55:43 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
- <class abstract="true" name="pheidip.objects.Bid" table="Bid">
+ <class abstract="true" name="pheidip.objects.Bid" table="Bid" lazy="false">
   <id name="id" type="int">
    <column name="ID"/>
    <generator class="assigned"/>
   </id>
   <property generated="never" lazy="false" name="name"
    type="java.lang.String" unique-key="BidNameUnique">
-   <column name="NAME"/>
+   <column name="NAME" not-null="true"/>
   </property>
-  <property generated="never" lazy="false" name="description" type="java.lang.String">
+  <property generated="never" lazy="false" name="description" type="java.lang.String" not-null="true">
    <column name="DESCRIPTION"/>
   </property>
   <property generated="never" lazy="false" name="bidState">
-   <column name="BIDSTATE"/>
+   <column name="BIDSTATE" not-null="true"/>
    <type name="org.hibernate.type.EnumType">
     <param name="type">12</param>
     <param name="enumClass">pheidip.objects.BidState</param>

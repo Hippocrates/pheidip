@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import pheidip.db.SpeedRunData;
 import pheidip.objects.Bid;
 import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
@@ -14,7 +13,7 @@ import pheidip.objects.SpeedRun;
 import pheidip.util.IdUtils;
 
 public class SpeedRunControl
-{
+{/*
   private DonationDatabaseManager donationDatabase;
   private SpeedRunData speedRuns;
   private int speedRunId;
@@ -111,5 +110,5 @@ public class SpeedRunControl
   public int getSpeedRunId()
   {
     return this.speedRunId;
-  }
+  }*/
 }

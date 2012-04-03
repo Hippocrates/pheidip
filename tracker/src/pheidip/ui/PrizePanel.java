@@ -3,7 +3,8 @@ package pheidip.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import pheidip.logic.PrizeControl;
+import pheidip.logic.EntityControlInstance;
+import pheidip.logic.PrizeAssign;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
 import pheidip.objects.PrizeDrawMethod;
@@ -32,7 +33,7 @@ import javax.swing.JComboBox;
 public class PrizePanel extends EntityPanel
 {
   private MainWindow owner;
-  private PrizeControl control;
+  private EntityControlInstance<Prize> control;
   
   private ActionHandler actionHandler;
   private JTextField nameField;
@@ -447,22 +448,24 @@ public class PrizePanel extends EntityPanel
     return this.tabOrder;
   }
   
-  public PrizePanel(MainWindow owner, PrizeControl control)
+  public PrizePanel(MainWindow owner, Prize prize)
   {
     this.owner = owner;
-    this.control = control;
+    this.control = new EntityControlInstance<Prize>(this.owner.getInstance().getEntityControl(Prize.class), prize);
     
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.refreshContent();
   }
   
   private void openWinner()
   {
-    Donor winner = this.control.getData().getWinner();
+    Donor winner = this.control.getInstance().getWinner();
     
     if (winner != null)
     {
-      this.owner.openDonorTab(winner.getId());
+      this.owner.openDonorTab(winner);
     }
   }
 
@@ -479,7 +482,8 @@ public class PrizePanel extends EntityPanel
   
   private void assignPrizeToDonor(Donor d)
   {
-    this.control.assignPrize(d);
+    this.control.getInstance().setWinner(d);
+    d.getPrizes().add(this.control.getInstance());
     this.yesWinner();
   }
   
@@ -487,7 +491,7 @@ public class PrizePanel extends EntityPanel
   {
     BigDecimal targetAmount = new BigDecimal(this.targetAmountField.getText());
     
-    Prize data = this.control.getData();
+    Prize data = this.control.getInstance();
     Date defaultStart = null;
     Date defaultEnd = null;
     PrizeDrawMethod defaultMethod = data.getDrawMethod();
@@ -502,7 +506,7 @@ public class PrizePanel extends EntityPanel
       defaultEnd = data.getEndGame().getEndTime();
     }
     
-    PrizeAssignmentDialog dialog = new PrizeAssignmentDialog(this.owner, this.control.getPrizeAssign(), defaultMethod, targetAmount, defaultStart, defaultEnd);
+    PrizeAssignmentDialog dialog = new PrizeAssignmentDialog(this.owner, new PrizeAssign(this.owner.getInstance()), defaultMethod, targetAmount, defaultStart, defaultEnd);
     dialog.setVisible(true);
     
     if (dialog.getResult() != null)
@@ -517,19 +521,25 @@ public class PrizePanel extends EntityPanel
   
     if (response == JOptionPane.YES_OPTION)
     {
-      this.control.removePrizeWinner();
+      Donor oldWinner = this.control.getInstance().getWinner();
+      if (oldWinner != null)
+      {
+        oldWinner.getPrizes().remove(this.control.getInstance());
+      }
+      this.control.getInstance().setWinner(null);
+      
       this.noWinner();
     }
   }
   
   public int getPrizeId()
   {
-    return this.control.getPrizeId();
+    return this.control.getId();
   }
   
   private void yesWinner()
   {
-    Donor winner = this.control.getData().getWinner();
+    Donor winner = this.control.getInstance().getWinner();
     this.winnerField.setText(winner.toString());
     this.assignWinnerButton.setEnabled(false);
     this.removeWinnerButton.setEnabled(true);
@@ -549,20 +559,23 @@ public class PrizePanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    this.control.refreshData();
+    if (this.control.isPersistent())
+    {
+      this.control.refreshInstance();
+    }
     this.redrawContent();
   }
   
   @Override
   public void redrawContent()
   {
-    Prize data = this.control.getData();
-    
-    if (data == null)
+    if (!this.control.isValid())
     {
       this.owner.removeTab(this);
       throw new RuntimeException("Error, this prize no longer exists.");
     }
+    
+    Prize data = this.control.getInstance();
     
     this.setHeaderText("Prize: " + data.toString());
 
@@ -588,14 +601,14 @@ public class PrizePanel extends EntityPanel
   @Override
   public void saveContent()
   {
-    Prize data = this.control.getData();
+    Prize data = this.control.getInstance();
     data.setName(this.nameField.getText());
     data.setImageURL(this.imageURLField.getText());
     data.setDescription(this.descriptionTextArea.getText());
     data.setSortKey(Integer.parseInt(this.sortKeyField.getText()));
     data.setMinimumBid(new BigDecimal(this.targetAmountField.getText()));
     data.setDrawMethod((PrizeDrawMethod) this.drawMethodComboBox.getSelectedItem());
-    this.control.updateData(data);
+    this.control.saveInstance();
     this.refreshContent();
   }
 
@@ -606,7 +619,7 @@ public class PrizePanel extends EntityPanel
     
     if (result == JOptionPane.OK_OPTION)
     {
-      this.control.deletePrize();
+      this.control.deleteInstance();
       this.owner.removeTab(this);
     }
   }
@@ -615,6 +628,11 @@ public class PrizePanel extends EntityPanel
   public boolean confirmClose()
   {
     return true;
+  }
+
+  public int getId()
+  {
+    return this.control.getId();
   }
 
 }

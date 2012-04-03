@@ -7,7 +7,7 @@ import pheidip.ui.DatabaseConnectDialog;
 import pheidip.ui.UIConfiguration;
 
 public class AddGrabBag
-{
+{/*
   public static void main(String[] args) throws java.io.IOException
   {
     UIConfiguration.setDefaultConfiguration();
@@ -20,7 +20,6 @@ public class AddGrabBag
     
     if (db.isConnected())
     {
-      /*
       StringBuffer fileData = new StringBuffer(1000);
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
       char[] buf = new char[1024];
@@ -32,9 +31,7 @@ public class AddGrabBag
           String date = line.substring(0, line.indexOf(';'));
 
       }
-      reader.close();
-      */
-      
+      reader.close(); 
     }
-  }
+  }*/
 }

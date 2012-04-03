@@ -3,14 +3,14 @@ package pheidip.ui;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import meta.search.MetaSearchEntity;
+import meta.search.MetaSearchField;
 import pheidip.logic.ProgramInstance;
 import pheidip.model.EntityPropertiesSync;
 import pheidip.model.ObjectProperty;
-import pheidip.model.SearchProperty;
-import pheidip.model.SearchSpecification;
 import pheidip.objects.Entity;
-import pheidip.objects.SearchParameters;
 import pheidip.util.Pair;
+import pheidip.logic.EntitySearchInstance;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -22,15 +22,12 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class SearchParametersPanel<T extends Entity> extends JPanel
 {
-  private SearchParameters<T> searchParams;
-  private List<Pair<Component, String>> components;
+  private MetaSearchEntity searchSpec;
+  private EntitySearchInstance<T> searcher;
   private EntityPropertiesSync sync;
-  private ProgramInstance instance;
 
   private void initializeGUI()
   {
-    SearchSpecification<T> spec = this.searchParams.getSearchSpecification();
-    
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = null;
     gridBagLayout.rowHeights = null;
@@ -39,8 +36,10 @@ public class SearchParametersPanel<T extends Entity> extends JPanel
     setLayout(gridBagLayout);
     
     int rowIndex = 0;
+   
+    List<Component> tabOrder = new ArrayList<Component>();
     
-    for (SearchProperty property : spec.getProperties())
+    for (MetaSearchField field : this.searchSpec.getSearchEntityDescription().getSearchFields())
     {
       GridBagConstraints labelConstraints = new GridBagConstraints();
       labelConstraints.gridx = 0;
@@ -48,7 +47,7 @@ public class SearchParametersPanel<T extends Entity> extends JPanel
       labelConstraints.anchor = GridBagConstraints.EAST;
       labelConstraints.insets = new Insets(5, 5, 5, 5);
       
-      JLabel label = new JLabel(property.getSearchProperty().getName());
+      JLabel label = new JLabel(field.getName());
       
       this.add(label, labelConstraints);
       
@@ -59,49 +58,27 @@ public class SearchParametersPanel<T extends Entity> extends JPanel
       componentConstraints.fill = GridBagConstraints.HORIZONTAL;
       componentConstraints.insets = new Insets(5, 5, 5, 5);
       
-      Pair<Component, String> component = UIGenerator.createPropertyComponent(property.getSearchProperty(), this.instance);
-      components.add(component);
+      Pair<Component, String> component = UIGenerator.generateSearcherComponent(field);
+
+      this.sync.synchronizeProperties(new ObjectProperty(component.getFirst(), component.getSecond()), new ObjectProperty(this.searcher.getSearchParams(), field.getName()));
       
       this.add(component.getFirst(), componentConstraints);
+      
+      tabOrder.add(component.getFirst());
+      
+      this.setFocusTraversalPolicy(new FocusTraversalManager(tabOrder));
+      this.setFocusTraversalPolicyProvider(true);
       
       ++rowIndex;
     }
   }
   
-  private void initializeGUIEvents()
+  public SearchParametersPanel(EntitySearchInstance<T> searcher, ProgramInstance instance)
   {
-    SearchSpecification<T> spec = this.searchParams.getSearchSpecification();
-    List<SearchProperty> searchProperties = spec.getProperties();
-    
-    for (int i = 0; i < this.components.size(); ++i)
-    {
-      this.sync.synchronizeProperties(new ObjectProperty(this.components.get(i).getFirst(), this.components.get(i).getSecond()), new ObjectProperty(this.searchParams, searchProperties.get(i).getSearchProperty().getName()));
-    }
-    
-    List<Component> tabOrder = new ArrayList<Component>();
-    
-    for (int i = 0; i < this.components.size(); ++i)
-    {
-      tabOrder.add(this.components.get(i).getFirst());
-    }
-    
-    this.setFocusTraversalPolicy(new FocusTraversalManager(tabOrder));
-    this.setFocusTraversalPolicyProvider(true);
-  }
-  
-  public SearchParametersPanel(SearchParameters<T> searchParams, ProgramInstance instance)
-  {
-    this.searchParams = searchParams;
-    this.instance = instance;
+    this.searcher = searcher;
+    this.searchSpec = searcher.getSearchDescription();
     this.sync = new EntityPropertiesSync();
-    this.components = new ArrayList<Pair<Component, String>>();
     
     this.initializeGUI();
-    this.initializeGUIEvents();
-  }
-
-  public SearchParameters<T> getParameters()
-  {
-    return this.searchParams;
   }
 }

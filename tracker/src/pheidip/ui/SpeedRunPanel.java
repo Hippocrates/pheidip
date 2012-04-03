@@ -1,15 +1,15 @@
 package pheidip.ui;
 
-import pheidip.logic.ChallengeControl;
-import pheidip.logic.ChoiceControl;
-import pheidip.logic.SpeedRunControl;
+import pheidip.logic.EntityControlInstance;
 import pheidip.objects.Bid;
 import pheidip.objects.BidType;
+import pheidip.objects.Challenge;
+import pheidip.objects.Choice;
 import pheidip.objects.ChoiceOption;
 import pheidip.objects.Prize;
 import pheidip.objects.SpeedRun;
 import pheidip.util.FormatUtils;
-import pheidip.util.Pair;
+import pheidip.util.StringUtils;
 
 import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
@@ -26,7 +26,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -40,7 +40,8 @@ import javax.swing.JList;
 public class SpeedRunPanel extends EntityPanel
 {
   private MainWindow owner;
-  private SpeedRunControl speedRunControl;
+  private EntityControlInstance<SpeedRun> speedRunControl;
+  
   private List<Bid> cachedRelatedBids;
   
   private JTextField nameField;
@@ -379,13 +380,15 @@ public class SpeedRunPanel extends EntityPanel
     this.setFocusTraversalPolicy(this.tabOrder);
   }
 
-  public SpeedRunPanel(MainWindow owner, SpeedRunControl control)
+  public SpeedRunPanel(MainWindow owner, SpeedRun data)
   {
     this.owner = owner;
-    this.speedRunControl = control;
-    
+    this.speedRunControl = new EntityControlInstance<SpeedRun>(this.owner.getInstance().getEntityControl(SpeedRun.class), data);
+
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.redrawContent();
   }
   
   public boolean isFocusCycleRoot()
@@ -407,7 +410,7 @@ public class SpeedRunPanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    this.speedRunControl.refreshData();
+    this.speedRunControl.refreshInstance();
     this.redrawContent();
   }
   
@@ -422,14 +425,14 @@ public class SpeedRunPanel extends EntityPanel
     
     if (p != null)
     {
-      this.owner.openPrizeTab(p.getId());
+      this.owner.openPrizeTab(p);
     }
   }
 
   @Override
   public void redrawContent()
   {
-    SpeedRun data = this.speedRunControl.getData();
+    SpeedRun data = this.speedRunControl.getInstance();
     
     if (data == null)
     {
@@ -453,7 +456,7 @@ public class SpeedRunPanel extends EntityPanel
     
     this.prizeList.setModel(prizeData);
     
-    cachedRelatedBids = this.speedRunControl.getAllBids();
+    cachedRelatedBids = new ArrayList<Bid>(data.getBids());
     
     CustomTableModel tableData = new CustomTableModel(new String[]
     {
@@ -465,26 +468,20 @@ public class SpeedRunPanel extends EntityPanel
     {
       String statusString = "";
       
-      if (b.getType() == BidType.CHALLENGE)
+      if (b.bidType() == BidType.CHALLENGE)
       {
-        ChallengeControl c = this.speedRunControl.getChallengeControl(b.getId());
-        statusString = "$" + c.getTotalCollected().toString();
+        statusString = "$" + ((Challenge)b).getTotalCollected();
       }
       else
       {
-        ChoiceControl c = this.speedRunControl.getChoiceControl(b.getId());
-        List<Pair<ChoiceOption,BigDecimal>> options = c.getOptionsWithTotals(true);
-        String[] strings = new String[options.size()];
+        List<String> strings = new ArrayList<String>();
         
-        for (int i = 0; i < strings.length; ++i)
+        for (ChoiceOption o : ((Choice)b).getOptions())
         {
-          statusString += options.get(i).getFirst() + " : $" + options.get(i).getSecond().toString();
-          
-          if (i != strings.length - 1)
-          {
-            statusString += ", ";
-          }
+          strings.add(o.getName() + " : $" + o.getTotalCollected().toString());
         }
+        
+        statusString = StringUtils.joinSeperated(strings, ", ");
       }
       
       tableData.addRow(
@@ -502,14 +499,14 @@ public class SpeedRunPanel extends EntityPanel
   
   public void saveContent()
   {
-    SpeedRun data = this.speedRunControl.getData();
+    SpeedRun data = this.speedRunControl.getInstance();
     data.setName(this.nameField.getText());
     data.setRunners(this.runnersTextField.getText());
     data.setDescription(this.descriptionTextArea.getText());
     data.setSortKey(Integer.parseInt(this.sortKeyField.getText()));
     data.setStartTime(this.startTimeField.getTimeValue());
     data.setEndTime(this.endTimeField.getTimeValue());
-    this.speedRunControl.updateData(data);
+    this.speedRunControl.saveInstance();
     this.refreshContent();
   }
 
@@ -519,7 +516,7 @@ public class SpeedRunPanel extends EntityPanel
     
     if (result == JOptionPane.OK_OPTION)
     {
-      this.speedRunControl.deleteSpeedRun();
+      this.speedRunControl.deleteInstance();
       this.owner.removeTab(this);
     }
   }
@@ -531,20 +528,20 @@ public class SpeedRunPanel extends EntityPanel
     if (selectedRow != -1)
     {
       Bid current = (Bid)this.bidTable.getValueAt(selectedRow, 0);
-      if (current.getType() == BidType.CHOICE)
+      if (current.bidType() == BidType.CHOICE)
       {
-        this.owner.openChoiceTab(current.getId());
+        this.owner.openChoiceTab((Choice)current);
       }
-      else if (current.getType() == BidType.CHALLENGE)
+      else if (current.bidType() == BidType.CHALLENGE)
       {
-        this.owner.openChallengeTab(current.getId());
+        this.owner.openChallengeTab((Challenge)current);
       }
     }
   }
 
   public int getSpeedRunId()
   {
-    return this.speedRunControl.getSpeedRunId();
+    return this.speedRunControl.getInstance().getId();
   }
   
   public void createNewChallenge()
@@ -553,8 +550,12 @@ public class SpeedRunPanel extends EntityPanel
     
     if (result != null)
     {
-      int created = this.speedRunControl.createNewChallenge(result);
-      this.owner.openChallengeTab(created);
+      Challenge challenge = new Challenge();
+      challenge.setSpeedRun(this.speedRunControl.getInstance());
+      challenge.setName(result);
+      this.speedRunControl.getInstance().getBids().add(challenge);
+      
+      this.owner.openChallengeTab(challenge);
     }
   }
 
@@ -564,8 +565,17 @@ public class SpeedRunPanel extends EntityPanel
     
     if (result != null)
     {
-      int created = this.speedRunControl.createNewChoice(result);
-      this.owner.openChoiceTab(created);
+      Choice choice = new Choice();
+      choice.setSpeedRun(this.speedRunControl.getInstance());
+      choice.setName(result);
+      this.speedRunControl.getInstance().getBids().add(choice);
+      
+      this.owner.openChoiceTab(choice);
     }
+  }
+
+  public int getId()
+  {
+    return this.speedRunControl.getId();
   }
 }

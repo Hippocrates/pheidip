@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import pheidip.db.DonationData;
 import pheidip.objects.BidType;
 import pheidip.objects.Challenge;
 import pheidip.objects.ChallengeBid;
@@ -21,7 +20,7 @@ import pheidip.objects.SpeedRun;
 import pheidip.util.IdUtils;
 
 public class DonationControl
-{
+{/*
   private DonationDatabaseManager donationDatabase;
   private DonationData donations;
   
@@ -209,13 +208,6 @@ public class DonationControl
 
   public void deleteDonation()
   {
-    /*List<DonationBid> attachedBids = getAttachedBids();
-    
-    for (DonationBid b : attachedBids)
-    {
-      this.removeBid(b);
-    }
-    */
     this.cachedData = null;
     this.donations.deleteDonation(this.getData());
   }
@@ -245,5 +237,5 @@ public class DonationControl
     }
     
     return sum;
-  }
+  }*/
 }

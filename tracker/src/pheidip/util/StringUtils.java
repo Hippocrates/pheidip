@@ -59,6 +59,11 @@ public final class StringUtils
     
     return new String(array);
   }
+  
+  public static String naturalToSymbol(String natural)
+  {
+    return natural.trim().toUpperCase().replace(' ', '_');
+  }
 
   public static boolean isEmptyOrNull(String test)
   {

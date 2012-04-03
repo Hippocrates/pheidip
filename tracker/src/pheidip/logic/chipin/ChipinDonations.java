@@ -15,7 +15,6 @@ import pheidip.objects.DonationCommentState;
 import pheidip.objects.DonationDomain;
 import pheidip.objects.DonationReadState;
 import pheidip.objects.Donor;
-import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
 
 public final class ChipinDonations
@@ -128,15 +127,19 @@ public final class ChipinDonations
       boolean signifigant = chipinDonation.getAmount().compareTo(SIGNIFIGANCE_THRESHOLD) >= 0;
       boolean hasComment = !StringUtils.isEmptyOrNull(commentString);
       
-      outDonationsToInsert.add(new Donation(IdUtils.generateId(),
-          DonationDomain.CHIPIN, 
-          chipinDonation.getChipinId(),
-          signifigant && hasComment ? DonationBidState.PENDING : DonationBidState.IGNORED, 
-          signifigant || hasComment ? DonationReadState.PENDING : DonationReadState.IGNORED,
-          DonationCommentState.PENDING, 
-          chipinDonation.getAmount(),
-          chipinDonation.getTimeStamp(), 
-          donor, StringUtils.nullIfEmpty(commentString)));
+      Donation toAdd = new Donation();
+      
+      toAdd.setDomain(DonationDomain.CHIPIN);
+      toAdd.setDomainId(chipinDonation.getChipinId());
+      toAdd.setBidState(signifigant && hasComment ? DonationBidState.PENDING : DonationBidState.IGNORED);
+      toAdd.setReadState(signifigant || hasComment ? DonationReadState.PENDING : DonationReadState.IGNORED);
+      toAdd.setCommentState(DonationCommentState.PENDING);
+      toAdd.setComment(StringUtils.nullIfEmpty(commentString));
+      toAdd.setAmount(chipinDonation.getAmount());
+      toAdd.setTimeReceived(chipinDonation.getTimeStamp());
+      toAdd.setDonor(donor);
+      
+      outDonationsToInsert.add(toAdd);
     }
   }
 

@@ -14,12 +14,12 @@ import pheidip.logic.chipin.ChipinDonation;
 import pheidip.objects.Donor;
 import pheidip.util.IdUtils;
 import pheidip.util.StringUtils;
-import test.logic.ChipinTestUtils;
 
 public class RandomChipinGenerator 
 {
   public static void main(String[] args)
   {
+    /*
 		List<String> strings = GetAllStdIn();
 		
 		List<Donor> donors = new ArrayList<Donor>();
@@ -58,6 +58,7 @@ public class RandomChipinGenerator
 		}
 		
 		System.out.print(ChipinTestUtils.generateChipinHTMLTable(donations));
+		*/
   }
 	
   public static List<String> GetAllStdIn()

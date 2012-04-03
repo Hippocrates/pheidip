@@ -7,11 +7,16 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
-import pheidip.logic.DonationControl;
+import pheidip.logic.EntityControlInstance;
 import pheidip.objects.BidType;
+import pheidip.objects.Challenge;
 import pheidip.objects.ChallengeBid;
+import pheidip.objects.Choice;
 import pheidip.objects.ChoiceBid;
+import pheidip.objects.ChoiceOption;
+import pheidip.objects.Donation;
 import pheidip.objects.DonationBid;
+import pheidip.objects.SpeedRun;
 import pheidip.util.FormatUtils;
 import pheidip.util.StringUtils;
 
@@ -22,6 +27,7 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -33,7 +39,7 @@ import javax.swing.ListSelectionModel;
 public class DonationBidsPanel extends JPanel
 {
   private ActionHandler actionHandler;
-  private DonationControl control;
+  private EntityControlInstance<Donation> donationControl;
   private JTable bidTable;
   private JScrollPane bidScrollPane;
   private MainWindow owner;
@@ -174,13 +180,14 @@ public class DonationBidsPanel extends JPanel
     this.setFocusCycleRoot(true);
   }
   
-  public DonationBidsPanel(MainWindow owner, DonationControl control)
+  public DonationBidsPanel(MainWindow owner, EntityControlInstance<Donation> control)
   {
     this.owner = owner;
-    this.control = control;
-    
+
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.setDonationControl(control);
   }
   
   private DonationBid getSelectedDonationBid()
@@ -206,9 +213,8 @@ public class DonationBidsPanel extends JPanel
       
       if (result == JOptionPane.YES_OPTION)
       {
-        this.control.removeBid(selected);
-        
-        this.refreshContent();
+        this.donationControl.getInstance().getBids().remove(selected);
+        this.redrawContent();
       }
     }
   }
@@ -221,26 +227,45 @@ public class DonationBidsPanel extends JPanel
     {
       DonationBid b = this.cachedDonationBids.get(selectedRow);
       
-      if (b.getType() == BidType.CHALLENGE)
+      if (b.getBidType() == BidType.CHALLENGE)
       {
-        this.owner.openChallengeTab(((ChallengeBid)b).getChallenge().getId());
+        this.owner.openChallengeTab(((ChallengeBid)b).getChallenge());
       }
-      else if (b.getType() == BidType.CHOICE)
+      else if (b.getBidType() == BidType.CHOICE)
       {
-        this.owner.openChoiceTab(((ChoiceBid)b).getOption().getChoice().getId());
+        this.owner.openChoiceTab(((ChoiceBid)b).getChoiceOption().getChoice());
       }
     }
   }
   
-  public void setControl(DonationControl control)
+  public void setDonationControl(EntityControlInstance<Donation> donationControl)
   {
-    this.control = control;
-    this.refreshContent();
+    this.donationControl = donationControl;
+    this.redrawContent();
   }
   
-  void refreshContent()
+  private String getDonationBidDisplayName(DonationBid b)
   {
-    if (this.control != null)
+    if (b.getBidType() == BidType.CHOICE)
+    {
+      ChoiceBid c = (ChoiceBid) b;
+      ChoiceOption option = c.getChoiceOption();
+      Choice choice = option.getChoice();
+      SpeedRun run = choice.getSpeedRun();
+      return (run == null ? "" : run.getName() + " : ") + choice.getName() + " : " + option.getName();
+    }
+    else
+    {
+      ChallengeBid c = (ChallengeBid) b;
+      Challenge challenge = c.getChallenge();
+      SpeedRun run = challenge.getSpeedRun();
+      return run.getName() + " : " + challenge.getName();
+    }
+  }
+  
+  void redrawContent()
+  {
+    if (this.donationControl != null)
     {
       this.attachBidButton.setEnabled(true);
       this.changeAmountButton.setEnabled(true);
@@ -249,14 +274,14 @@ public class DonationBidsPanel extends JPanel
       CustomTableModel tableData = new CustomTableModel(
           new String[]{"Bid", "Amount"}, 0);
       
-      this.cachedDonationBids = this.control.getAttachedBids();
+      this.cachedDonationBids = new ArrayList<DonationBid>(this.donationControl.getInstance().getBids());
       
       for (DonationBid b : this.cachedDonationBids)
       {
         tableData.addRow(
             new Object[]
             {
-                this.control.getDonationBidDisplayName(b),
+                this.getDonationBidDisplayName(b),
                 b.getAmount()
             });
       }
@@ -285,8 +310,8 @@ public class DonationBidsPanel extends JPanel
       
       if (!StringUtils.isEmptyOrNull(amount))
       {
-        this.control.updateDonationBidAmount(selected, new BigDecimal(amount));
-        this.refreshContent();
+        selected.setAmount(new BigDecimal(amount));
+        this.redrawContent();
       }
     }
   }
@@ -299,19 +324,27 @@ public class DonationBidsPanel extends JPanel
     
     if (dialog.getSelectionType() != null)
     {
-      String amount = FormattedInputDialog.showDialog(this.owner, "Please enter a new amount to bid.", "Enter amount", FormatUtils.getMoneyFormat(), this.control.getTotalAvailiable().toString());
+      String amount = FormattedInputDialog.showDialog(this.owner, "Please enter a new amount to bid.", "Enter amount", FormatUtils.getMoneyFormat(), new BigDecimal("0.00").toString());
       
       if (!StringUtils.isEmptyOrNull(amount))
       {
         if (dialog.getSelectionType() == BidType.CHOICE)
         {
-          this.control.attachNewChoiceBid(dialog.getSelectedOption(), new BigDecimal(amount));
+          ChoiceBid bid = new ChoiceBid();
+          bid.setDonation(this.donationControl.getInstance());
+          bid.setChoiceOption(dialog.getSelectedOption());
+          bid.setAmount(new BigDecimal(amount));
+          this.donationControl.getInstance().getBids().add(bid);
         }
         else
         {
-          this.control.attachNewChallengeBid(dialog.getSelectedChallenge(), new BigDecimal(amount));
+          ChallengeBid bid = new ChallengeBid();
+          bid.setDonation(this.donationControl.getInstance());
+          bid.setChallenge(dialog.getSelectedChallenge());
+          bid.setAmount(new BigDecimal(amount));
+          this.donationControl.getInstance().getBids().add(bid);
         }
-        this.refreshContent();
+        this.redrawContent();
       }
     }
   }

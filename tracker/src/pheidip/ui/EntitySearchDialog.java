@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,14 +19,13 @@ import pheidip.model.ObjectProperty;
 import pheidip.objects.Entity;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
-import pheidip.logic.EntitySearcher;
+
+import pheidip.logic.EntitySearchInstance;
 import pheidip.logic.ProgramInstance;
 
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import pheidip.objects.SearchParameters;
 
 @SuppressWarnings("serial")
 public class EntitySearchDialog<T extends Entity> extends JDialog
@@ -38,9 +36,8 @@ public class EntitySearchDialog<T extends Entity> extends JDialog
   private JButton cancelButton;
   private EntitySearchList<T> listPanel;
   private SearchParametersPanel<T> parametersPanel;
-  private SearchParameters<T> parameters;
   private JButton searchButton;
-  private EntitySearcher<T> searcher;
+  private EntitySearchInstance<T> searcher;
   private boolean allowMultiSelect;
   private List<T> results;
   private ActionHandler actionHandler;
@@ -62,7 +59,7 @@ public class EntitySearchDialog<T extends Entity> extends JDialog
     gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     contentPanel.setLayout(gbl_contentPanel);
     {
-      parametersPanel = new SearchParametersPanel<T>((SearchParameters<T>) this.parameters, this.instance);
+      parametersPanel = new SearchParametersPanel<T>(this.searcher, this.instance);
       GridBagConstraints gbc_panel_1 = new GridBagConstraints();
       gbc_panel_1.insets = new Insets(0, 0, 5, 5);
       gbc_panel_1.fill = GridBagConstraints.BOTH;
@@ -109,7 +106,7 @@ public class EntitySearchDialog<T extends Entity> extends JDialog
         this.creationButtons = new ArrayList<JButton>();
         
         int i = 0;
-        
+        /*
         for (Class<?> clazz : this.parameters.getSearchSpecification().getCreationClasses())
         {
           JButton creationButton = new JButton("Create new " + clazz.getSimpleName());
@@ -120,7 +117,7 @@ public class EntitySearchDialog<T extends Entity> extends JDialog
           panel.add(creationButton, gbc_btnNewButton);
           this.creationButtons.add(creationButton);
           ++i;
-        }
+        }*/
       }
     }
     {
@@ -161,11 +158,12 @@ public class EntitySearchDialog<T extends Entity> extends JDialog
         else if (creationButtons.contains(ev.getSource()))
         {
           int i = creationButtons.indexOf(ev.getSource());
-          createFromFields(parameters.getSearchSpecification().getCreationClasses().get(i));
+          //createFromFields(parameters.getSearchSpecification().getCreationClasses().get(i));
         }
       }
       catch(Exception e)
       {
+        e.printStackTrace();
         UIConfiguration.reportError(e);
       }
     }
@@ -205,15 +203,13 @@ public class EntitySearchDialog<T extends Entity> extends JDialog
     this.setFocusTraversalPolicyProvider(true);
   }
   
-  @SuppressWarnings("unchecked")
   public EntitySearchDialog(ProgramInstance instance, Class<T> clazz, boolean allowMultiSelect)
   {
     super((JFrame)null, true);
     
     this.instance = instance;
     this.sync = new EntityPropertiesSync();
-    this.parameters = (SearchParameters<T>) this.instance.createSearchParameters(clazz);
-    this.searcher = (EntitySearcher<T>) this.instance.createEntitySearcher(clazz);
+    this.searcher = this.instance.getEntitySearch(clazz).createSearchInstance();
     this.allowMultiSelect = allowMultiSelect;
     this.results = Collections.unmodifiableList(new ArrayList<T>());
     
@@ -245,17 +241,17 @@ public class EntitySearchDialog<T extends Entity> extends JDialog
   
   private void runSearch()
   {
-    this.listPanel.setSearchParams(this.parametersPanel.getParameters());
+    this.listPanel.updateSearchList();
   }
   
   @SuppressWarnings("unchecked")
   private void createFromFields(Class<?> clazz) throws Exception
   {
-    T instance = this.parameters.createInstanceFromParameters(clazz);
+    //T instance = this.parameters.createInstanceFromParameters(clazz);
     
     //this.instance.saveObject(instance);
     
-    this.results = Collections.unmodifiableList(Arrays.<T>asList(instance));
-    this.setVisible(false);
+    //this.results = Collections.unmodifiableList(Arrays.<T>asList(instance));
+    //this.setVisible(false);
   }
 }

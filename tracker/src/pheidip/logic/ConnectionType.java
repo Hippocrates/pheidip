@@ -1,5 +1,6 @@
 package pheidip.logic;
 
+import lombok.Getter;
 import pheidip.db.DBType;
 import pheidip.util.StringUtils;
 
@@ -9,11 +10,9 @@ public enum ConnectionType
   HSQLDB_MEMORY(DBType.HSQLDB),
   HSQLDB_FILE(DBType.HSQLDB);
   
-  private DBType dbType;
-  
-  public DBType getDBType()
+  ConnectionType(DBType type)
   {
-    return dbType;
+    this.type = type;
   }
   
   public String toString()
@@ -21,11 +20,6 @@ public enum ConnectionType
     return StringUtils.symbolToNatural(super.toString());
   }
 
-  ConnectionType(DBType dbType)
-  {
-    this.dbType = dbType;
-  }
-  
   private static ConnectionType[] _list = ConnectionType.values();
   
   public static int size()
@@ -37,4 +31,7 @@ public enum ConnectionType
   {
     return _list[i];
   }
+  
+  @Getter
+  private DBType type;
 }

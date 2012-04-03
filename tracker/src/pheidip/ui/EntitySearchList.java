@@ -8,9 +8,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import pheidip.logic.EntitySearcher;
+import pheidip.logic.EntitySearchInstance;
 import pheidip.objects.Entity;
-import pheidip.objects.SearchParameters;
 
 import java.awt.Component;
 import java.awt.GridBagLayout;
@@ -30,8 +29,7 @@ import javax.swing.ListSelectionModel;
 @SuppressWarnings("serial")
 public class EntitySearchList<T extends Entity> extends JPanel
 {
-  private SearchParameters<T> searchParams;
-  private EntitySearcher<T> searcher;
+  private EntitySearchInstance<T> searcher;
   private List<T> cachedList;
   private JList resultsList;
   private JButton previousButton;
@@ -150,9 +148,9 @@ public class EntitySearchList<T extends Entity> extends JPanel
     this.setFocusTraversalPolicyProvider(true);
   }
   
-  public EntitySearchList(EntitySearcher<T> searcher)
+  public EntitySearchList(EntitySearchInstance<T> searchInstance)
   {
-    this.searcher = searcher;
+    this.searcher = searchInstance;
     this.cachedList = new ArrayList<T>();
 
     this.initializeGUI();
@@ -170,20 +168,7 @@ public class EntitySearchList<T extends Entity> extends JPanel
   {
     return this.cachedList;
   }
-  
-  public SearchParameters<T> getSearchParams()
-  {
-    return this.searchParams;
-  }
-  
-  public void setSearchParams(SearchParameters<T> searchParams)
-  {
-    SearchParameters<T> oldValue = this.searchParams;
-    this.searchParams = searchParams;
-    this.runSearch();
-    this.firePropertyChange("searchParams", oldValue, this.searchParams);
-  }
-  
+
   public boolean isMultiSelectAllowed()
   {
     return this.multiSelectAllowed;
@@ -197,11 +182,10 @@ public class EntitySearchList<T extends Entity> extends JPanel
     this.firePropertyChange("multiSelectAllowed", oldValue, this.multiSelectAllowed);
   }
   
-  private void runSearch()
+  public void updateSearchList()
   {
-    List<T> results = this.searcher.runSearch(this.searchParams);
-    
-    this.setSearchListContents(results);
+    this.searcher.runSearch();
+    this.setSearchListContents(this.searcher.getResults());
   }
   
   private void setSearchListContents(List<T> results)
@@ -224,17 +208,19 @@ public class EntitySearchList<T extends Entity> extends JPanel
       this.resultsList.setEnabled(false);
     }
     
-    this.nextButton.setEnabled(this.isEnabled() && this.searcher.getHasNext());
-    this.previousButton.setEnabled(this.isEnabled() && this.searcher.getHasPrevious());
+    this.nextButton.setEnabled(this.isEnabled() && this.searcher.isNextPageAvailable());
+    this.previousButton.setEnabled(this.isEnabled() && this.searcher.isPreviousPageAvailable());
   }
   
   private void navigateToNext()
   {
-    this.setSearchListContents(this.searcher.moveNext());
+    this.searcher.nextPage();
+    this.setSearchListContents(this.searcher.getResults());
   }
   
   private void navigateToPrevious()
   {
-    this.setSearchListContents(this.searcher.movePrevious());
+    this.searcher.previousPage();
+    this.setSearchListContents(this.searcher.getResults());
   }
 }

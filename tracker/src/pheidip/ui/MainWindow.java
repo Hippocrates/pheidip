@@ -23,16 +23,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import pheidip.logic.BidSearch;
-import pheidip.logic.ChallengeControl;
-import pheidip.logic.ChoiceControl;
 import pheidip.logic.DonationBidTask;
-import pheidip.logic.DonationControl;
 import pheidip.logic.DonationReadTask;
-import pheidip.logic.DonorControl;
-import pheidip.logic.PrizeControl;
 import pheidip.logic.ProgramInstance;
-import pheidip.logic.SpeedRunControl;
 import pheidip.logic.chipin.ChipinDonationSource;
 import pheidip.logic.chipin.ChipinFileDonationSource;
 import pheidip.logic.chipin.ChipinMergeProcess;
@@ -214,7 +207,7 @@ public class MainWindow extends JFrame implements Reporter
       {
         if (ev.getSource() == connectToDatabaseButton)
         {
-          if (!MainWindow.this.instance.getDonationDatabase().isConnected())
+          if (!MainWindow.this.instance.getDataAccess().isConnected())
           {
             MainWindow.this.openConnectDialog();
           }
@@ -433,7 +426,7 @@ public class MainWindow extends JFrame implements Reporter
   public MainWindow()
   {
     // Initialise program logic
-    this.instance = new ProgramInstance(this);
+    this.instance = new ProgramInstance();
     
     this.initializeGUI();
     this.initializeGUIEvents();
@@ -521,7 +514,7 @@ public class MainWindow extends JFrame implements Reporter
   
   protected void runChipinWebsiteMerge()
   {
-    if (this.instance.getDonationDatabase().isConnected())
+    if (this.instance.getDataAccess().isConnected())
     {
       if (this.instance.getChipinLogin().isLoggedIn())
       {
@@ -541,7 +534,7 @@ public class MainWindow extends JFrame implements Reporter
  
   private void openChipinTextMergeDialog()
   {
-    if (this.instance.getDonationDatabase().isConnected())
+    if (this.instance.getDataAccess().isConnected())
     {
       ChipinTextMergeDialog dialog = new ChipinTextMergeDialog(this);
       dialog.setVisible(true);
@@ -560,7 +553,7 @@ public class MainWindow extends JFrame implements Reporter
 
   protected void openChipinFileMergeDialog()
   {
-    if (this.instance.getDonationDatabase().isConnected())
+    if (this.instance.getDataAccess().isConnected())
     {
       JFileChooser fileChooser = new JFileChooser();
       fileChooser.addChoosableFileFilter(new ListFileFilter(new String[]{"html","htm","xml"}));
@@ -631,7 +624,7 @@ public class MainWindow extends JFrame implements Reporter
       }
     }
     
-    ExternalProcessTab tab = new ExternalProcessTab(new ChipinMergeProcess(this.instance.getDonationDatabase(), documentSource));
+    ExternalProcessTab tab = new ExternalProcessTab(new ChipinMergeProcess(this.instance, documentSource));
     
     this.insertTab(tab);
   }
@@ -674,7 +667,7 @@ public class MainWindow extends JFrame implements Reporter
 
   private void openGoogleSpreadsheetUpdateTab()
   {
-    if (this.instance.getDonationDatabase().isConnected())
+    if (this.instance.getDataAccess().isConnected())
     {
       if (this.instance.getGoogleLogin().isLoggedIn())
       {
@@ -693,7 +686,7 @@ public class MainWindow extends JFrame implements Reporter
           }
         }
         
-        ExternalProcessTab tab = new ExternalProcessTab(new GoogleRefreshProcess(this.instance.getDonationDatabase(), this.instance.getGoogleLogin()));
+        ExternalProcessTab tab = new ExternalProcessTab(new GoogleRefreshProcess(this.instance, this.instance.getGoogleLogin()));
         
         this.insertTab(tab);
       }
@@ -710,7 +703,7 @@ public class MainWindow extends JFrame implements Reporter
   
   private void openConnectDialog()
   {
-    DatabaseConnectDialog dialog = new DatabaseConnectDialog(this, this.instance.getDonationDatabase());
+    DatabaseConnectDialog dialog = new DatabaseConnectDialog(this, this.instance.getDataAccess());
     dialog.setVisible(true);
     
     this.updateUIState();
@@ -718,7 +711,7 @@ public class MainWindow extends JFrame implements Reporter
   
   private void updateUIState()
   {
-    if (this.instance.getDonationDatabase().isConnected())
+    if (this.instance.getDataAccess().isConnected())
     {
       this.connectToDatabaseButton.setText("Disconnect From Database...");
       this.createMenu.setEnabled(true);
@@ -737,7 +730,7 @@ public class MainWindow extends JFrame implements Reporter
       this.tabbedPane.removeAll();
     }
     
-    if (this.instance.getChipinLogin().isLoggedIn() && this.instance.getDonationDatabase().isConnected())
+    if (this.instance.getChipinLogin().isLoggedIn() && this.instance.getDataAccess().isConnected())
     {
       this.chipinLoginButton.setText("Log Out Of Chipin...");
       this.chipinWebsiteMergeButton.setEnabled(true);
@@ -748,7 +741,7 @@ public class MainWindow extends JFrame implements Reporter
       this.chipinWebsiteMergeButton.setEnabled(false);
     }
     
-    if (this.instance.getGoogleLogin().isLoggedIn() && this.instance.getDonationDatabase().isConnected())
+    if (this.instance.getGoogleLogin().isLoggedIn() && this.instance.getDataAccess().isConnected())
     {
       this.googleLoginButton.setText("Log Out Of Google...");
       this.googleMenu.setEnabled(true);
@@ -793,13 +786,13 @@ public class MainWindow extends JFrame implements Reporter
     
     for (Bid result : dialog.getResults())
     {
-      if (result.getType() == BidType.CHALLENGE)
+      if (result.bidType() == BidType.CHALLENGE)
       {
-        this.openChallengeTab(result.getId());
+        this.openChallengeTab((Challenge)result);
       }
       else
       {
-        this.openChoiceTab(result.getId());
+        this.openChoiceTab((Choice)result);
       }
     }
   }
@@ -813,7 +806,7 @@ public class MainWindow extends JFrame implements Reporter
 
     for (Donation result : dialog.getResults())
     {
-      this.openDonationTab(result.getId());
+      this.openDonationTab(result);
     }
   }
   
@@ -826,7 +819,7 @@ public class MainWindow extends JFrame implements Reporter
     
     for (Donor result : dialog.getResults())
     {
-      this.openDonorTab(result.getId());
+      this.openDonorTab(result);
     }
   }
   
@@ -839,7 +832,7 @@ public class MainWindow extends JFrame implements Reporter
     
     for (SpeedRun result : dialog.getResults())
     {
-      this.openSpeedRunTab(result.getId());
+      this.openSpeedRunTab(result);
     }
   }
   
@@ -852,7 +845,7 @@ public class MainWindow extends JFrame implements Reporter
     
     for (Prize result : dialog.getResults())
     {
-      this.openPrizeTab(result.getId());
+      this.openPrizeTab(result);
     }
   }
 
@@ -869,7 +862,7 @@ public class MainWindow extends JFrame implements Reporter
       }
     }
     
-    DonationReadTask task = new DonationReadTask(this.instance.getDonationDatabase());
+    DonationReadTask task = new DonationReadTask(this.instance.getEntityControl(Donation.class), this.instance.getEntitySearch(Donation.class));
     DonationTaskPanel panel = new DonationTaskPanel(this, task);
     
     this.insertTab(panel);
@@ -888,7 +881,7 @@ public class MainWindow extends JFrame implements Reporter
       }
     }
     
-    DonationBidTask task = new DonationBidTask(this.instance.getDonationDatabase());
+    DonationBidTask task = new DonationBidTask(this.instance.getEntityControl(Donation.class), this.instance.getEntitySearch(Donation.class));
     DonationTaskPanel panel = new DonationTaskPanel(this, task);
     
     this.insertTab(panel);
@@ -898,27 +891,27 @@ public class MainWindow extends JFrame implements Reporter
   {
     if (entity instanceof SpeedRun)
     {
-      this.openSpeedRunTab(entity.getId());
+      this.openSpeedRunTab((SpeedRun)entity);
     }
     else if (entity instanceof Donor)
     {
-      this.openDonorTab(entity.getId());
+      this.openDonorTab((Donor)entity);
     }
     else if (entity instanceof Donation)
     {
-      this.openDonationTab(entity.getId());
+      this.openDonationTab((Donation)entity);
     }
     else if (entity instanceof Choice)
     {
-      this.openChoiceTab(entity.getId());
+      this.openChoiceTab((Choice)entity);
     }
     else if (entity instanceof Challenge)
     {
-      this.openChallengeTab(entity.getId());
+      this.openChallengeTab((Challenge)entity);
     }
     else if (entity instanceof Prize)
     {
-      this.openPrizeTab(entity.getId());
+      this.openPrizeTab((Prize)entity);
     }
     else
     {
@@ -926,111 +919,105 @@ public class MainWindow extends JFrame implements Reporter
     }
   }
 
-  protected void openSpeedRunTab(int speedRunId)
+  protected void openSpeedRunTab(SpeedRun speedRun)
   {
     // prevent opening the same tab twice
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof SpeedRunPanel && ((SpeedRunPanel)target).getSpeedRunId() == speedRunId)
+      if (target instanceof SpeedRunPanel && ((SpeedRunPanel)target).getId() == speedRun.getId())
       {
         this.focusOnTab(i);
         return;
       }
     }
     
-    SpeedRunControl ctrl = new SpeedRunControl(this.instance.getDonationDatabase(), speedRunId);
-    SpeedRunPanel panel = new SpeedRunPanel(this, ctrl);
+    SpeedRunPanel panel = new SpeedRunPanel(this, speedRun);
     this.insertTab(panel);
   }
 
-  protected void openDonorTab(int donorId)
+  protected void openDonorTab(Donor donor)
   {
     // prevent opening the same tab twice
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof DonorPanel && ((DonorPanel)target).getDonorId() == donorId)
+      if (target instanceof DonorPanel && ((DonorPanel)target).getDonorId() == donor.getId())
       {
         this.focusOnTab(i);
         return;
       }
     }
     
-    DonorControl ctrl = this.instance.createDonorControl(donorId);
-    DonorPanel panel = new DonorPanel(this, ctrl);
+    DonorPanel panel = new DonorPanel(this, donor);
     this.insertTab(panel);
   }
   
-  protected void openChoiceTab(int choiceId)
+  protected void openChoiceTab(Choice choice)
   {
     // prevent opening the same tab twice
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof ChoicePanel && ((ChoicePanel)target).getChoiceId() == choiceId)
+      if (target instanceof ChoicePanel && ((ChoicePanel)target).getChoiceId() == choice.getId())
       {
         this.focusOnTab(i);
         return;
       }
     }
     
-    ChoiceControl ctrl = this.instance.createChoiceControl(choiceId);
-    ChoicePanel panel = new ChoicePanel(this, ctrl);
+    ChoicePanel panel = new ChoicePanel(this, choice);
     this.insertTab(panel);
   }
 
-  protected void openChallengeTab(int challengeId)
+  protected void openChallengeTab(Challenge challenge)
   {
     // prevent opening the same tab twice
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof ChallengePanel && ((ChallengePanel)target).getChallengeId() == challengeId)
+      if (target instanceof ChallengePanel && ((ChallengePanel)target).getChallengeId() == challenge.getId())
       {
         this.focusOnTab(i);
         return;
       }
     }
     
-    ChallengeControl ctrl = this.instance.createChallengeControl(challengeId);
-    ChallengePanel panel = new ChallengePanel(this, ctrl);
+    ChallengePanel panel = new ChallengePanel(this, challenge);
     this.insertTab(panel);
   }
   
-  protected void openPrizeTab(int prizeId)
+  protected void openPrizeTab(Prize prize)
   {
     // prevent opening the same tab twice
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof PrizePanel && ((PrizePanel)target).getPrizeId() == prizeId)
+      if (target instanceof PrizePanel && ((PrizePanel)target).getId() == prize.getId())
       {
         this.focusOnTab(i);
         return;
       }
     }
     
-    PrizeControl ctrl = this.instance.createPrizeControl(prizeId);
-    PrizePanel panel = new PrizePanel(this, ctrl);
+    PrizePanel panel = new PrizePanel(this, prize);
     this.insertTab(panel);
   }
   
-  protected void openDonationTab(int donationId)
+  protected void openDonationTab(Donation donation)
   {
     // prevent opening the same tab twice
     for (int i = 0; i < this.tabbedPane.getTabCount(); ++i)
     {
       Component target = this.tabbedPane.getComponentAt(i);
-      if (target instanceof DonationPanel && ((DonationPanel)target).getDonationId() == donationId)
+      if (target instanceof DonationPanel && ((DonationPanel)target).getDonationId() == donation.getId())
       {
         this.focusOnTab(i);
         return;
       }
     }
     
-    DonationControl ctrl = this.instance.createDonationControl(donationId);
-    DonationPanel panel = new DonationPanel(this, ctrl);
+    DonationPanel panel = new DonationPanel(this, donation);
     this.insertTab(panel);
   }
   
@@ -1040,7 +1027,7 @@ public class MainWindow extends JFrame implements Reporter
 
     if (result == JOptionPane.YES_OPTION)
     {
-      this.instance.getDonationDatabase().closeConnection();
+      this.instance.getDataAccess().closeConnection();
       this.updateUIState();
     }
   }
@@ -1057,25 +1044,22 @@ public class MainWindow extends JFrame implements Reporter
 
   private void createNewPrize()
   {
-    int newId = PrizeControl.createNewPrize(this.instance.getDonationDatabase());
-    this.openPrizeTab(newId);
+    this.openPrizeTab(new Prize());
   }
   
   protected void createNewSpeedRun()
   {
-    int newId = SpeedRunControl.createNewSpeedRun(this.instance.getDonationDatabase());
-    this.openSpeedRunTab(newId);
+    this.openSpeedRunTab(new SpeedRun());
   }
   
   protected DonationBidSearchDialog openDonationBidSearch()
   {
-    return new DonationBidSearchDialog(this, new BidSearch(this.instance.getDonationDatabase()));
+    return new DonationBidSearchDialog(this, this.getInstance());
   }
     
   private void createNewDonor()
   {
-    int newId = DonorControl.createNewDonor(this.instance.getDonationDatabase());
-    this.openDonorTab(newId);
+    this.openDonorTab(new Donor());
   }
 
   private class WindowEvents implements WindowListener
@@ -1127,6 +1111,7 @@ public class MainWindow extends JFrame implements Reporter
   @Override
   public void report(Exception report)
   {
+    report.printStackTrace();
     this.report(report.getMessage());
   }
 }

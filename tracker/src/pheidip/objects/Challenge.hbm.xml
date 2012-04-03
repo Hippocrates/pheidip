@@ -5,7 +5,7 @@
 <hibernate-mapping>
     <union-subclass name="pheidip.objects.Challenge" extends="pheidip.objects.Bid" lazy="false">
         <property name="goalAmount" type="java.math.BigDecimal">
-            <column name="GOALAMOUNT" />
+            <column name="GOALAMOUNT" not-null="true"/>
         </property>
         
         <set name="bids" table="ChallengeBid" cascade="all,delete-orphan" fetch="join" lazy="true" inverse="true">
@@ -14,5 +14,8 @@
             </key>
             <one-to-many class="pheidip.objects.ChallengeBid" />
         </set>
+        <property name="totalCollected" type="java.math.BigDecimal" lazy="false">
+   		    <formula>(SELECT IFNULL(SUM(bid.Amount), 0.00) FROM ChallengeBid bid WHERE bid.challenge = id)</formula>
+        </property>
     </union-subclass>
 </hibernate-mapping>

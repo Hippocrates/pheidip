@@ -219,7 +219,7 @@ public class PropertyReflectSupport
     }
     catch (Exception e)
     {
-      throw new RuntimeException(e.getMessage());
+      throw new RuntimeException(e);
     }
   }
   

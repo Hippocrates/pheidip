@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import pheidip.db.PrizeData;
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
@@ -19,6 +18,7 @@ public final class PrizeFormPrinter
 {
   public static void main(String[] args) throws java.io.IOException
   {
+    /*
     UIConfiguration.setDefaultConfiguration();
 
     DonationDatabaseManager db = new DonationDatabaseManager();
@@ -92,6 +92,6 @@ public final class PrizeFormPrinter
           }
           
         }
-    }
+    }*/
   }
 }

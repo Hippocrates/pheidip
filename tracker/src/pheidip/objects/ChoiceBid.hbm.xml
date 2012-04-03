@@ -5,8 +5,8 @@
 <hibernate-mapping>
  <union-subclass extends="pheidip.objects.DonationBid" lazy="false" name="pheidip.objects.ChoiceBid">
   <many-to-one class="pheidip.objects.ChoiceOption" fetch="join" lazy="false"
-   name="option" foreign-key="ChoiceBidFKOption">
-   <column name="CHOICEOPTION"/>
+   name="choiceOption" foreign-key="ChoiceBidFKOption" not-null="true">
+   <column name="CHOICEOPTION" not-null="true"/>
   </many-to-one>
  </union-subclass>
 </hibernate-mapping>

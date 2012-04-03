@@ -1,6 +1,6 @@
 package pheidip.ui;
 
-import pheidip.logic.DonationControl;
+import pheidip.logic.EntityControlInstance;
 import pheidip.objects.Donation;
 import pheidip.objects.Donor;
 import pheidip.objects.DonationBidState;
@@ -33,7 +33,7 @@ import javax.swing.JComboBox;
 @SuppressWarnings("serial")
 public class DonationPanel extends EntityPanel
 {
-  private DonationControl donationControl;
+  private EntityControlInstance<Donation> donationControl;
   private JFormattedTextField amountField;
   private JTextField domainIdField;
   private MainWindow owner;
@@ -59,12 +59,17 @@ public class DonationPanel extends EntityPanel
   private JLabel commentStateLabel;
   private EntitySelector<Donor> donorSelector;
 
+  public int getDonationId()
+  {
+    return this.donationControl.getInstance().getId();
+  }
+  
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{99, 93, 105, 105, 58, 48, 63};
     gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 23, 58, 31, 0, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
@@ -242,11 +247,10 @@ public class DonationPanel extends EntityPanel
     gbc_saveButton.gridy = 7;
     add(saveButton, gbc_saveButton);
     
-    donationBidsPanel = new DonationBidsPanel(this.owner, this.donationControl);
+    donationBidsPanel = new DonationBidsPanel(this.owner, null);
     GridBagConstraints gbc_donationBidsPanel = new GridBagConstraints();
-    gbc_donationBidsPanel.anchor = GridBagConstraints.EAST;
     gbc_donationBidsPanel.gridwidth = 7;
-    gbc_donationBidsPanel.fill = GridBagConstraints.VERTICAL;
+    gbc_donationBidsPanel.fill = GridBagConstraints.BOTH;
     gbc_donationBidsPanel.gridx = 0;
     gbc_donationBidsPanel.gridy = 10;
     add(donationBidsPanel, gbc_donationBidsPanel);
@@ -324,30 +328,28 @@ public class DonationPanel extends EntityPanel
     
     if (result == JOptionPane.OK_OPTION)
     {
-      this.donationControl.deleteDonation();
+      this.donationControl.deleteInstance();
       this.owner.removeTab(this);
     }
   }
 
-  public DonationPanel(MainWindow owner, DonationControl control)
+  public DonationPanel(MainWindow owner, Donation donation)
   {    
     this.owner = owner;
-    this.donationControl = control;
-
+    
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.setDonation(donation);
   }
   
-  public void setDonationControl(DonationControl control)
+  public void setDonation(Donation donation)
   {
-    this.donationControl = control;
-    this.donationBidsPanel.setControl(control);
-    this.redrawContent();
-  }
-  
-  public int getDonationId()
-  {
-    return this.donationControl.getDonationId();
+    this.donationControl = new EntityControlInstance<Donation>(this.owner.getInstance().getEntityControl(Donation.class), donation);
+    
+    this.refreshContent();
+
+    this.donationBidsPanel.setDonationControl(this.donationControl);
   }
 
   @Override
@@ -359,27 +361,25 @@ public class DonationPanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    if (this.donationControl != null)
+    if (this.donationControl != null && this.donationControl.isPersistent())
     {
-      this.donationControl.refreshData();
+      this.donationControl.refreshInstance();
     }
     this.redrawContent();
   }
   
   public void redrawContent()
   {
-    Donation result = null;
-    
     if (this.donationControl != null)
     {
-      result = this.donationControl.getData();
-
-      if (result == null)
+      if (!this.donationControl.isValid())
       {
         JOptionPane.showMessageDialog(this, "Error, This donation no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
         this.owner.removeTab(this);
         return;
       }
+      
+      Donation result = this.donationControl.getInstance();
 
       this.amountField.setText(result.getAmount().toString());
       this.timeField.setText(result.getTimeReceived().toString());
@@ -387,17 +387,9 @@ public class DonationPanel extends EntityPanel
       this.amountField.setEnabled(true);
       this.commentTextArea.setEnabled(true);
       this.commentTextArea.setEditable(true);
-      
-      if (this.donationControl.allowUpdateData())
-      {
-        this.amountField.setEditable(true);
-      }
-      else
-      {
-        this.amountField.setEditable(false);
-      }
-      
-      this.domainIdField.setText(result.getDomainString());
+      this.amountField.setEditable(true);
+
+      this.domainIdField.setText(result.getDomain().toString() + ":" + result.getDomainId());
       this.donorSelector.setEntity(result.getDonor());
       this.commentTextArea.setText(result.getComment());
       this.bidStateComboBox.setEnabled(true);
@@ -409,9 +401,9 @@ public class DonationPanel extends EntityPanel
       this.refreshButton.setEnabled(true);
       this.saveButton.setEnabled(true);
       
-      this.donationBidsPanel.refreshContent();
+      this.donationBidsPanel.redrawContent();
 
-      this.setHeaderText(result.getDomainString());
+      this.setHeaderText(result.toString());
     }
     else
     {
@@ -427,26 +419,22 @@ public class DonationPanel extends EntityPanel
       this.bidStateComboBox.setEnabled(false);
       this.readStateComboBox.setEnabled(false);
       this.commentStateComboBox.setEnabled(false);
-      this.donationBidsPanel.refreshContent();
+      this.donationBidsPanel.redrawContent();
       this.deleteButton.setEnabled(false);
     }
   }
   
   public void saveContent()
   {
-    Donation d = this.donationControl.getData();
+    Donation data = this.donationControl.getInstance();
+    data.setAmount(new BigDecimal(this.amountField.getText()));
+    data.setComment(this.commentTextArea.getText());
+    data.setCommentState((DonationCommentState)this.commentStateComboBox.getSelectedItem());
+    data.setReadState((DonationReadState)this.readStateComboBox.getSelectedItem());
+    data.setBidState((DonationBidState)this.bidStateComboBox.getSelectedItem());
+    data.setDonor(this.donorSelector.getEntity());
     
-    if (this.donationControl.allowUpdateData())
-    {
-      d.setAmount(new BigDecimal(this.amountField.getText()));
-    }
-    
-    d.setComment(this.commentTextArea.getText());
-    d.setCommentState((DonationCommentState)this.commentStateComboBox.getSelectedItem());
-    d.setReadState((DonationReadState)this.readStateComboBox.getSelectedItem());
-    d.setBidState((DonationBidState)this.bidStateComboBox.getSelectedItem());
-    
-    this.donationControl.updateData(d);
+    this.donationControl.saveInstance();
     
     this.redrawContent();
   }
