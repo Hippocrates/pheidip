@@ -1,8 +1,9 @@
 package pheidip.ui;
 
-import pheidip.logic.DonorControl;
+import pheidip.logic.EntityControlInstance;
 
 import pheidip.objects.Donation;
+import pheidip.objects.DonationDomain;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
 import pheidip.util.StringUtils;
@@ -23,18 +24,20 @@ import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
 
 import java.awt.Component;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.ListSelectionModel;
 
+import meta.reflect.MetaEntityReflector;
 
 @SuppressWarnings("serial")
 public class DonorPanel extends EntityPanel
 {
-  private DonorControl donorControl;
-  int[] donationTableIds;
+  private EntityControlInstance<Donor> donorControl;
+  private ListTableModel<Donation> tableData;
   
   private JTextField firstNameField;
   private JTextField lastNameField;
@@ -282,6 +285,7 @@ public class DonorPanel extends EntityPanel
       }
       catch (Exception e)
       {
+        e.printStackTrace();
         owner.report(e);
       }
     }
@@ -348,56 +352,65 @@ public class DonorPanel extends EntityPanel
   /**
    * @wbp.parser.constructor
    */
-  public DonorPanel(MainWindow owner, DonorControl donorControl)
+  public DonorPanel(MainWindow owner, Donor donor)
   {
     this.initializeGUI();
     this.initializeGUIEvents();
     
     this.owner = owner;
-    this.donorControl = donorControl;
+    this.donorControl = new EntityControlInstance<Donor>(this.owner.getInstance().getEntityControl(Donor.class), donor);
     this.refreshContent();
-  }
-  
-  public int getDonorId()
-  {
-    return this.donorControl.getDonorId();
   }
   
   private void openPrize()
   {
-    Prize won = this.donorControl.getPrizeWon();
+    Prize won = null;
+    
+    if (this.donorControl.getInstance().getPrizes().size() > 0)
+    {
+      won = this.donorControl.getInstance().getPrizes().iterator().next();
+    }
     
     if (won != null)
     {
-      this.owner.openPrizeTab(won.getId());
+      this.owner.openPrizeTab(won);
     }
   }
   
   public void refreshContent()
   {
-    this.donorControl.refreshData();
+    this.donorControl.refreshInstance();
+    
     this.redrawContent();
   }
 
   public void redrawContent()
   {
-    Donor data = this.donorControl.getData();
-    
-    if (data == null)
+    if (!this.donorControl.isValid())
     {
       JOptionPane.showMessageDialog(this, "Error, This donor no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
       this.owner.removeTab(this);
       return;
     }
     
+    Donor data = this.donorControl.getInstance();
+    
     this.firstNameField.setText(data.getFirstName());
     this.lastNameField.setText(data.getLastName());
     this.aliasField.setText(data.getAlias());
     this.emailField.setText(data.getEmail());
     
-    this.emailField.setEditable(this.donorControl.allowEmailUpdate());
+    // todo: re-fix this
+    this.emailField.setEditable(true);
     
-    this.totalDonatedField.setText(this.donorControl.getTotalDonated().toString());
+    BigDecimal total = BigDecimal.ZERO;
+    
+    for (Donation d : data.getDonations())
+    {
+      total = total.add(d.getAmount());
+    }
+    
+    this.totalDonatedField.setText(total.toString());
     
     List<Prize> allPrizes = new ArrayList<Prize>(data.getPrizes());
     
@@ -416,30 +429,14 @@ public class DonorPanel extends EntityPanel
       this.prizeField.setText("");
       this.openPrizeButton.setEnabled(false);
     }
-    
-    List<Donation> donations = this.donorControl.getDonorDonations();
-    CustomTableModel tableData = new CustomTableModel(new String[]
-    {
-        "Time Received",
-        "Domain",
-        "Amount",
-        "Comment",
-    },0);
 
-    donationTableIds = new int[donations.size()];
+    this.tableData = new ListTableModel<Donation>(Donation.class, 
+        "timeReceived",
+        "domain",
+        "amount",
+        "comment");
     
-    for(int i = 0; i < donations.size(); ++i)
-    {
-      Donation d = donations.get(i);
-      donationTableIds[i] = d.getId();
-      tableData.addRow(new Object[]
-      {
-        d.getTimeReceived().toString(), 
-        StringUtils.symbolToNatural(d.getDomain().toString()),
-        d.getAmount().toString(),
-        StringUtils.emptyIfNull(d.getComment())
-      });
-    }
+    this.tableData.setCollection(data.getDonations());
     
     this.donationTable.setModel(tableData);
     
@@ -452,28 +449,35 @@ public class DonorPanel extends EntityPanel
     
     if (result == JOptionPane.OK_OPTION)
     {
-      this.donorControl.deleteDonor();
+      this.donorControl.deleteInstance();
       this.owner.removeTab(this);
     }
   }
   
   private void createNewDonation()
   {
-    int id = this.donorControl.createNewLocalDonation();
-    this.owner.openDonationTab(id);
+    Donation donation = new Donation();
+    donation.setDomain(DonationDomain.LOCAL);
+    donation.setDomainId("" + donation.getId());
+    donation.setDonor(this.donorControl.getInstance());
+    donation.setAmount(new BigDecimal("0.00"));
+    this.donorControl.getInstance().getDonations().add(donation);
+    this.donorControl.getControl().getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(Donation.class), donation);
+    
+    this.owner.openDonationTab(donation);
   }
   
   public void saveContent()
   {
-    Donor data = this.donorControl.getData();
+    Donor data = this.donorControl.getInstance();
     data.setEmail(this.emailField.getText());
-    data.setAlias(this.aliasField.getText());
-    data.setFirstName(this.firstNameField.getText());
-    data.setLastName(this.lastNameField.getText());
+    data.setAlias(StringUtils.nullIfEmpty(this.aliasField.getText()));
+    data.setFirstName(StringUtils.emptyIfNull(this.firstNameField.getText()));
+    data.setLastName(StringUtils.emptyIfNull(this.lastNameField.getText()));
     
-    this.donorControl.updateData(data);
+    this.donorControl.saveInstance();
     
-    this.redrawContent();
+    this.refreshContent();
   }
   
   private void openDonation()
@@ -482,7 +486,7 @@ public class DonorPanel extends EntityPanel
     
     if (selectedRow != -1)
     {
-      this.owner.openDonationTab(this.donationTableIds[selectedRow]);
+      this.owner.openDonationTab(this.tableData.getRow(selectedRow));
     }
   }
 
@@ -490,5 +494,10 @@ public class DonorPanel extends EntityPanel
   public boolean confirmClose()
   {
     return true;
+  }
+
+  public int getDonorId()
+  {
+    return this.donorControl.getId();
   }
 }

@@ -5,12 +5,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import pheidip.logic.ChoiceControl;
+import pheidip.logic.EntityControlInstance;
 import pheidip.objects.Choice;
 import pheidip.objects.ChoiceBid;
 import pheidip.objects.ChoiceOption;
 import pheidip.objects.BidState;
-import pheidip.util.Pair;
 
 import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
@@ -20,6 +19,9 @@ import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
 import java.awt.Insets;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -31,11 +33,16 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.JComboBox;
 import javax.swing.ListSelectionModel;
 
+import lombok.Getter;
+import meta.reflect.MetaEntityReflector;
+
 @SuppressWarnings("serial")
 public class ChoicePanel extends EntityPanel
 {
   private MainWindow owner;
-  private ChoiceControl choiceControl;
+  private EntityControlInstance<Choice> choiceControl;
+  private ListTableModel<ChoiceOption> optionsTableData;
+  
   private ActionHandler actionHandler;
   private JTextField nameField;
   private JTable optionTable;
@@ -59,7 +66,13 @@ public class ChoicePanel extends EntityPanel
   private JButton openDonationButton;
   private JScrollPane bidsTableScrollPane;
   private JTable bidsTable;
-  private int[] donationTableIds;
+
+  private ListTableModel<ChoiceBid> bidsTableData;
+  
+  public int getChoiceId()
+  {
+    return this.choiceControl.getId();
+  }
 
   private void initializeGUI()
   {
@@ -349,36 +362,37 @@ public class ChoicePanel extends EntityPanel
     return this.tabOrder;
   }
   
-  public ChoicePanel(MainWindow owner, ChoiceControl choiceControl)
+  public ChoicePanel(MainWindow owner, Choice choice)
   {
     this.owner = owner;
-    this.choiceControl = choiceControl;
+    this.choiceControl = new EntityControlInstance<Choice>(this.owner.getInstance().getEntityControl(Choice.class), choice);
 
     this.initializeGUI();
     this.initializeGUIEvents();
+    
+    this.refreshContent();
   }
 
   @Override
   public void refreshContent()
   {
-    this.choiceControl.refreshData();
+    this.choiceControl.refreshInstance();
+
     this.redrawContent();
   }
   
   private void openAssociatedRun()
   {
-    this.owner.openSpeedRunTab(this.choiceControl.getData().getSpeedRun().getId());
+    this.owner.openSpeedRunTab(this.choiceControl.getInstance().getSpeedRun());
   }
   
   private void updateUIState()
   {
     ChoiceOption currentOption = this.getSelectedOption();
     
-    CustomTableModel bidTableData = new CustomTableModel(new String[]
-    {
-      "Amount Bid",
-      "Donor",
-    },0);
+    this.bidsTableData = new ListTableModel<ChoiceBid>(ChoiceBid.class, 
+      "amount",
+      "donorName");
     
     if (currentOption == null)
     {
@@ -394,74 +408,57 @@ public class ChoicePanel extends EntityPanel
       this.renameOptionButton.setEnabled(true);
       this.openDonationButton.setEnabled(true);
       
-      int current = 0;
-      
-      this.donationTableIds = new int[currentOption.getBids().size()];
-      
-      for (ChoiceBid b : currentOption.getBids())
-      {
-        this.donationTableIds[current] = b.getDonation().getId();
-        ++current;
-        
-        bidTableData.addRow(new Object[]
-        {
-          b.getAmount(),
-          b.getDonation().getDonor().toString(),
-        });
-      }
+      this.bidsTableData.setCollection(currentOption.getBids());
     }
       
-    this.bidsTable.setModel(bidTableData);
+    this.bidsTable.setModel(this.bidsTableData);
   }
 
   @Override
   public void redrawContent()
   {
-    Choice choice = this.choiceControl.getData();
-    
-    if (choice == null)
+    if (!this.choiceControl.isValid())
     {
       JOptionPane.showMessageDialog(this, "Error, this choice no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
       this.owner.removeTab(this);
       return;
     }
-
-    this.nameField.setText(choice.getName());
-    this.descriptionTextArea.setText(choice.getDescription());
-    this.stateComboBox.setSelectedItem(choice.getBidState());
-    this.runField.setText(choice.getSpeedRun().getName());
     
-    List<Pair<ChoiceOption,BigDecimal>> options = this.choiceControl.getOptionsWithTotals(true);
-    
-    CustomTableModel tableData = new CustomTableModel(new String[]
-    {
-        "Name",
-        "Total Collected",
-    },0);
+    Choice data = this.choiceControl.getInstance();
 
-    for(Pair<ChoiceOption,BigDecimal> option : options)
-    {
-      tableData.addRow(new Object[]
-      {
-        option.getFirst(),
-        option.getSecond(),
-      });
-    }
+    this.nameField.setText(data.getName());
+    this.descriptionTextArea.setText(data.getDescription());
+    this.stateComboBox.setSelectedItem(data.getBidState());
+    this.runField.setText(data.getSpeedRun().getName());
     
-    this.optionTable.setModel(tableData);
+    List<ChoiceOption> options = new ArrayList<ChoiceOption>(data.getOptions());
+    
+    Collections.sort(options, new Comparator<ChoiceOption>()
+        {
+          @Override
+          public int compare(ChoiceOption x, ChoiceOption y)
+          {
+            return x.getTotalCollected().compareTo(y.getTotalCollected());
+          }
+        });
+    
+    this.optionsTableData = new ListTableModel<ChoiceOption>(ChoiceOption.class, "name", "totalCollected");
+    this.optionsTableData.setCollection(options);
+    
+    this.optionTable.setModel(this.optionsTableData);
 
-    this.setHeaderText(choice.toString());
+    this.setHeaderText(data.toString());
     
     this.updateUIState();
   }
   
   public void saveContent()
   {
-    Choice data = this.choiceControl.getData();
+    Choice data = this.choiceControl.getInstance();
     data.setName(this.nameField.getText());
     data.setDescription(this.descriptionTextArea.getText());
     data.setBidState((BidState) this.stateComboBox.getSelectedItem());
-    this.choiceControl.updateData(data);
+    this.choiceControl.saveInstance();
     this.refreshContent();
   }
 
@@ -471,7 +468,7 @@ public class ChoicePanel extends EntityPanel
       
     if (selectedRow != -1)
     {
-      this.owner.openDonationTab(this.donationTableIds[selectedRow]);
+      this.owner.openDonationTab(this.bidsTableData.getRow(selectedRow).getDonation());
     }
   }
   
@@ -481,8 +478,13 @@ public class ChoicePanel extends EntityPanel
     
     if (name != null)
     {
-      this.choiceControl.createNewOption(name);
-      this.refreshContent();
+      ChoiceOption added = new ChoiceOption();
+      added.setName(name);
+      added.setChoice(this.choiceControl.getInstance());
+      added.setTotalCollected(new BigDecimal("0.00"));
+      this.choiceControl.getInstance().getOptions().add(added);
+      this.choiceControl.getControl().getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(ChoiceOption.class), added);
+      this.redrawContent();
     }
   }
 
@@ -493,7 +495,7 @@ public class ChoicePanel extends EntityPanel
     
     if (rowId != -1)
     {
-      result = (ChoiceOption) this.optionTable.getValueAt(rowId, 0);
+      result = (ChoiceOption) this.optionsTableData.getRow(rowId);
     }
     
     return result;
@@ -525,8 +527,8 @@ public class ChoicePanel extends EntityPanel
       
       if (result == JOptionPane.YES_OPTION)
       {
-        this.choiceControl.deleteOption(selected);
-        this.refreshContent();
+        this.choiceControl.getInstance().getOptions().remove(selected);
+        this.redrawContent();
       }
     }
   }
@@ -538,7 +540,7 @@ public class ChoicePanel extends EntityPanel
     
     if (result == JOptionPane.YES_OPTION)
     {
-      this.choiceControl.deleteChoice();
+      this.choiceControl.deleteInstance();
       this.owner.removeTab(this);
     }
   }
@@ -547,10 +549,5 @@ public class ChoicePanel extends EntityPanel
   public boolean confirmClose()
   {
     return true;
-  }
-
-  public int getChoiceId()
-  {
-    return this.choiceControl.getChoiceId();
   }
 }

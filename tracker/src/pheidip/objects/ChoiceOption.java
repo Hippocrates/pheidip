@@ -1,72 +1,27 @@
 package pheidip.objects;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
-import pheidip.util.IdUtils;
-import pheidip.util.StringUtils;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
-public class ChoiceOption 
+import lombok.Getter;
+import lombok.Setter;
+
+public class ChoiceOption extends Entity
 {
-	private String name;
-  private int id;
-  private Choice choice;
-  private Set<ChoiceBid> bids = new HashSet<ChoiceBid>();
-	
-  public ChoiceOption()
-  {
-    this.id = IdUtils.generateId(); 
-  }
-
-	public ChoiceOption(int id, String name, Choice choice)
-  {
-    this.setId(id);
-    this.setName(name);
-    this.setChoice(choice);
-  }
-
-  public String getName()
-	{
-		return this.name;
-	}
-
-  public void setName(String name)
-  {
-    this.name = StringUtils.isEmptyOrNull(name) ? "#" + this.getId() : name.toLowerCase();
-  }
-
-  public int getId()
-  {
-    return id;
-  }
+  @Getter @Setter @NotNull @Size(min=1, max=255)
+  private String name;
   
-  private void setId(int id)
-  {
-    this.id = id;
-  }
-
-  public void setChoice(Choice choice)
-  {
-    this.choice = choice;
-  }
-
-  public Choice getChoice()
-  {
-    return choice;
-  }
-
-  public void setBids(Set<ChoiceBid> bids)
-  {
-    this.bids = bids;
-  }
-
-  public Set<ChoiceBid> getBids()
-  {
-    return bids;
-  }
-  public String toString()
-  {
-    return StringUtils.isEmptyOrNull(this.getName()) ? "#" + this.getId() : this.getName();
-  }
-
+  @Getter @Setter @NotNull 
+  private Choice choice;
+  
+  @Getter @Setter @DecimalMin("0.00")
+  private BigDecimal totalCollected;
+  
+  @Getter @Setter @NotNull 
+  private Set<ChoiceBid> bids = new HashSet<ChoiceBid>();
 }

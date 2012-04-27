@@ -1,34 +1,26 @@
 package pheidip.logic;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 
-import org.hibernate.Session;
-import org.hibernate.jdbc.Work;
-
+import pheidip.db.DBConnectionParams;
 import pheidip.db.DBType;
-import pheidip.db.DonationDataAccess;
-import pheidip.db.DonationDataErrorParser;
-import pheidip.db.SQLScriptRunner;
-import pheidip.db.hibernate.HibernateDonationDataAccess;
+import pheidip.db.DataAccess;
+import pheidip.db.hibernate.HibernateDataAccess;
 import pheidip.util.Reporter;
 
 public class DonationDatabaseManager
 {
-  private HibernateDonationDataAccess dataAccess;
+  private HibernateDataAccess dataAccess;
   private Reporter reporter;
 	
   public DonationDatabaseManager()
   {
-    this.dataAccess = new HibernateDonationDataAccess();
+    this.dataAccess = new HibernateDataAccess();
   }
   
   public DonationDatabaseManager(Reporter reporter)
   {
-    this.dataAccess = new HibernateDonationDataAccess();
+    this.dataAccess = new HibernateDataAccess();
     this.reporter = reporter;
   }
   
@@ -42,7 +34,7 @@ public class DonationDatabaseManager
     return (this.dataAccess.isConnected());
   }
   
-  public DonationDataAccess getDataAccess()
+  public DataAccess getDataAccess()
   {
     return this.dataAccess;
   }
@@ -50,7 +42,7 @@ public class DonationDatabaseManager
   public void createMemoryDatabase()
   {
     this.autoCloseConnection();
-    this.dataAccess.createMemoryDatabase();
+    this.dataAccess.createMemoryConnection();
   }
   
   public void openFileDatabase(File location)
@@ -62,12 +54,19 @@ public class DonationDatabaseManager
   public void connectToServer(DBType type, String serverURL, String dbName, String userName, String password)
   {
     this.autoCloseConnection();
-    this.dataAccess.connectToDatabaseServer(type, serverURL, dbName, userName, password);
+    DBConnectionParams params = new DBConnectionParams();
+    params.setDatabaseType(type);
+    params.setDatabaseServer(serverURL);
+    params.setDatabaseName(dbName);
+    params.setUserName(userName);
+    params.setPassword(password);
+    
+    this.dataAccess.connectToServer(params);
   }
   
   public void runSQLScript(final String filename)
   {
-    // Does not work
+    /*// Does not work
     Session session = this.dataAccess.getSessionFactory().openSession();
 
     try
@@ -120,8 +119,7 @@ public class DonationDatabaseManager
         session.close();
       }
     }
-
-    
+    */
   }
   
   private void autoCloseConnection()

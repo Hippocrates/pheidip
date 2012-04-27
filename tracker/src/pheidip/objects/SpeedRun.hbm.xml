@@ -3,24 +3,24 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:49:18 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
- <class name="pheidip.objects.SpeedRun" table="SpeedRun">
+ <class name="pheidip.objects.SpeedRun" table="SpeedRun" lazy="false">
   <id name="id" type="int">
    <column name="ID"/>
    <generator class="assigned"/>
   </id>
   <property generated="never" lazy="false" name="name"
    type="java.lang.String" unique-key="SpeedRunNameUnique">
-   <column name="NAME" unique="true"/>
+   <column name="NAME" not-null="true"/>
   </property>
   <property generated="never" lazy="false" name="runners"
    type="java.lang.String">
    <column name="RUNNERS"/>
   </property>
   <property generated="never" lazy="false" name="description" type="java.lang.String">
-   <column name="DESCRIPTION"/>
+   <column name="DESCRIPTION" not-null="true"/>
   </property>
   <property generated="never" lazy="false" name="sortKey" type="int">
-   <column name="sortKey"/>
+   <column name="sortKey" not-null="true"/>
   </property>
   <property generated="never" lazy="false" name="startTime" type="java.util.Date">
    <column name="STARTTIME"/>

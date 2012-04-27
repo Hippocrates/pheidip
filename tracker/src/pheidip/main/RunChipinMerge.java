@@ -11,7 +11,7 @@ import pheidip.logic.chipin.ChipinWebsiteDonationSource;
 public class RunChipinMerge
 {
   public static void main(String[] args)
-  {
+  {/*
 	DonationDatabaseManager dbManager = null;
 	ChipinLoginManager chipinManager = null;
 	
@@ -53,7 +53,7 @@ public class RunChipinMerge
 		{
 			chipinManager.logOut();
 		}
-	}
+	}*/
 	
   }
 }

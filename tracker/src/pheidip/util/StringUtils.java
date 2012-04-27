@@ -1,6 +1,7 @@
 package pheidip.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -57,6 +58,11 @@ public final class StringUtils
     }
     
     return new String(array);
+  }
+  
+  public static String naturalToSymbol(String natural)
+  {
+    return natural.trim().toUpperCase().replace(' ', '_');
   }
 
   public static boolean isEmptyOrNull(String test)
@@ -197,5 +203,30 @@ public final class StringUtils
     }
     
     return acculm.toString();
+  }
+
+  public static String javaToNatural(String java) 
+  {
+    StringBuilder output = new StringBuilder();
+    char[] array = java.toCharArray();
+    
+    output.append(Character.toUpperCase(array[0]));
+    
+    for (int i = 1; i < array.length; ++i)
+    {
+      if (Character.isUpperCase(array[i]))
+      {
+        output.append(' ');
+      }
+      
+      output.append(array[i]);
+    }
+    
+    return output.toString();
+  }
+
+  public static String joinSeperated(String[] orderingProperties, String seperator)
+  {
+    return joinSeperated(Arrays.asList(orderingProperties), seperator);
   }
 }

@@ -3,17 +3,20 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:49:18 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
- <class name="pheidip.objects.ChoiceOption" table="ChoiceOption">
+ <class name="pheidip.objects.ChoiceOption" table="ChoiceOption" lazy="false">
   <id name="id" type="int">
    <column name="ID"/>
    <generator class="assigned"/>
   </id>
-  <property generated="never" lazy="false" name="name" type="java.lang.String">
-   <column name="NAME" />
+  <property generated="never" lazy="false" name="name" type="java.lang.String" unique-key="OptionNameUnique">
+   <column name="NAME" not-null="true"/>
+  </property>
+  <property name="totalCollected" type="java.math.BigDecimal" lazy="false">
+   <formula>(SELECT IFNULL(SUM(bid.Amount), 0.00) FROM ChoiceBid bid WHERE bid.choiceOption = id)</formula>
   </property>
   <many-to-one class="pheidip.objects.Choice" fetch="join"
-   lazy="false" name="choice" foreign-key="OptionFKChoice">
-   <column name="CHOICE" />
+   lazy="false" name="choice" unique-key="OptionNameUnique" foreign-key="OptionFKChoice" not-null="true">
+   <column name="CHOICE" not-null="true"/>
   </many-to-one>
   <set cascade="all,delete-orphan" fetch="join" lazy="false" name="bids"
    sort="unsorted" table="CHOICEBID" inverse="true">

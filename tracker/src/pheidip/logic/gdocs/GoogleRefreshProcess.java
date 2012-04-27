@@ -6,10 +6,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import pheidip.db.PrizeData;
-import pheidip.db.SpeedRunData;
+import meta.MetaEntity;
+import meta.reflect.MetaEntityReflector;
+
+import pheidip.db.DataAccess;
 import pheidip.logic.AbstractExternalProcess;
-import pheidip.logic.DonationDatabaseManager;
+import pheidip.logic.EntitySearch;
+import pheidip.logic.EntitySearchInstance;
+import pheidip.logic.ProgramInstance;
 import pheidip.logic.chipin.ExternalProcessState;
 import pheidip.objects.Prize;
 import pheidip.objects.SpeedRun;
@@ -17,20 +21,30 @@ import pheidip.util.StringUtils;
 
 public class GoogleRefreshProcess extends AbstractExternalProcess
 {
-  private DonationDatabaseManager database;
+  private ProgramInstance instance;
   private GoogleSpreadSheetLoginManager loginManager;
+  private EntitySearch<SpeedRun> speedRunSearch;
+  private EntitySearch<Prize> prizeSearch;
+  private MetaEntity speedRunEntity;
+  private MetaEntity prizeEntity;
   
-  public GoogleRefreshProcess(DonationDatabaseManager database, GoogleSpreadSheetLoginManager loginManager)
+  public GoogleRefreshProcess(ProgramInstance instance, GoogleSpreadSheetLoginManager loginManager)
   {
-    this(database, loginManager, null);
+    this(instance, loginManager, null);
   }
   
-  public GoogleRefreshProcess(DonationDatabaseManager database, GoogleSpreadSheetLoginManager loginManager, ProcessStateCallback listener)
+  public GoogleRefreshProcess(ProgramInstance instance, GoogleSpreadSheetLoginManager loginManager, ProcessStateCallback listener)
   {
     super(listener);
     
-    this.database = database;
+    this.instance = instance;
     this.loginManager = loginManager;
+    
+    this.speedRunSearch = this.instance.getEntitySearch(SpeedRun.class);
+    this.prizeSearch = this.instance.getEntitySearch(Prize.class);
+    
+    this.speedRunEntity = MetaEntityReflector.getMetaEntity(SpeedRun.class);
+    this.prizeEntity = MetaEntityReflector.getMetaEntity(Prize.class);
   }
 
   @Override
@@ -48,10 +62,16 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
         this.resetState(ExternalProcessState.RUNNING, 0.3, "Reading current database state");
         Thread.sleep(0);
         
-        SpeedRunData speedRuns = database.getDataAccess().getSpeedRunData();
-        PrizeData prizes = database.getDataAccess().getPrizeData();
+        EntitySearchInstance<SpeedRun> speedRunSearchInstance = this.speedRunSearch.createSearchInstance();
+        EntitySearchInstance<Prize> prizeSearchInstance = this.prizeSearch.createSearchInstance();
         
-        List<SpeedRun> allRuns = speedRuns.getAllSpeedRuns();
+        speedRunSearchInstance.setPageSize(Integer.MAX_VALUE);
+        speedRunSearchInstance.runSearch();
+        prizeSearchInstance.setPageSize(Integer.MAX_VALUE);
+        prizeSearchInstance.runSearch();
+
+        List<SpeedRun> allRuns = speedRunSearchInstance.getResults();
+        List<Prize> allPrizes = prizeSearchInstance.getResults();
         Map<String, SpeedRun> mappedRuns = GoogleSpreadSheetReader.nameMapRuns(allRuns);
         
         double processIncrement = (0.8 - 0.4) / (entries.size() * 2 + allRuns.size());
@@ -102,7 +122,15 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
               found.setStartTime(entry.getStartTime());
               found.setEndTime(entry.getEstimatedFinish());
               
-              List<Prize> runPrizes = new ArrayList<Prize>(found.getPrizeEndGame());
+              List<Prize> runPrizes = new ArrayList<Prize>();
+              
+              for (Prize p : allPrizes)
+              {
+                if (p.getEndGame().getId() == found.getId())
+                {
+                  runPrizes.add(p);
+                }
+              }
               
               Collections.sort(runPrizes, new Comparator<Prize>()
               {
@@ -144,20 +172,21 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
           runsToUpdate.add(s);
         }
         
+        DataAccess database = this.instance.getDataAccess();
+        
         for (SpeedRun s : runsToInsert)
         {
-          speedRuns.insertSpeedRun(s);
+          database.saveInstance(this.speedRunEntity, s);
           this.resetState(ExternalProcessState.RUNNING, processPercentage, "Pushing run information");
           Thread.sleep(0);
           processPercentage += processIncrement;
         }
         
-        speedRuns.multiUpdateSpeedRuns(runsToUpdate);
+        database.updateMultiple(this.speedRunEntity, runsToUpdate);
 
         this.resetState(ExternalProcessState.RUNNING, 0.8, "Pushing prize information");
-        
-        
-        prizes.multiUpdatePrizes(prizesToUpdate);
+
+        database.updateMultiple(this.prizeEntity, prizesToUpdate);
         
         this.resetState(ExternalProcessState.COMPLETED, 1.0, "All runs updated");
         

@@ -2,9 +2,6 @@ package pheidip.logic;
 
 import java.math.BigDecimal;
 
-import pheidip.db.DonationDataConstraintException;
-import pheidip.db.DonorData;
-import pheidip.db.PrizeData;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
 import pheidip.objects.PrizeDrawMethod;
@@ -12,7 +9,7 @@ import pheidip.objects.SpeedRun;
 import pheidip.util.IdUtils;
 
 public class PrizeControl
-{
+{/*
   private DonationDatabaseManager manager;
   private int prizeId;
   private PrizeData prizes;
@@ -161,5 +158,5 @@ public class PrizeControl
   public SpeedRunSearch getSpeedRunSearch()
   {
     return new SpeedRunSearch(this.manager);
-  }
+  }*/
 }

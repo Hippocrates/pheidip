@@ -1,39 +1,37 @@
 package pheidip.logic;
 
+import java.util.EnumSet;
 import java.util.List;
 
-import pheidip.db.DonationData;
+import pheidip.model.PropertyReflectSupport;
 import pheidip.objects.Donation;
 import pheidip.objects.DonationBidState;
-import pheidip.objects.DonationSearchParams;
 
 public class DonationBidTask implements DonationTask
 {
   public static String TASK_NAME = "Bid Task";
-  private DonationDatabaseManager manager;
-  private DonationData donations;
+
+  private EntityControl<Donation> control;
+  private EntitySearch<Donation> search;
+  private EntitySearchInstance<Donation> searchInstance;
   
-  public DonationBidTask(DonationDatabaseManager manager)
+  public DonationBidTask(EntityControl<Donation> control, EntitySearch<Donation> search)
   {
-    this.manager = manager;
-    this.donations = this.manager.getDataAccess().getDonationData();
-  }
-  
-  @Override
-  public DonationControl getControl(Donation d)
-  {
-    return new DonationControl(this.manager, d);
+    this.control = control;
+    this.search = search;
+    this.searchInstance = this.search.createSearchInstance();
+    this.searchInstance.setPageSize(Integer.MAX_VALUE);
+    PropertyReflectSupport.setProperty(this.searchInstance.getSearchParams(), "bidState", EnumSet.of(DonationBidState.PENDING));
   }
 
   @Override
   public void clearTask(Donation d)
   {
-    DonationControl control = this.getControl(d);
-    if (control.getData().getBidState() == DonationBidState.PENDING)
+    if (d.getBidState() == DonationBidState.PENDING)
     {
-      control.getData().setBidState(DonationBidState.PROCESSED);
+      d.setBidState(DonationBidState.PROCESSED);
     }
-    control.updateData(control.getData());
+    this.control.save(d);
   }
   
   public boolean isTaskCleared(Donation d)
@@ -44,10 +42,8 @@ public class DonationBidTask implements DonationTask
   @Override
   public List<Donation> refreshTaskList()
   {
-    DonationSearchParams params = new DonationSearchParams();
-    params.targetBidState = DonationBidState.PENDING;
-    
-    return this.donations.searchDonations(params);
+    this.searchInstance.runSearch();
+    return this.searchInstance.getResults();
   }
 
   @Override
@@ -55,5 +51,4 @@ public class DonationBidTask implements DonationTask
   {
     return TASK_NAME;
   }
-
 }

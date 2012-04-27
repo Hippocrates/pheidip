@@ -4,171 +4,44 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import pheidip.util.IdUtils;
-import pheidip.util.StringUtils;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
-public class SpeedRun
+import lombok.Getter;
+import lombok.Setter;
+
+public class SpeedRun extends Entity
 {
-  private int id;
-  private String name;
-  private String description;
-  private String runners;
+  @Getter @Setter @NotNull @Size(min=1,max=255)
+  private String name = "" + this.getId();
+  
+  @Getter @Setter @NotNull @Size(min=0, max=1024)
+  private String description = "";
+  
+  @Getter @Setter @NotNull @Size(min=0, max=255)
+  private String runners = "";
+  
+  @Getter @Setter @NotNull
   private Date startTime;
+  
+  @Getter @Setter @NotNull
   private Date endTime;
-  private int sortKey;
+  
+  @Getter @Setter @NotNull
+  private int sortKey = this.getId();
+  
+  @Getter @Setter @NotNull
   private Set<Bid> bids = new HashSet<Bid>();
+  
+  @Getter @Setter @NotNull
   private Set<Prize> prizeStartGame = new HashSet<Prize>();
+  
+  @Getter @Setter @NotNull
   private Set<Prize> prizeEndGame = new HashSet<Prize>();
   
-  public SpeedRun()
-  {
-    this.id = IdUtils.generateId();
-  }
-  
-  public SpeedRun(int id, String name, String runners, int sortKey, Date startTime, Date endTime, String description)
-  {
-    this.setId(id);
-    this.setName(name);
-    this.setRunners(runners);
-    this.setDescription(description);
-    this.setStartTime(startTime);
-    this.setEndTime(endTime);
-    this.setSortKey(sortKey);
-  }
-
-  public int getId()
-  {
-    return id;
-  }
-
-  public void setId(int id)
-  {
-    this.id = id;
-  }
-
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = StringUtils.isEmptyOrNull(name) ? "" + this.getId() : name.toLowerCase();
-  }
-
-  public String getDescription()
-  {
-    return this.description;
-  }
-  
-  public void setDescription(String description)
-  {
-    this.description = StringUtils.emptyIfNull(description);
-  }
-
+  @Override
   public String toString()
   {
     return this.getName();
-  }
-  
-  public int hashCode()
-  {
-    return this.getId();
-  }
-  
-  public boolean equals(Object other)
-  {
-    if (other instanceof SpeedRun)
-    {
-      return this.getId() == ((SpeedRun)other).getId();
-    }
-    else
-    {
-      return false;
-    }
-  }
-
-  public void setBids(Set<Bid> bids)
-  {
-    this.bids = bids;
-  }
-
-  public Set<Bid> getBids()
-  {
-    return bids;
-  }
-
-  public void setSortKey(int sortKey)
-  {
-    this.sortKey = sortKey;
-  }
-
-  public int getSortKey()
-  {
-    return sortKey;
-  }
-
-  public void setPrizeStartGame(Set<Prize> prizeStartGame)
-  {
-    this.prizeStartGame = prizeStartGame;
-  }
-
-  public Set<Prize> getPrizeStartGame()
-  {
-    return prizeStartGame;
-  }
-
-  public void setPrizeEndGame(Set<Prize> prizeEndGame)
-  {
-    this.prizeEndGame = prizeEndGame;
-  }
-
-  public Set<Prize> getPrizeEndGame()
-  {
-    return prizeEndGame;
-  }
-
-  public void setStartTime(Date startTime)
-  {
-    if (startTime == null)
-    {
-      this.startTime = new Date();
-    }
-    else
-    {
-      this.startTime = startTime;
-    }
-  }
-
-  public Date getStartTime()
-  {
-    return startTime;
-  }
-
-  public void setEndTime(Date endTime)
-  {
-    if (endTime == null)
-    {
-      this.endTime = new Date();
-    }
-    else
-    {
-      this.endTime = endTime;
-    }
-  }
-
-  public Date getEndTime()
-  {
-    return endTime;
-  }
-
-  public void setRunners(String runners)
-  {
-    this.runners = StringUtils.emptyIfNull(runners);
-  }
-
-  public String getRunners()
-  {
-    return runners;
   }
 }

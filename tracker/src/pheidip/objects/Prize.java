@@ -2,164 +2,45 @@ package pheidip.objects;
 
 import java.math.BigDecimal;
 
-import pheidip.util.IdUtils;
-import pheidip.util.StringUtils;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
-public class Prize
+import lombok.Getter;
+import lombok.Setter;
+
+public class Prize extends Entity
 {
-  private int id = IdUtils.generateId();
-  private String name;
+  @Getter @Setter @NotNull @Size(min=1, max=255)
+  private String name = "" + this.getId();
+  
+  @Getter @Setter @NotNull @Size(min=0, max=255)
+  private String description = "";
+  
+  @Getter @Setter @Size(min=0, max=255)
   private String imageURL;
-  private String description;
-  private int sortKey;
-  private Donor winner;
-  private PrizeDrawMethod drawMethod;
-  private BigDecimal mimimumBid = new BigDecimal("5.00");
+  
+  @Getter @Setter
   private SpeedRun startGame;
+  
+  @Getter @Setter
   private SpeedRun endGame;
   
-  public Prize()
-  {
-  }
+  @Getter @Setter @NotNull
+  private int sortKey = this.getId();
   
-  public Prize(int id, String name, String imageURL, String description, int sortKey, PrizeDrawMethod drawMethod, BigDecimal mimimumBid, Donor winner, SpeedRun startGame, SpeedRun endGame)
-  {
-    this.setId(id);
-    this.setName(name);
-    this.setImageURL(imageURL);
-    this.setDescription(description);
-    this.setWinner(winner);
-    this.setSortKey(sortKey);
-    this.setDrawMethod(drawMethod);
-    this.setMinimumBid(mimimumBid);
-    this.setStartGame(startGame);
-    this.setEndGame(endGame);
-  }
+  @Getter @Setter
+  private Donor winner;
   
-  public int getId()
-  {
-    return this.id;
-  }
+  @Getter @Setter @NotNull
+  private PrizeDrawMethod drawMethod = PrizeDrawMethod.RANDOM_UNIFORM_DRAW;
   
-  public void setId(int id)
-  {
-    this.id = id;
-  }
-
-  public String getName()
-  {
-    return this.name;
-  }
+  @Getter @Setter @NotNull @DecimalMin("0.00")
+  private BigDecimal minimumBid = new BigDecimal("5.00");
   
-  public void setName(String name)
-  {
-    this.name = StringUtils.isEmptyOrNull(name) ? "#" + this.getId() : name.toLowerCase();
-  }
-
-  public String getImageURL()
-  {
-    return this.imageURL;
-  }
-
-  public void setImageURL(String imageURL)
-  {
-    this.imageURL = StringUtils.nullIfEmpty(imageURL);
-  }
-
-  public String getDescription()
-  {
-    return this.description;
-  }
-  
-  public void setDescription(String description)
-  {
-    this.description = StringUtils.emptyIfNull(description);
-  }
-
+  @Override
   public String toString()
   {
-    return this.getName() == null ? "Prize#" + this.getId() : this.getName();
-  }
-  
-  public int hashCode()
-  {
-    return this.getId();
-  }
-  
-  public boolean equals(Object other)
-  {
-    if (other instanceof Prize)
-    {
-      return this.getId() == ((Prize)other).getId();
-    }
-    else
-    {
-      return false;
-    }
-  }
-
-  public void setWinner(Donor winner)
-  {
-    this.winner = winner;
-  }
-
-  public Donor getWinner()
-  {
-    return winner;
-  }
-
-  public void setSortKey(int sortKey)
-  {
-    this.sortKey = sortKey;
-  }
-
-  public int getSortKey()
-  {
-    return sortKey;
-  }
-
-  public void setDrawMethod(PrizeDrawMethod drawMethod)
-  {
-    this.drawMethod = drawMethod;
-  }
-
-  public PrizeDrawMethod getDrawMethod()
-  {
-    return drawMethod;
-  }
-
-  public void setMinimumBid(BigDecimal minimumBid)
-  {
-    if (minimumBid == null || minimumBid.compareTo(BigDecimal.ZERO) <= 0)
-    {
-      throw new RuntimeException("Error, invalid minimum bid amount.");
-    }
-    
-    this.mimimumBid = minimumBid;
-  }
-
-  public BigDecimal getMinimumBid()
-  {
-    return mimimumBid;
-  }
-
-  public void setStartGame(SpeedRun startGame)
-  {
-    this.startGame = startGame;
-  }
-
-  public SpeedRun getStartGame()
-  {
-    return startGame;
-  }
-
-  public void setEndGame(SpeedRun endGame)
-  {
-    this.endGame = endGame;
-  }
-
-  public SpeedRun getEndGame()
-  {
-    return endGame;
+    return "" + this.name;
   }
 }

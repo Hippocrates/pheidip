@@ -15,9 +15,9 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
+import pheidip.db.DBConnectionParams;
+import pheidip.db.DataAccess;
 import pheidip.logic.ConnectionType;
-import pheidip.logic.DonationDatabaseManager;
-import pheidip.util.StringUtils;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -32,7 +32,7 @@ public class DatabaseConnectDialog extends JDialog
   private JLabel connectionTypeLabel;
   private JComboBox connectionTypeBox;
   private JPanel connectPanel;
-  private DonationDatabaseManager databaseManager;
+  private DataAccess databaseManager;
   private JPanel buttonPanel;
   private JPanel connectionTypePanel;
   private JPanel contentPanel;
@@ -140,7 +140,7 @@ public class DatabaseConnectDialog extends JDialog
     this.getRootPane().setDefaultButton(this.connectButton);
   }
   
-  public DatabaseConnectDialog(JFrame parent, DonationDatabaseManager databaseManager)
+  public DatabaseConnectDialog(JFrame parent, DataAccess databaseManager)
   {
     super(parent, true);
     
@@ -186,28 +186,33 @@ public class DatabaseConnectDialog extends JDialog
   {
     DatabaseServerConnectPanel panel = (DatabaseServerConnectPanel) this.connectPanel;
     
-     this.databaseManager.connectToServer(
-          this.currentConnectionType.getDBType(),
-          panel.getServerURL(),
-          panel.getDBName(),
-          panel.getUserName(),
-          panel.getPassword());
+    DBConnectionParams params = new DBConnectionParams();
+    
+    params.setDatabaseName(panel.getDBName());
+    params.setDatabaseServer(panel.getServerURL());
+    params.setPassword(panel.getPassword());
+    params.setUserName(panel.getUserName());
+    params.setDatabaseType(this.currentConnectionType.getType());
+    
+     this.databaseManager.connectToServer(params);
   }
   
   private void createMemoryConnection()
   {
    DatabaseMemoryConnectPanel panel = (DatabaseMemoryConnectPanel) this.connectPanel;
     
-   this.databaseManager.createMemoryDatabase();
+   this.databaseManager.createMemoryConnection();
      
    if (this.databaseManager.isConnected())
    {
+     /*
      String initFilename = panel.getInitializeScriptFilename();
        
      if (!StringUtils.isEmptyOrNull(initFilename))
      {
        this.databaseManager.runSQLScript(initFilename);
      }
+     */
    }
   }
   

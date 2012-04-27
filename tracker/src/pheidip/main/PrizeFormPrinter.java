@@ -1,13 +1,12 @@
 package pheidip.main;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
 
-import pheidip.db.PrizeData;
 import pheidip.logic.DonationDatabaseManager;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
@@ -19,6 +18,7 @@ public final class PrizeFormPrinter
 {
   public static void main(String[] args) throws java.io.IOException
   {
+    /*
     UIConfiguration.setDefaultConfiguration();
 
     DonationDatabaseManager db = new DonationDatabaseManager();
@@ -30,7 +30,7 @@ public final class PrizeFormPrinter
     if (db.isConnected())
     {
         StringBuffer fileData = new StringBuffer(1000);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader reader = new BufferedReader(new FileReader("prizeformat.txt"));
         char[] buf = new char[1024];
         int numRead=0;
         while((numRead=reader.read(buf)) != -1)
@@ -92,6 +92,6 @@ public final class PrizeFormPrinter
           }
           
         }
-    }
+    }*/
   }
 }
