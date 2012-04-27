@@ -31,6 +31,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.ListSelectionModel;
 
+import meta.reflect.MetaEntityReflector;
+
 @SuppressWarnings("serial")
 public class DonorPanel extends EntityPanel
 {
@@ -377,10 +379,8 @@ public class DonorPanel extends EntityPanel
   
   public void refreshContent()
   {
-    if (this.donorControl.isPersistent())
-    {
-      this.donorControl.refreshInstance();
-    }
+    this.donorControl.refreshInstance();
+    
     this.redrawContent();
   }
 
@@ -462,7 +462,8 @@ public class DonorPanel extends EntityPanel
     donation.setDonor(this.donorControl.getInstance());
     donation.setAmount(new BigDecimal("0.00"));
     this.donorControl.getInstance().getDonations().add(donation);
-
+    this.donorControl.getControl().getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(Donation.class), donation);
+    
     this.owner.openDonationTab(donation);
   }
   

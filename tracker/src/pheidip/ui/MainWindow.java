@@ -1044,12 +1044,16 @@ public class MainWindow extends JFrame implements Reporter
 
   private void createNewPrize()
   {
-    this.openPrizeTab(new Prize());
+    Prize result = new Prize();
+    this.instance.getEntityControl(Prize.class).save(result);
+    this.openPrizeTab(result);
   }
   
   protected void createNewSpeedRun()
   {
-    this.openSpeedRunTab(new SpeedRun());
+    SpeedRun result = new SpeedRun();
+    this.instance.getEntityControl(SpeedRun.class).save(result);
+    this.openSpeedRunTab(result);
   }
   
   protected DonationBidSearchDialog openDonationBidSearch()
@@ -1059,7 +1063,9 @@ public class MainWindow extends JFrame implements Reporter
     
   private void createNewDonor()
   {
-    this.openDonorTab(new Donor());
+    Donor result = new Donor();
+    this.instance.getEntityControl(Donor.class).save(result);
+    this.openDonorTab(result);
   }
 
   private class WindowEvents implements WindowListener

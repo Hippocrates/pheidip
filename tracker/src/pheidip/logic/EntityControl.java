@@ -30,14 +30,7 @@ public class EntityControl<E extends Entity>
   {
     try
     {
-      if (instance.isPersistent())
-      {
-        this.dataAccess.deleteInstance(this.entityDescription, instance);
-      }
-      else  
-      {
-        throw new RuntimeException("Object is not in database.");
-      }
+      this.dataAccess.deleteInstance(this.entityDescription, instance);
     }
     catch(Exception e)
     {
@@ -59,14 +52,7 @@ public class EntityControl<E extends Entity>
     {
       try
       {
-        if (instance.isPersistent())
-        {
-          this.dataAccess.updateInstance(this.entityDescription, instance);
-        }
-        else
-        {
-          this.dataAccess.saveInstance(this.entityDescription, instance);
-        }
+        this.dataAccess.updateInstance(this.entityDescription, instance);
       }
       catch(Exception e)
       {

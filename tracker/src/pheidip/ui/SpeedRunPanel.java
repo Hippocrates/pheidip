@@ -36,6 +36,8 @@ import javax.swing.JFormattedTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.JList;
 
+import meta.reflect.MetaEntityReflector;
+
 @SuppressWarnings("serial")
 public class SpeedRunPanel extends EntityPanel
 {
@@ -388,7 +390,7 @@ public class SpeedRunPanel extends EntityPanel
     this.initializeGUI();
     this.initializeGUIEvents();
     
-    this.redrawContent();
+    this.refreshContent();
   }
   
   public boolean isFocusCycleRoot()
@@ -411,6 +413,7 @@ public class SpeedRunPanel extends EntityPanel
   public void refreshContent()
   {
     this.speedRunControl.refreshInstance();
+
     this.redrawContent();
   }
   
@@ -555,6 +558,8 @@ public class SpeedRunPanel extends EntityPanel
       challenge.setName(result);
       this.speedRunControl.getInstance().getBids().add(challenge);
       
+      this.speedRunControl.getControl().getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(Challenge.class), challenge);
+      
       this.owner.openChallengeTab(challenge);
     }
   }
@@ -569,6 +574,8 @@ public class SpeedRunPanel extends EntityPanel
       choice.setSpeedRun(this.speedRunControl.getInstance());
       choice.setName(result);
       this.speedRunControl.getInstance().getBids().add(choice);
+      
+      this.speedRunControl.getControl().getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(Choice.class), choice);
       
       this.owner.openChoiceTab(choice);
     }

@@ -13,13 +13,13 @@ import lombok.Setter;
 public class SpeedRun extends Entity
 {
   @Getter @Setter @NotNull @Size(min=1,max=255)
-  private String name;
+  private String name = "" + this.getId();
   
   @Getter @Setter @NotNull @Size(min=0, max=1024)
-  private String description;
+  private String description = "";
   
   @Getter @Setter @NotNull @Size(min=0, max=255)
-  private String runners;
+  private String runners = "";
   
   @Getter @Setter @NotNull
   private Date startTime;
@@ -28,7 +28,7 @@ public class SpeedRun extends Entity
   private Date endTime;
   
   @Getter @Setter @NotNull
-  private int sortKey;
+  private int sortKey = this.getId();
   
   @Getter @Setter @NotNull
   private Set<Bid> bids = new HashSet<Bid>();

@@ -3,7 +3,7 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:55:43 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
- <class abstract="true" name="pheidip.objects.Bid" table="Bid" lazy="false">
+ <class abstract="true" lazy="false" name="pheidip.objects.Bid" table="Bid">
   <id name="id" type="int">
    <column name="ID"/>
    <generator class="assigned"/>
@@ -12,7 +12,8 @@
    type="java.lang.String" unique-key="BidNameUnique">
    <column name="NAME" not-null="true"/>
   </property>
-  <property generated="never" lazy="false" name="description" type="java.lang.String" not-null="true">
+  <property generated="never" lazy="false" name="description"
+   not-null="true" type="java.lang.String">
    <column name="DESCRIPTION"/>
   </property>
   <property generated="never" lazy="false" name="bidState">

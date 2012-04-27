@@ -361,7 +361,7 @@ public class DonationPanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    if (this.donationControl != null && this.donationControl.isPersistent())
+    if (this.donationControl != null)
     {
       this.donationControl.refreshInstance();
     }

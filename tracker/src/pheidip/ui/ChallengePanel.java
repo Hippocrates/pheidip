@@ -357,11 +357,8 @@ public class ChallengePanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    if (this.challengeControl.isPersistent())
-    {
-      this.challengeControl.refreshInstance();
-    }
-    
+    this.challengeControl.refreshInstance();
+
     this.redrawContent();
   }
   

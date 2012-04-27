@@ -12,10 +12,10 @@ import lombok.Setter;
 public class Prize extends Entity
 {
   @Getter @Setter @NotNull @Size(min=1, max=255)
-  private String name;
+  private String name = "" + this.getId();
   
   @Getter @Setter @NotNull @Size(min=0, max=255)
-  private String description;
+  private String description = "";
   
   @Getter @Setter @Size(min=0, max=255)
   private String imageURL;
@@ -27,7 +27,7 @@ public class Prize extends Entity
   private SpeedRun endGame;
   
   @Getter @Setter @NotNull
-  private int sortKey;
+  private int sortKey = this.getId();
   
   @Getter @Setter
   private Donor winner;
@@ -37,4 +37,10 @@ public class Prize extends Entity
   
   @Getter @Setter @NotNull @DecimalMin("0.00")
   private BigDecimal minimumBid = new BigDecimal("5.00");
+  
+  @Override
+  public String toString()
+  {
+    return "" + this.name;
+  }
 }

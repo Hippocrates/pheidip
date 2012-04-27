@@ -35,6 +35,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
+import meta.reflect.MetaEntityReflector;
+
 @SuppressWarnings("serial")
 public class DonationBidsPanel extends JPanel
 {
@@ -335,6 +337,7 @@ public class DonationBidsPanel extends JPanel
           bid.setChoiceOption(dialog.getSelectedOption());
           bid.setAmount(new BigDecimal(amount));
           this.donationControl.getInstance().getBids().add(bid);
+          this.donationControl.getControl().getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(ChoiceBid.class), bid);
         }
         else
         {
@@ -343,6 +346,7 @@ public class DonationBidsPanel extends JPanel
           bid.setChallenge(dialog.getSelectedChallenge());
           bid.setAmount(new BigDecimal(amount));
           this.donationControl.getInstance().getBids().add(bid);
+          this.donationControl.getControl().getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(ChallengeBid.class), bid);
         }
         this.redrawContent();
       }

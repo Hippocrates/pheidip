@@ -9,10 +9,10 @@ import lombok.Setter;
 public abstract class Bid extends Entity
 {
   @Getter @Setter @NotNull @Size(min=1, max=255)
-  private String name;
+  private String name = "" + this.getId();
   
   @Getter @Setter @NotNull @Size(min=0, max=1024)
-  private String description;
+  private String description = "";
   
   @Getter @Setter @NotNull 
   private BidState bidState = BidState.HIDDEN;

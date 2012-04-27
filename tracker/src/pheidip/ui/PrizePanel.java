@@ -483,7 +483,6 @@ public class PrizePanel extends EntityPanel
   private void assignPrizeToDonor(Donor d)
   {
     this.control.getInstance().setWinner(d);
-    d.getPrizes().add(this.control.getInstance());
     this.yesWinner();
   }
   
@@ -559,10 +558,8 @@ public class PrizePanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    if (this.control.isPersistent())
-    {
-      this.control.refreshInstance();
-    }
+    this.control.refreshInstance();
+
     this.redrawContent();
   }
   

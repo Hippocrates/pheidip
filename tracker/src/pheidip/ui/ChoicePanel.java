@@ -34,6 +34,7 @@ import javax.swing.JComboBox;
 import javax.swing.ListSelectionModel;
 
 import lombok.Getter;
+import meta.reflect.MetaEntityReflector;
 
 @SuppressWarnings("serial")
 public class ChoicePanel extends EntityPanel
@@ -66,9 +67,12 @@ public class ChoicePanel extends EntityPanel
   private JScrollPane bidsTableScrollPane;
   private JTable bidsTable;
 
-  @Getter
-  private int choiceId;
   private ListTableModel<ChoiceBid> bidsTableData;
+  
+  public int getChoiceId()
+  {
+    return this.choiceControl.getId();
+  }
 
   private void initializeGUI()
   {
@@ -372,10 +376,8 @@ public class ChoicePanel extends EntityPanel
   @Override
   public void refreshContent()
   {
-    if (this.choiceControl.isPersistent())
-    {
-      this.choiceControl.refreshInstance();
-    }
+    this.choiceControl.refreshInstance();
+
     this.redrawContent();
   }
   
@@ -481,6 +483,7 @@ public class ChoicePanel extends EntityPanel
       added.setChoice(this.choiceControl.getInstance());
       added.setTotalCollected(new BigDecimal("0.00"));
       this.choiceControl.getInstance().getOptions().add(added);
+      this.choiceControl.getControl().getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(ChoiceOption.class), added);
       this.redrawContent();
     }
   }

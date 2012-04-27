@@ -13,10 +13,10 @@ import lombok.Setter;
 public class Challenge extends Bid
 {
   @Getter @Setter @NotNull @DecimalMin("0.00")
-  private BigDecimal goalAmount;
+  private BigDecimal goalAmount = new BigDecimal("0.00");
   
   @Getter @Setter @DecimalMin("0.00")
-  private BigDecimal totalCollected;
+  private BigDecimal totalCollected = new BigDecimal("0.00");
   
   @Getter @Setter @NotNull
   private Set<ChallengeBid> bids = new HashSet<ChallengeBid>();

@@ -9,9 +9,6 @@ public abstract class Entity
   @Getter @Setter 
   private int id = IdUtils.generateId();
   
-  @Getter @Setter 
-  private boolean persistent;
-  
   @Override
   public int hashCode()
   {

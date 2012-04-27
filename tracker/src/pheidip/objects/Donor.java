@@ -23,7 +23,7 @@ public class Donor extends Entity
   private String alias;
   
   @Getter @Setter @NotNull @Size(min=1, max=255)
-  private String email;
+  private String email = "" + this.getId();
   
   @Getter @Setter @NotNull
   private Set<Donation> donations = new HashSet<Donation>();

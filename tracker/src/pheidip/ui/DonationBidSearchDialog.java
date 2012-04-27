@@ -44,6 +44,8 @@ import pheidip.util.StringUtils;
 import javax.swing.JComboBox;
 import javax.swing.ListSelectionModel;
 
+import meta.reflect.MetaEntityReflector;
+
 @SuppressWarnings("serial")
 public class DonationBidSearchDialog extends JDialog
 {
@@ -339,26 +341,33 @@ public class DonationBidSearchDialog extends JDialog
     @Override
     public void valueChanged(ListSelectionEvent event)
     {
-      if (!event.getValueIsAdjusting() && event.getSource() == bidList)
+      try
       {
-        DefaultListModel model = new DefaultListModel();
-        
-        Choice c = getCurrentChoice();
-        if (c != null)
+        if (!event.getValueIsAdjusting() && event.getSource() == bidList)
         {
-          for (ChoiceOption o : c.getOptions())
+          DefaultListModel model = new DefaultListModel();
+          
+          Choice c = getCurrentChoice();
+          if (c != null)
           {
-            model.addElement(o);
+            for (ChoiceOption o : c.getOptions())
+            {
+              model.addElement(o);
+            }
           }
+          
+          optionList.setModel(model);
+          
+          updateUIState();
         }
-        
-        optionList.setModel(model);
-        
-        updateUIState();
+        else if (!event.getValueIsAdjusting() && event.getSource() == optionList)
+        {
+          updateUIState();
+        }
       }
-      else if (!event.getValueIsAdjusting() && event.getSource() == optionList)
+      catch(Exception e)
       {
-        updateUIState();
+        JOptionPane.showMessageDialog(DonationBidSearchDialog.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
       }
     }
     
@@ -546,6 +555,9 @@ public class DonationBidSearchDialog extends JDialog
       this.choiceOptionResult = new ChoiceOption();
       this.choiceOptionResult.setName(this.optionField.getText());
       this.choiceOptionResult.setChoice(currentChoice);
+      currentChoice.getOptions().add(this.choiceOptionResult);
+      
+      this.instance.getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(ChoiceOption.class), this.choiceOptionResult);
     }
     else
     {
@@ -561,6 +573,7 @@ public class DonationBidSearchDialog extends JDialog
     this.challengeResult.setName(this.bidField.getText());
     this.challengeResult.setSpeedRun(this.currentRun);
 
+    this.instance.getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(Challenge.class), this.challengeResult);
     closeDialog();
   }
   

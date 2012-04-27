@@ -77,11 +77,6 @@ public class HibernateDataAccess implements DataAccess
 
       result = (E) c.uniqueResult();
       
-      if (result != null)
-      {
-        result.setPersistent(true);
-      }
-      
       session.getTransaction().commit();
     }
     catch(Exception e)
@@ -111,15 +106,9 @@ public class HibernateDataAccess implements DataAccess
     try
     {
       session.beginTransaction();
-      
-      if (instance.isPersistent())
-      {
-        throw new RuntimeException("Error, object is already in database");
-      }
-      
+
       session.save(instance);
-      instance.setPersistent(true);
-      
+
       session.getTransaction().commit();
     }
     catch(Exception e)
@@ -156,11 +145,6 @@ public class HibernateDataAccess implements DataAccess
     try
     {
       session.beginTransaction();
-      
-      if (!instance.isPersistent())
-      {
-        throw new RuntimeException("Error, object is not in database");
-      }
       
       session.update(instance);
       
@@ -202,12 +186,7 @@ public class HibernateDataAccess implements DataAccess
     try
     {
       session.beginTransaction();
-      
-      if (!instance.isPersistent())
-      {
-        throw new RuntimeException("Error, object is not in database");
-      }
-      
+
       session.delete(instance);
       
       session.getTransaction().commit();
@@ -261,12 +240,7 @@ public class HibernateDataAccess implements DataAccess
       q.setMaxResults(count);
 
       results = q.list();
-      
-      for (Entity result : results)
-      {
-        result.setPersistent(true);
-      }
-      
+
       session.getTransaction().rollback();
     }
     catch(Exception e)
