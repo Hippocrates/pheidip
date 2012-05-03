@@ -7,14 +7,20 @@ import java.util.Map;
 
 import meta.MetaEntity;
 import meta.reflect.MetaEntityReflector;
+import meta.search.MetaSearchEntity;
+import meta.search.MetaSearchEntityDescription;
+import meta.search.MetaSearchUtils;
 
 import pheidip.db.DataAccess;
 import pheidip.logic.AbstractExternalProcess;
 import pheidip.logic.EntitySearch;
 import pheidip.logic.EntitySearchInstance;
 import pheidip.logic.ProgramInstance;
+import pheidip.model.PropertyReflectSupport;
 import pheidip.objects.Donation;
+import pheidip.objects.DonationBidState;
 import pheidip.objects.DonationDomain;
+import pheidip.objects.DonationReadState;
 import pheidip.objects.DonationSearchParams;
 import pheidip.objects.Donor;
 
@@ -57,13 +63,14 @@ public class ChipinMergeProcess extends AbstractExternalProcess
       
       this.resetState(ExternalProcessState.RUNNING, 0.3, "Reading current donation set...");
       Thread.sleep(0);
-      
-      DonationSearchParams params = new DonationSearchParams();
-      params.setDomain(EnumSet.of(DonationDomain.CHIPIN));
-      
-      EntitySearchInstance<Donation> donationSearchInstance = this.donationSearch.createSearchInstance(params);
+
+      EntitySearchInstance<Donation> donationSearchInstance = this.donationSearch.createSearchInstance();
       EntitySearchInstance<Donor> donorSearchInstance = this.donorSearch.createSearchInstance();
 
+      Object params = donationSearchInstance.getSearchParams();
+      
+      PropertyReflectSupport.setProperty(params, "bidState", EnumSet.allOf(DonationBidState.class));
+      
       donorSearchInstance.setPageSize(Integer.MAX_VALUE);
 
       donorSearchInstance.runSearch();

@@ -345,7 +345,14 @@ public class DonationPanel extends EntityPanel
   
   public void setDonation(Donation donation)
   {
-    this.donationControl = new EntityControlInstance<Donation>(this.owner.getInstance().getEntityControl(Donation.class), donation);
+    if (donation != null)
+    {
+      this.donationControl = new EntityControlInstance<Donation>(this.owner.getInstance().getEntityControl(Donation.class), donation);
+    }
+    else
+    {
+      this.donationControl = null;
+    }
     
     this.refreshContent();
 

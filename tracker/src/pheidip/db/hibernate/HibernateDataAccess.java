@@ -113,10 +113,13 @@ public class HibernateDataAccess implements DataAccess
     }
     catch(Exception e)
     {
+      e.printStackTrace();
+      
       if (session != null)
       {
         session.getTransaction().rollback();
       }
+      
       throw new RuntimeException(e);
     }
     finally
@@ -131,10 +134,38 @@ public class HibernateDataAccess implements DataAccess
   @Override
   public <E extends Entity> void saveMultiple(MetaEntity spec, List<E> instances)
   {
-    for (E instance : instances)
+    Session session = this.sessionFactory.openSession();
+
+    try
     {
-      this.saveInstance(spec, instance);
+      session.beginTransaction();
+      
+      for (E instance : instances)
+      {
+        session.save(instance);
+      }
+
+      session.getTransaction().commit();
     }
+    catch(Exception e)
+    {
+      e.printStackTrace();
+      
+      if (session != null)
+      {
+        session.getTransaction().rollback();
+      }
+      
+      throw new RuntimeException(e);
+    }
+    finally
+    {
+      if (session != null)
+      {
+        session.close();
+      }
+    }
+    
   }
   
   @Override
@@ -170,11 +201,35 @@ public class HibernateDataAccess implements DataAccess
   @Override
   public <E extends Entity> List<E> updateMultiple(MetaEntity spec, List<E> instances)
   {
-    for (E instance : instances)
+    Session session = this.sessionFactory.openSession();
+
+    try
     {
-      this.updateInstance(spec, instance);
+      session.beginTransaction();
+      
+      for (E instance : instances)
+      {
+        session.update(instance);
+      }
+
+      session.getTransaction().commit();
     }
-    
+    catch(Exception e)
+    {
+      if (session != null)
+      {
+        session.getTransaction().rollback();
+      }
+      throw new RuntimeException(e);
+    }
+    finally
+    {
+      if (session != null)
+      {
+        session.close();
+      }
+    }
+
     return instances;
   }
 

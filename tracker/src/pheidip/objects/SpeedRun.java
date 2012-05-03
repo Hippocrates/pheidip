@@ -22,10 +22,10 @@ public class SpeedRun extends Entity
   private String runners = "";
   
   @Getter @Setter @NotNull
-  private Date startTime;
+  private Date startTime = new Date();
   
   @Getter @Setter @NotNull
-  private Date endTime;
+  private Date endTime = new Date();
   
   @Getter @Setter @NotNull
   private int sortKey = this.getId();
