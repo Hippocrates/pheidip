@@ -42,7 +42,7 @@ public class DonationBidTask implements DonationTask
   @Override
   public List<Donation> refreshTaskList()
   {
-    this.searchInstance.runSearch();
+    this.searchInstance.runSearch("timeReceived");
     return this.searchInstance.getResults();
   }
 

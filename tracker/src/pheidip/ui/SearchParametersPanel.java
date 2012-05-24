@@ -10,6 +10,7 @@ import pheidip.model.EntityPropertiesSync;
 import pheidip.model.ObjectProperty;
 import pheidip.objects.Entity;
 import pheidip.util.Pair;
+import pheidip.util.StringUtils;
 import pheidip.logic.EntitySearchInstance;
 
 import java.awt.Component;
@@ -25,6 +26,7 @@ public class SearchParametersPanel<T extends Entity> extends JPanel
   private MetaSearchEntity searchSpec;
   private EntitySearchInstance<T> searcher;
   private EntityPropertiesSync sync;
+  private ProgramInstance instance;
 
   private void initializeGUI()
   {
@@ -46,8 +48,8 @@ public class SearchParametersPanel<T extends Entity> extends JPanel
       labelConstraints.gridy = rowIndex;
       labelConstraints.anchor = GridBagConstraints.EAST;
       labelConstraints.insets = new Insets(5, 5, 5, 5);
-      
-      JLabel label = new JLabel(field.getName());
+
+      JLabel label = new JLabel(StringUtils.javaToNatural(field.getName().replace('_', ' ')));
       
       this.add(label, labelConstraints);
       
@@ -58,7 +60,7 @@ public class SearchParametersPanel<T extends Entity> extends JPanel
       componentConstraints.fill = GridBagConstraints.HORIZONTAL;
       componentConstraints.insets = new Insets(5, 5, 5, 5);
       
-      Pair<Component, String> component = UIGenerator.generateSearcherComponent(field);
+      Pair<Component, String> component = UIGenerator.generateSearcherComponent(field, this.instance);
 
       this.sync.synchronizeProperties(new ObjectProperty(component.getFirst(), component.getSecond()), new ObjectProperty(this.searcher.getSearchParams(), field.getName()));
       
@@ -78,6 +80,7 @@ public class SearchParametersPanel<T extends Entity> extends JPanel
     this.searcher = searcher;
     this.searchSpec = searcher.getSearchDescription();
     this.sync = new EntityPropertiesSync();
+    this.instance = instance;
     
     this.initializeGUI();
   }

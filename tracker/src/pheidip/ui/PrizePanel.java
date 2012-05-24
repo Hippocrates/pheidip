@@ -7,6 +7,7 @@ import pheidip.logic.EntityControlInstance;
 import pheidip.logic.PrizeAssign;
 import pheidip.objects.Donor;
 import pheidip.objects.Prize;
+import pheidip.objects.SpeedRun;
 import pheidip.objects.PrizeDrawMethod;
 import pheidip.util.FormatUtils;
 
@@ -59,23 +60,17 @@ public class PrizePanel extends EntityPanel
   private JFormattedTextField targetAmountField;
   private JLabel lblStartGame;
   private JLabel lblEndGame;
-  private JTextField startGameField;
-  private JTextField endGameField;
-  private JButton openStartGameButton;
-  private JButton openEndGameButton;
-  private JButton setStartGameButton;
-  private JButton setEndGameButton;
-  private JButton clearStartGameButton;
-  private JButton clearEndGameButton;
   private JLabel lblDrawingMethod;
   private JComboBox drawMethodComboBox;
+  private EntitySelector<SpeedRun> startGameSelector;
+  private EntitySelector<SpeedRun> endGameSelector;
 
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{90, 106, 106, 106, 85, 97, 88, 68, 24, 0};
-    gridBagLayout.rowHeights = new int[]{21, 21, 0, 0, 118, 0, 0, 0, 0, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.rowHeights = new int[]{21, 21, 0, 0, 118, 0, 25, 25, 0, 0, 0, 0, 0};
+    gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
@@ -205,40 +200,16 @@ public class PrizePanel extends EntityPanel
     gbc_lblStartGame.gridy = 6;
     add(lblStartGame, gbc_lblStartGame);
     
-    startGameField = new JTextField();
-    startGameField.setEditable(false);
-    GridBagConstraints gbc_startGameField = new GridBagConstraints();
-    gbc_startGameField.gridwidth = 3;
-    gbc_startGameField.insets = new Insets(0, 0, 5, 5);
-    gbc_startGameField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_startGameField.gridx = 1;
-    gbc_startGameField.gridy = 6;
-    add(startGameField, gbc_startGameField);
-    startGameField.setColumns(10);
-    
-    openStartGameButton = new JButton("Open");
-    GridBagConstraints gbc_openStartGameButton = new GridBagConstraints();
-    gbc_openStartGameButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_openStartGameButton.insets = new Insets(0, 0, 5, 5);
-    gbc_openStartGameButton.gridx = 4;
-    gbc_openStartGameButton.gridy = 6;
-    add(openStartGameButton, gbc_openStartGameButton);
-    
-    setStartGameButton = new JButton("Set...");
-    GridBagConstraints gbc_setStartGameButton = new GridBagConstraints();
-    gbc_setStartGameButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_setStartGameButton.insets = new Insets(0, 0, 5, 5);
-    gbc_setStartGameButton.gridx = 5;
-    gbc_setStartGameButton.gridy = 6;
-    add(setStartGameButton, gbc_setStartGameButton);
-    
-    clearStartGameButton = new JButton("Clear");
-    GridBagConstraints gbc_clearStartGameButton = new GridBagConstraints();
-    gbc_clearStartGameButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_clearStartGameButton.insets = new Insets(0, 0, 5, 5);
-    gbc_clearStartGameButton.gridx = 6;
-    gbc_clearStartGameButton.gridy = 6;
-    add(clearStartGameButton, gbc_clearStartGameButton);
+    startGameSelector = new EntitySelector<SpeedRun>(this.owner, SpeedRun.class);
+    startGameSelector.setNullSelectionAllowed(true);
+    startGameSelector.setNavigationAllowed(true);
+    GridBagConstraints gbc_startGameSelector = new GridBagConstraints();
+    gbc_startGameSelector.gridwidth = 6;
+    gbc_startGameSelector.insets = new Insets(0, 0, 5, 5);
+    gbc_startGameSelector.fill = GridBagConstraints.BOTH;
+    gbc_startGameSelector.gridx = 1;
+    gbc_startGameSelector.gridy = 6;
+    add(startGameSelector, gbc_startGameSelector);
     
     lblEndGame = new JLabel("End Game:");
     GridBagConstraints gbc_lblEndGame = new GridBagConstraints();
@@ -248,44 +219,16 @@ public class PrizePanel extends EntityPanel
     gbc_lblEndGame.gridy = 7;
     add(lblEndGame, gbc_lblEndGame);
     
-    endGameField = new JTextField();
-    endGameField.setEditable(false);
-    GridBagConstraints gbc_endGameField = new GridBagConstraints();
-    gbc_endGameField.gridwidth = 3;
-    gbc_endGameField.insets = new Insets(0, 0, 5, 5);
-    gbc_endGameField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_endGameField.gridx = 1;
-    gbc_endGameField.gridy = 7;
-    add(endGameField, gbc_endGameField);
-    endGameField.setColumns(10);
-    
-    openEndGameButton = new JButton("Open");
-    openEndGameButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent arg0) {
-      }
-    });
-    GridBagConstraints gbc_openEndGameButton = new GridBagConstraints();
-    gbc_openEndGameButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_openEndGameButton.insets = new Insets(0, 0, 5, 5);
-    gbc_openEndGameButton.gridx = 4;
-    gbc_openEndGameButton.gridy = 7;
-    add(openEndGameButton, gbc_openEndGameButton);
-    
-    setEndGameButton = new JButton("Set...");
-    GridBagConstraints gbc_setEndGameButton = new GridBagConstraints();
-    gbc_setEndGameButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_setEndGameButton.insets = new Insets(0, 0, 5, 5);
-    gbc_setEndGameButton.gridx = 5;
-    gbc_setEndGameButton.gridy = 7;
-    add(setEndGameButton, gbc_setEndGameButton);
-    
-    clearEndGameButton = new JButton("Clear");
-    GridBagConstraints gbc_clearEndGameButton = new GridBagConstraints();
-    gbc_clearEndGameButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_clearEndGameButton.insets = new Insets(0, 0, 5, 5);
-    gbc_clearEndGameButton.gridx = 6;
-    gbc_clearEndGameButton.gridy = 7;
-    add(clearEndGameButton, gbc_clearEndGameButton);
+    endGameSelector = new EntitySelector<SpeedRun>(this.owner, SpeedRun.class);
+    endGameSelector.setNullSelectionAllowed(true);
+    endGameSelector.setNavigationAllowed(true);
+    GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+    gbc_panel_1.gridwidth = 6;
+    gbc_panel_1.insets = new Insets(0, 0, 5, 5);
+    gbc_panel_1.fill = GridBagConstraints.BOTH;
+    gbc_panel_1.gridx = 1;
+    gbc_panel_1.gridy = 7;
+    add(endGameSelector, gbc_panel_1);
     
     lblDrawingMethod = new JLabel("Drawing Method:");
     GridBagConstraints gbc_lblDrawingMethod = new GridBagConstraints();
@@ -409,12 +352,6 @@ public class PrizePanel extends EntityPanel
     this.removeWinnerButton.addActionListener(this.actionHandler);
     this.openDonorButton.addActionListener(this.actionHandler);
     this.manualAssignButton.addActionListener(this.actionHandler);
-    this.openStartGameButton.addActionListener(this.actionHandler);
-    this.openEndGameButton.addActionListener(this.actionHandler);
-    this.setStartGameButton.addActionListener(this.actionHandler);
-    this.setEndGameButton.addActionListener(this.actionHandler);
-    this.clearEndGameButton.addActionListener(this.actionHandler);
-    this.clearStartGameButton.addActionListener(this.actionHandler);
     
     this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(this.descriptionTextArea));
     
@@ -425,12 +362,8 @@ public class PrizePanel extends EntityPanel
       this.targetAmountField,
       this.descriptionTextArea,
       this.sortKeyField,
-      this.openStartGameButton,
-      this.setStartGameButton,
-      this.clearStartGameButton,
-      this.openEndGameButton,
-      this.setEndGameButton,
-      this.clearEndGameButton,
+      this.startGameSelector,
+      this.endGameSelector,
       this.drawMethodComboBox,
       this.refreshButton,
       this.saveButton,
@@ -560,12 +493,6 @@ public class PrizePanel extends EntityPanel
   {
     this.control.refreshInstance();
 
-    this.redrawContent();
-  }
-  
-  @Override
-  public void redrawContent()
-  {
     if (!this.control.isValid())
     {
       this.owner.removeTab(this);
@@ -581,9 +508,10 @@ public class PrizePanel extends EntityPanel
     this.descriptionTextArea.setText(data.getDescription());
     this.sortKeyField.setText(""+data.getSortKey());
     this.targetAmountField.setText(data.getMinimumBid().toString());
-    this.startGameField.setText(data.getStartGame() != null ? data.getStartGame().toString() : "");
-    this.endGameField.setText(data.getEndGame() != null ? data.getEndGame().toString() : "");
     this.drawMethodComboBox.setSelectedItem(data.getDrawMethod());
+    
+    this.startGameSelector.setEntity(data.getStartGame());
+    this.endGameSelector.setEntity(data.getEndGame());
     
     if (data.getWinner() != null)
     {
@@ -592,6 +520,18 @@ public class PrizePanel extends EntityPanel
     else
     {
       this.noWinner();
+    }
+    
+    this.redrawContent();
+  }
+  
+  @Override
+  public void redrawContent()
+  {
+    if (!this.control.isValid())
+    {
+      this.owner.removeTab(this);
+      throw new RuntimeException("Error, this prize no longer exists.");
     }
   }
 
@@ -605,6 +545,8 @@ public class PrizePanel extends EntityPanel
     data.setSortKey(Integer.parseInt(this.sortKeyField.getText()));
     data.setMinimumBid(new BigDecimal(this.targetAmountField.getText()));
     data.setDrawMethod((PrizeDrawMethod) this.drawMethodComboBox.getSelectedItem());
+    data.setStartGame(this.startGameSelector.getEntity());
+    data.setEndGame(this.endGameSelector.getEntity());
     this.control.saveInstance();
     this.refreshContent();
   }

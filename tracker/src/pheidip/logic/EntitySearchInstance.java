@@ -14,6 +14,8 @@ import lombok.Setter;
 import meta.MetaEntity;
 import meta.search.MetaSearchEntity;
 import pheidip.db.DataAccess;
+import pheidip.objects.Donation;
+import pheidip.objects.Donor;
 import pheidip.objects.Entity;
 import pheidip.util.Pair;
 
@@ -60,11 +62,37 @@ public class EntitySearchInstance<E extends Entity>
     return this.cachedResults;
   }
   
-  public void runSearch()
+  private static String[] getDefaultEntityOrder(MetaEntity desc)
   {
+    final Class<?> cls = desc.getStorageClass();
+    if (cls == Donor.class)
+    {
+      return new String[]{ "alias", "firstName", "lastName", "email" };
+    }
+    else if (cls == Donation.class)
+    {
+      return new String[]{ "timeReceived" };
+    }
+    else if (desc.getEntityDescription().getField("name") != null)
+    {
+      return new String[]{ "name" };
+    }
+    else
+    {
+      return new String[]{ "id" };
+    }
+  }
+  
+  public void runSearch(String... paramOrder)
+  {
+    if (paramOrder.length == 0)
+    {
+      paramOrder = getDefaultEntityOrder(this.entityDescription);
+    }
+    
     Pair<Long, List<E>> results = this.dataAccess.searchEntityRange(
         this.entityDescription, this.searchDescription, 
-        this.searchParams, pageNumber * pageSize, pageSize);
+        this.searchParams, pageNumber * pageSize, pageSize, paramOrder);
     
     List<E> oldResults = this.getResults();
 

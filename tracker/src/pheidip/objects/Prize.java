@@ -14,7 +14,7 @@ public class Prize extends Entity
   @Getter @Setter @NotNull @Size(min=1, max=255)
   private String name = "" + this.getId();
   
-  @Getter @Setter @NotNull @Size(min=0, max=255)
+  @Getter @Setter @NotNull @Size(min=0, max=1024)
   private String description = "";
   
   @Getter @Setter @Size(min=0, max=255)

@@ -23,7 +23,7 @@ public class DonationReadTask implements DonationTask
     this.search = search;
     this.searchInstance = this.search.createSearchInstance();
     this.searchInstance.setPageSize(Integer.MAX_VALUE);
-    PropertyReflectSupport.setProperty(this.searchInstance.getSearchParams(), "bidState", EnumSet.of(DonationReadState.PENDING));
+    PropertyReflectSupport.setProperty(this.searchInstance.getSearchParams(), "readState", EnumSet.of(DonationReadState.PENDING));
   }
   
   @Override
@@ -45,7 +45,7 @@ public class DonationReadTask implements DonationTask
   @Override
   public List<Donation> refreshTaskList()
   {
-    this.searchInstance.runSearch();
+    this.searchInstance.runSearch("timeReceived");
     return this.searchInstance.getResults();
   }
   

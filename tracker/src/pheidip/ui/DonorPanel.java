@@ -381,11 +381,6 @@ public class DonorPanel extends EntityPanel
   {
     this.donorControl.refreshInstance();
     
-    this.redrawContent();
-  }
-
-  public void redrawContent()
-  {
     if (!this.donorControl.isValid())
     {
       JOptionPane.showMessageDialog(this, "Error, This donor no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
@@ -419,7 +414,7 @@ public class DonorPanel extends EntityPanel
       List<String> strings = new ArrayList<String>();
       for (Prize p : allPrizes)
       {
-    	  strings.add(p.toString());
+        strings.add(p.toString());
       }
       this.prizeField.setText(StringUtils.joinSeperated(strings, ","));
       this.openPrizeButton.setEnabled(true);
@@ -441,6 +436,16 @@ public class DonorPanel extends EntityPanel
     this.donationTable.setModel(tableData);
     
     this.setHeaderText(data.toString());
+  }
+
+  public void redrawContent()
+  {
+    if (!this.donorControl.isValid())
+    {
+      JOptionPane.showMessageDialog(this, "Error, This donor no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
+      this.owner.removeTab(this);
+      return;
+    }
   }
 
   public void deleteContent()

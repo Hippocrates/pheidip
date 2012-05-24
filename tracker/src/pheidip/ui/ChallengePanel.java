@@ -4,6 +4,7 @@ import pheidip.logic.EntityControlInstance;
 import pheidip.objects.BidState;
 import pheidip.objects.Challenge;
 import pheidip.objects.ChallengeBid;
+import pheidip.objects.SpeedRun;
 import pheidip.util.FormatUtils;
 
 import java.awt.Component;
@@ -52,20 +53,19 @@ public class ChallengePanel extends EntityPanel
   private JLabel stateLabel;
   private JComboBox bidStateComboBox;
   private JLabel lblRun;
-  private JTextField runField;
-  private JButton openRunButton;
   private JScrollPane bidScrollPane;
   private JTable bidsTable;
   private JButton openDonationButton;
   
   private ListTableModel<ChallengeBid> bidsTableData;
+  private EntitySelector<SpeedRun> runSelector;
   
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{0, 107, 103, 95, 93, 26, 93, 0};
     gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
@@ -103,24 +103,16 @@ public class ChallengePanel extends EntityPanel
     gbc_lblRun.gridy = 1;
     add(lblRun, gbc_lblRun);
     
-    runField = new JTextField();
-    runField.setEditable(false);
-    GridBagConstraints gbc_runField = new GridBagConstraints();
-    gbc_runField.gridwidth = 2;
-    gbc_runField.insets = new Insets(0, 0, 5, 5);
-    gbc_runField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_runField.gridx = 1;
-    gbc_runField.gridy = 1;
-    add(runField, gbc_runField);
-    runField.setColumns(10);
-    
-    openRunButton = new JButton("Open");
-    GridBagConstraints gbc_openRunButton = new GridBagConstraints();
-    gbc_openRunButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_openRunButton.insets = new Insets(0, 0, 5, 5);
-    gbc_openRunButton.gridx = 3;
-    gbc_openRunButton.gridy = 1;
-    add(openRunButton, gbc_openRunButton);
+    runSelector = new EntitySelector<SpeedRun>(this.owner, SpeedRun.class);
+    runSelector.setNullSelectionAllowed(true);
+    runSelector.setNavigationAllowed(true);
+    GridBagConstraints gbc_runSelector = new GridBagConstraints();
+    gbc_runSelector.gridwidth = 4;
+    gbc_runSelector.insets = new Insets(0, 0, 5, 5);
+    gbc_runSelector.fill = GridBagConstraints.BOTH;
+    gbc_runSelector.gridx = 1;
+    gbc_runSelector.gridy = 1;
+    add(runSelector, gbc_runSelector);
     
     goalAmountLabel = new JLabel("Goal Amount:");
     GridBagConstraints gbc_goalAmountLabel = new GridBagConstraints();
@@ -254,13 +246,9 @@ public class ChallengePanel extends EntityPanel
         {
           ChallengePanel.this.deleteContent();
         }
-        else if (ev.getSource() == openRunButton)
-        {
-          ChallengePanel.this.openAssociatedRun();
-        }
         else if (ev.getSource() == openDonationButton)
         {
-          
+          ChallengePanel.this.openSelectedBid();
         }
       }
       catch(Exception e)
@@ -297,7 +285,6 @@ public class ChallengePanel extends EntityPanel
     this.saveButton.addActionListener(this.actionHandler);
     this.refreshButton.addActionListener(this.actionHandler);
     this.deleteChallengeButton.addActionListener(this.actionHandler);
-    this.openRunButton.addActionListener(this.actionHandler);
     this.openDonationButton.addActionListener(this.actionHandler);
     this.bidsTable.addMouseListener(this.actionHandler);
     
@@ -306,7 +293,7 @@ public class ChallengePanel extends EntityPanel
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
       this.nameField,
-      this.openRunButton,
+      this.runSelector,
       this.amountField,
       this.bidStateComboBox,
       this.descriptionTextArea,
@@ -359,7 +346,31 @@ public class ChallengePanel extends EntityPanel
   {
     this.challengeControl.refreshInstance();
 
-    this.redrawContent();
+    if (!this.challengeControl.isValid())
+    {
+      JOptionPane.showMessageDialog(this, "Error, this challenge no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
+      this.owner.removeTab(this);
+      return;
+    }
+    
+    Challenge data = this.challengeControl.getInstance();
+    
+    this.nameField.setText(data.getName());
+    this.amountField.setText(data.getGoalAmount().toString());
+    this.descriptionTextArea.setText(data.getDescription());
+    this.totalAmountField.setText(data.getTotalCollected().toString());
+    this.bidStateComboBox.setSelectedItem(data.getBidState());
+    this.runSelector.setEntity(data.getSpeedRun());
+    
+    this.bidsTableData = new ListTableModel<ChallengeBid>(ChallengeBid.class,
+      "amount",
+      "donorName");
+    
+    this.bidsTableData.setCollection(data.getBids());
+
+    this.bidsTable.setModel(this.bidsTableData);
+    
+    this.setHeaderText(data.toString());
   }
   
   @Override
@@ -373,28 +384,14 @@ public class ChallengePanel extends EntityPanel
     }
     
     Challenge data = this.challengeControl.getInstance();
-    
-    this.nameField.setText(data.getName());
-    this.runField.setText(data.getSpeedRun().getName());
-    this.amountField.setText(data.getGoalAmount().toString());
-    this.descriptionTextArea.setText(data.getDescription());
-    this.totalAmountField.setText(data.getTotalCollected().toString());
-    this.bidStateComboBox.setSelectedItem(data.getBidState());
-    
+
     this.bidsTableData = new ListTableModel<ChallengeBid>(ChallengeBid.class,
-      "amount",
-      "donorName");
-    
+        "amount",
+        "donorName");
+      
     this.bidsTableData.setCollection(data.getBids());
 
     this.bidsTable.setModel(this.bidsTableData);
-    
-    this.setHeaderText(data.toString());
-  }
-  
-  private void openAssociatedRun()
-  {
-    this.owner.openSpeedRunTab(this.challengeControl.getInstance().getSpeedRun());
   }
 
   public int getChallengeId()
@@ -420,6 +417,8 @@ public class ChallengePanel extends EntityPanel
     data.setGoalAmount(new BigDecimal(this.amountField.getText()));
     data.setDescription(this.descriptionTextArea.getText());
     data.setBidState((BidState)this.bidStateComboBox.getSelectedItem());
+    data.setSpeedRun(this.runSelector.getEntity());
     this.challengeControl.saveInstance();
+    this.refreshContent();
   }
 }

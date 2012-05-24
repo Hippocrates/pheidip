@@ -12,6 +12,8 @@ import javax.swing.JPasswordField;
 import meta.MetaField;
 import meta.StringFieldDescription;
 import meta.TimeFieldDescription;
+import meta.EntityFieldDescription;
+import meta.EnumSetFieldDescription;
 
 import pheidip.logic.ProgramInstance;
 import pheidip.model.EntityProperty;
@@ -33,7 +35,8 @@ public class UIGenerator
     return new JLabel(StringUtils.javaToNatural(field.getName()) + ":");
   }
   
-  public static Pair<Component, String> generateSearcherComponent(MetaField field)
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public static Pair<Component, String> generateSearcherComponent(MetaField field, ProgramInstance instance)
   {
     Component component = null;
     String bindingProperty = null;
@@ -55,6 +58,20 @@ public class UIGenerator
     {
       component = new DateSpinner(((TimeFieldDescription)field.getFieldDescription()).getDateFormat());
       bindingProperty = "value";
+    }
+    else if (field.getFieldDescription() instanceof EntityFieldDescription<?>)
+    {
+      EntitySelector selector = new EntitySelector(instance, field.getFieldDescription().getStorageClass());
+      selector.setNullSelectionAllowed(true);
+      component = selector;
+      bindingProperty = "entity";
+    }
+    else if (field.getFieldDescription() instanceof EnumSetFieldDescription<?>)
+    {
+      EnumSetFieldDescription<?> enumField = (EnumSetFieldDescription<?>)field.getFieldDescription();
+      SetSelector<?> selector = new SetSelector(enumField.getEnumValues());
+      component = selector;
+      bindingProperty = "selections";
     }
     else if (field.getFieldDescription().getFormatter() != null)
     {

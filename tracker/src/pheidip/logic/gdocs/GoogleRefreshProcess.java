@@ -126,7 +126,7 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
               
               for (Prize p : allPrizes)
               {
-                if (p.getEndGame().getId() == found.getId())
+                if (p.getEndGame() != null && p.getEndGame().getId() == found.getId())
                 {
                   runPrizes.add(p);
                 }
@@ -161,6 +161,7 @@ public class GoogleRefreshProcess extends AbstractExternalProcess
         
         for (SpeedRun s : mappedRuns.values())
         {
+          s = this.instance.getEntityControl(SpeedRun.class).load(s.getId());
           s.setSortKey(currentRunIndex * 100);
           ++currentRunIndex;
           

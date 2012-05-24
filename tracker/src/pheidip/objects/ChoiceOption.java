@@ -24,4 +24,9 @@ public class ChoiceOption extends Entity
   
   @Getter @Setter @NotNull 
   private Set<ChoiceBid> bids = new HashSet<ChoiceBid>();
+  
+  public String toString()
+  {
+    return this.name;
+  }
 }

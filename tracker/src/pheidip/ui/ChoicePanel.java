@@ -10,6 +10,7 @@ import pheidip.objects.Choice;
 import pheidip.objects.ChoiceBid;
 import pheidip.objects.ChoiceOption;
 import pheidip.objects.BidState;
+import pheidip.objects.SpeedRun;
 
 import java.awt.Component;
 import java.awt.FocusTraversalPolicy;
@@ -61,13 +62,12 @@ public class ChoicePanel extends EntityPanel
   private JLabel stateLabel;
   private JComboBox stateComboBox;
   private JLabel lblRun;
-  private JTextField runField;
-  private JButton openRunButton;
   private JButton openDonationButton;
   private JScrollPane bidsTableScrollPane;
   private JTable bidsTable;
 
   private ListTableModel<ChoiceBid> bidsTableData;
+  private EntitySelector<SpeedRun> runSelector;
   
   public int getChoiceId()
   {
@@ -79,7 +79,7 @@ public class ChoicePanel extends EntityPanel
     GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[]{83, 93, 99, 104, 54, 43, 85, 0};
     gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+    gridBagLayout.columnWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
     gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
     setLayout(gridBagLayout);
     
@@ -116,24 +116,16 @@ public class ChoicePanel extends EntityPanel
     gbc_lblRun.gridy = 1;
     add(lblRun, gbc_lblRun);
     
-    runField = new JTextField();
-    runField.setEditable(false);
-    GridBagConstraints gbc_runField = new GridBagConstraints();
-    gbc_runField.gridwidth = 2;
-    gbc_runField.insets = new Insets(0, 0, 5, 5);
-    gbc_runField.fill = GridBagConstraints.HORIZONTAL;
-    gbc_runField.gridx = 1;
-    gbc_runField.gridy = 1;
-    add(runField, gbc_runField);
-    runField.setColumns(10);
-    
-    openRunButton = new JButton("Open");
-    GridBagConstraints gbc_openRunButton = new GridBagConstraints();
-    gbc_openRunButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_openRunButton.insets = new Insets(0, 0, 5, 5);
-    gbc_openRunButton.gridx = 3;
-    gbc_openRunButton.gridy = 1;
-    add(openRunButton, gbc_openRunButton);
+    runSelector = new EntitySelector<SpeedRun>(this.owner, SpeedRun.class);
+    runSelector.setNullSelectionAllowed(true);
+    runSelector.setNavigationAllowed(true);
+    GridBagConstraints gbc_runSelector = new GridBagConstraints();
+    gbc_runSelector.gridwidth = 4;
+    gbc_runSelector.insets = new Insets(0, 0, 5, 5);
+    gbc_runSelector.fill = GridBagConstraints.BOTH;
+    gbc_runSelector.gridx = 1;
+    gbc_runSelector.gridy = 1;
+    add(runSelector, gbc_runSelector);
     
     stateLabel = new JLabel("State:");
     GridBagConstraints gbc_stateLabel = new GridBagConstraints();
@@ -185,7 +177,7 @@ public class ChoicePanel extends EntityPanel
     bidsTableScrollPane = new JScrollPane();
     GridBagConstraints gbc_bidsTableScrollPane = new GridBagConstraints();
     gbc_bidsTableScrollPane.gridwidth = 3;
-    gbc_bidsTableScrollPane.insets = new Insets(0, 0, 5, 5);
+    gbc_bidsTableScrollPane.insets = new Insets(0, 0, 5, 0);
     gbc_bidsTableScrollPane.fill = GridBagConstraints.BOTH;
     gbc_bidsTableScrollPane.gridx = 4;
     gbc_bidsTableScrollPane.gridy = 3;
@@ -277,10 +269,6 @@ public class ChoicePanel extends EntityPanel
         {
           addNewOption();
         }
-        else if (ev.getSource() == openRunButton)
-        {
-          openAssociatedRun();
-        }
         else if (ev.getSource() == openDonationButton)
         {
           openSelectedBid();
@@ -326,7 +314,6 @@ public class ChoicePanel extends EntityPanel
     this.deleteOptionButton.addActionListener(this.actionHandler);
     this.renameOptionButton.addActionListener(this.actionHandler);
     this.deleteChoiceButton.addActionListener(this.actionHandler);
-    this.openRunButton.addActionListener(this.actionHandler);
     this.optionTable.addMouseListener(this.actionHandler);
     
     this.openDonationButton.addActionListener(this.actionHandler);
@@ -339,7 +326,7 @@ public class ChoicePanel extends EntityPanel
     this.tabOrder = new FocusTraversalManager(new Component[]
     {
         this.nameField,
-        this.openRunButton,
+        this.runSelector,
         this.stateComboBox,
         this.descriptionTextArea,
         this.saveButton,
@@ -378,12 +365,39 @@ public class ChoicePanel extends EntityPanel
   {
     this.choiceControl.refreshInstance();
 
-    this.redrawContent();
-  }
-  
-  private void openAssociatedRun()
-  {
-    this.owner.openSpeedRunTab(this.choiceControl.getInstance().getSpeedRun());
+    if (!this.choiceControl.isValid())
+    {
+      JOptionPane.showMessageDialog(this, "Error, this choice no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
+      this.owner.removeTab(this);
+      return;
+    }
+    
+    Choice data = this.choiceControl.getInstance();
+
+    this.nameField.setText(data.getName());
+    this.descriptionTextArea.setText(data.getDescription());
+    this.stateComboBox.setSelectedItem(data.getBidState());
+    this.runSelector.setEntity(data.getSpeedRun());
+    
+    List<ChoiceOption> options = new ArrayList<ChoiceOption>(data.getOptions());
+    
+    Collections.sort(options, new Comparator<ChoiceOption>()
+        {
+          @Override
+          public int compare(ChoiceOption x, ChoiceOption y)
+          {
+            return x.getTotalCollected().compareTo(y.getTotalCollected());
+          }
+        });
+    
+    this.optionsTableData = new ListTableModel<ChoiceOption>(ChoiceOption.class, "name", "totalCollected");
+    this.optionsTableData.setCollection(options);
+    
+    this.optionTable.setModel(this.optionsTableData);
+
+    this.setHeaderText(data.toString());
+    
+    this.updateUIState();
   }
   
   private void updateUIState()
@@ -425,11 +439,6 @@ public class ChoicePanel extends EntityPanel
     }
     
     Choice data = this.choiceControl.getInstance();
-
-    this.nameField.setText(data.getName());
-    this.descriptionTextArea.setText(data.getDescription());
-    this.stateComboBox.setSelectedItem(data.getBidState());
-    this.runField.setText(data.getSpeedRun().getName());
     
     List<ChoiceOption> options = new ArrayList<ChoiceOption>(data.getOptions());
     
@@ -446,8 +455,6 @@ public class ChoicePanel extends EntityPanel
     this.optionsTableData.setCollection(options);
     
     this.optionTable.setModel(this.optionsTableData);
-
-    this.setHeaderText(data.toString());
     
     this.updateUIState();
   }
@@ -458,6 +465,7 @@ public class ChoicePanel extends EntityPanel
     data.setName(this.nameField.getText());
     data.setDescription(this.descriptionTextArea.getText());
     data.setBidState((BidState) this.stateComboBox.getSelectedItem());
+    data.setSpeedRun(this.runSelector.getEntity());
     this.choiceControl.saveInstance();
     this.refreshContent();
   }

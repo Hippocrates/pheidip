@@ -3,6 +3,7 @@ package meta.search;
 import java.util.ArrayList;
 import java.util.List;
 
+import meta.EntityFieldDescription;
 import meta.EnumFieldDescription;
 import meta.EnumSetFieldDescription;
 import meta.MetaEntityDescription;
@@ -56,6 +57,11 @@ public final class MetaSearchUtils
       {
         EnumFieldDescription<?> cast = (EnumFieldDescription<?>) description;
         fields.add(new MetaSearchField(field.getName(), new EnumSetFieldDescription(cast.getStorageClass()), ComparisonOperator.IN, field));
+      }
+      else if (description instanceof EntityFieldDescription)
+      {
+        EntityFieldDescription<?> cast = (EntityFieldDescription) description;
+        fields.add(new MetaSearchField(field.getName(), new EntityFieldDescription(cast.getStorageClass(), true), ComparisonOperator.EQUALS, field));
       }
     }
     

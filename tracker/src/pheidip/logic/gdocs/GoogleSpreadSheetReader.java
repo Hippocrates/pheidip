@@ -22,7 +22,7 @@ public class GoogleSpreadSheetReader
     
     for (SpeedRun run : allRuns)
     {
-      mappedRuns.put(run.getName(), run);
+      mappedRuns.put(run.getName().toLowerCase(), run);
     }
     
     return mappedRuns;

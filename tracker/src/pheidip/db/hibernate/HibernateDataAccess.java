@@ -267,9 +267,9 @@ public class HibernateDataAccess implements DataAccess
   @Override
   public <E extends Entity, S> Pair<Long, List<E>> searchEntityRange(
       MetaEntity instanceSpec, MetaSearchEntity searchSpec, S searchParams,
-      int offset, int count)
+      int offset, int count, String... ordering)
   {
-    String hqlQuery = HQLMethods.makeHQLSearchQueryString(instanceSpec.getName(), searchSpec, searchParams).trim();
+    String hqlQuery = HQLMethods.makeHQLSearchQueryString(instanceSpec.getName(), searchSpec, searchParams, ordering).trim();
     
     Session session = this.sessionFactory.openSession();
     
@@ -314,9 +314,9 @@ public class HibernateDataAccess implements DataAccess
   }
 
   @Override
-  public <E extends Entity, S> List<E> searchEntity(MetaEntity instanceSpec, MetaSearchEntity searchSpec, S searchParams)
+  public <E extends Entity, S> List<E> searchEntity(MetaEntity instanceSpec, MetaSearchEntity searchSpec, S searchParams, String... ordering)
   {
-    Pair<Long, List<E>> result = this.searchEntityRange(instanceSpec, searchSpec, searchParams, 0, Integer.MAX_VALUE);
+    Pair<Long, List<E>> result = this.searchEntityRange(instanceSpec, searchSpec, searchParams, 0, Integer.MAX_VALUE, ordering);
     return result.getSecond();
   }
   

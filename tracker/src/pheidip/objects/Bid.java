@@ -26,6 +26,6 @@ public abstract class Bid extends Entity
   @Override
   public String toString()
   {
-    return this.bidType().toString() + ":" + this.getSpeedRun().getName() + ":" + this.getName();
+    return this.bidType().toString() + ":" + (this.getSpeedRun() == null ? "<none>" : this.getSpeedRun().getName()) + ":" + this.getName();
   }
 }

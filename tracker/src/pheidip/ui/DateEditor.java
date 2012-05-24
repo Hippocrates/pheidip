@@ -2,6 +2,8 @@ package pheidip.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.Format;
@@ -19,6 +21,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import meta.TimeFieldDescription;
 import javax.swing.JPanel;
@@ -26,28 +30,6 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class DateEditor extends JFormattedTextField implements SpinnerModel
 {
-  public static void main(String[] args)
-  {
-    TimeFieldDescription desc = new TimeFieldDescription(true);
-    
-    JDialog dialog = new JDialog((JFrame)null, true);
-    JPanel panel = new JPanel();
-    dialog.add(panel);
-    JSpinner spinner = new JSpinner();
-    DateEditor editor = new DateEditor(desc.getFormatter(), new Date());
-    editor.setColumns(20);
-    spinner.setModel(editor);
-    spinner.setEditor(editor);
-    panel.add(spinner);
-    panel.add(new JButton("X"));
-    dialog.pack();
-    dialog.setVisible(true);
-    
-    System.out.println(editor.getDate());
-    
-    System.exit(0);
-  }
-  
   public static final long ONE_SECOND = 1000;
 
   public static final long ONE_MINUTE = 60 * ONE_SECOND;
@@ -77,14 +59,19 @@ public class DateEditor extends JFormattedTextField implements SpinnerModel
   private Calendar calendar;
   private Date cachedValue;
 
-  public DateEditor(Format formatter)
+  private DateSpinner superSpinner;
+
+  public DateEditor(Format formatter, DateSpinner superSpinner)
   {
-    this(formatter, null);
+    this(formatter, superSpinner, null);
   }
   
-  public DateEditor(Format formatter, Date value)
+  
+  
+  public DateEditor(Format formatter, DateSpinner superSpinner, Date value)
   {
     super(formatter);
+    this.superSpinner = superSpinner;
     this.formatter = formatter;
     this.listeners = new ArrayList<ChangeListener>();
     this.calendar = Calendar.getInstance();
@@ -99,10 +86,79 @@ public class DateEditor extends JFormattedTextField implements SpinnerModel
         try
         {
           commitEdit();
+          setValue(null);
         }
         catch (ParseException e)
         {
         }
+      }
+    });
+    
+    this.addFocusListener(new FocusListener()
+    {
+      @Override
+      public void focusGained(FocusEvent arg0)
+      {
+        // TODO Auto-generated method stub
+        
+      }
+
+      @Override
+      public void focusLost(FocusEvent arg0)
+      {
+          try
+          {
+            commitEdit();
+          }
+          catch (ParseException e)
+          {
+          }
+          
+          if (getText().length() == 0)
+          {
+            setValue(null);
+          }
+      }
+    });
+    
+    this.getDocument().addDocumentListener(
+    new DocumentListener()
+    {
+      @Override
+      public void changedUpdate(DocumentEvent arg0)
+      {
+        if (getText().length() == 0)
+        {
+          try
+          {
+            commitEdit();
+            setValue(null);
+          }
+          catch (ParseException e)
+          {
+          }
+        }
+      }
+
+      @Override
+      public void insertUpdate(DocumentEvent arg0)
+      {
+        if (getText().length() == 0)
+        {
+          try
+          {
+            commitEdit();
+            setValue(null);
+          }
+          catch (ParseException e)
+          {
+          }
+        }
+      }
+
+      @Override
+      public void removeUpdate(DocumentEvent arg0)
+      {
       }
     });
   }
@@ -239,6 +295,7 @@ public class DateEditor extends JFormattedTextField implements SpinnerModel
       this.select(pos.getBeginIndex(), pos.getEndIndex());
     }
     
+    this.superSpinner.fire(this.cachedValue, this.getDate());
     this.cachedValue = this.getDate();
   }
   

@@ -372,11 +372,7 @@ public class DonationPanel extends EntityPanel
     {
       this.donationControl.refreshInstance();
     }
-    this.redrawContent();
-  }
-  
-  public void redrawContent()
-  {
+    
     if (this.donationControl != null)
     {
       if (!this.donationControl.isValid())
@@ -411,6 +407,36 @@ public class DonationPanel extends EntityPanel
       this.donationBidsPanel.redrawContent();
 
       this.setHeaderText(result.toString());
+    }
+    else
+    {
+      this.amountField.setEnabled(false);
+      this.amountField.setText("");
+      this.commentTextArea.setEnabled(false);
+      this.commentTextArea.setText("");
+      this.refreshButton.setEnabled(false);
+      this.saveButton.setEnabled(false);
+      
+      this.domainIdField.setText("");
+      this.donorSelector.setEntity(null);
+      this.bidStateComboBox.setEnabled(false);
+      this.readStateComboBox.setEnabled(false);
+      this.commentStateComboBox.setEnabled(false);
+      this.donationBidsPanel.redrawContent();
+      this.deleteButton.setEnabled(false);
+    }
+  }
+  
+  public void redrawContent()
+  {
+    if (this.donationControl != null)
+    {
+      if (!this.donationControl.isValid())
+      {
+        JOptionPane.showMessageDialog(this, "Error, This donation no longer exists", "Not Found", JOptionPane.ERROR_MESSAGE);
+        this.owner.removeTab(this);
+        return;
+      }
     }
     else
     {

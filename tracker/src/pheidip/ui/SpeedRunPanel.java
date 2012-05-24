@@ -43,9 +43,7 @@ public class SpeedRunPanel extends EntityPanel
 {
   private MainWindow owner;
   private EntityControlInstance<SpeedRun> speedRunControl;
-  
-  private List<Bid> cachedRelatedBids;
-  
+
   private JTextField nameField;
   private JTable bidTable;
   private JButton deleteButton;
@@ -76,12 +74,16 @@ public class SpeedRunPanel extends EntityPanel
   private void initializeGUI()
   {
     GridBagLayout gridBagLayout = new GridBagLayout();
-    gridBagLayout.columnWidths = new int[]{72, 110, 116, 114, 0, 0, 85, 0};
-    gridBagLayout.rowHeights = new int[]{0, 0, 74, 0, 0, 0, 0, 37, 0, 131, 0};
-    gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-    gridBagLayout.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, Double.MIN_VALUE};
+    gridBagLayout.columnWidths = new int[]
+    { 72, 110, 116, 114, 0, 0, 85, 0 };
+    gridBagLayout.rowHeights = new int[]
+    { 0, 0, 74, 0, 0, 0, 0, 37, 0, 131, 0 };
+    gridBagLayout.columnWeights = new double[]
+    { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
+    gridBagLayout.rowWeights = new double[]
+    { 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, Double.MIN_VALUE };
     setLayout(gridBagLayout);
-    
+
     JLabel nameLabel = new JLabel("Name:");
     GridBagConstraints gbc_nameLabel = new GridBagConstraints();
     gbc_nameLabel.insets = new Insets(0, 0, 5, 5);
@@ -89,7 +91,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_nameLabel.gridx = 0;
     gbc_nameLabel.gridy = 0;
     add(nameLabel, gbc_nameLabel);
-    
+
     nameField = new JTextField();
     GridBagConstraints gbc_nameField = new GridBagConstraints();
     gbc_nameField.insets = new Insets(0, 0, 5, 5);
@@ -99,7 +101,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_nameField.gridy = 0;
     add(nameField, gbc_nameField);
     nameField.setColumns(10);
-    
+
     deleteButton = new JButton("Delete SpeedRun");
     GridBagConstraints gbc_deleteButton = new GridBagConstraints();
     gbc_deleteButton.fill = GridBagConstraints.HORIZONTAL;
@@ -107,7 +109,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_deleteButton.gridx = 6;
     gbc_deleteButton.gridy = 0;
     add(deleteButton, gbc_deleteButton);
-    
+
     lblRunners = new JLabel("Runner(s):");
     GridBagConstraints gbc_lblRunners = new GridBagConstraints();
     gbc_lblRunners.anchor = GridBagConstraints.EAST;
@@ -115,7 +117,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_lblRunners.gridx = 0;
     gbc_lblRunners.gridy = 1;
     add(lblRunners, gbc_lblRunners);
-    
+
     runnersTextField = new JTextField();
     GridBagConstraints gbc_runnersTextField = new GridBagConstraints();
     gbc_runnersTextField.gridwidth = 2;
@@ -125,7 +127,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_runnersTextField.gridy = 1;
     add(runnersTextField, gbc_runnersTextField);
     runnersTextField.setColumns(10);
-    
+
     lblDescription = new JLabel("Description:");
     GridBagConstraints gbc_lblDescription = new GridBagConstraints();
     gbc_lblDescription.anchor = GridBagConstraints.NORTH;
@@ -133,9 +135,10 @@ public class SpeedRunPanel extends EntityPanel
     gbc_lblDescription.gridx = 0;
     gbc_lblDescription.gridy = 2;
     add(lblDescription, gbc_lblDescription);
-    
+
     descriptionScrollPane = new JScrollPane();
-    descriptionScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    descriptionScrollPane
+        .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     GridBagConstraints gbc_descriptionScrollPane = new GridBagConstraints();
     gbc_descriptionScrollPane.gridwidth = 3;
     gbc_descriptionScrollPane.insets = new Insets(0, 0, 5, 5);
@@ -143,12 +146,12 @@ public class SpeedRunPanel extends EntityPanel
     gbc_descriptionScrollPane.gridx = 1;
     gbc_descriptionScrollPane.gridy = 2;
     add(descriptionScrollPane, gbc_descriptionScrollPane);
-    
+
     descriptionTextArea = new JTextArea();
     descriptionTextArea.setWrapStyleWord(true);
     descriptionTextArea.setLineWrap(true);
     descriptionScrollPane.setViewportView(descriptionTextArea);
-    
+
     lblSortingKey = new JLabel("Sorting Key:");
     GridBagConstraints gbc_lblSortingKey = new GridBagConstraints();
     gbc_lblSortingKey.anchor = GridBagConstraints.EAST;
@@ -156,7 +159,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_lblSortingKey.gridx = 0;
     gbc_lblSortingKey.gridy = 3;
     add(lblSortingKey, gbc_lblSortingKey);
-    
+
     sortKeyField = new JFormattedTextField(FormatUtils.getIntegerFormat());
     GridBagConstraints gbc_sortKeyField = new GridBagConstraints();
     gbc_sortKeyField.gridwidth = 2;
@@ -165,7 +168,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_sortKeyField.gridx = 1;
     gbc_sortKeyField.gridy = 3;
     add(sortKeyField, gbc_sortKeyField);
-    
+
     openPrizeButton = new JButton("Open Prize");
     GridBagConstraints gbc_openPrizeButton = new GridBagConstraints();
     gbc_openPrizeButton.fill = GridBagConstraints.HORIZONTAL;
@@ -173,7 +176,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_openPrizeButton.gridx = 6;
     gbc_openPrizeButton.gridy = 3;
     add(openPrizeButton, gbc_openPrizeButton);
-    
+
     lblStartTime = new JLabel("Start Time:");
     GridBagConstraints gbc_lblStartTime = new GridBagConstraints();
     gbc_lblStartTime.anchor = GridBagConstraints.EAST;
@@ -181,7 +184,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_lblStartTime.gridx = 0;
     gbc_lblStartTime.gridy = 4;
     add(lblStartTime, gbc_lblStartTime);
-    
+
     startTimeField = new TimeControl();
     GridBagConstraints gbc_startTimeField = new GridBagConstraints();
     gbc_startTimeField.gridwidth = 2;
@@ -190,7 +193,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_startTimeField.gridx = 1;
     gbc_startTimeField.gridy = 4;
     add(startTimeField, gbc_startTimeField);
-    
+
     lblPrizesToBe = new JLabel("Prizes to be drawn:");
     GridBagConstraints gbc_lblPrizesToBe = new GridBagConstraints();
     gbc_lblPrizesToBe.anchor = GridBagConstraints.EAST;
@@ -198,7 +201,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_lblPrizesToBe.gridx = 4;
     gbc_lblPrizesToBe.gridy = 4;
     add(lblPrizesToBe, gbc_lblPrizesToBe);
-    
+
     prizesScrollPane = new JScrollPane();
     GridBagConstraints gbc_prizesScrollPane = new GridBagConstraints();
     gbc_prizesScrollPane.fill = GridBagConstraints.BOTH;
@@ -208,11 +211,11 @@ public class SpeedRunPanel extends EntityPanel
     gbc_prizesScrollPane.gridx = 5;
     gbc_prizesScrollPane.gridy = 4;
     add(prizesScrollPane, gbc_prizesScrollPane);
-    
+
     prizeList = new JList();
     prizeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     prizesScrollPane.setViewportView(prizeList);
-    
+
     lblEndTime = new JLabel("End Time:");
     GridBagConstraints gbc_lblEndTime = new GridBagConstraints();
     gbc_lblEndTime.anchor = GridBagConstraints.EAST;
@@ -220,7 +223,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_lblEndTime.gridx = 0;
     gbc_lblEndTime.gridy = 5;
     add(lblEndTime, gbc_lblEndTime);
-    
+
     endTimeField = new TimeControl();
     GridBagConstraints gbc_endTimeField = new GridBagConstraints();
     gbc_endTimeField.gridwidth = 2;
@@ -229,7 +232,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_endTimeField.gridx = 1;
     gbc_endTimeField.gridy = 5;
     add(endTimeField, gbc_endTimeField);
-    
+
     saveButton = new JButton("Save");
     GridBagConstraints gbc_saveButton = new GridBagConstraints();
     gbc_saveButton.fill = GridBagConstraints.HORIZONTAL;
@@ -237,7 +240,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_saveButton.gridx = 1;
     gbc_saveButton.gridy = 6;
     add(saveButton, gbc_saveButton);
-    
+
     refreshButton = new JButton("Refresh");
     GridBagConstraints gbc_refreshButton = new GridBagConstraints();
     gbc_refreshButton.fill = GridBagConstraints.HORIZONTAL;
@@ -245,7 +248,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_refreshButton.gridx = 2;
     gbc_refreshButton.gridy = 6;
     add(refreshButton, gbc_refreshButton);
-    
+
     openBidButton = new JButton("Open Bid");
     GridBagConstraints gbc_openBidButton = new GridBagConstraints();
     gbc_openBidButton.fill = GridBagConstraints.HORIZONTAL;
@@ -253,7 +256,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_openBidButton.gridx = 2;
     gbc_openBidButton.gridy = 8;
     add(openBidButton, gbc_openBidButton);
-    
+
     newChoiceButton = new JButton("New Choice");
     GridBagConstraints gbc_newChoiceButton = new GridBagConstraints();
     gbc_newChoiceButton.fill = GridBagConstraints.HORIZONTAL;
@@ -261,7 +264,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_newChoiceButton.gridx = 3;
     gbc_newChoiceButton.gridy = 8;
     add(newChoiceButton, gbc_newChoiceButton);
-    
+
     newChallengeButton = new JButton("New Challenge");
     GridBagConstraints gbc_newChallengeButton = new GridBagConstraints();
     gbc_newChallengeButton.fill = GridBagConstraints.HORIZONTAL;
@@ -269,7 +272,7 @@ public class SpeedRunPanel extends EntityPanel
     gbc_newChallengeButton.gridx = 4;
     gbc_newChallengeButton.gridy = 8;
     add(newChallengeButton, gbc_newChallengeButton);
-    
+
     bidsScrollPane = new JScrollPane();
     GridBagConstraints gbc_bidsScrollPane = new GridBagConstraints();
     gbc_bidsScrollPane.gridwidth = 7;
@@ -277,12 +280,12 @@ public class SpeedRunPanel extends EntityPanel
     gbc_bidsScrollPane.gridx = 0;
     gbc_bidsScrollPane.gridy = 9;
     add(bidsScrollPane, gbc_bidsScrollPane);
-    
+
     bidTable = new JTable();
     bidTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     bidsScrollPane.setViewportView(bidTable);
   }
-  
+
   private class ActionHandler extends MouseAdapter implements ActionListener
   {
     public void actionPerformed(ActionEvent ev)
@@ -318,14 +321,14 @@ public class SpeedRunPanel extends EntityPanel
           SpeedRunPanel.this.openSelectedPrize();
         }
       }
-      catch(Exception e)
+      catch (Exception e)
       {
         e.printStackTrace();
         owner.report(e);
       }
     }
-    
-    public void mouseClicked(MouseEvent ev) 
+
+    public void mouseClicked(MouseEvent ev)
     {
       if (ev.getSource() == bidTable)
       {
@@ -343,11 +346,11 @@ public class SpeedRunPanel extends EntityPanel
       }
     }
   }
-  
+
   private void initializeGUIEvents()
   {
     this.actionHandler = new ActionHandler();
-    
+
     refreshButton.addActionListener(this.actionHandler);
     saveButton.addActionListener(this.actionHandler);
     openBidButton.addActionListener(this.actionHandler);
@@ -357,48 +360,39 @@ public class SpeedRunPanel extends EntityPanel
     bidTable.addMouseListener(this.actionHandler);
     prizeList.addMouseListener(this.actionHandler);
     this.openPrizeButton.addActionListener(this.actionHandler);
-    
-    this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(this.descriptionTextArea));
-    
+
+    this.descriptionTextArea.addKeyListener(new TabTraversalKeyListener(
+        this.descriptionTextArea));
+
     this.bidTable.addKeyListener(new TabTraversalKeyListener(this.bidTable));
-    
+
     this.tabOrder = new FocusTraversalManager(new Component[]
-    {
-      this.nameField,
-      this.runnersTextField,
-      this.descriptionTextArea,
-      this.sortKeyField,
-      this.startTimeField,
-      this.endTimeField,
-      this.saveButton,
-      this.refreshButton,
-      this.openBidButton,
-      this.newChoiceButton,
-      this.newChallengeButton,
-      this.bidTable,
-      this.openPrizeButton,
-      this.prizeList,
-    });
+    { this.nameField, this.runnersTextField, this.descriptionTextArea,
+        this.sortKeyField, this.startTimeField, this.endTimeField,
+        this.saveButton, this.refreshButton, this.openBidButton,
+        this.newChoiceButton, this.newChallengeButton, this.bidTable,
+        this.openPrizeButton, this.prizeList, });
     this.setFocusTraversalPolicy(this.tabOrder);
   }
 
   public SpeedRunPanel(MainWindow owner, SpeedRun data)
   {
     this.owner = owner;
-    this.speedRunControl = new EntityControlInstance<SpeedRun>(this.owner.getInstance().getEntityControl(SpeedRun.class), data);
+    this.speedRunControl = new EntityControlInstance<SpeedRun>(this.owner
+        .getInstance().getEntityControl(SpeedRun.class), data);
 
     this.initializeGUI();
     this.initializeGUIEvents();
-    
+
     this.refreshContent();
   }
-  
+
   public boolean isFocusCycleRoot()
   {
     return true;
   }
-  
-  public FocusTraversalPolicy getFocusTraversalPolicy() 
+
+  public FocusTraversalPolicy getFocusTraversalPolicy()
   {
     return this.tabOrder;
   }
@@ -408,24 +402,79 @@ public class SpeedRunPanel extends EntityPanel
   {
     return true;
   }
-  
+
   @Override
   public void refreshContent()
   {
     this.speedRunControl.refreshInstance();
 
+    SpeedRun data = this.speedRunControl.getInstance();
+
+    this.nameField.setText(data.getName());
+    this.runnersTextField.setText(data.getRunners());
+    this.descriptionTextArea.setText(data.getDescription());
+    this.sortKeyField.setText("" + data.getSortKey());
+    this.startTimeField.setTimeValue(data.getStartTime());
+    this.endTimeField.setTimeValue(data.getEndTime());
+
+    DefaultListModel prizeData = new DefaultListModel();
+
+    for (Prize p : data.getPrizeEndGame())
+    {
+      prizeData.addElement(p);
+    }
+
+    this.prizeList.setModel(prizeData);
+
+    CustomTableModel tableData = new CustomTableModel(new String[]
+    { "Bid", "Status", }, 0);
+
+    for (Bid b : new ArrayList<Bid>(data.getBids()))
+    {
+      String statusString = "";
+
+      if (b.bidType() == BidType.CHALLENGE)
+      {
+        statusString = "$" + ((Challenge) b).getTotalCollected();
+      }
+      else
+      {
+        List<String> strings = new ArrayList<String>();
+
+        for (ChoiceOption o : ((Choice) b).getOptions())
+        {
+          strings.add(o.getName() + " : $" + o.getTotalCollected().toString());
+        }
+
+        statusString = StringUtils.joinSeperated(strings, ", ");
+      }
+
+      tableData.addRow(new Object[]
+      { b, statusString, });
+    }
+
+    this.bidTable.setModel(tableData);
+
+    this.setHeaderText("Run: " + data.getName());
+
+    if (!this.speedRunControl.isValid())
+    {
+      this.owner.removeTab(this);
+      throw new RuntimeException("Error, this run no longer exists");
+    }
+
     this.redrawContent();
   }
-  
+
   private Prize getSelectedPrize()
   {
     return (Prize) this.prizeList.getSelectedValue();
   }
-  
+
   private void openSelectedPrize()
   {
     Prize p = this.getSelectedPrize();
-    
+
     if (p != null)
     {
       this.owner.openPrizeTab(p);
@@ -435,71 +484,44 @@ public class SpeedRunPanel extends EntityPanel
   @Override
   public void redrawContent()
   {
-    SpeedRun data = this.speedRunControl.getInstance();
-    
-    if (data == null)
+    if (!this.speedRunControl.isValid())
     {
       this.owner.removeTab(this);
       throw new RuntimeException("Error, this run no longer exists");
     }
     
-    this.nameField.setText(data.getName());
-    this.runnersTextField.setText(data.getRunners());
-    this.descriptionTextArea.setText(data.getDescription());
-    this.sortKeyField.setText("" + data.getSortKey());
-    this.startTimeField.setTimeValue(data.getStartTime());
-    this.endTimeField.setTimeValue(data.getEndTime());
-    
-    DefaultListModel prizeData = new DefaultListModel();
-    
-    for (Prize p : data.getPrizeEndGame())
-    {
-      prizeData.addElement(p);
-    }
-    
-    this.prizeList.setModel(prizeData);
-    
-    cachedRelatedBids = new ArrayList<Bid>(data.getBids());
-    
+    SpeedRun data = this.speedRunControl.getInstance();
+
     CustomTableModel tableData = new CustomTableModel(new String[]
-    {
-        "Bid",
-        "Status",
-    },0);
-    
-    for (Bid b : cachedRelatedBids)
+    { "Bid", "Status", }, 0);
+
+    for (Bid b : new ArrayList<Bid>(data.getBids()))
     {
       String statusString = "";
-      
+
       if (b.bidType() == BidType.CHALLENGE)
       {
-        statusString = "$" + ((Challenge)b).getTotalCollected();
+        statusString = "$" + ((Challenge) b).getTotalCollected();
       }
       else
       {
         List<String> strings = new ArrayList<String>();
-        
-        for (ChoiceOption o : ((Choice)b).getOptions())
+
+        for (ChoiceOption o : ((Choice) b).getOptions())
         {
           strings.add(o.getName() + " : $" + o.getTotalCollected().toString());
         }
-        
+
         statusString = StringUtils.joinSeperated(strings, ", ");
       }
-      
-      tableData.addRow(
-          new Object[]
-          {
-              b,
-              statusString,
-          });
+
+      tableData.addRow(new Object[]
+      { b, statusString, });
     }
-    
+
     this.bidTable.setModel(tableData);
-    
-    this.setHeaderText("Run: " + data.getName());
   }
-  
+
   public void saveContent()
   {
     SpeedRun data = this.speedRunControl.getInstance();
@@ -515,29 +537,31 @@ public class SpeedRunPanel extends EntityPanel
 
   public void deleteContent()
   {
-    int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this speed run?", "Confirm delete", JOptionPane.YES_NO_OPTION);
-    
+    int result = JOptionPane.showConfirmDialog(this,
+        "Are you sure you want to delete this speed run?", "Confirm delete",
+        JOptionPane.YES_NO_OPTION);
+
     if (result == JOptionPane.OK_OPTION)
     {
       this.speedRunControl.deleteInstance();
       this.owner.removeTab(this);
     }
   }
-  
+
   private void openSelectedBid()
   {
     int selectedRow = this.bidTable.getSelectedRow();
-    
+
     if (selectedRow != -1)
     {
-      Bid current = (Bid)this.bidTable.getValueAt(selectedRow, 0);
+      Bid current = (Bid) this.bidTable.getValueAt(selectedRow, 0);
       if (current.bidType() == BidType.CHOICE)
       {
-        this.owner.openChoiceTab((Choice)current);
+        this.owner.openChoiceTab((Choice) current);
       }
       else if (current.bidType() == BidType.CHALLENGE)
       {
-        this.owner.openChallengeTab((Challenge)current);
+        this.owner.openChallengeTab((Challenge) current);
       }
     }
   }
@@ -546,37 +570,46 @@ public class SpeedRunPanel extends EntityPanel
   {
     return this.speedRunControl.getInstance().getId();
   }
-  
+
   public void createNewChallenge()
   {
-    String result = JOptionPane.showInputDialog(this, "Please enter a challenge name...");
-    
+    String result = JOptionPane.showInputDialog(this,
+        "Please enter a challenge name...");
+
     if (result != null)
     {
       Challenge challenge = new Challenge();
       challenge.setSpeedRun(this.speedRunControl.getInstance());
       challenge.setName(result);
       this.speedRunControl.getInstance().getBids().add(challenge);
-      
-      this.speedRunControl.getControl().getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(Challenge.class), challenge);
-      
+
+      this.speedRunControl
+          .getControl()
+          .getDataAccess()
+          .saveInstance(MetaEntityReflector.getMetaEntity(Challenge.class),
+              challenge);
+
       this.owner.openChallengeTab(challenge);
     }
   }
 
   public void createNewChoice()
   {
-    String result = JOptionPane.showInputDialog(this, "Please enter a choice name...");
-    
+    String result = JOptionPane.showInputDialog(this,
+        "Please enter a choice name...");
+
     if (result != null)
     {
       Choice choice = new Choice();
       choice.setSpeedRun(this.speedRunControl.getInstance());
       choice.setName(result);
       this.speedRunControl.getInstance().getBids().add(choice);
-      
-      this.speedRunControl.getControl().getDataAccess().saveInstance(MetaEntityReflector.getMetaEntity(Choice.class), choice);
-      
+
+      this.speedRunControl
+          .getControl()
+          .getDataAccess()
+          .saveInstance(MetaEntityReflector.getMetaEntity(Choice.class), choice);
+
       this.owner.openChoiceTab(choice);
     }
   }

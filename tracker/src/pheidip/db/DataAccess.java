@@ -22,8 +22,8 @@ public interface DataAccess
   
   
   
-  <E extends Entity, S> Pair<Long, List<E>> searchEntityRange(MetaEntity instanceSpec, MetaSearchEntity searchSpec, S searchParams, int offset, int count);
-  <E extends Entity, S> List<E> searchEntity(MetaEntity instanceSpec, MetaSearchEntity searchSpec, S searchParams);
+  <E extends Entity, S> Pair<Long, List<E>> searchEntityRange(MetaEntity instanceSpec, MetaSearchEntity searchSpec, S searchParams, int offset, int count, String... ordering);
+  <E extends Entity, S> List<E> searchEntity(MetaEntity instanceSpec, MetaSearchEntity searchSpec, S searchParams, String... ordering);
   
   void connectToServer(DBConnectionParams params);
   void createMemoryConnection();

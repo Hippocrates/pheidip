@@ -2,35 +2,28 @@ package pheidip.ui;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JSpinner;
+import javax.swing.event.ChangeListener;
 
 import meta.format.NullableFormat;
 
 @SuppressWarnings("serial")
 public class DateSpinner extends JSpinner
 {
-  private Object cachedValue = null;
-  
   public DateSpinner(String simpleDateFormat)
   {
     Format formatter = new NullableFormat(new SimpleDateFormat(simpleDateFormat));
-    pheidip.ui.DateEditor editor = new pheidip.ui.DateEditor(formatter);
+    pheidip.ui.DateEditor editor = new pheidip.ui.DateEditor(formatter, this);
     
     this.setModel(editor);
     this.setEditor(editor);
   }
   
-  public Object getValue()
+  protected void fire(Date prev, Date curr)
   {
-    return super.getValue();
-  }
-  
-  public void setValue(Object value)
-  {
-    Object oldValue = cachedValue;
-    super.setValue(value);
-    this.firePropertyChange("value", oldValue, value);
-    this.cachedValue = value;
+    this.firePropertyChange("value", prev, curr);
+    
   }
 }

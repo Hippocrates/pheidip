@@ -317,6 +317,23 @@ public class DonationBidsPanel extends JPanel
       }
     }
   }
+  
+  private static BigDecimal amountBid(Donation target)
+  {
+    BigDecimal sum = BigDecimal.ZERO;
+    
+    for (DonationBid bid : target.getBids())
+    {
+      sum = sum.add(bid.getAmount());
+    }
+    
+    return sum;
+  }
+  
+  private static BigDecimal getRemainingToBid(Donation target)
+  {
+    return target.getAmount().subtract(amountBid(target));
+  }
 
   private void attachNewBid()
   {
@@ -326,7 +343,7 @@ public class DonationBidsPanel extends JPanel
     
     if (dialog.getSelectionType() != null)
     {
-      String amount = FormattedInputDialog.showDialog(this.owner, "Please enter a new amount to bid.", "Enter amount", FormatUtils.getMoneyFormat(), new BigDecimal("0.00").toString());
+      String amount = FormattedInputDialog.showDialog(this.owner, "Please enter a new amount to bid.", "Enter amount", FormatUtils.getMoneyFormat(), getRemainingToBid(this.donationControl.getInstance()).toString());
       
       if (!StringUtils.isEmptyOrNull(amount))
       {
