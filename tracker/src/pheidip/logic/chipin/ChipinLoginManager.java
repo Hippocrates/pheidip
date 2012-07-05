@@ -1,6 +1,11 @@
 package pheidip.logic.chipin;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
@@ -23,22 +28,34 @@ public class ChipinLoginManager
   
   private static final String SESSION_ID_COOKIE_NAME = "JSESSIONID";
   
+  private Map<String, ChipinDonation> knownDonations;
+  
   private String loginName;
   private String password;
   private String chipinId;
   private String sessionId;
   private Reporter reporter;
   
+  public void addKnownDonation(ChipinDonation donation)
+  {
+    this.knownDonations.put(donation.getChipinId(), donation);
+  }
   
+  public Map<String, ChipinDonation> getKnownDonations()
+  {
+    return Collections.unmodifiableMap(this.knownDonations);
+  }
+
   public ChipinLoginManager()
   {
-    this.sessionId = null;
+    this(null);
   }
   
   public ChipinLoginManager(Reporter reporter)
   {
     this.sessionId = null;
     this.reporter = reporter;
+    this.knownDonations = new HashMap<String, ChipinDonation>();
   }
   
   public boolean isLoggedIn()
@@ -61,6 +78,7 @@ public class ChipinLoginManager
       if (result.statusCode() == 200 && result.url().getFile().equals(SUCCESSFUL_LOGIN_TARGET))
       {
         this.sessionId = result.cookie(SESSION_ID_COOKIE_NAME);
+        this.knownDonations = new HashMap<String, ChipinDonation>();
       }
       else
       {
@@ -81,7 +99,7 @@ public class ChipinLoginManager
     this.loginName = loginName;
     this.password = password;
     this.chipinId = chipinId;
-    
+
     this.retryLogin();
   }
   
@@ -108,6 +126,7 @@ public class ChipinLoginManager
       try
       {
         logoutConnection.execute();
+        this.knownDonations = new HashMap<String, ChipinDonation>();
       } 
       catch (Exception e)
       {

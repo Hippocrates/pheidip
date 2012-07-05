@@ -135,17 +135,17 @@ create table Prize
   IMAGEURL varchar(255), 
   SORTKEY integer, 
   DESCRIPTION varchar(255), 
-  MINIMUMBID decimal(19,2),
   WINNER integer, 
   STARTGAME integer,
   ENDGAME integer,
+  DRAWMETHOD varchar(255) not null, 
+  MINIMUMBID decimal(19,2) not null,
   
   CONSTRAINT PrizeNameUnique UNIQUE(NAME),
   CONSTRAINT PrizeNameLowerCase CHECK(NAME = lower(NAME)),
   CONSTRAINT PrizeFKDonor FOREIGN KEY (WINNER) REFERENCES Donor (ID),
   CONSTRAINT PrizeFKSpeedRunStart FOREIGN KEY (STARTGAME) REFERENCES SPEEDRUN(ID),
   CONSTRAINT PrizeFKSpeedRunEnd FOREIGN KEY (ENDGAME) REFERENCES SPEEDRUN(ID),
-  -- CONSTRAINT PrizeSortKeyUnique UNIQUE(SORTKEY),
   
   CONSTRAINT PrizePK PRIMARY KEY(ID)
 );

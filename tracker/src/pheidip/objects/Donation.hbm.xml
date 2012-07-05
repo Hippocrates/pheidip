@@ -3,7 +3,7 @@
                                    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 18-Oct-2011 3:49:18 PM by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
- <class name="pheidip.objects.Donation" table="Donation" lazy="false">
+ <class lazy="false" name="pheidip.objects.Donation" table="Donation">
   <id name="id" type="int">
    <column name="ID"/>
    <generator class="assigned"/>
@@ -24,7 +24,8 @@
     <param name="enumClass">pheidip.objects.DonationDomain</param>
    </type>
   </property>
-  <property generated="never" lazy="false" name="domainId" type="java.lang.String" unique-key="DomainIDKey">
+  <property generated="never" lazy="false" name="domainId"
+   type="java.lang.String" unique-key="DomainIDKey">
    <column name="DOMAINID" not-null="true"/>
   </property>
   <property generated="never" lazy="false" name="bidState">

@@ -20,6 +20,7 @@ import java.awt.event.MouseAdapter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -386,7 +387,7 @@ public class DonationPanel extends EntityPanel
 
       this.amountField.setText(result.getAmount().toString());
       this.timeField.setText(result.getTimeReceived().toString());
-      
+
       this.amountField.setEnabled(true);
       this.commentTextArea.setEnabled(true);
       this.commentTextArea.setEditable(true);
